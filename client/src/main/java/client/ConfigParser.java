@@ -1,10 +1,7 @@
 package client;
 
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -29,18 +26,31 @@ public class ConfigParser {
      *
      * @return the config parser singleton instance
      */
-    public static ConfigParser createInstance() {
+    public static ConfigParser createInstance() throws IOException {
         if(parser == null) {
-            List<String> settings;
-            try {
-                BufferedReader reader = new BufferedReader(new FileReader(new File("../resources/config.txt")));
-                settings = reader.lines().toList();
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            List<String> settings = readConfig();
             parser = new ConfigParser(settings.get(0));
         }
         return parser;
+    }
+
+
+    /**
+     * Reads the settings of the config and returns them in a list
+     * If the config file does not exist, creates one with default values
+     *
+     * @return the list of settings
+     * @throws IOException if file can not be accessed
+     */
+    private static List<String> readConfig() throws IOException {
+        File file = new File("../resources/config.txt");
+        if(!file.exists()) {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write("http://localhost:8080/");
+            writer.flush();
+        }
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        return reader.lines().toList();
     }
 
     /**
