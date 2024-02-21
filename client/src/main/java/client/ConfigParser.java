@@ -3,6 +3,7 @@ package client;
 
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Interacts with the config file and stores the settings
@@ -11,7 +12,7 @@ import java.util.List;
 public class ConfigParser {
 
     private static ConfigParser parser;
-    private String url;
+    private final String url;
 
     /**
      * The constructor is private so multiple instances can't be created
@@ -29,7 +30,7 @@ public class ConfigParser {
     public static ConfigParser createInstance() throws IOException {
         if(parser == null) {
             List<String> settings = readConfig();
-            parser = new ConfigParser(settings.get(0));
+            parser = new ConfigParser(settings.getFirst());
         }
         return parser;
     }
@@ -37,19 +38,13 @@ public class ConfigParser {
 
     /**
      * Reads the settings of the config and returns them in a list
-     * If the config file does not exist, creates one with default values
      *
      * @return the list of settings
      * @throws IOException if file can not be accessed
      */
     private static List<String> readConfig() throws IOException {
-        String absolutePath = new File("").getAbsolutePath();
-        File file = new File(absolutePath + "/src/main/resources/client/config.properties");
-        if(!file.exists()) {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write("http://localhost:8080/");
-            writer.flush();
-        }
+        File file = new File(Objects.requireNonNull(ConfigParser.class.getClassLoader()
+                .getResource("client/config.properties")).getPath());
         BufferedReader reader = new BufferedReader(new FileReader(file));
         return reader.lines().toList();
     }
