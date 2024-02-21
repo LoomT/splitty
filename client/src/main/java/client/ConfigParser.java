@@ -43,7 +43,8 @@ public class ConfigParser {
      * @throws IOException if file can not be accessed
      */
     private static List<String> readConfig() throws IOException {
-        File file = new File("../resources/config.txt");
+        String absolutePath = new File("").getAbsolutePath();
+        File file = new File(absolutePath + "/src/main/resources/client/config.properties");
         if(!file.exists()) {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write("http://localhost:8080/");
