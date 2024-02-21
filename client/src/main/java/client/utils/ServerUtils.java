@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import client.ConfigParser;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -33,7 +34,15 @@ import jakarta.ws.rs.core.GenericType;
 
 public class ServerUtils {
 
-	private static final String SERVER = "http://localhost:8080/";
+	private static final String SERVER;
+
+    static {
+        try {
+            SERVER = ConfigParser.createInstance().getUrl();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 	public void getQuotesTheHardWay() throws IOException, URISyntaxException {
 		var url = new URI("http://localhost:8080/api/quotes").toURL();
