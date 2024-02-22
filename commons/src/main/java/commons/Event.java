@@ -34,7 +34,8 @@ public class Event {
     public Event(int eventID, String title, List<String> participants){
         this.eventID = eventID;
         this.title = title;
-        this.participants = CopyLtoAL(participants);
+        if(participants == null) this.participants = new ArrayList<String>();
+        else this.participants = CopyLtoAL(participants);
         this.creationDate = new Date();
     }
 
