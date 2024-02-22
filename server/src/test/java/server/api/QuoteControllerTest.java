@@ -62,7 +62,7 @@ public class QuoteControllerTest {
     @Test
     public void databaseIsUsed() {
         sut.add(getQuote("q1"));
-        repo.calledMethods.contains("save");
+        repo.getCalledMethods().contains("save");
     }
 
     private static Quote getQuote(String q) {
