@@ -117,7 +117,7 @@ public class TestQuoteRepository implements QuoteRepository {
     }
 
     private Optional<Quote> find(Long id) {
-        return quotes.stream().filter(q -> q.id == id).findFirst();
+        return quotes.stream().filter(q -> q.getId() == id).findFirst();
     }
 
     @Override
@@ -141,7 +141,7 @@ public class TestQuoteRepository implements QuoteRepository {
     @Override
     public <S extends Quote> S save(S entity) {
         call("save");
-        entity.id = (long) quotes.size();
+        entity.setId((long) quotes.size());
         quotes.add(entity);
         return entity;
     }

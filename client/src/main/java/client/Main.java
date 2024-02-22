@@ -33,10 +33,23 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
+    /**
+     * Main class
+     *
+     * @param args Runtime arguments
+     * @throws URISyntaxException if there is a URI syntax error
+     * @throws IOException if there is a problem with IO
+     */
     public static void main(String[] args) throws URISyntaxException, IOException {
         launch();
     }
 
+    /**
+     * Starts the application
+     *
+     * @param primaryStage stage
+     * @throws IOException IO exception
+     */
     @Override
     public void start(Stage primaryStage) throws IOException {
 
