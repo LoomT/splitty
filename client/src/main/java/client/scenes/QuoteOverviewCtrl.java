@@ -46,23 +46,41 @@ public class QuoteOverviewCtrl implements Initializable {
     @FXML
     private TableColumn<Quote, String> colQuote;
 
+    /**
+     * @param server server utilities
+     * @param mainCtrl main scene controller
+     */
     @Inject
     public QuoteOverviewCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
     }
 
+    /**
+     * Initializes the quote table
+     *
+     * @param location ¯\_(ツ)_/¯
+     * @param resources ¯\_(ツ)_/¯
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        colFirstName.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().person.firstName));
-        colLastName.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().person.lastName));
-        colQuote.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().quote));
+        colFirstName.setCellValueFactory(q ->
+                new SimpleStringProperty(q.getValue().getPerson().getFirstName()));
+        colLastName.setCellValueFactory(q ->
+                new SimpleStringProperty(q.getValue().getPerson().getLastName()));
+        colQuote.setCellValueFactory(q -> new SimpleStringProperty(q.getValue().getQuote()));
     }
 
+    /**
+     * Display quote add scene
+     */
     public void addQuote() {
         mainCtrl.showAdd();
     }
 
+    /**
+     * Refresh the table with quotes from the server
+     */
     public void refresh() {
         var quotes = server.getQuotes();
         data = FXCollections.observableList(quotes);

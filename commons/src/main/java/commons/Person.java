@@ -29,35 +29,66 @@ import jakarta.persistence.Id;
 @Entity
 public class Person {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-	public String firstName;
-	public String lastName;
+    private String firstName;
+    private String lastName;
 
-	@SuppressWarnings("unused")
-	private Person() {
-		// for object mapper
-	}
+    /**
+     * for object mappers
+     */
+    @SuppressWarnings("unused")
+    public Person() {
+    }
 
-	public Person(String firstName, String lastName) {
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
+    /**
+     * person constructor
+     *
+     * @param firstName First name
+     * @param lastName Last name
+     */
+    public Person(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		return EqualsBuilder.reflectionEquals(this, obj);
-	}
+    /**
+     * @param obj to test against
+     * @return true if equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
 
-	@Override
-	public int hashCode() {
-		return HashCodeBuilder.reflectionHashCode(this);
-	}
+    /**
+     * @return hash code of this
+     */
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+    /**
+     * @return String representation of this
+     */
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
+    }
 
-	@Override
-	public String toString() {
-		return ToStringBuilder.reflectionToString(this, MULTI_LINE_STYLE);
-	}
+    /**
+     * @return first name
+     */
+    public String getFirstName() {
+        return firstName;
+    }
+
+    /**
+     * @return last name
+     */
+    public String getLastName() {
+        return lastName;
+    }
 }
