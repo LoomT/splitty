@@ -19,7 +19,6 @@ import static com.google.inject.Guice.createInjector;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Locale;
 
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
@@ -53,7 +52,19 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
+        LanguageConf.onLanguageChange(()->{
+            System.out.println("reloading");
+            loadLanguageResourcesAndStart(primaryStage);
+        });
 
+        loadLanguageResourcesAndStart(primaryStage);
+    }
+
+    /**
+     * loads/reloads the page with the new language resources
+     * @param primaryStage the primary stage
+     */
+    public void loadLanguageResourcesAndStart(Stage primaryStage) {
         //var overview = FXML.load(QuoteOverviewCtrl.class,
         // "client", "scenes", "QuoteOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
@@ -65,8 +76,5 @@ public class Main extends Application {
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, start);
-        System.out.println(Locale.getDefault().getDisplayLanguage());
-        System.out.println(Locale.ENGLISH);
-
     }
 }

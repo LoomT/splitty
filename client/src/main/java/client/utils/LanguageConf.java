@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+
 public class LanguageConf {
 
 
 
     private static final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
     private static Locale currentLocale = Locale.of("en");
+    private static Runnable callback = null;
     private static ResourceBundle currentBundle = getCurrentResourceBundle();
 
     /**
@@ -39,6 +41,7 @@ public class LanguageConf {
 
         currentLocale = newLocale;
         currentBundle = getCurrentResourceBundle();
+        callback.run();
         System.out.println("Language changed to " + newLocaleString);
     }
 
@@ -65,5 +68,12 @@ public class LanguageConf {
             localesString.add(l.getLanguage());
         }
         return localesString;
+    }
+
+    /**
+     * @param function sets the callback for the language change
+     */
+    public static void onLanguageChange(Runnable function) {
+        callback = function;
     }
 }
