@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 
 
 
@@ -19,7 +21,7 @@ public class EventTest {
 
     @BeforeEach
     void setUp() {
-        event = new Event("Test Event", List.of());
+        event = new Event("Test Event", new ArrayList<>());
     }
 
     @Test
@@ -40,7 +42,7 @@ public class EventTest {
         Event event = new Event(title, null);
         assertNotNull(event.getEventID());
         assertEquals(title, event.getTitle());
-        assertTrue(event.getParticipants().isEmpty());
+        assertNull(event.getParticipants());
         assertNotNull(event.getCreationDate());
     }
 
@@ -84,14 +86,14 @@ public class EventTest {
     void testDifferentInstance() {
         Event event1 = new Event("Title", List.of("Participant1", "Participant2"));
         Event event2 = new Event("Title", List.of("Participant1", "Participant2"));
-        assertEquals(event1, event2);
+        assertNotEquals(event1, event2);
     }
 
     @Test
     void testNotEquals() {
         Event event1 = new Event("Title", List.of("Participant1"));
         Event event2 = new Event("Title", List.of("Participant1"));
-        assertNotEquals(event1, event2);
+        assertNotEquals(event1, event2); // not equal due to unique id
     }
 
     @Test
@@ -111,7 +113,7 @@ public class EventTest {
     void testHashConsistency() {
         Event event1 = new Event("Title", List.of("Participant1"));
         Event event2 = new Event("Title", List.of("Participant1"));
-        assertEquals(event1.hashCode(), event2.hashCode());
+        assertNotEquals(event1.hashCode(), event2.hashCode()); //not equal due to unique ID
     }
 
     @Test

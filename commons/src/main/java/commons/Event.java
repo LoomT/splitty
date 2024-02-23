@@ -6,7 +6,8 @@ public class Event {
       Properties:
       Int EventID to join an event (getter + set once in constructor)
       String title to easily differentiate two events (getter and setter)
-      List<Participants> to store all active participants of an event (get, remove, edit and add method)
+      List<Participants> to store all
+      active participants of an event (get, remove, edit and add method)
       Date creationDate to store the date of creation (getter + set once in constructor)
 
       Methods:
@@ -23,7 +24,7 @@ public class Event {
 
     private String title;
 
-    private ArrayList<String> participants;
+    private List<String> participants;
 
 //    private ArrayList<Expense> expenses;
 
@@ -38,24 +39,23 @@ public class Event {
     public Event(String title, List<String> participants){
         this.eventID = generateUniqueId();
         this.title = title;
-        if(participants == null) this.participants = new ArrayList<String>();
-        else this.participants = listToArrayList(participants);
+        this.participants = participants;
         this.creationDate = new Date();
     }
 
-    /**
-     * Method to copy list to Array List
-     *
-     * @param participants list
-     * @return array list
-     */
-    public ArrayList<String> listToArrayList(List<String> participants){
-        ArrayList<String> result = new ArrayList<String>();
-        for(String x : participants){
-            result.add(x);
-        }
-        return result;
-    }
+//    /**
+//     * Method to copy list to Array List
+//     *
+//     * @param participants list
+//     * @return array list
+//     */
+//    public ArrayList<String> listToArrayList(List<String> participants){
+//        ArrayList<String> result = new ArrayList<String>();
+//        for(String x : participants){
+//            result.add(x);
+//        }
+//        return result;
+//    }
 
 
     /**
@@ -82,15 +82,30 @@ public class Event {
         return lastId;
     }
 
-
+    /**
+     * Getter for Title
+     *
+     * @return string
+     */
     public String getTitle(){
         return this.title;
     }
+
+    /**
+     * Setter for title
+     *
+     * @param title string
+     */
 
     public void setTitle(String title){
         this.title = title;
     }
 
+    /**
+     * getter for creation date
+     *
+     * @return the date
+     */
     public Date getCreationDate() {
         return creationDate;
     }
@@ -102,9 +117,7 @@ public class Event {
      */
 
     public void deleteParticipant(String participant){
-        if (getParticipants().contains(participant)){
-            getParticipants().remove(participant);
-        }
+        this.participants.remove(participant);
     }
 
     /**
@@ -114,12 +127,24 @@ public class Event {
      */
 
     public void addParticipant(String participant){
-        getParticipants().add(participant);
+        this.participants.add(participant);
     }
 
-    public ArrayList<String> getParticipants() {
+    /**
+     * getter for Participants
+     *
+     * @return participants
+     */
+
+    public List<String> getParticipants() {
         return participants;
     }
+
+    /**
+     * Setter for participants
+     *
+     * @param participants list of participants
+     */
 
     public void setParticipants(ArrayList<String> participants) {
         this.participants = participants;
