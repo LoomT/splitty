@@ -3,11 +3,22 @@ package commons;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.*;
 
 
 public class EventTest {
+
+    private Event event;
+
+    @BeforeEach
+    void setUp() {
+        event = new Event("Test Event", List.of());
+    }
 
     @Test
     public void EventGetterTest(){
@@ -40,7 +51,6 @@ public class EventTest {
 
     @Test
     void testNotEquals() {
-        // This test assumes eventIDs are set differently which should be the case by design
         Event event1 = new Event("Title", List.of("Participant1"));
         Event event2 = new Event("Title", List.of("Participant1"));
         assertNotEquals(event1, event2);
@@ -64,5 +74,37 @@ public class EventTest {
         Event event1 = new Event("Title", List.of("Participant1"));
         Event event2 = new Event("Title", List.of("Participant1"));
         assertEquals(event1.hashCode(), event2.hashCode());
+    }
+
+    @Test
+    void addingParticipantTest() {
+        String participant = "Person123";
+        event.addParticipant(participant);
+        assertTrue(event.getParticipants().contains(participant));
+    }
+
+    @Test
+    void testDeleteParticipant() {
+        String participant = "Person123";
+        event.addParticipant(participant);
+        event.deleteParticipant(participant);
+        assertFalse(event.getParticipants().contains(participant));
+    }
+
+    @Test
+    void testDeleteNothing() {
+        String participant = "Person123";
+        event.deleteParticipant(participant);
+        assertFalse(event.getParticipants().contains(participant));
+    }
+
+    @Test
+    void testParticipantList() {
+        String participant1 = "Person123";
+        String participant2 = "Person123";
+        event.addParticipant(participant1);
+        event.addParticipant(participant2);
+        event.deleteParticipant(participant1);
+        assertTrue(event.getParticipants().contains(participant2) && event.getParticipants().size() == 1);
     }
 }
