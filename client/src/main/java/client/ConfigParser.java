@@ -40,13 +40,17 @@ public class ConfigParser {
      * Reads the settings of the config and returns them in a list
      *
      * @return the list of settings
-     * @throws IOException if file can not be accessed
+     * @throws IOException if config file can not be accessed
      */
     private static List<String> readConfig() throws IOException {
         File file = new File(Objects.requireNonNull(ConfigParser.class.getClassLoader()
                 .getResource("client/config.properties")).getPath());
-        BufferedReader reader = new BufferedReader(new FileReader(file));
-        return reader.lines().toList();
+
+        // try with resources auto-closes the resource
+        try(FileReader fileReader = new FileReader(file)) {
+            BufferedReader reader = new BufferedReader(fileReader);
+            return reader.lines().toList();
+        }
     }
 
     /**
