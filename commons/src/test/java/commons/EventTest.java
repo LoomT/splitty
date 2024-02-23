@@ -97,6 +97,17 @@ public class EventTest {
     }
 
     @Test
+    void testEqualsWithoutId(){
+        Event event1 = new Event("Title", List.of("Participant1", "Participant2"));
+        Event event2 = new Event("Title", List.of("Participant1", "Participant2"));
+        assertEquals(event1.getTitle(), event2.getTitle());
+        assertEquals(event1.getParticipants().size(), event2.getParticipants().size());
+        for(int i = 0; i < event1.getParticipants().size(); i++){
+            assertEquals(event1.getParticipants().get(i), event2.getParticipants().get(i));
+        }
+    }
+
+    @Test
     void testNull() {
         Event event = new Event("Title", List.of("Participant1"));
         assertNotEquals(null, event);
