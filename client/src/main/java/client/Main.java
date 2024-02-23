@@ -19,8 +19,10 @@ import static com.google.inject.Guice.createInjector;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Locale;
 
 import client.scenes.StartScreenCtrl;
+import client.utils.LanguageConf;
 import com.google.inject.Injector;
 
 import client.scenes.MainCtrl;
@@ -55,9 +57,16 @@ public class Main extends Application {
         //var overview = FXML.load(QuoteOverviewCtrl.class,
         // "client", "scenes", "QuoteOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
-        var start = FXML.load(StartScreenCtrl.class, "client", "scenes", "StartScreen.fxml");
+        var start = FXML.load(
+                StartScreenCtrl.class,
+                LanguageConf.getLanguageResources(),
+                "client", "scenes", "StartScreen.fxml"
+        );
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, start);
+        System.out.println(Locale.getDefault().getDisplayLanguage());
+        System.out.println(Locale.ENGLISH);
+
     }
 }
