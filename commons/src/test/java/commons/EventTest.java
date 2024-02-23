@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,42 @@ public class EventTest {
     @BeforeEach
     void setUp() {
         event = new Event("Test Event", List.of());
+    }
+
+    @Test
+    void testConstructor() {
+        String title = "Test Event";
+        List<String> participants = Arrays.asList("Person1", "Person2");
+        Event event = new Event(title, participants);
+        assertNotNull(event.getEventID());
+        assertEquals(title, event.getTitle());
+        assertEquals(participants.size(), event.getParticipants().size());
+        assertTrue(event.getParticipants().containsAll(participants));
+        assertNotNull(event.getCreationDate());
+    }
+
+    @Test
+    void testConstructorNullParticipants() {
+        String title = "Test Event";
+        Event event = new Event(title, null);
+        assertNotNull(event.getEventID());
+        assertEquals(title, event.getTitle());
+        assertTrue(event.getParticipants().isEmpty());
+        assertNotNull(event.getCreationDate());
+    }
+
+    @Test
+    void testEventIDUnique() {
+        Event event1 = new Event("Event 1", List.of("Participant 1"));
+        Event event2 = new Event("Event 2", List.of("Participant 2"));
+        assertNotEquals(event1.getEventID(), event2.getEventID());
+    }
+
+    @Test
+    void testCreationDate() {
+        Event event = new Event("Test Event", List.of("John Doe"));
+        assertNotNull(event.getCreationDate());
+        assertTrue(event.getCreationDate().getTime() <= System.currentTimeMillis());
     }
 
     @Test
