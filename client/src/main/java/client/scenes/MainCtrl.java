@@ -25,10 +25,10 @@ public class MainCtrl {
 
     private Stage primaryStage;
 
-    private QuoteOverviewCtrl overviewCtrl;
+    //private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
 
-    private AddQuoteCtrl addCtrl;
+    //private AddQuoteCtrl addCtrl;
     private Scene add;
 
     private StartScreenCtrl startScreenCtrl;
@@ -69,18 +69,18 @@ public class MainCtrl {
     /**
      * Display overview
      */
-    public void showOverview() {
-        primaryStage.setTitle("Quotes: Overview");
-        primaryStage.setScene(overview);
-        overviewCtrl.refresh();
-    }
-
-    /**
-     * display adding quote scene
-     */
-    public void showAdd() {
-        primaryStage.setTitle("Quotes: Adding Quote");
-        primaryStage.setScene(add);
-        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-    }
+//    public void showOverview() {
+//        primaryStage.setTitle("Quotes: Overview");
+//        primaryStage.setScene(overview);
+//        overviewCtrl.refresh();
+//    }
+//
+//    /**
+//     * display adding quote scene
+//     */
+//    public void showAdd() {
+//        primaryStage.setTitle("Quotes: Adding Quote");
+//        primaryStage.setScene(add);
+//        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
+//    }
 }
