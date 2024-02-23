@@ -39,6 +39,7 @@ public class MainCtrl {
      * @param primaryStage stage
      //* @param overview controller and parent
      //* @param add controller and parent
+     * @param startScreen controller and scene
      */
     public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen) {
         this.primaryStage = primaryStage;
@@ -56,6 +57,9 @@ public class MainCtrl {
         primaryStage.show();
     }
 
+    /**
+     * Display start screen
+     */
     public void showStartScreen() {
         primaryStage.setTitle("Start Screen");
         primaryStage.setScene(startScreen);
