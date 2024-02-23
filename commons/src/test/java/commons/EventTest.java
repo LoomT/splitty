@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class EventTest {
 
@@ -23,5 +26,14 @@ public class EventTest {
         assertEquals("title", test.getTitle());
         test.setTitle("newTitle");
         assertEquals("newTitle", test.getTitle());
+    }
+
+    @Test
+    public void ParticipantsAddTest(){
+        Event test = new Event(1, "title", null);
+        test.addParticipant("participant");
+        List<String> list = new ArrayList<String>();
+        list.add("participant");
+        Event compare = new Event(1, "title", list);
     }
 }

@@ -62,4 +62,38 @@ public class Event {
     public Date getCreationDate() {
         return creationDate;
     }
+
+    public ArrayList<String> getParticipants(){
+        return participants;
+    }
+
+    public String getParticipant(int index){
+        if(participants == null || participants.size() <= index) return null;
+        else return participants.get(index);
+    }
+
+    public void editParticipant(int index, String editedParticipant){
+        if(participants == null || participants.size() <= index) throw new IndexOutOfBoundsException();
+        participants.set(index, editedParticipant);
+    }
+
+    public void removeParticipant(int index){
+        if(participants == null || participants.size() <= index) throw new IndexOutOfBoundsException();
+        participants.remove(index);
+    }
+
+    public void addParticipant(String newParticipant){
+        participants.add(newParticipant);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if(other == null || this.getClass() != other.getClass()) return false;
+        Event that = (Event) other;
+        if(this.participants.size() != that.participants.size()) return false;
+        for(int i = 0; i < this.participants.size(); i++){
+            if(this.participants.get(i).equals(that.participants.get(i))) return false;
+        }
+        return this.eventID == that.eventID;
+    }
 }
