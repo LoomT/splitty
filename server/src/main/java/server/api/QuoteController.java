@@ -36,16 +36,29 @@ public class QuoteController {
     private final Random random;
     private final QuoteRepository repo;
 
+    /**
+     * quote controller constructor
+     *
+     * @param random instance
+     * @param repo instance
+     */
     public QuoteController(Random random, QuoteRepository repo) {
         this.random = random;
         this.repo = repo;
     }
 
+    /**
+     * @return all quotes
+     */
     @GetMapping(path = { "", "/" })
     public List<Quote> getAll() {
         return repo.findAll();
     }
 
+    /**
+     * @param id of quote
+     * @return the quote with the provided id
+     */
     @GetMapping("/{id}")
     public ResponseEntity<Quote> getById(@PathVariable("id") long id) {
         if (id < 0 || !repo.existsById(id)) {
@@ -54,11 +67,18 @@ public class QuoteController {
         return ResponseEntity.ok(repo.findById(id).get());
     }
 
+    /**
+     * Adds the quote to the database
+     *
+     * @param quote quote to add
+     * @return added quote
+     */
     @PostMapping(path = { "", "/" })
     public ResponseEntity<Quote> add(@RequestBody Quote quote) {
 
-        if (quote.person == null || isNullOrEmpty(quote.person.firstName) || isNullOrEmpty(quote.person.lastName)
-                || isNullOrEmpty(quote.quote)) {
+        if (quote.getPerson() == null || isNullOrEmpty(quote.getPerson().getFirstName())
+                || isNullOrEmpty(quote.getPerson().getLastName())
+                || isNullOrEmpty(quote.getQuote())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -66,10 +86,17 @@ public class QuoteController {
         return ResponseEntity.ok(saved);
     }
 
+    /**
+     * @param s string
+     * @return true iff s is null or empty
+     */
     private static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
     }
 
+    /**
+     * @return a random quote from the database
+     */
     @GetMapping("rnd")
     public ResponseEntity<Quote> getRandom() {
         var quotes = repo.findAll();
