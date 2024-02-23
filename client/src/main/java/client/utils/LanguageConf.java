@@ -15,11 +15,15 @@ public class LanguageConf {
     private static Runnable callback = null;
     private static ResourceBundle currentBundle = getCurrentResourceBundle();
 
+
     /**
-     * @return the current locale
+     * Use this function when you need to display language dependent text
+     * that is not in the fxml file. (Such as the title)
+     * @param key The key of the property in the language properties file
+     * @return the value of the key in the currently set language
      */
-    public static Locale getCurrentLocale() {
-        return currentLocale;
+    public static String get(String key) {
+        return currentBundle.getString(key);
     }
 
     /**

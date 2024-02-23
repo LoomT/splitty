@@ -61,10 +61,14 @@ public class Main extends Application {
     }
 
     /**
-     * loads/reloads the page with the new language resources
+     * Loads/reloads the page with the resources.
+     * IMPORTANT: put all the FXML loading in this function, as when the language is changed,
+     * this is the function that is rerun to reload the different language bundle.
      * @param primaryStage the primary stage
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {
+        // Load all the FXML here:
+
         //var overview = FXML.load(QuoteOverviewCtrl.class,
         // "client", "scenes", "QuoteOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");

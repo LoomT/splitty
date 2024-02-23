@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.utils.LanguageConf;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -61,7 +62,7 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        primaryStage.setTitle("Start Screen");
+        primaryStage.setTitle(LanguageConf.get("StartScreen.title"));
         primaryStage.setScene(startScreen);
     }
 
