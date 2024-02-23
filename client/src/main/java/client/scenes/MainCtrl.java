@@ -30,24 +30,35 @@ public class MainCtrl {
     private AddQuoteCtrl addCtrl;
     private Scene add;
 
+    private StartScreenCtrl startScreenCtrl;
+    private Scene startScreen;
+
     /**
      * Initializes the UI
      *
      * @param primaryStage stage
-     * @param overview controller and parent
-     * @param add controller and parent
+     //* @param overview controller and parent
+     //* @param add controller and parent
      */
-    public void initialize(Stage primaryStage, Pair<QuoteOverviewCtrl, Parent> overview,
-            Pair<AddQuoteCtrl, Parent> add) {
+    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen) {
         this.primaryStage = primaryStage;
-        this.overviewCtrl = overview.getKey();
-        this.overview = new Scene(overview.getValue());
+        //this.overviewCtrl = overview.getKey();
+        //this.overview = new Scene(overview.getValue());
 
-        this.addCtrl = add.getKey();
-        this.add = new Scene(add.getValue());
+        //this.addCtrl = add.getKey();
+        //this.add = new Scene(add.getValue());
 
-        showOverview();
+        this.startScreenCtrl = startScreen.getKey();
+        this.startScreen = new Scene(startScreen.getValue());
+
+        //showOverview();
+        showStartScreen();
         primaryStage.show();
+    }
+
+    public void showStartScreen() {
+        primaryStage.setTitle("Start Screen");
+        primaryStage.setScene(startScreen);
     }
 
     /**
