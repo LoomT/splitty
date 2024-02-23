@@ -8,7 +8,7 @@ import java.util.*;
 public class Participant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id; //ID of participant should be determined systematically
     @OneToMany(cascade = CascadeType.PERSIST)
     private Set<Expense> expenseList;
