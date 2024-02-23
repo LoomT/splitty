@@ -19,7 +19,7 @@ public class Expense {
     Date date for the exact date when the expense was paid
     Boolean splitMethod, 0 - equally among all participant, 1 - only a part of them
     List<String> participants for all the people that are splitting the expense
-    String type for the type of the current expense
+    String type for the type of the current created expense
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
