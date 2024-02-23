@@ -31,194 +31,335 @@ import server.database.QuoteRepository;
 
 public class TestQuoteRepository implements QuoteRepository {
 
-    public final List<Quote> quotes = new ArrayList<>();
-    public final List<String> calledMethods = new ArrayList<>();
+    private final List<Quote> quotes = new ArrayList<>();
+    private final List<String> calledMethods = new ArrayList<>();
 
+    /**
+     * @return called methods
+     */
+    public List<String> getCalledMethods() {
+        return calledMethods;
+    }
+
+    /**
+     * @param name name
+     */
     private void call(String name) {
         calledMethods.add(name);
     }
 
+    /**
+     * @return all quotes
+     */
     @Override
     public List<Quote> findAll() {
         calledMethods.add("findAll");
         return quotes;
     }
 
+    /**
+     * @param sort sort
+     * @return list
+     */
     @Override
     public List<Quote> findAll(Sort sort) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param ids to find by
+     * @return list
+     */
     @Override
     public List<Quote> findAllById(Iterable<Long> ids) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param entities to save
+     * @param <S> clas
+     * @return list of saved
+     */
     @Override
     public <S extends Quote> List<S> saveAll(Iterable<S> entities) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * flush
+     */
     @Override
     public void flush() {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param entity entity
+     * @param <S> class
+     * @return saved entity
+     */
     @Override
     public <S extends Quote> S saveAndFlush(S entity) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param entities to save
+     * @param <S> class
+     * @return list
+     */
     @Override
     public <S extends Quote> List<S> saveAllAndFlush(Iterable<S> entities) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param entities to delete
+     */
     @Override
     public void deleteAllInBatch(Iterable<Quote> entities) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param ids to delete by
+     */
     @Override
     public void deleteAllByIdInBatch(Iterable<Long> ids) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * delete
+     */
     @Override
     public void deleteAllInBatch() {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param id id
+     * @return quote
+     */
     @Override
     public Quote getOne(Long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param id id
+     * @return quote
+     */
     @Override
     public Quote getById(Long id) {
         call("getById");
         return find(id).get();
     }
 
+    /**
+     * @param id id
+     * @return quote
+     */
     @Override
     public Quote getReferenceById(Long id) {
         call("getReferenceById");
         return find(id).get();
     }
 
+    /**
+     * @param id id
+     * @return quote
+     */
     private Optional<Quote> find(Long id) {
-        return quotes.stream().filter(q -> q.id == id).findFirst();
+        return quotes.stream().filter(q -> q.getId() == id).findFirst();
     }
 
+    /**
+     * @param example entity
+     * @param <S> class
+     * @return list
+     */
     @Override
     public <S extends Quote> List<S> findAll(Example<S> example) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param example entity
+     * @param sort sort
+     * @param <S> class
+     * @return list of quotes
+     */
     @Override
     public <S extends Quote> List<S> findAll(Example<S> example, Sort sort) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param pageable p
+     * @return page
+     */
     @Override
     public Page<Quote> findAll(Pageable pageable) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * Saves an entity to the database
+     *
+     * @param entity to save
+     * @param <S> class of entity
+     * @return saved entity
+     */
     @Override
     public <S extends Quote> S save(S entity) {
         call("save");
-        entity.id = (long) quotes.size();
+        entity.setId((long) quotes.size());
         quotes.add(entity);
         return entity;
     }
 
+    /**
+     * @param id id
+     * @return quote
+     */
     @Override
     public Optional<Quote> findById(Long id) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param id to search
+     * @return true if present
+     */
     @Override
     public boolean existsById(Long id) {
         call("existsById");
         return find(id).isPresent();
     }
 
+    /**
+     * @return the amount of quotes
+     */
     @Override
     public long count() {
         return quotes.size();
     }
 
+    /**
+     * @param id to delete by
+     */
     @Override
     public void deleteById(Long id) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param entity to delete
+     */
     @Override
     public void delete(Quote entity) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param ids to delete by
+     */
     @Override
     public void deleteAllById(Iterable<? extends Long> ids) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param entities to delete
+     */
     @Override
     public void deleteAll(Iterable<? extends Quote> entities) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * delete everything
+     */
     @Override
     public void deleteAll() {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * @param example entity
+     * @param <S> class
+     * @return quote
+     */
     @Override
     public <S extends Quote> Optional<S> findOne(Example<S> example) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param example entity
+     * @param pageable p
+     * @param <S> class
+     * @return page
+     */
     @Override
     public <S extends Quote> Page<S> findAll(Example<S> example, Pageable pageable) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    /**
+     * @param example entity
+     * @param <S> class
+     * @return count
+     */
     @Override
     public <S extends Quote> long count(Example<S> example) {
         // TODO Auto-generated method stub
         return 0;
     }
 
+    /**
+     * @param example entity
+     * @param <S> class
+     * @return true iff exists
+     */
     @Override
     public <S extends Quote> boolean exists(Example<S> example) {
         // TODO Auto-generated method stub
         return false;
     }
 
+    /**
+     * @param example entity
+     * @param queryFunction function
+     * @param <S> class
+     * @param <R> a
+     * @return a
+     */
     @Override
-    public <S extends Quote, R> R findBy(Example<S> example, Function<FetchableFluentQuery<S>, R> queryFunction) {
+    public <S extends Quote, R> R findBy(Example<S> example,
+                                         Function<FetchableFluentQuery<S>, R> queryFunction) {
         // TODO Auto-generated method stub
         return null;
     }
