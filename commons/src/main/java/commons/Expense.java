@@ -2,6 +2,8 @@ package commons;
 
 
 import jakarta.persistence.*;
+import org.jetbrains.annotations.*;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -24,47 +26,60 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "expense_id")
-    private final int expenseID;
-    @Column(name = "partipant")
-    private String participant;
+    private int expenseID;
+    @Column(name = "expenseAuthor")
+    @NotNull
+    private String expenseAuthor;
     @Column(name = "purpose")
+    @NotNull
     private String purpose;
     @Column(name = "amount")
+    @NotNull
     private double amount;
     @Column(name = "currency")
+    @NotNull
     private String currency;
     @Column(name = "date")
     @Temporal(TemporalType.TIMESTAMP)
-    private final Date date;
-    @ElementCollection
-    @CollectionTable(name = "expense_participants", joinColumns = @JoinColumn(name = "expense_id"))
+    @NotNull
+    private Date date;
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL)
     @Column(name = "participant")
-    private List<String> participants;
+    private List<String> expenseParticipants;
     @Column(name = "type")
+    @NotNull
     private String type;
 
     /**
      * constructor for Expense class
      * @param expenseID
-     * @param participant
+     * @param expenseAuthor
      * @param purpose
      * @param amount
      * @param currency
      * @param date
-     * @param participants
+     * @param expenseParticipants
      * @param type
      */
-    public Expense(int expenseID, String participant, String purpose, double amount,
-                   String currency, Date date, List<String> participants, String type) {
+    public Expense(int expenseID, String expenseAuthor, String purpose, double amount,
+                   String currency, Date date, List<String> expenseParticipants, String type) {
         this.expenseID = expenseID;
-        this.participant = participant;
+        this.expenseAuthor = expenseAuthor;
         this.purpose = purpose;
         this.amount = amount;
         this.currency = currency;
         this.date = date;
-        this.participants = participants;
+        this.expenseParticipants = expenseParticipants;
         this.type = type;
     }
+
+    /**
+     * no arg constructor for the Expense class
+     */
+    public Expense() {
+
+    }
+
 
     /**
      * getter for expenseID
@@ -78,8 +93,8 @@ public class Expense {
      * getter for participant
      * @return the participant
      */
-    public String getParticipant() {
-        return participant;
+    public String getExpenseAuthor() {
+        return expenseAuthor;
     }
 
     /**
@@ -118,8 +133,8 @@ public class Expense {
      * getter for the list of participants
      * @return the list of participants
      */
-    public List<String> getParticipants() {
-        return participants;
+    public List<String> getExpenseParticipants() {
+        return expenseParticipants;
     }
 
     /**
@@ -134,8 +149,8 @@ public class Expense {
      * setter for participant
      * @param participant
      */
-    public void setParticipant(String participant) {
-        this.participant = participant;
+    public void setExpenseAuthor(String participant) {
+        this.expenseAuthor = expenseAuthor;
     }
 
     /**
@@ -182,11 +197,11 @@ public class Expense {
         Expense expense = (Expense) o;
         return expenseID == expense.expenseID
                 && Double.compare(expense.amount, amount) == 0
-                && Objects.equals(participant, expense.participant)
+                && Objects.equals(expenseAuthor, expense.expenseAuthor)
                 && Objects.equals(purpose, expense.purpose)
                 && Objects.equals(currency, expense.currency)
                 && Objects.equals(date, expense.date)
-                && Objects.equals(participants, expense.participants)
+                && Objects.equals(expenseParticipants, expense.expenseParticipants)
                 && Objects.equals(type, expense.type);
     }
 
@@ -196,7 +211,7 @@ public class Expense {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(expenseID, participant, purpose,
-                amount, currency, date, participants, type);
+        return Objects.hash(expenseID, expenseAuthor, purpose,
+                amount, currency, date, expenseParticipants, type);
     }
 }
