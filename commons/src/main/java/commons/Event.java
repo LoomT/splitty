@@ -43,21 +43,6 @@ public class Event {
         this.creationDate = new Date();
     }
 
-//    /**
-//     * Method to copy list to Array List
-//     *
-//     * @param participants list
-//     * @return array list
-//     */
-//    public ArrayList<String> listToArrayList(List<String> participants){
-//        ArrayList<String> result = new ArrayList<String>();
-//        for(String x : participants){
-//            result.add(x);
-//        }
-//        return result;
-//    }
-
-
     /**
      * Getter for the unique EventID
      *
@@ -146,7 +131,7 @@ public class Event {
      * @param participants list of participants
      */
 
-    public void setParticipants(ArrayList<String> participants) {
+    public void setParticipants(List<String> participants) {
         this.participants = participants;
     }
 
