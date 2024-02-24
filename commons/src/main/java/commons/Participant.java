@@ -10,6 +10,10 @@ public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long expenseID;
+
+    /**
+     * constructor for dummy class Participant
+     */
     public Participant() {
     }
 }
