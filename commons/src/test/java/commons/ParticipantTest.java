@@ -1,5 +1,6 @@
 package commons;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -10,15 +11,23 @@ class ParticipantTest {
 
     Participant participant1 = new Participant("participant1");
     Participant participant2 = new Participant("participant2");
+    Expense expense;
     Set<Expense> testSet = new HashSet<>();
-    Expense expense = new Expense(2, 32, "created for tests",
-            "test", participant1, participant2);
+    @BeforeEach
+    public void testSetup(){
+        List<Participant> expenseParticipants = new ArrayList<>();
+        expenseParticipants.add(participant1);
+        expenseParticipants.add(participant2);
+        Expense expense = new Expense(participant1, "test", 32,
+                "EUR", expenseParticipants, "type");
+    }
+
 
     /**
      * tests the getName function
      */
     @Test
-    void getName() {
+    void getNameTest() {
         assertEquals(participant1.getName(), "participant1");
     }
 
@@ -26,7 +35,7 @@ class ParticipantTest {
      * tests the setName function
      */
     @Test
-    void setName() {
+    void setNameTest() {
         participant1.setName("participant");
         assertEquals(participant1.getName(), "participant");
     }
@@ -35,18 +44,18 @@ class ParticipantTest {
      * tests the getExpenseList function
      */
     @Test
-    void getExpenseList() {
-        assertEquals(participant1.getExpenseList(),new HashSet<>());
+    void getExpenseListTest() {
+        assertEquals(participant1.getExpenseSet(),new HashSet<>());
     }
 
     /**
      * tests the setExpenseList function
      */
     @Test
-    void setExpenseList() {
+    void setExpenseListTest() {
         testSet.add(expense);
-        participant1.setExpenseList(testSet);
-        assertEquals(participant1.getExpenseList(),testSet);
+        participant1.setExpenseSet(testSet);
+        assertEquals(participant1.getExpenseSet(),testSet);
     }
 
     /**
@@ -55,9 +64,9 @@ class ParticipantTest {
      * isn't in the ExpenseList.
      */
     @Test
-    void addExpenseTrue() {
-        Expense testExpense = new Expense(3, 15, "test2",
-                "testExpense2", participant1, participant2);
+    void addExpenseWhenTrue() {
+        Expense testExpense = new Expense(participant2, "test2", 45,
+                "EUR", new ArrayList<>(), "type"); // different from expense
         assertTrue(participant1.addExpense(testExpense));
     }
 
@@ -67,7 +76,7 @@ class ParticipantTest {
      * is in the ExpenseList.
      */
     @Test
-    void addExpenseFalse() {
+    void addExpenseWhenFalse() {
         participant1.addExpense(expense);
         assertFalse(participant1.addExpense(expense));
     }

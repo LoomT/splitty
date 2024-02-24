@@ -11,17 +11,17 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id; //ID of participant should be determined systematically
     @OneToMany(cascade = CascadeType.PERSIST)
-    private Set<Expense> expenseList;
+    private Set<Expense> expenseSet;
     private String name;
 
     /**
      * Use this constructed if the participant already has expenses
      * @param name name of participant
-     * @param expenseList expenses the participant has already acquired
+     * @param expenseSet expenses the participant has already acquired
      */
-    public Participant(String name, Set<Expense> expenseList) {
+    public Participant(String name, Set<Expense> expenseSet) {
         this.name = name;
-        this.expenseList = expenseList;
+        this.expenseSet = expenseSet;
     }
 
     /**
@@ -37,7 +37,7 @@ public class Participant {
      */
     public Participant(String name) {
         this.name = name;
-        this.expenseList = new HashSet<>();
+        this.expenseSet = new HashSet<>();
     }
 
     /**
@@ -76,16 +76,16 @@ public class Participant {
      * getter for expenses
      * @return the expenses of the participant
      */
-    public Set<Expense> getExpenseList() {
-        return expenseList;
+    public Set<Expense> getExpenseSet() {
+        return expenseSet;
     }
 
     /**
      *
-     * @param expenseList setter for the expenses
+     * @param expenseSet setter for the expenses
      */
-    public void setExpenseList(Set<Expense> expenseList) {
-        this.expenseList = expenseList;
+    public void setExpenseSet(Set<Expense> expenseSet) {
+        this.expenseSet = expenseSet;
     }
 
 
@@ -96,8 +96,8 @@ public class Participant {
      * Otherwise, it adds the expense to the expenseList and returns true.
      */
     public boolean addExpense(Expense expense) {
-        if(expense == null || expenseList.contains(expense)) return false;
-        expenseList.add(expense);
+        if(expense == null || expenseSet.contains(expense)) return false;
+        expenseSet.add(expense);
         return true;
     }
 
@@ -115,7 +115,7 @@ public class Participant {
 
         if (id != that.id) return false;
         if (!Objects.equals(name, that.name)) return false;
-        return Objects.equals(expenseList, that.expenseList);
+        return Objects.equals(expenseSet, that.expenseSet);
     }
 
     /**
@@ -126,7 +126,7 @@ public class Participant {
     public int hashCode() {
         long result = id;
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (expenseList != null ? expenseList.hashCode() : 0);
+        result = 31 * result + (expenseSet != null ? expenseSet.hashCode() : 0);
         return (int) result;
     }
 }
