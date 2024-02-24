@@ -52,23 +52,20 @@ public class Expense {
 
     /**
      * constructor for Expense class
-     * @param expenseID
      * @param expenseAuthor
      * @param purpose
      * @param amount
      * @param currency
-     * @param date
      * @param expenseParticipants
      * @param type
      */
-    public Expense(int expenseID, String expenseAuthor, String purpose, double amount,
-                   String currency, Date date, List<String> expenseParticipants, String type) {
-        this.expenseID = expenseID;
+    public Expense(String expenseAuthor, String purpose, double amount,
+                   String currency, List<String> expenseParticipants, String type) {
         this.expenseAuthor = expenseAuthor;
         this.purpose = purpose;
         this.amount = amount;
         this.currency = currency;
-        this.date = date;
+        this.date = new Date();
         this.expenseParticipants = expenseParticipants;
         this.type = type;
     }
