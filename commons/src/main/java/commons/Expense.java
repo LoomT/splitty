@@ -12,7 +12,7 @@ public class Expense {
     /*
     Properties:
     Int expenseID so that one can reuse this type of expense
-    String participant for the person that paid
+    String participant for the person that paid the expense
     String purpose for the purpose of the existent expense
     Double amount for the amount paid by the participant
     String currency for the currency that was used then
