@@ -29,7 +29,7 @@ public class EventTest {
         String title = "Test Event";
         List<String> participants = Arrays.asList("Person1", "Person2");
         Event event = new Event(title, participants);
-        assertNotNull(event.getEventID());
+        assertNotEquals(event.getEventID(), 0);
         assertEquals(title, event.getTitle());
         assertEquals(participants.size(), event.getParticipants().size());
         assertTrue(event.getParticipants().containsAll(participants));
@@ -40,7 +40,7 @@ public class EventTest {
     void testConstructorNullParticipants() {
         String title = "Test Event";
         Event event = new Event(title, null);
-        assertNotNull(event.getEventID());
+        assertNotNull(event);
         assertEquals(title, event.getTitle());
         assertNull(event.getParticipants());
         assertNotNull(event.getCreationDate());
@@ -79,7 +79,9 @@ public class EventTest {
     @Test
     void testSameInstance() {
         Event event = new Event("Title", List.of("Participant1", "Participant2"));
-        assertEquals(event, event);
+        Event event1;
+        event1 = event;
+        assertEquals(event1, event);
     }
 
     @Test
@@ -97,7 +99,7 @@ public class EventTest {
     }
 
     @Test
-    void testEqualsWithoutId(){
+    void testEqualityWithoutId(){
         Event event1 = new Event("Title", List.of("Participant1", "Participant2"));
         Event event2 = new Event("Title", List.of("Participant1", "Participant2"));
         assertEquals(event1.getTitle(), event2.getTitle());
@@ -132,6 +134,19 @@ public class EventTest {
         String participant = "Person123";
         event.addParticipant(participant);
         assertTrue(event.getParticipants().contains(participant));
+    }
+
+    @Test
+    void settingParticipantTest(){
+        List<String> testList = new ArrayList<>();
+        testList.add("Participant1");
+        testList.add("Participant2");
+        testList.add("Participant3");
+        testList.add("Participant4");
+        Event event1 = new Event("title", null);
+        event1.setParticipants(testList);
+        Event event2 = new Event("title", testList);
+        assertEquals(event1.getParticipants(), event2.getParticipants());
     }
 
     @Test
