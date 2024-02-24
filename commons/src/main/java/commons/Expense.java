@@ -26,7 +26,7 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "expense_id")
-    private int expenseID;
+    private long expenseID;
     @Column(name = "expenseAuthor")
     @NotNull
     private String expenseAuthor;
@@ -43,7 +43,7 @@ public class Expense {
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
-    @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "expense", cascade = CascadeType.PERSIST)
     @Column(name = "participant")
     private List<String> expenseParticipants;
     @Column(name = "type")
@@ -82,7 +82,7 @@ public class Expense {
      * getter for expenseID
      * @return the expenseID
      */
-    public int getExpenseID() {
+    public long getExpenseID() {
         return expenseID;
     }
 
