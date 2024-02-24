@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "expenses")
 public class Expense {
     /*
     Properties:
@@ -25,28 +24,21 @@ public class Expense {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "expense_id")
     private long expenseID;
-    @Column(name = "expenseAuthor")
     @NotNull
-    private String expenseAuthor;
-    @Column(name = "purpose")
+    @ManyToOne
+    private Participant expenseAuthor;
     @NotNull
     private String purpose;
-    @Column(name = "amount")
     @NotNull
     private double amount;
-    @Column(name = "currency")
     @NotNull
     private String currency;
-    @Column(name = "date")
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
-    @OneToMany(mappedBy = "expense", cascade = CascadeType.PERSIST)
-    @Column(name = "participant")
-    private List<String> expenseParticipants;
-    @Column(name = "type")
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    private List<Participant> expenseParticipants;
     @NotNull
     private String type;
 
@@ -59,8 +51,8 @@ public class Expense {
      * @param expenseParticipants
      * @param type
      */
-    public Expense(String expenseAuthor, String purpose, double amount,
-                   String currency, List<String> expenseParticipants, String type) {
+    public Expense(Participant expenseAuthor, String purpose, double amount,
+                   String currency, List<Participant> expenseParticipants, String type) {
         this.expenseAuthor = expenseAuthor;
         this.purpose = purpose;
         this.amount = amount;
@@ -90,7 +82,7 @@ public class Expense {
      * getter for participant
      * @return the participant
      */
-    public String getExpenseAuthor() {
+    public Participant getExpenseAuthor() {
         return expenseAuthor;
     }
 
@@ -130,7 +122,7 @@ public class Expense {
      * getter for the list of participants
      * @return the list of participants
      */
-    public List<String> getExpenseParticipants() {
+    public List<Participant> getExpenseParticipants() {
         return expenseParticipants;
     }
 
