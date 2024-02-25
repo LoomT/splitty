@@ -9,17 +9,21 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ParticipantTest {
 
-    Participant participant1 = new Participant("participant1");
-    Participant participant2 = new Participant("participant2");
+    Participant participant1;
+    Participant participant2;
     Expense expense;
-    Set<Expense> testSet = new HashSet<>();
+    List<Expense> testSet;
     @BeforeEach
     public void testSetup(){
+        participant1 = new Participant("participant1");
+        participant2 = new Participant("participant2");
+        testSet = new ArrayList<>();
         List<Participant> expenseParticipants = new ArrayList<>();
         expenseParticipants.add(participant1);
         expenseParticipants.add(participant2);
-        Expense expense = new Expense(participant1, "test", 32,
+        expense = new Expense(participant1, "test", 32,
                 "EUR", expenseParticipants, "type");
+
     }
 
 
@@ -45,7 +49,7 @@ class ParticipantTest {
      */
     @Test
     void getExpenseListTest() {
-        assertEquals(participant1.getExpenseSet(),new HashSet<>());
+        assertEquals(participant1.getAttributedExpenseList(),new ArrayList<>());
     }
 
     /**
@@ -54,8 +58,8 @@ class ParticipantTest {
     @Test
     void setExpenseListTest() {
         testSet.add(expense);
-        participant1.setExpenseSet(testSet);
-        assertEquals(participant1.getExpenseSet(),testSet);
+        participant1.setAttributedExpenseList(testSet);
+        assertEquals(participant1.getAttributedExpenseList(),testSet);
     }
 
     /**
@@ -105,5 +109,11 @@ class ParticipantTest {
     void testHashCode() {
         Participant participant3 = new Participant("participant2");
         assertEquals(participant2.hashCode(), participant3.hashCode());
+    }
+
+    @Test
+    void testHashRecursion() {
+        participant1.addExpense(expense);
+        expense.hashCode();
     }
 }

@@ -11,17 +11,17 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id; //ID of participant should be determined systematically
     @OneToMany(cascade = CascadeType.PERSIST)
-    private Set<Expense> expenseSet;
+    private List<Expense> attributedExpenseList;
     private String name;
 
     /**
      * Use this constructed if the participant already has expenses
      * @param name name of participant
-     * @param expenseSet expenses the participant has already acquired
+     * @param attributedExpenseList expenses the participant has already acquired
      */
-    public Participant(String name, Set<Expense> expenseSet) {
+    public Participant(String name, List<Expense> attributedExpenseList) {
         this.name = name;
-        this.expenseSet = expenseSet;
+        this.attributedExpenseList = attributedExpenseList;
     }
 
     /**
@@ -37,7 +37,7 @@ public class Participant {
      */
     public Participant(String name) {
         this.name = name;
-        this.expenseSet = new HashSet<>();
+        this.attributedExpenseList = new ArrayList<>();
     }
 
     /**
@@ -76,16 +76,16 @@ public class Participant {
      * getter for expenses
      * @return the expenses of the participant
      */
-    public Set<Expense> getExpenseSet() {
-        return expenseSet;
+    public List<Expense> getAttributedExpenseList() {
+        return attributedExpenseList;
     }
 
     /**
      *
-     * @param expenseSet setter for the expenses
+     * @param attributedExpenseList setter for the expenses
      */
-    public void setExpenseSet(Set<Expense> expenseSet) {
-        this.expenseSet = expenseSet;
+    public void setAttributedExpenseList(List<Expense> attributedExpenseList) {
+        this.attributedExpenseList = attributedExpenseList;
     }
 
 
@@ -96,8 +96,8 @@ public class Participant {
      * Otherwise, it adds the expense to the expenseList and returns true.
      */
     public boolean addExpense(Expense expense) {
-        if(expense == null || expenseSet.contains(expense)) return false;
-        expenseSet.add(expense);
+        if(expense == null || attributedExpenseList.contains(expense)) return false;
+        attributedExpenseList.add(expense);
         return true;
     }
 
@@ -115,7 +115,7 @@ public class Participant {
 
         if (id != that.id) return false;
         if (!Objects.equals(name, that.name)) return false;
-        return Objects.equals(expenseSet, that.expenseSet);
+        return Objects.equals(attributedExpenseList, that.attributedExpenseList);
     }
 
     /**
@@ -124,10 +124,8 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        long result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (expenseSet != null ? expenseSet.hashCode() : 0);
-        return (int) result;
+        return Objects.hash(id, name, attributedExpenseList);
+
     }
 }
 
