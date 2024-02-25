@@ -45,47 +45,6 @@ class ParticipantTest {
     }
 
     /**
-     * tests the getExpenseList function
-     */
-    @Test
-    void getExpenseListTest() {
-        assertEquals(participant1.getAttributedExpenseList(),new ArrayList<>());
-    }
-
-    /**
-     * tests the setExpenseList function
-     */
-    @Test
-    void setExpenseListTest() {
-        testSet.add(expense);
-        participant1.setAttributedExpenseList(testSet);
-        assertEquals(participant1.getAttributedExpenseList(),testSet);
-    }
-
-    /**
-     * tests the setExpense function when an Expense can be added.
-     * The function returns true if Expense isn't null and the Expense itself
-     * isn't in the ExpenseList.
-     */
-    @Test
-    void addExpenseWhenTrue() {
-        Expense testExpense = new Expense(participant2, "test2", 45,
-                "EUR", new ArrayList<>(), "type"); // different from expense
-        assertTrue(participant1.addExpense(testExpense));
-    }
-
-    /**
-     * tests the setExpense function when an Expense can be added.
-     * The function returns false if Expense is null or Expense itself
-     * is in the ExpenseList.
-     */
-    @Test
-    void addExpenseWhenFalse() {
-        participant1.addExpense(expense);
-        assertFalse(participant1.addExpense(expense));
-    }
-
-    /**
      * tests the true case for the equals function
      */
     @Test
@@ -109,11 +68,5 @@ class ParticipantTest {
     void testHashCode() {
         Participant participant3 = new Participant("participant2");
         assertEquals(participant2.hashCode(), participant3.hashCode());
-    }
-
-    @Test
-    void testHashRecursion() {
-        participant1.addExpense(expense);
-        expense.hashCode();
     }
 }

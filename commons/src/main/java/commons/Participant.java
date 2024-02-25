@@ -9,20 +9,8 @@ public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id; //ID of participant should be determined systematically
-    @OneToMany(cascade = CascadeType.PERSIST)
-    private List<Expense> attributedExpenseList;
+    private long id;
     private String name;
-
-    /**
-     * Use this constructed if the participant already has expenses
-     * @param name name of participant
-     * @param attributedExpenseList expenses the participant has already acquired
-     */
-    public Participant(String name, List<Expense> attributedExpenseList) {
-        this.name = name;
-        this.attributedExpenseList = attributedExpenseList;
-    }
 
     /**
      * constructor
@@ -31,13 +19,10 @@ public class Participant {
     }
 
     /**\
-     * Use this constructed if the participant is known to
-     * not have any expenses
      * @param name name of participant
      */
     public Participant(String name) {
         this.name = name;
-        this.attributedExpenseList = new ArrayList<>();
     }
 
     /**
@@ -73,35 +58,6 @@ public class Participant {
     }
 
     /**
-     * getter for expenses
-     * @return the expenses of the participant
-     */
-    public List<Expense> getAttributedExpenseList() {
-        return attributedExpenseList;
-    }
-
-    /**
-     *
-     * @param attributedExpenseList setter for the expenses
-     */
-    public void setAttributedExpenseList(List<Expense> attributedExpenseList) {
-        this.attributedExpenseList = attributedExpenseList;
-    }
-
-
-    /**
-     * adds an expense to the expenseList
-     * @param expense the expense to be added to the expenseList
-     * @return false if expense is null, or it is already in expenseList.
-     * Otherwise, it adds the expense to the expenseList and returns true.
-     */
-    public boolean addExpense(Expense expense) {
-        if(expense == null || attributedExpenseList.contains(expense)) return false;
-        attributedExpenseList.add(expense);
-        return true;
-    }
-
-    /**
      *
      * @param o object to be compared to
      * @return true iff all the parameters are the same, false otherwise
@@ -114,8 +70,7 @@ public class Participant {
         Participant that = (Participant) o;
 
         if (id != that.id) return false;
-        if (!Objects.equals(name, that.name)) return false;
-        return Objects.equals(attributedExpenseList, that.attributedExpenseList);
+        return Objects.equals(name, that.name);
     }
 
     /**
@@ -124,8 +79,7 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, attributedExpenseList);
-
+        return Objects.hash(id, name);
     }
 }
 
