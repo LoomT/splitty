@@ -1,6 +1,9 @@
 package commons;
 import java.util.*;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "events")
 public class Event {
     /*
       Properties:
@@ -20,27 +23,45 @@ public class Event {
       hashing method
 
       */
-    private final int eventID;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int eventID;
 
+    @Column(name = "title", nullable = false)
     private String title;
 
+    @ElementCollection
+    @CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "participant")
     private List<String> participants;
 
 //    private ArrayList<Expense> expenses;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "creation_date")
     private final Date creationDate;
 
     /**
-     * Constructor for an event instance
-     *
-     * @param title Event Title
-     * @param participants list of participants
+     * No-Argument Constructor
+     * Required by JPA
      */
-    public Event(String title, List<String> participants){
-        this.eventID = generateUniqueId();
+
+    public Event() {
+        this.creationDate = new Date();
+    }
+
+    /**
+     * Constructor that does take arguments, uses this()
+     *
+     * @param title string
+     * @param participants list of strings (going to be
+     *                     participant objects in the future)
+     */
+
+    public Event(String title, List<String> participants) {
+        this();
         this.title = title;
         this.participants = participants;
-        this.creationDate = new Date();
     }
 
     /**
@@ -50,21 +71,6 @@ public class Event {
      */
     public int getEventID(){
         return this.eventID;
-    }
-
-    private static int lastId = 9999;
-
-    /**
-     * Unique ID generator
-     * Cannot generate unlimited uniqueIDs
-     * @return integer
-     */
-    public static int generateUniqueId() {
-        lastId = (lastId + 1) % 100000;
-        if (lastId < 10000) {
-            lastId = 10000;
-        }
-        return lastId;
     }
 
     /**
@@ -96,13 +102,14 @@ public class Event {
     }
 
     /**
-     * Deletes a participant from the list of participants
-     *
-     * @param participant String (In the future probably a participant object)
+     * Delete participant function
+     * @param participant takes a
+     *                    participant (going to be an object in the future)
+     * @return boolean value
      */
 
-    public void deleteParticipant(String participant){
-        this.participants.remove(participant);
+    public boolean deleteParticipant(String participant){
+        return getParticipants().remove(participant);
     }
 
     /**
