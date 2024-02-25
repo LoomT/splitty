@@ -32,9 +32,8 @@ public class Event {
 
     @ElementCollection
     @CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
-    @Column(name = "participant")
+    @Column(name = "participant", nullable = false)
     private List<String> participants;
-
 //    private ArrayList<Expense> expenses;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -61,16 +60,7 @@ public class Event {
     public Event(String title, List<String> participants) {
         this();
         this.title = title;
-        this.participants = participants;
-    }
-
-    /**
-     * Getter for the unique EventID
-     *
-     * @return integer
-     */
-    public int getEventID(){
-        return this.eventID;
+        this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
     }
 
     /**
@@ -144,6 +134,7 @@ public class Event {
 
     /**
      * Equals method that checks whether two instances are equal
+     * Does not take the unique eventID into consideration
      *
      * @param obj another object
      * @return boolean value
@@ -157,10 +148,9 @@ public class Event {
             return false;
         }
         Event other = (Event) obj;
-        return eventID == other.eventID &&
-                Objects.equals(title, other.title) &&
-                Objects.equals(participants, other.participants) &&
-                Objects.equals(creationDate, other.creationDate);
+        return Objects.equals(title, other.title) &&
+                Objects.equals(participants, other.participants); // &&
+                // Objects.equals(creationDate, other.creationDate);
     }
 
     /**
@@ -170,6 +160,6 @@ public class Event {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(eventID, title, participants, creationDate);
+        return Objects.hash(title, participants, creationDate);
     }
 }

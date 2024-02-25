@@ -8,11 +8,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 
+/*
+
+Important to consider, the hash consistency and the eventId
+uniqueness cannot be tested without persisting entities yet
+should be implemented in the future.
+
+
+ */
 
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.*;
+import jakarta.persistence.*;
 
 
 public class EventTest {
@@ -29,7 +38,6 @@ public class EventTest {
         String title = "Test Event";
         List<String> participants = Arrays.asList("Person1", "Person2");
         Event event = new Event(title, participants);
-        assertNotEquals(event.getEventID(), 0);
         assertEquals(title, event.getTitle());
         assertEquals(participants.size(), event.getParticipants().size());
         assertTrue(event.getParticipants().containsAll(participants));
@@ -42,16 +50,11 @@ public class EventTest {
         Event event = new Event(title, null);
         assertNotNull(event);
         assertEquals(title, event.getTitle());
-        assertNull(event.getParticipants());
+        assertNotNull(event.getParticipants());
+        assertTrue(event.getParticipants().isEmpty());
         assertNotNull(event.getCreationDate());
     }
 
-    @Test
-    void testEventIDUnique() {
-        Event event1 = new Event("Event 1", List.of("Participant 1"));
-        Event event2 = new Event("Event 2", List.of("Participant 2"));
-        assertNotEquals(event1.getEventID(), event2.getEventID());
-    }
 
     @Test
     void testCreationDate() {
@@ -88,14 +91,7 @@ public class EventTest {
     void testDifferentInstance() {
         Event event1 = new Event("Title", List.of("Participant1", "Participant2"));
         Event event2 = new Event("Title", List.of("Participant1", "Participant2"));
-        assertNotEquals(event1, event2);
-    }
-
-    @Test
-    void testNotEquals() {
-        Event event1 = new Event("Title", List.of("Participant1"));
-        Event event2 = new Event("Title", List.of("Participant1"));
-        assertNotEquals(event1, event2); // not equal due to unique id
+        assertEquals(event1, event2);
     }
 
     @Test
@@ -108,6 +104,7 @@ public class EventTest {
             assertEquals(event1.getParticipants().get(i), event2.getParticipants().get(i));
         }
     }
+
 
     @Test
     void testNull() {
@@ -126,7 +123,9 @@ public class EventTest {
     void testHashConsistency() {
         Event event1 = new Event("Title", List.of("Participant1"));
         Event event2 = new Event("Title", List.of("Participant1"));
-        assertNotEquals(event1.hashCode(), event2.hashCode()); //not equal due to unique ID
+        assertEquals(event1.hashCode(), event2.hashCode()); // should be equal due to unique ID not
+        // taken into consideration
+        //can later be tested differently when object persistence is implemented with a database
     }
 
     @Test
