@@ -30,10 +30,10 @@ public class Event {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @ElementCollection
+    @OneToMany
     @CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
     @Column(name = "participant", nullable = false)
-    private List<String> participants;
+    private List<Participant> participants;
 //    private ArrayList<Expense> expenses;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -57,7 +57,7 @@ public class Event {
      *                     participant objects in the future)
      */
 
-    public Event(String title, List<String> participants) {
+    public Event(String title, List<Participant> participants) {
         this();
         this.title = title;
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
@@ -98,7 +98,7 @@ public class Event {
      * @return boolean value
      */
 
-    public boolean deleteParticipant(String participant){
+    public boolean deleteParticipant(Participant participant){
         return getParticipants().remove(participant);
     }
 
@@ -108,7 +108,7 @@ public class Event {
      * @param participant String (In the future probably a participant object)
      */
 
-    public void addParticipant(String participant){
+    public void addParticipant(Participant participant){
         this.participants.add(participant);
     }
 
@@ -118,7 +118,7 @@ public class Event {
      * @return participants
      */
 
-    public List<String> getParticipants() {
+    public List<Participant> getParticipants() {
         return participants;
     }
 
@@ -128,7 +128,7 @@ public class Event {
      * @param participants list of participants
      */
 
-    public void setParticipants(List<String> participants) {
+    public void setParticipants(List<Participant> participants) {
         this.participants = participants;
     }
 
