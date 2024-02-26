@@ -6,32 +6,36 @@ import java.util.Properties;
 
 /**
  * Interacts with the config file and stores the settings
- * Follows singleton pattern
+ * Follows singleton design pattern
  */
-public class ConfigParser {
+public class UserConfig {
 
-    private static ConfigParser parser;
-    private final String configPath = Objects.requireNonNull(ConfigParser.class.getClassLoader()
+    private static UserConfig config;
+    private final String configPath = Objects.requireNonNull(UserConfig.class.getClassLoader()
             .getResource("client/config.properties")).getPath();
     private final Properties configProperties;
 
     /**
      * The constructor is private so multiple instances can't be created
      */
-    private ConfigParser() throws IOException {
+    private UserConfig() {
         configProperties = new Properties();
-        configProperties.load(new FileInputStream(configPath));
+        try {
+            configProperties.load(new FileInputStream(configPath));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to access the config file", e);
+        }
     }
     /**
      * Creates an instance of the parser
      *
      * @return the config parser singleton instance
      */
-    public static ConfigParser createInstance() throws IOException {
-        if(parser == null) {
-            parser = new ConfigParser();
+    public static UserConfig createInstance() {
+        if(config == null) {
+            config = new UserConfig();
         }
-        return parser;
+        return config;
     }
     /**
      * Returns the server URL from the config
@@ -55,10 +59,10 @@ public class ConfigParser {
      * Saves the locale to config file
      *
      * @param lang locale to save
-     * @throws IOException if config file can not be opened
+     * @throws IOException if config file can not be accessed
      */
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
-        configProperties.store(new FileOutputStream(configPath), null);
+        configProperties.store(new FileOutputStream(configPath), "Changed language to " + lang);
     }
 }

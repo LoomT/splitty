@@ -17,7 +17,6 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.glassfish.jersey.client.ClientConfig;
@@ -29,15 +28,7 @@ import jakarta.ws.rs.core.GenericType;
 
 public class ServerUtils {
 
-    private static final String SERVER;
-
-    static {
-        try {
-            SERVER = ConfigParser.createInstance().getUrl();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static final String SERVER = UserConfig.createInstance().getUrl();
 
     /**
      * Sends an API call to server for quotes

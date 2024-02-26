@@ -13,17 +13,8 @@ public class LanguageConf {
 
     private static final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
 
-    private static ConfigParser configParser;
-
-    static {
-        try {
-            configParser = ConfigParser.createInstance();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static Locale currentLocale = Locale.of(configParser.getLocale());
+    private static final UserConfig userConfig = UserConfig.createInstance();
+    private static Locale currentLocale = Locale.of(userConfig.getLocale());
 
     private static Runnable callback = null;
     private static ResourceBundle currentBundle = getCurrentResourceBundle();
@@ -61,7 +52,7 @@ public class LanguageConf {
         callback.run();
         System.out.println("Language changed to " + newLocaleString);
         try {
-            configParser.setLocale(newLocale.toString());
+            userConfig.setLocale(newLocale.toString());
         } catch (IOException ignored){}
     }
 
