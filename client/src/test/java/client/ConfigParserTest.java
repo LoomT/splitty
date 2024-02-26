@@ -1,17 +1,36 @@
 package client;
 
 import client.utils.ConfigParser;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConfigParserTest {
 
+    ConfigParser configParser;
 
+    {
+        try {
+            configParser = ConfigParser.createInstance();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to create an instance of config parser", e);
+        }
+    }
+
+    /**
+     * Reset the config parser to default properties before each test
+     */
+    @BeforeEach
+    void setUp() {
+        try {
+            configParser.setLocale("en");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to access the file while resetting locale",e);
+        }
+    }
     /**
      * Assert that the parser is created
      */
@@ -26,8 +45,20 @@ class ConfigParserTest {
     @Test
     void getUrl() throws IOException {
         ConfigParser parser = ConfigParser.createInstance();
-        String absolutePath = new File("").getAbsolutePath();
-        File file = new File(absolutePath + "/src/main/resources/client/config.properties");
-        assertEquals(new Scanner(file).nextLine().substring(10), parser.getUrl());
+        assertEquals("http://localhost:8080/", parser.getUrl());
+    }
+
+    @Test
+    void getLocale() throws IOException {
+        ConfigParser parser = ConfigParser.createInstance();
+        assertEquals("en", parser.getLocale());
+    }
+
+    @Test
+    void setLocale() throws IOException {
+        ConfigParser parser = ConfigParser.createInstance();
+        assertEquals("en", parser.getLocale());
+        parser.setLocale("nl");
+        assertEquals("nl", parser.getLocale());
     }
 }

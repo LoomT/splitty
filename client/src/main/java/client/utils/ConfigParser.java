@@ -1,6 +1,5 @@
 package client.utils;
 
-
 import java.io.*;
 import java.util.Objects;
 import java.util.Properties;
@@ -14,7 +13,7 @@ public class ConfigParser {
     private static ConfigParser parser;
     private final String configPath = Objects.requireNonNull(ConfigParser.class.getClassLoader()
             .getResource("client/config.properties")).getPath();
-    private Properties configProperties;
+    private final Properties configProperties;
 
     /**
      * The constructor is private so multiple instances can't be created
@@ -23,8 +22,6 @@ public class ConfigParser {
         configProperties = new Properties();
         configProperties.load(new FileInputStream(configPath));
     }
-
-
     /**
      * Creates an instance of the parser
      *
@@ -45,10 +42,21 @@ public class ConfigParser {
         return configProperties.getProperty("serverURL");
     }
 
+    /**
+     * Returns previously set locale from the config
+     *
+     * @return locale
+     */
     public String getLocale() {
         return configProperties.getProperty("lang");
     }
 
+    /**
+     * Saves the locale to config file
+     *
+     * @param lang locale to save
+     * @throws IOException if config file can not be opened
+     */
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
         configProperties.store(new FileOutputStream(configPath), null);

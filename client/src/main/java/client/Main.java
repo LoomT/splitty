@@ -17,9 +17,6 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
@@ -37,10 +34,8 @@ public class Main extends Application {
      * Main class
      *
      * @param args Runtime arguments
-     * @throws URISyntaxException if there is a URI syntax error
-     * @throws IOException        if there is a problem with IO
      */
-    public static void main(String[] args) throws URISyntaxException, IOException {
+    public static void main(String[] args){
         launch();
     }
 
@@ -48,12 +43,11 @@ public class Main extends Application {
      * Starts the application
      *
      * @param primaryStage stage
-     * @throws IOException IO exception
      */
     @Override
-    public void start(Stage primaryStage) throws IOException {
+    public void start(Stage primaryStage) {
         LanguageConf.onLanguageChange(() -> {
-            // When the language is changed, this funciton is run
+            // When the language is changed, this function is run
             loadLanguageResourcesAndStart(primaryStage);
         });
 
@@ -78,7 +72,6 @@ public class Main extends Application {
                 LanguageConf.getLanguageResources(),
                 "client", "scenes", "StartScreen.fxml"
         );
-
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, start);
     }
