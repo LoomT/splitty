@@ -12,6 +12,8 @@ import java.util.Properties;
 public class ConfigParser {
 
     private static ConfigParser parser;
+    private final String configPath = Objects.requireNonNull(ConfigParser.class.getClassLoader()
+            .getResource("client/config.properties")).getPath();
     private Properties configProperties;
 
     /**
@@ -19,8 +21,7 @@ public class ConfigParser {
      */
     private ConfigParser() throws IOException {
         configProperties = new Properties();
-        configProperties.load(new FileInputStream(Objects.requireNonNull(ConfigParser.class.getClassLoader()
-                .getResource("client/config.properties")).getPath()));
+        configProperties.load(new FileInputStream(configPath));
     }
 
 
@@ -42,5 +43,14 @@ public class ConfigParser {
      */
     public String getUrl() {
         return configProperties.getProperty("serverURL");
+    }
+
+    public String getLocale() {
+        return configProperties.getProperty("lang");
+    }
+
+    public void setLocale(String lang) throws IOException {
+        configProperties.setProperty("lang", lang);
+        configProperties.store(new FileOutputStream(configPath), null);
     }
 }
