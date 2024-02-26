@@ -53,7 +53,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws IOException {
         LanguageConf.onLanguageChange(() -> {
-            // When the language is changed, this funciton is run
+            // When the language is changed, this function is run
             loadLanguageResourcesAndStart(primaryStage);
         });
 

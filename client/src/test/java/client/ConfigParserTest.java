@@ -26,6 +26,7 @@ class ConfigParserTest {
     void getUrl() throws IOException {
         ConfigParser parser = ConfigParser.createInstance();
         String absolutePath = new File("").getAbsolutePath();
+        System.out.println("tha path is " + absolutePath);
         File file = new File(absolutePath + "/src/main/resources/client/config.properties");
         assertEquals(new Scanner(file).nextLine(), parser.getUrl());
     }
