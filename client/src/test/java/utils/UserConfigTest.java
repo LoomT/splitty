@@ -1,4 +1,4 @@
-package client;
+package utils;
 
 import client.utils.UserConfig;
 import org.junit.jupiter.api.Test;
