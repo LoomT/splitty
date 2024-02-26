@@ -20,7 +20,6 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.io.IOException;
 import java.util.List;
 
-import client.ConfigParser;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
