@@ -38,7 +38,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      * @throws URISyntaxException if there is a URI syntax error
-     * @throws IOException if there is a problem with IO
+     * @throws IOException        if there is a problem with IO
      */
     public static void main(String[] args) throws URISyntaxException, IOException {
         launch();
@@ -52,8 +52,8 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
-        LanguageConf.onLanguageChange(()->{
-            System.out.println("reloading");
+        LanguageConf.onLanguageChange(() -> {
+            // When the language is changed, this funciton is run
             loadLanguageResourcesAndStart(primaryStage);
         });
 
@@ -64,6 +64,7 @@ public class Main extends Application {
      * Loads/reloads the page with the resources.
      * IMPORTANT: put all the FXML loading in this function, as when the language is changed,
      * this is the function that is rerun to reload the different language bundle.
+     *
      * @param primaryStage the primary stage
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {
