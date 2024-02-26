@@ -1,9 +1,11 @@
 package client.scenes;
 
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 
 public class StartScreenCtrl {
@@ -17,6 +19,9 @@ public class StartScreenCtrl {
     @FXML
     private TextField code;
 
+    @FXML
+    private ChoiceBox<String> languageChoiceBox;
+
     /**
      * start screen controller constructor
      *
@@ -28,6 +33,19 @@ public class StartScreenCtrl {
         this.mainCtrl = mainCtrl;
         this.server = server;
     }
+
+    /**
+     * Initialize method for startscreenctrl
+     */
+    @FXML
+    private void initialize() {
+        languageChoiceBox.setValue(LanguageConf.getCurrentLocaleString());
+        languageChoiceBox.getItems().addAll(LanguageConf.getAvailableLocalesString());
+        languageChoiceBox.setOnAction(event -> {
+            LanguageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
+        });
+    }
+
 
     /**
      * Creates and joins the event with provided title
