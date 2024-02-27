@@ -265,7 +265,7 @@ public class TestEventRepository implements EventRepository {
     @Override
     public void deleteById(Long id) {
         // TODO Auto-generated method stub
-
+        call("deleteById");
     }
 
     /**

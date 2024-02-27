@@ -26,8 +26,8 @@ public class EventController {
      * @param id invite code of event to search
      * @return the found event entity or 404 'not found' response otherwise
      */
-    @GetMapping("")
-    public ResponseEntity<Event> findById(@RequestParam("id") long id) {
+    @GetMapping( "/{id}")
+    public ResponseEntity<Event> findById(@PathVariable long id) {
         Optional<Event> event = repo.findById(id);
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -44,12 +44,27 @@ public class EventController {
      *     "creationDate": "1999-01-01T16:16:58.385+00:00"<br>
      * }
      */
-    @PostMapping(path = { "", "/" })
+    @PostMapping({ "", "/" })
     public ResponseEntity<Event> add(@RequestBody Event event) {
         if (event == null || event.getTitle() == null || event.getTitle().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
         Event saved = repo.save(event);
         return ResponseEntity.ok(saved);
+    }
+
+    /**
+     * Deletes an event
+     *
+     * @param id of event to delete
+     * @return status 204 if deleted successfully or 404 if the event does not exist
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Event> deleteById(@PathVariable long id) {
+        if(repo.existsById(id)) {
+            repo.deleteById(id);
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

@@ -50,20 +50,35 @@ class EventControllerTest {
     }
 
     @Test
-    public void cannotAddEventWithNullTitle() {
+    void cannotAddEventWithNullTitle() {
         var actual = sut.add(new Event(null));
         assertEquals(BAD_REQUEST, actual.getStatusCode());
     }
 
     @Test
-    public void cannotAddEventWithEmptyTitle() {
+    void cannotAddEventWithEmptyTitle() {
         var actual = sut.add(new Event(""));
         assertEquals(BAD_REQUEST, actual.getStatusCode());
     }
 
     @Test
-    public void cannotAddNull() {
+    void cannotAddNull() {
         var actual = sut.add(null);
         assertEquals(BAD_REQUEST, actual.getStatusCode());
+    }
+
+    @Test
+    void deleteNothing() {
+        var actual = sut.deleteById(0);
+        assertTrue(repo.getCalledMethods().contains("existsById"));
+        assertEquals(NOT_FOUND, actual.getStatusCode());
+    }
+
+    @Test
+    void delete() {
+        var added = sut.add(new Event("title"));
+        var actual = sut.deleteById(Objects.requireNonNull(added.getBody()).getId());
+        assertTrue(repo.getCalledMethods().contains("deleteById"));
+        assertEquals(NO_CONTENT, actual.getStatusCode());
     }
 }
