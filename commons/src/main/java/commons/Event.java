@@ -1,6 +1,7 @@
 package commons;
 import java.util.*;
 import jakarta.persistence.*;
+import org.apache.commons.lang3.RandomStringUtils;
 
 @Entity
 public class Event {
@@ -38,7 +39,6 @@ public class Event {
      * No-Argument Constructor
      * Required by JPA
      */
-
     public Event() {
         this.creationDate = new Date();
     }
@@ -61,7 +61,6 @@ public class Event {
      * @param participants list of strings (going to be
      *                     participant objects in the future)
      */
-
     public Event(String title, List<Participant> participants) {
         this(title);
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
@@ -97,7 +96,6 @@ public class Event {
      *
      * @param title string
      */
-
     public void setTitle(String title){
         this.title = title;
     }
@@ -117,7 +115,6 @@ public class Event {
      *                    participant (going to be an object in the future)
      * @return boolean value
      */
-
     public boolean deleteParticipant(Participant participant){
         return getParticipants().remove(participant);
     }
@@ -127,7 +124,6 @@ public class Event {
      *
      * @param participant String (In the future probably a participant object)
      */
-
     public void addParticipant(Participant participant){
         this.participants.add(participant);
     }
@@ -137,7 +133,6 @@ public class Event {
      *
      * @return participants
      */
-
     public List<Participant> getParticipants() {
         return participants;
     }
@@ -147,9 +142,17 @@ public class Event {
      *
      * @param participants list of participants
      */
-
     public void setParticipants(List<Participant> participants) {
         this.participants = participants;
+    }
+
+    /**
+     * Generates a random string to be used for its ID
+     *
+     * @return a random 5 letter uppercase string
+     */
+    public static String generateId() {
+        return RandomStringUtils.randomAlphabetic(5).toUpperCase();
     }
 
     /**

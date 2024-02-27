@@ -49,6 +49,11 @@ public class EventController {
         if (event == null || event.getTitle() == null || event.getTitle().isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+        String id;
+        do {
+            id = Event.generateId();
+        } while (repo.existsById(id));
+        event.setId(id);
         Event saved = repo.save(event);
         return ResponseEntity.ok(saved);
     }
