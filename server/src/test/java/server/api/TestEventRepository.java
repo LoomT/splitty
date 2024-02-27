@@ -29,6 +29,7 @@ import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuer
 import commons.Event;
 import server.database.EventRepository;
 
+@SuppressWarnings("NullableProblems")
 public class TestEventRepository implements EventRepository {
 
     private final List<Event> events = new ArrayList<>();
@@ -162,8 +163,7 @@ public class TestEventRepository implements EventRepository {
      */
     @Override
     public Event getById(Long id) {
-        call("getById");
-        return find(id).get();
+        return null;
     }
 
     /**
@@ -172,8 +172,7 @@ public class TestEventRepository implements EventRepository {
      */
     @Override
     public Event getReferenceById(Long id) {
-        call("getReferenceById");
-        return find(id).get();
+        return null;
     }
 
     /**
@@ -313,7 +312,7 @@ public class TestEventRepository implements EventRepository {
     @Override
     public <S extends Event> Optional<S> findOne(Example<S> example) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     /**
