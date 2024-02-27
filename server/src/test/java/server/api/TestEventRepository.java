@@ -238,6 +238,7 @@ public class TestEventRepository implements EventRepository {
      */
     @Override
     public Optional<Event> findById(Long id) {
+        call("findById");
         return events.stream().filter(e -> e.getId() == id).findAny();
     }
 
