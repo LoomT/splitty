@@ -12,12 +12,10 @@ class ParticipantTest {
     Participant participant1;
     Participant participant2;
     Expense expense;
-    List<Expense> testSet;
     @BeforeEach
     public void testSetup(){
         participant1 = new Participant("participant1");
         participant2 = new Participant("participant2");
-        testSet = new ArrayList<>();
         List<Participant> expenseParticipants = new ArrayList<>();
         expenseParticipants.add(participant1);
         expenseParticipants.add(participant2);

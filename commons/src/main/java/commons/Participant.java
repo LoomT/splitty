@@ -9,8 +9,9 @@ public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long participantId;
     private String name;
+    private String emailAddress;
 
     /**
      * constructor
@@ -30,7 +31,7 @@ public class Participant {
      * @return the ID of the participant
      */
     public long getID() {
-        return id;
+        return participantId;
     }
 
     /**
@@ -38,7 +39,7 @@ public class Participant {
      * @param id id to be changed to
      */
     public void setID(long id){
-        this.id = id;
+        this.participantId = id;
     }
 
     /**
@@ -69,7 +70,7 @@ public class Participant {
 
         Participant that = (Participant) o;
 
-        if (id != that.id) return false;
+        if (participantId != that.participantId) return false;
         return Objects.equals(name, that.name);
     }
 
@@ -79,7 +80,7 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+        return Objects.hash(participantId, name);
     }
 }
 
