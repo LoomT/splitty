@@ -21,13 +21,13 @@ public class EventController {
 
     /**
      * Path:
-     * /api/events?id={id}
+     * /api/events/{id}
      *
      * @param id invite code of event to search
      * @return the found event entity or 404 'not found' response otherwise
      */
     @GetMapping( "/{id}")
-    public ResponseEntity<Event> findById(@PathVariable long id) {
+    public ResponseEntity<Event> getById(@PathVariable long id) {
         Optional<Event> event = repo.findById(id);
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }

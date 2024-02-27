@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
 
 class EventControllerTest {
-
     private TestEventRepository repo;
     private EventController sut;
     @BeforeEach
@@ -18,24 +17,23 @@ class EventControllerTest {
         repo = new TestEventRepository();
         sut = new EventController(repo);
     }
-
     @Test
     public void databaseIsUsed() {
         sut.add(new Event("title"));
         assertTrue(repo.getCalledMethods().contains("save"));
     }
     @Test
-    void noFindById() {
-        var actual = sut.findById(0);
+    void noGetById() {
+        var actual = sut.getById(0);
         assertTrue(repo.getCalledMethods().contains("findById"));
         assertEquals(NOT_FOUND, actual.getStatusCode());
     }
 
     @Test
-    void findById() {
+    void getById() {
         Event e = new Event("test");
         var saved = sut.add(e);
-        var actual = sut.findById(Objects.requireNonNull(saved.getBody()).getId());
+        var actual = sut.getById(Objects.requireNonNull(saved.getBody()).getId());
         assertTrue(repo.getCalledMethods().contains("findById"));
         assertEquals(OK, actual.getStatusCode());
         assertEquals(e.getTitle(), Objects.requireNonNull(actual.getBody()).getTitle());
