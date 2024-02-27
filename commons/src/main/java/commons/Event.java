@@ -23,8 +23,8 @@ public class Event {
 
       */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int eventID;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     private String title;
 
@@ -45,17 +45,43 @@ public class Event {
     }
 
     /**
+     * Constructor with just the title
+     *
+     * @param title name of the event
+     */
+    public Event(String title) {
+        this();
+        this.title = title;
+        this.participants = new ArrayList<>();
+    }
+
+    /**
      * Constructor that does take arguments, uses this()
      *
-     * @param title string
+     * @param title name of the event
      * @param participants list of strings (going to be
      *                     participant objects in the future)
      */
 
     public Event(String title, List<Participant> participants) {
-        this();
-        this.title = title;
+        this(title);
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
+    }
+
+    /**
+     * @return id of the event
+     */
+    public long getId() {
+        return id;
+    }
+
+    /**
+     * Sets the id of the event
+     *
+     * @param id to set
+     */
+    public void setId(long id) {
+        this.id = id;
     }
 
     /**
