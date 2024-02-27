@@ -23,8 +23,7 @@ public class Event {
 
       */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String id;
 
     private String title;
 
@@ -71,7 +70,7 @@ public class Event {
     /**
      * @return id of the event
      */
-    public long getId() {
+    public String getId() {
         return id;
     }
 
@@ -80,7 +79,7 @@ public class Event {
      *
      * @param id to set
      */
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -168,10 +167,8 @@ public class Event {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        Event other = (Event) obj;
-        return Objects.equals(title, other.title) &&
-                Objects.equals(participants, other.participants); // &&
-                // Objects.equals(creationDate, other.creationDate);
+        Event other = (Event)obj;
+        return this.id.equals(other.id);
     }
 
     /**
@@ -181,6 +178,6 @@ public class Event {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(title, participants, creationDate);
+        return Objects.hash(id, creationDate);
     }
 }

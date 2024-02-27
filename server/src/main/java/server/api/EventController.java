@@ -27,7 +27,7 @@ public class EventController {
      * @return the found event entity or 404 'not found' response otherwise
      */
     @GetMapping( "/{id}")
-    public ResponseEntity<Event> getById(@PathVariable long id) {
+    public ResponseEntity<Event> getById(@PathVariable String id) {
         Optional<Event> event = repo.findById(id);
         return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -60,7 +60,7 @@ public class EventController {
      * @return status 204 if deleted successfully or 404 if the event does not exist
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Event> deleteById(@PathVariable long id) {
+    public ResponseEntity<Event> deleteById(@PathVariable String id) {
         if(repo.existsById(id)) {
             repo.deleteById(id);
             return ResponseEntity.status(204).build();
@@ -77,7 +77,7 @@ public class EventController {
      * @return the event entity with new title
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<Event> changeTitleById(@PathVariable long id,
+    public ResponseEntity<Event> changeTitleById(@PathVariable String id,
                                                  @RequestParam("newTitle") String title) {
         Optional<Event> found = repo.findById(id);
         if(found.isPresent()) {

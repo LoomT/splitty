@@ -73,7 +73,7 @@ public class TestEventRepository implements EventRepository {
      * @return list
      */
     @Override
-    public List<Event> findAllById(Iterable<Long> ids) {
+    public List<Event> findAllById(Iterable<String> ids) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -133,7 +133,7 @@ public class TestEventRepository implements EventRepository {
      * @param ids to delete by
      */
     @Override
-    public void deleteAllByIdInBatch(Iterable<Long> ids) {
+    public void deleteAllByIdInBatch(Iterable<String> ids) {
         // TODO Auto-generated method stub
 
     }
@@ -152,7 +152,7 @@ public class TestEventRepository implements EventRepository {
      * @return Event
      */
     @Override
-    public Event getOne(Long id) {
+    public Event getOne(String id) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -162,7 +162,7 @@ public class TestEventRepository implements EventRepository {
      * @return Event
      */
     @Override
-    public Event getById(Long id) {
+    public Event getById(String id) {
         return null;
     }
 
@@ -171,7 +171,7 @@ public class TestEventRepository implements EventRepository {
      * @return Event
      */
     @Override
-    public Event getReferenceById(Long id) {
+    public Event getReferenceById(String id) {
         return null;
     }
 
@@ -179,8 +179,8 @@ public class TestEventRepository implements EventRepository {
      * @param id id
      * @return Event
      */
-    private Optional<Event> find(Long id) {
-        return events.stream().filter(q -> q.getId() == id).findFirst();
+    private Optional<Event> find(String id) {
+        return events.stream().filter(q -> q.getId().equals(id)).findFirst();
     }
 
     /**
@@ -226,7 +226,7 @@ public class TestEventRepository implements EventRepository {
     @Override
     public <S extends Event> S save(S entity) {
         call("save");
-        entity.setId(events.size());
+        entity.setId(Long.toString(events.size()));
         events.add(entity);
         return entity;
     }
@@ -236,9 +236,9 @@ public class TestEventRepository implements EventRepository {
      * @return Event
      */
     @Override
-    public Optional<Event> findById(Long id) {
+    public Optional<Event> findById(String id) {
         call("findById");
-        return events.stream().filter(e -> e.getId() == id).findAny();
+        return events.stream().filter(e -> e.getId().equals(id)).findAny();
     }
 
     /**
@@ -246,7 +246,7 @@ public class TestEventRepository implements EventRepository {
      * @return true if present
      */
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(String id) {
         call("existsById");
         return find(id).isPresent();
     }
@@ -263,7 +263,7 @@ public class TestEventRepository implements EventRepository {
      * @param id to delete by
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         // TODO Auto-generated method stub
         call("deleteById");
     }
@@ -281,7 +281,7 @@ public class TestEventRepository implements EventRepository {
      * @param ids to delete by
      */
     @Override
-    public void deleteAllById(Iterable<? extends Long> ids) {
+    public void deleteAllById(Iterable<? extends String> ids) {
         // TODO Auto-generated method stub
 
     }

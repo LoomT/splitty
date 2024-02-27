@@ -24,7 +24,7 @@ class EventControllerTest {
     }
     @Test
     void noGetById() {
-        var actual = sut.getById(0);
+        var actual = sut.getById("a");
         assertTrue(repo.getCalledMethods().contains("findById"));
         assertEquals(NOT_FOUND, actual.getStatusCode());
     }
@@ -67,7 +67,7 @@ class EventControllerTest {
 
     @Test
     void deleteNothing() {
-        var actual = sut.deleteById(0);
+        var actual = sut.deleteById("a");
         assertTrue(repo.getCalledMethods().contains("existsById"));
         assertEquals(NOT_FOUND, actual.getStatusCode());
     }
@@ -83,7 +83,7 @@ class EventControllerTest {
     @Test
     void changeTitleById() {
         var added = sut.add(new Event("title"));
-        long id = Objects.requireNonNull(added.getBody()).getId();
+        String id = Objects.requireNonNull(added.getBody()).getId();
         var actual = sut.changeTitleById(id, "new title");
         assertEquals("new title", Objects.requireNonNull(actual.getBody()).getTitle());
     }
