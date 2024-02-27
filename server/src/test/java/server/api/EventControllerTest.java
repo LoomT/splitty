@@ -79,4 +79,12 @@ class EventControllerTest {
         assertTrue(repo.getCalledMethods().contains("deleteById"));
         assertEquals(NO_CONTENT, actual.getStatusCode());
     }
+
+    @Test
+    void changeTitleById() {
+        var added = sut.add(new Event("title"));
+        long id = Objects.requireNonNull(added.getBody()).getId();
+        var actual = sut.changeTitleById(id, "new title");
+        assertEquals("new title", Objects.requireNonNull(actual.getBody()).getTitle());
+    }
 }

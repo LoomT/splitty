@@ -67,4 +67,24 @@ public class EventController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    /**
+     * Change the title of the event
+     * /api/events/{id}?newTitle={title}
+     *
+     * @param id id of the event
+     * @param title new title
+     * @return the event entity with new title
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<Event> changeTitleById(@PathVariable long id,
+                                                 @RequestParam("newTitle") String title) {
+        Optional<Event> found = repo.findById(id);
+        if(found.isPresent()) {
+            Event event = found.get();
+            event.setTitle(title);
+            return ResponseEntity.ok(repo.save(event));
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
