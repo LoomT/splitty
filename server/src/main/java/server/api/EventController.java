@@ -6,17 +6,29 @@ import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
 import java.util.Optional;
+import java.util.random.RandomGenerator;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
     private final EventRepository repo;
-
+    private final RandomGenerator random;
     /**
      * @param repo Event repository interface (injection)
      */
-    public EventController(EventRepository repo) {
+    public EventController(EventRepository repo, RandomGenerator random) {
         this.repo = repo;
+        this.random = random;
+    }
+
+    private String generateId() {
+        byte[] bytes = new byte[5];
+        random.nextBytes(bytes);
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] %= 26;
+            bytes[i] += 65;
+        }
+        return new String(bytes);
     }
 
     /**
@@ -28,8 +40,12 @@ public class EventController {
      */
     @GetMapping( "/{id}")
     public ResponseEntity<Event> getById(@PathVariable String id) {
-        Optional<Event> event = repo.findById(id);
-        return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        try {
+            Optional<Event> event = repo.findById(id);
+            return event.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /**
@@ -46,16 +62,21 @@ public class EventController {
      */
     @PostMapping({ "", "/" })
     public ResponseEntity<Event> add(@RequestBody Event event) {
-        if (event == null || event.getTitle() == null || event.getTitle().isEmpty()) {
-            return ResponseEntity.badRequest().build();
+        try {
+            if (event == null || event.getTitle() == null || event.getTitle().isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            System.out.println(event);
+            String id;
+            do {
+                id = Event.generateId();
+            } while (repo.existsById(id));
+            event.setId(id);
+            Event saved = repo.save(event);
+            return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        String id;
-        do {
-            id = Event.generateId();
-        } while (repo.existsById(id));
-        event.setId(id);
-        Event saved = repo.save(event);
-        return ResponseEntity.ok(saved);
     }
 
     /**
@@ -66,11 +87,15 @@ public class EventController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Event> deleteById(@PathVariable String id) {
-        if(repo.existsById(id)) {
-            repo.deleteById(id);
-            return ResponseEntity.status(204).build();
+        try {
+            if(repo.existsById(id)) {
+                repo.deleteById(id);
+                return ResponseEntity.status(204).build();
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.notFound().build();
     }
 
     /**
@@ -84,12 +109,16 @@ public class EventController {
     @PatchMapping("/{id}")
     public ResponseEntity<Event> changeTitleById(@PathVariable String id,
                                                  @RequestParam("newTitle") String title) {
-        Optional<Event> found = repo.findById(id);
-        if(found.isPresent()) {
-            Event event = found.get();
-            event.setTitle(title);
-            return ResponseEntity.ok(repo.save(event));
+        try {
+            Optional<Event> found = repo.findById(id);
+            if(found.isPresent()) {
+                Event event = found.get();
+                event.setTitle(title);
+                return ResponseEntity.ok(repo.save(event));
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
-        return ResponseEntity.notFound().build();
     }
 }
