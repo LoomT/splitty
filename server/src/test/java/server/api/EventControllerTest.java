@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.Participant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,10 +13,11 @@ import static org.springframework.http.HttpStatus.*;
 class EventControllerTest {
     private TestEventRepository repo;
     private EventController sut;
+    private TestRandom random;
     @BeforeEach
     void setUp() {
         repo = new TestEventRepository();
-        sut = new EventController(repo);
+        sut = new EventController(repo, random);
     }
     @Test
     public void databaseIsUsed() {
@@ -27,6 +29,15 @@ class EventControllerTest {
         var actual = sut.getById("a");
         assertTrue(repo.getCalledMethods().contains("findById"));
         assertEquals(NOT_FOUND, actual.getStatusCode());
+    }
+
+    @Test
+    void nestedEntities() {
+        Event event = new Event("test");
+        Participant p = new Participant("Bob");
+        event.addParticipant(p);
+        var actual = sut.add(event);
+        assertEquals(p, actual.getBody().getParticipants().getFirst());
     }
 
     @Test

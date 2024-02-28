@@ -1,7 +1,6 @@
 package commons;
 import java.util.*;
 import jakarta.persistence.*;
-import org.apache.commons.lang3.RandomStringUtils;
 
 @Entity
 public class Event {
@@ -28,10 +27,8 @@ public class Event {
 
     private String title;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Participant> participants;
-//    private ArrayList<Expense> expenses;
-
     @Temporal(TemporalType.TIMESTAMP)
     private final Date creationDate;
 
@@ -147,15 +144,6 @@ public class Event {
     }
 
     /**
-     * Generates a random string to be used for its ID
-     *
-     * @return a random 5 letter uppercase string
-     */
-    public static String generateId() {
-        return RandomStringUtils.randomAlphabetic(5).toUpperCase();
-    }
-
-    /**
      * Equals method that checks whether two instances are equal
      * Does not take the unique eventID into consideration
      *
@@ -182,5 +170,15 @@ public class Event {
     @Override
     public int hashCode() {
         return Objects.hash(id, creationDate);
+    }
+
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", participants=" + participants +
+                ", creationDate=" + creationDate +
+                '}';
     }
 }

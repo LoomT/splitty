@@ -69,7 +69,7 @@ public class EventController {
             System.out.println(event);
             String id;
             do {
-                id = Event.generateId();
+                id = generateId();
             } while (repo.existsById(id));
             event.setId(id);
             Event saved = repo.save(event);
