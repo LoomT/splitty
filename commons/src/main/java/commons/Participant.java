@@ -5,6 +5,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 
+/**
+ * Class for testing purposes
+ */
 @Entity
 public class Participant {
 

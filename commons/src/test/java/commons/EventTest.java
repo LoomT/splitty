@@ -21,7 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.*;
 
-
+//TODO implement DI and test id generation
 public class EventTest {
 
     private Event event;
@@ -107,8 +107,6 @@ public class EventTest {
             assertEquals(event1.getParticipants().get(i), event2.getParticipants().get(i));
         }
     }
-
-
     @Test
     void testNull() {
         assertNotEquals(null, event);
