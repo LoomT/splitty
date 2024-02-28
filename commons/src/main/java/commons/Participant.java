@@ -12,18 +12,39 @@ public class Participant {
     private long participantId;
     private String name;
     private String emailAddress;
+    @OneToMany
+    private Set<Expense> expenses;
 
     /**
      * constructor
      */
-    public Participant(){
+    public Participant(){}
+
+    /**
+     *
+     * @param name name of the participant
+     * @param email email of the participant. Can be Null
+     * @param bankAccount bankAccount number of the participant
+     */
+    public Participant(String name, String email, String bankAccount) {
+        this.name = name;
+        this.emailAddress = email;
+        new BankAccount(this, bankAccount); //bankAccount should probably be hashed
+        expenses = new HashSet<>();
     }
 
-    /**\
-     * @param name name of participant
+    /**
+     * constructor with expenses
+     * @param name name of the participant
+     * @param email email of the participant. Can be Null
+     * @param bankAccount bankAccount number of the participant
+     * @param expenses expenses of a participant if it already had some.
      */
-    public Participant(String name) {
+    public Participant(String name, String email, String bankAccount, Set<Expense> expenses) {
         this.name = name;
+        this.emailAddress = email;
+        new BankAccount(this, bankAccount);
+        this.expenses = expenses;
     }
 
     /**
@@ -59,6 +80,54 @@ public class Participant {
     }
 
     /**
+     * get participant
+     * @return participant
+     */
+    public long getParticipantId() {
+        return participantId;
+    }
+
+    /**
+     *
+     * @param participantId participantID to replace the old one
+     */
+    public void setParticipantId(long participantId) {
+        this.participantId = participantId;
+    }
+
+    /**
+     * emailAddress getter. Can be null
+     * @return emailAddress
+     */
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    /**
+     *
+     * @param emailAddress that will replace the participants old one
+     */
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    /**
+     * getter for expenses
+     * @return expenses
+     */
+    public Set<Expense> getExpenses() {
+        return expenses;
+    }
+
+    /**
+     * setter for expenses
+     * @param expenses expenses to replace the old one
+     */
+    public void setExpenses(Set<Expense> expenses) {
+        this.expenses = expenses;
+    }
+
+    /**
      *
      * @param o object to be compared to
      * @return true iff all the parameters are the same, false otherwise
@@ -71,7 +140,9 @@ public class Participant {
         Participant that = (Participant) o;
 
         if (participantId != that.participantId) return false;
-        return Objects.equals(name, that.name);
+        if (!name.equals(that.name)) return false;
+        if (!Objects.equals(emailAddress, that.emailAddress)) return false;
+        return expenses.equals(that.expenses);
     }
 
     /**
@@ -80,7 +151,25 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(participantId, name);
+        int result = Objects.hash(participantId);
+        for(Expense e : expenses){
+            result += Objects.hash(e.getExpenseID());
+        }
+        return result;
+    }
+
+    /**
+     *
+     * @return human-readable string of object
+     */
+    @Override
+    public String toString() {
+        return "Participant{" +
+                "participantId=" + participantId +
+                ", name='" + name + '\'' +
+                ", emailAddress='" + emailAddress + '\'' +
+                ", expenses=" + expenses +
+                '}';
     }
 }
 

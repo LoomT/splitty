@@ -27,16 +27,23 @@ import jakarta.persistence.*;
 public class EventTest {
 
     private Event event;
+    private Event event1;
+    private Event event2;
 
     @BeforeEach
     void setUp() {
         event = new Event("Test Event", new ArrayList<>());
+        event1 = new Event("Title", List.of(new Participant("Person1", "p1", "p1"),
+                new Participant("Person2", "p2", "p2")));
+        event2 = new Event("Title", List.of(new Participant("Person1", "p1", "p1"),
+                new Participant("Person2", "p2", "p2")));
     }
 
     @Test
     void testConstructor() {
         String title = "Test Event";
-        List<Participant> participants = Arrays.asList(new Participant("Person1"), new Participant("Person2"));
+        List<Participant> participants = Arrays.asList(new Participant("Person1", "p1", "p1"),
+                new Participant("Person2", "p2", "p2"));
         Event event = new Event(title, participants);
         assertEquals(title, event.getTitle());
         assertEquals(participants.size(), event.getParticipants().size());
@@ -58,7 +65,8 @@ public class EventTest {
 
     @Test
     void testCreationDate() {
-        Event event = new Event("Test Event", List.of(new Participant("John Doe")));
+        Event event = new Event("Test Event", List.of(
+                new Participant("John Doe", "jd", "jd")));
         assertNotNull(event.getCreationDate());
         assertTrue(event.getCreationDate().getTime() <= System.currentTimeMillis());
     }
@@ -81,28 +89,17 @@ public class EventTest {
 
     @Test
     void testSameInstance() {
-        Event event = new Event("Title", List.of(new Participant("Participant1"),
-                new Participant("Participant2")));
-        Event event1;
-        event1 = event;
-        assertEquals(event1, event);
+        Event testEvent = event;
+        assertEquals(testEvent, event);
     }
 
     @Test
     void testDifferentInstance() {
-        Event event1 = new Event("Title", List.of(new Participant("Participant1"),
-                new Participant("Participant2")));
-        Event event2 = new Event("Title", List.of(new Participant("Participant1"),
-                new Participant("Participant2")));
         assertEquals(event1, event2);
     }
 
     @Test
     void testEqualityWithoutId(){
-        Event event1 = new Event("Title", List.of(new Participant("Participant1"),
-                new Participant("Participant2")));
-        Event event2 = new Event("Title", List.of(new Participant("Participant1"),
-                new Participant("Participant2")));
         assertEquals(event1.getTitle(), event2.getTitle());
         assertEquals(event1.getParticipants().size(), event2.getParticipants().size());
         for(int i = 0; i < event1.getParticipants().size(); i++){
@@ -113,29 +110,25 @@ public class EventTest {
 
     @Test
     void testNull() {
-        Event event = new Event("Title", List.of(new Participant("Participant1")));
         assertNotEquals(null, event);
     }
 
     @Test
     void testEqualityDifferentClass() {
-        Event event = new Event("Title", List.of(new Participant("Participant1")));
         Object other = new Object();
         assertNotEquals(event, other);
     }
 
     @Test
     void testHashConsistency() {
-        Event event1 = new Event("Title", List.of(new Participant("Participant1")));
-        Event event2 = new Event("Title", List.of(new Participant("Participant1")));
-        assertEquals(event1.hashCode(), event2.hashCode()); // should be equal due to unique ID not
-        // taken into consideration
+        assertEquals(event1.hashCode(), event2.hashCode());
+        // should be equal due to unique ID not taken into consideration
         //can later be tested differently when object persistence is implemented with a database
     }
 
     @Test
     void addingParticipantTest() {
-        Participant participant = new Participant("Person123");
+        Participant participant = new Participant("Person123", "test123", "test123");
         event.addParticipant(participant);
         assertTrue(event.getParticipants().contains(participant));
     }
@@ -143,10 +136,9 @@ public class EventTest {
     @Test
     void settingParticipantTest(){
         List<Participant> testList = new ArrayList<>();
-        testList.add(new Participant("Participant1"));
-        testList.add(new Participant("Participant2"));
-        testList.add(new Participant("Participant3"));
-        testList.add(new Participant("Participant4"));
+        for(int i = 0; i<4; i++){
+            testList.add(new Participant("Person"+i, "test"+i, "test"+i));
+        }
         Event event1 = new Event("title", null);
         event1.setParticipants(testList);
         Event event2 = new Event("title", testList);
@@ -155,7 +147,7 @@ public class EventTest {
 
     @Test
     void testDeleteParticipant() {
-        Participant participant = new Participant("Person123");
+        Participant participant = new Participant("Person", "test", "test");
         event.addParticipant(participant);
         event.deleteParticipant(participant);
         assertFalse(event.getParticipants().contains(participant));
@@ -163,15 +155,15 @@ public class EventTest {
 
     @Test
     void testDeleteNothing() {
-        Participant participant = new Participant("Person123");
+        Participant participant = new Participant("Person", "test", "test");
         event.deleteParticipant(participant);
         assertFalse(event.getParticipants().contains(participant));
     }
 
     @Test
     void testParticipantList() {
-        Participant participant1 = new Participant("Person123");
-        Participant participant2 = new Participant("Person123");
+        Participant participant1 = new Participant("Person123", "test123", "test123");
+        Participant participant2 = new Participant("Person123", "test123", "test123");
         event.addParticipant(participant1);
         event.addParticipant(participant2);
         event.deleteParticipant(participant1);

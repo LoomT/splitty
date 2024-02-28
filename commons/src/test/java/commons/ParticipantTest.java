@@ -14,14 +14,13 @@ class ParticipantTest {
     Expense expense;
     @BeforeEach
     public void testSetup(){
-        participant1 = new Participant("participant1");
-        participant2 = new Participant("participant2");
+        participant1 = new Participant("participant1", "p1@gmail.com", "1234");
+        participant2 = new Participant("participant2", "p2@gmail.com", "5678");
         List<Participant> expenseParticipants = new ArrayList<>();
         expenseParticipants.add(participant1);
         expenseParticipants.add(participant2);
         expense = new Expense(participant1, "test", 32,
                 "EUR", expenseParticipants, "type");
-
     }
 
 
@@ -47,7 +46,7 @@ class ParticipantTest {
      */
     @Test
     void testEquals() {
-        Participant participant3 = new Participant("participant2");
+        Participant participant3 = new Participant("participant2", "p2@gmail.com", "5678");
         assertEquals(participant2, participant3);
     }
 
@@ -64,7 +63,12 @@ class ParticipantTest {
      */
     @Test
     void testHashCode() {
-        Participant participant3 = new Participant("participant2");
+        Participant participant3 = new Participant("participant2", "p2@gmail.com", "5678");
         assertEquals(participant2.hashCode(), participant3.hashCode());
+    }
+
+    @Test
+    void testHashCodeOverflow() {
+
     }
 }
