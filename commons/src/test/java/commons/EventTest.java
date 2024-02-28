@@ -27,6 +27,7 @@ public class EventTest {
     private Event event;
     private Event event1;
     private Event event2;
+    List<Participant> list;
 
     @BeforeEach
     void setUp() {
@@ -130,7 +131,7 @@ public class EventTest {
     void addingParticipantTest() {
         Participant participant = new Participant("Person123", "test123", "test123");
         event.addParticipant(participant);
-        assertEquals(event.getParticipants().get(0), participant);
+        assertEquals(event.getParticipants().getFirst(), participant);
     }
 
     @Test
