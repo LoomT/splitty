@@ -29,13 +29,21 @@ public class Participant {
 
     /**
      * @param name  name of the participant
+     */
+    public Participant(String name) {
+        this.name = name;
+        emailAddress = null;
+        expenseSet = new HashSet<>();
+        bankAccountSet = new HashSet<>();
+    }
+
+    /**
+     * @param name  name of the participant
      * @param email email of the participant. Can be Null
      */
     public Participant(String name, @Nullable String email) {
-        this.name = name;
+        this(name);
         this.emailAddress = email;
-        expenseSet = new HashSet<>();
-        bankAccountSet = new HashSet<>();
     }
 
     /**
@@ -47,8 +55,7 @@ public class Participant {
      */
     public Participant(String name, @Nullable String email, Set<Expense> expenseSet,
                        Set<BankAccount> bankAccountSet ) {
-        this.name = name;
-        this.emailAddress = email;
+        this(name, email);
         this.expenseSet = expenseSet;
         this.bankAccountSet = bankAccountSet;
     }
@@ -97,7 +104,7 @@ public class Participant {
      *
      * @param emailAddress that will replace the participants old one
      */
-    public void setEmailAddress(String emailAddress) {
+    public void setEmailAddress(@Nullable String emailAddress) {
         this.emailAddress = emailAddress;
     }
 

@@ -96,6 +96,8 @@ public class EventTest {
 
     @Test
     void testDifferentInstance() {
+        Event event1 = new Event("Title", list);
+        Event event2 = new Event("Title", list);
         assertEquals(event1, event2);
     }
 
