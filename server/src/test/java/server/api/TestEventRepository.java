@@ -180,7 +180,7 @@ public class TestEventRepository implements EventRepository {
      * @return Event
      */
     private Optional<Event> find(String id) {
-        return events.stream().filter(q -> q.getId().equals(id)).findFirst();
+        return events.stream().filter(q -> q.getId().equals(id)).findAny();
     }
 
     /**
@@ -226,7 +226,6 @@ public class TestEventRepository implements EventRepository {
     @Override
     public <S extends Event> S save(S entity) {
         call("save");
-        entity.setId(Long.toString(events.size()));
         events.add(entity);
         return entity;
     }

@@ -16,6 +16,7 @@ class EventControllerTest {
     private TestRandom random;
     @BeforeEach
     void setUp() {
+        random = new TestRandom();
         repo = new TestEventRepository();
         sut = new EventController(repo, random);
     }
@@ -97,5 +98,11 @@ class EventControllerTest {
         String id = Objects.requireNonNull(added.getBody()).getId();
         var actual = sut.changeTitleById(id, "new title");
         assertEquals("new title", Objects.requireNonNull(actual.getBody()).getTitle());
+    }
+
+    @Test
+    void randomId() {
+        var added = sut.add(new Event("title"));
+        assertEquals("ABCDE", added.getBody().getId());
     }
 }

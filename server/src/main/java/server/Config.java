@@ -15,6 +15,7 @@
  */
 package server;
 
+import java.util.Random;
 import java.util.random.RandomGenerator;
 
 import org.springframework.context.annotation.Bean;
@@ -28,6 +29,6 @@ public class Config {
      */
     @Bean
     public RandomGenerator getRandomGenerator() {
-        return RandomGenerator.getDefault();
+        return new Random();
     }
 }
