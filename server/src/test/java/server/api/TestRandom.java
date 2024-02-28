@@ -2,6 +2,7 @@ package server.api;
 
 import java.util.Arrays;
 import java.util.random.RandomGenerator;
+import java.util.stream.IntStream;
 
 public class TestRandom implements RandomGenerator {
 
@@ -30,5 +31,18 @@ public class TestRandom implements RandomGenerator {
             bytes[i] = (byte)offset++;
         }
         System.out.println(Arrays.toString(bytes));
+    }
+
+    /**
+     * Returns an effectively unlimited stream of sequentially chosen
+     * {@code int} values between a and b
+     *
+     * @param a lower bound
+     * @param b upper bound
+     * @return a stream of sequentially chosen {@code int} values
+     */
+    @Override
+    public IntStream ints(int a, int b) {
+        return IntStream.generate(() -> (offset++% (b-a) + a));
     }
 }

@@ -26,19 +26,16 @@ public class EventController {
     }
 
     /**
-     * Generates an event ID by generating an array of random bytes
+     * Generates an event ID by generating a stream of random integers
      * and converting them into a string
      *
      * @return a random string of 5 uppercase characters
      */
     private String generateId() {
-        byte[] bytes = new byte[5];
-        random.nextBytes(bytes);
-        for (int i = 0; i < bytes.length; i++) {
-            bytes[i] %= 26;
-            bytes[i] += 65;
-        }
-        return new String(bytes);
+        return random.ints(97, 123)
+                .limit(5)
+                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString().toUpperCase();
     }
 
     /**
