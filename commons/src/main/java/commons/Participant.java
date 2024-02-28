@@ -19,7 +19,7 @@ public class Participant {
     private String emailAddress;
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Expense> expenseSet;
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<BankAccount> bankAccountSet;
 
     /**
