@@ -17,7 +17,7 @@ public class Participant {
     private String name;
     @Nullable
     private String emailAddress;
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<Expense> expenseSet;
     @OneToMany(cascade = CascadeType.ALL)
     private Set<BankAccount> bankAccountSet;

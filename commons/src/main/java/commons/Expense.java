@@ -36,7 +36,7 @@ public class Expense {
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
-    @OneToMany
+    @ManyToMany
     private List<Participant> expenseParticipants;
     @NotNull
     private String type;
