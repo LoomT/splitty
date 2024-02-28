@@ -6,12 +6,9 @@ import jakarta.persistence.*;
 public class BankAccount {
 
     @Id
-    @Column(name="bankID")
     private long bankId;
 
-    @OneToOne
-    @PrimaryKeyJoinColumn(name="bankID", referencedColumnName="participantId")
-    private Participant beneficiary;
+    private String beneficiary;
 
     private String accountNumber;
 
@@ -20,7 +17,7 @@ public class BankAccount {
      * @param beneficiary beneficiary of the account
      * @param accountNumber accountNumber
      */
-    public BankAccount(Participant beneficiary, String accountNumber) {
+    public BankAccount(String beneficiary, String accountNumber) {
         this.beneficiary = beneficiary;
         this.accountNumber = accountNumber; //should be hashed
     }
@@ -50,7 +47,7 @@ public class BankAccount {
      * Getter for beneficiary
      * @return beneficiary of account
      */
-    public Participant getBeneficiary() {
+    public String getBeneficiary() {
         return beneficiary;
     }
 
@@ -58,7 +55,7 @@ public class BankAccount {
      * Setter for beneficiary
      * @param beneficiary beneficiary to replace the old one
      */
-    public void setBeneficiary(Participant beneficiary) {
+    public void setBeneficiary(String beneficiary) {
         this.beneficiary = beneficiary;
     }
 

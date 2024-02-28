@@ -1,5 +1,6 @@
 package commons;
 import jakarta.persistence.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -11,9 +12,12 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long participantId;
     private String name;
+    @Nullable
     private String emailAddress;
-    @OneToMany
-    private Set<Expense> expenses;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Expense> expenseSet;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<BankAccount> bankAccountSet;
 
     /**
      * constructor
@@ -21,46 +25,29 @@ public class Participant {
     public Participant(){}
 
     /**
-     *
-     * @param name name of the participant
+     * @param name  name of the participant
      * @param email email of the participant. Can be Null
-     * @param bankAccount bankAccount number of the participant
      */
-    public Participant(String name, String email, String bankAccount) {
+    public Participant(String name, @Nullable String email) {
         this.name = name;
         this.emailAddress = email;
-        new BankAccount(this, bankAccount); //bankAccount should probably be hashed
-        expenses = new HashSet<>();
+        expenseSet = new HashSet<>();
+        bankAccountSet = new HashSet<>();
     }
 
     /**
      * constructor with expenses
      * @param name name of the participant
      * @param email email of the participant. Can be Null
-     * @param bankAccount bankAccount number of the participant
-     * @param expenses expenses of a participant if it already had some.
+     * @param bankAccountSet bankAccount number of the participant
+     * @param expenseSet expenses of a participant if it already had some.
      */
-    public Participant(String name, String email, String bankAccount, Set<Expense> expenses) {
+    public Participant(String name, @Nullable String email, Set<Expense> expenseSet,
+                       Set<BankAccount> bankAccountSet ) {
         this.name = name;
         this.emailAddress = email;
-        new BankAccount(this, bankAccount);
-        this.expenses = expenses;
-    }
-
-    /**
-     * getter for ID
-     * @return the ID of the participant
-     */
-    public long getID() {
-        return participantId;
-    }
-
-    /**
-     * setter for id
-     * @param id id to be changed to
-     */
-    public void setID(long id){
-        this.participantId = id;
+        this.expenseSet = expenseSet;
+        this.bankAccountSet = bankAccountSet;
     }
 
     /**
@@ -99,7 +86,7 @@ public class Participant {
      * emailAddress getter. Can be null
      * @return emailAddress
      */
-    public String getEmailAddress() {
+    public @Nullable String getEmailAddress() {
         return emailAddress;
     }
 
@@ -115,16 +102,52 @@ public class Participant {
      * getter for expenses
      * @return expenses
      */
-    public Set<Expense> getExpenses() {
-        return expenses;
+    public Set<Expense> getExpenseSet() {
+        return expenseSet;
     }
 
     /**
      * setter for expenses
-     * @param expenses expenses to replace the old one
+     * @param expenseSet expenses to replace the old one
      */
-    public void setExpenses(Set<Expense> expenses) {
-        this.expenses = expenses;
+    public void setExpenseSet(Set<Expense> expenseSet) {
+        this.expenseSet = expenseSet;
+    }
+
+    /**
+     * Add bankAccount to bankAccountSet
+     * @param expense expense to be added
+     * @return false if bankAccount is null or already in set, true otherwise
+     */
+    public boolean addExpense(Expense expense){
+        if(expense == null) return false;
+        return expenseSet.add(expense);
+    }
+
+    /**
+     * getter for bankAccountSet
+     * @return bankAccountSet
+     */
+    public Set<BankAccount> getBankAccountSet() {
+        return bankAccountSet;
+    }
+
+    /**
+     * setter for bankAccountSet
+     * @param bankAccountSet to replace the old one
+     */
+    public void setBankAccountSet(Set<BankAccount> bankAccountSet) {
+        this.bankAccountSet = bankAccountSet;
+    }
+
+    /**
+     * Add bankAccount to bankAccountSet
+     * @param bankAccount bankAccount to be added
+     * @return false if bankAccount is null or already in set, true otherwise
+     */
+    public boolean addBankAccount(BankAccount bankAccount){
+        if(bankAccount == null) return false;
+        return bankAccountSet.add(bankAccount);
     }
 
     /**
@@ -139,10 +162,10 @@ public class Participant {
 
         Participant that = (Participant) o;
 
-        if (participantId != that.participantId) return false;
-        if (!name.equals(that.name)) return false;
+        if (participantId != that.participantId || !name.equals(that.name)) return false;
         if (!Objects.equals(emailAddress, that.emailAddress)) return false;
-        return expenses.equals(that.expenses);
+        if (!expenseSet.equals(that.expenseSet)) return false;
+        return bankAccountSet.equals(that.bankAccountSet);
     }
 
     /**
@@ -151,25 +174,24 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        int result = Objects.hash(participantId);
-        for(Expense e : expenses){
-            result += Objects.hash(e.getExpenseID());
-        }
-        return result;
+        return Objects.hash(participantId);
     }
 
     /**
-     *
-     * @return human-readable string of object
+     * toString method for Participant class
+     * @return human-readable string
      */
     @Override
     public String toString() {
-        return "Participant{" +
+        String result = "Participant{" +
                 "participantId=" + participantId +
-                ", name='" + name + '\'' +
-                ", emailAddress='" + emailAddress + '\'' +
-                ", expenses=" + expenses +
+                ", name='" + name + '\'';
+        if(emailAddress != null)
+            result += ", emailAddress='" + emailAddress + '\'';
+        result += ", expenseSet=" + expenseSet +
+                ", bankAccountSet=" + bankAccountSet +
                 '}';
+        return result;
     }
 }
 

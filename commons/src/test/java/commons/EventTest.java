@@ -34,17 +34,17 @@ public class EventTest {
         list = new ArrayList<>();
         list.add(new Participant());
         event = new Event("Test Event", new ArrayList<>());
-        event1 = new Event("Title", List.of(new Participant("Person1", "p1", "p1"),
-                new Participant("Person2", "p2", "p2")));
-        event2 = new Event("Title", List.of(new Participant("Person1", "p1", "p1"),
-                new Participant("Person2", "p2", "p2")));
+        event1 = new Event("Title", List.of(new Participant("Person1", "p1"),
+                new Participant("Person2", "p2")));
+        event2 = new Event("Title", List.of(new Participant("Person1", "p1"),
+                new Participant("Person2", "p2")));
     }
 
     @Test
     void testConstructor() {
         String title = "Test Event";
-        List<Participant> participants = Arrays.asList(new Participant("Person1", "p1", "p1"),
-                new Participant("Person2", "p2", "p2"));
+        List<Participant> participants = Arrays.asList(new Participant("Person1", "p1"),
+                new Participant("Person2", "p2"));
         Event event = new Event(title, participants);
         assertEquals(title, event.getTitle());
         assertEquals(participants.size(), event.getParticipants().size());
@@ -67,7 +67,7 @@ public class EventTest {
     @Test
     void testCreationDate() {
         Event event = new Event("Test Event", List.of(
-                new Participant("John Doe", "jd", "jd")));
+                new Participant("John Doe", "jd")));
         assertNotNull(event.getCreationDate());
         assertTrue(event.getCreationDate().getTime() <= System.currentTimeMillis());
     }
@@ -129,7 +129,7 @@ public class EventTest {
 
     @Test
     void addingParticipantTest() {
-        Participant participant = new Participant("Person123", "test123", "test123");
+        Participant participant = new Participant("Person123", "test123");
         event.addParticipant(participant);
         assertEquals(event.getParticipants().getFirst(), participant);
     }
@@ -138,7 +138,7 @@ public class EventTest {
     void settingParticipantTest(){
         List<Participant> testList = new ArrayList<>();
         for(int i = 0; i<4; i++){
-            testList.add(new Participant("Person"+i, "test"+i, "test"+i));
+            testList.add(new Participant("Person"+i, "test"+i));
         }
         Event event1 = new Event("title", null);
         event1.setParticipants(testList);
@@ -148,7 +148,7 @@ public class EventTest {
 
     @Test
     void testDeleteParticipant() {
-        Participant participant = new Participant("Person", "test", "test");
+        Participant participant = new Participant("Person", "test");
         event.addParticipant(participant);
         assertTrue(event.deleteParticipant(participant));
         assertFalse(event.getParticipants().contains(participant));
@@ -156,15 +156,15 @@ public class EventTest {
 
     @Test
     void testDeleteNothing() {
-        Participant participant = new Participant("Person", "test", "test");
+        Participant participant = new Participant("Person", "test");
         event.deleteParticipant(participant);
         assertFalse(event.getParticipants().contains(participant));
     }
 
     @Test
     void testParticipantList() {
-        Participant participant1 = new Participant("Person123", "test123", "test123");
-        Participant participant2 = new Participant("Person123", "test123", "test123");
+        Participant participant1 = new Participant("Person123", "test123");
+        Participant participant2 = new Participant("Person123", "test123");
         event.addParticipant(participant1);
         event.addParticipant(participant2);
         event.deleteParticipant(participant1);
