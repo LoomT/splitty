@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import client.scenes.StartScreenCtrl;
+import client.utils.LanguageConf;
 import com.google.inject.Injector;
 
 import client.scenes.MainCtrl;
@@ -37,7 +38,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      * @throws URISyntaxException if there is a URI syntax error
-     * @throws IOException if there is a problem with IO
+     * @throws IOException        if there is a problem with IO
      */
     public static void main(String[] args) throws URISyntaxException, IOException {
         launch();
@@ -51,11 +52,32 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) throws IOException {
+        LanguageConf.onLanguageChange(() -> {
+            // When the language is changed, this funciton is run
+            loadLanguageResourcesAndStart(primaryStage);
+        });
+
+        loadLanguageResourcesAndStart(primaryStage);
+    }
+
+    /**
+     * Loads/reloads the page with the resources.
+     * IMPORTANT: put all the FXML loading in this function, as when the language is changed,
+     * this is the function that is rerun to reload the different language bundle.
+     *
+     * @param primaryStage the primary stage
+     */
+    public void loadLanguageResourcesAndStart(Stage primaryStage) {
+        // Load all the FXML here:
 
         //var overview = FXML.load(QuoteOverviewCtrl.class,
         // "client", "scenes", "QuoteOverview.fxml");
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
-        var start = FXML.load(StartScreenCtrl.class, "client", "scenes", "StartScreen.fxml");
+        var start = FXML.load(
+                StartScreenCtrl.class,
+                LanguageConf.getLanguageResources(),
+                "client", "scenes", "StartScreen.fxml"
+        );
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, start);

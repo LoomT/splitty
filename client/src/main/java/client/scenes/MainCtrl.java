@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.utils.LanguageConf;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -24,10 +25,10 @@ public class MainCtrl {
 
     private Stage primaryStage;
 
-    private QuoteOverviewCtrl overviewCtrl;
+    //private QuoteOverviewCtrl overviewCtrl;
     private Scene overview;
 
-    private AddQuoteCtrl addCtrl;
+    //private AddQuoteCtrl addCtrl;
     private Scene add;
 
     private StartScreenCtrl startScreenCtrl;
@@ -61,25 +62,25 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        primaryStage.setTitle("Start Screen");
+        primaryStage.setTitle(LanguageConf.get("StartScreen.title"));
         primaryStage.setScene(startScreen);
     }
 
     /**
      * Display overview
      */
-    public void showOverview() {
-        primaryStage.setTitle("Quotes: Overview");
-        primaryStage.setScene(overview);
-        overviewCtrl.refresh();
-    }
-
-    /**
-     * display adding quote scene
-     */
-    public void showAdd() {
-        primaryStage.setTitle("Quotes: Adding Quote");
-        primaryStage.setScene(add);
-        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-    }
+//    public void showOverview() {
+//        primaryStage.setTitle("Quotes: Overview");
+//        primaryStage.setScene(overview);
+//        overviewCtrl.refresh();
+//    }
+//
+//    /**
+//     * display adding quote scene
+//     */
+//    public void showAdd() {
+//        primaryStage.setTitle("Quotes: Adding Quote");
+//        primaryStage.setScene(add);
+//        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
+//    }
 }

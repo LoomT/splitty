@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 
 /*
@@ -21,7 +20,6 @@ should be implemented in the future.
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.*;
-import jakarta.persistence.*;
 
 
 public class EventTest {
@@ -32,6 +30,8 @@ public class EventTest {
 
     @BeforeEach
     void setUp() {
+        list = new ArrayList<>();
+        list.add(new Participant());
         event = new Event("Test Event", new ArrayList<>());
         event1 = new Event("Title", List.of(new Participant("Person1", "p1", "p1"),
                 new Participant("Person2", "p2", "p2")));
@@ -130,7 +130,7 @@ public class EventTest {
     void addingParticipantTest() {
         Participant participant = new Participant("Person123", "test123", "test123");
         event.addParticipant(participant);
-        assertTrue(event.getParticipants().contains(participant));
+        assertEquals(event.getParticipants().get(0), participant);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class EventTest {
     void testDeleteParticipant() {
         Participant participant = new Participant("Person", "test", "test");
         event.addParticipant(participant);
-        event.deleteParticipant(participant);
+        assertTrue(event.deleteParticipant(participant));
         assertFalse(event.getParticipants().contains(participant));
     }
 

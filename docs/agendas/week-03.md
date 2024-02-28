@@ -31,3 +31,46 @@ To finish the meeting (5 min)
 - Closure (1 min)
 
 Total planned time (55 min + 5 min buffer)
+
+# Notes
+
+## Agenda Item 1: Reflection last week
+
+- Great work last week
+- Most of us passed the GIT Assignment
+- The checkstyle has been experienced as okay, minor changes in the future could be implemented like the number of parameters for a funciton.
+
+
+## Agenda Item 2: Continuing the project
+
+### Code of Conduct:
+- All the key elements have been added to the git repository as issues.
+- The tasks are divided evenly based on the number of words one should write.
+- The structure has been provided in the overleaf project, that Liam has sent in the whatsapp group.
+- The aim is to write approximately 300 words per key point (Shared team values amounts to 500) and to finish writing on thursday, such that the text files can correctly be implemented in the overleaf project.
+- Submission deadline is on Friday, minute-taker for week 3 (Liam) is responsible for the submission.
+- Agreement has been made to keep in contact via Whatsapp regarding the code of conduct.
+
+### Developement
+
+- Main priority for week 3 is to get the backend (divided into server and database) up and running.
+- Several issues have been made during the meeting on that matter.
+- New meeting has been planned on Wednesday 27/02/2024 to discuss the tasks and the division of them further
+
+To be expanded on later
+
+## Other key points
+
+- Thinking about rotating team-tasks (a few people on front-end and the rest on back-end) To be discussed
+- Some issues have been edited to get the appropriate label
+- Guney has a spreadsheet regarding the role assignment (chair and minute-taker) to make sure everyone passes.
+
+
+## Action points
+
+- Get the back-end up and running
+- Submit Code of Conduct
+
+---
+- Next minute taker: Bogdan
+- Next chair: Adam

@@ -3,7 +3,6 @@ import java.util.*;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "events")
 public class Event {
     /*
       Properties:
@@ -27,18 +26,13 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int eventID;
 
-    @Column(name = "title", nullable = false)
     private String title;
 
-
-    @CollectionTable(name = "event_participants", joinColumns = @JoinColumn(name = "event_id"))
-    @Column(name = "participant", nullable = false)
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Participant> participants;
 //    private ArrayList<Expense> expenses;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "creation_date")
     private final Date creationDate;
 
     /**
