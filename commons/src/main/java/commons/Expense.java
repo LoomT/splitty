@@ -6,6 +6,7 @@ import org.jetbrains.annotations.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -36,8 +37,12 @@ public class Expense {
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<Participant> expenseParticipants;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "order_item_mapping",
+            joinColumns = {@JoinColumn(name = "order_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "item_id", referencedColumnName = "id")})
+    @MapKey(name = "itemName")
+    private Map<Participant, Integer> expenseParticipants;
     @NotNull
     private String type;
 
