@@ -13,14 +13,24 @@ import java.util.random.RandomGenerator;
 public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
+
     /**
-     * @param repo Event repository interface (injection)
+     * Constructor with repository and random number generator injections
+     *
+     * @param repo Event repository
+     * @param random A random number generator
      */
     public EventController(EventRepository repo, RandomGenerator random) {
         this.repo = repo;
         this.random = random;
     }
 
+    /**
+     * Generates an event ID by generating an array of random bytes
+     * and converting them into a string
+     *
+     * @return a random string of 5 uppercase characters
+     */
     private String generateId() {
         byte[] bytes = new byte[5];
         random.nextBytes(bytes);
@@ -49,16 +59,10 @@ public class EventController {
     }
 
     /**
-     * @param event to save to the database
+     * Generates an ID for the event, adds it to the database and sends it back to the client
+     *
+     * @param event to be saved to the database
      * @return the saved entity with an assigned ID
-     * <br><br>
-     * returned JSON example:<br>
-     * {<br>
-     *     "id": 2,<br>
-     *     "title": "test",<br>
-     *     "participants": [],<br>
-     *     "creationDate": "1999-01-01T16:16:58.385+00:00"<br>
-     * }
      */
     @PostMapping({ "", "/" })
     public ResponseEntity<Event> add(@RequestBody Event event) {
@@ -66,7 +70,6 @@ public class EventController {
             if (event == null || event.getTitle() == null || event.getTitle().isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            System.out.println(event);
             String id;
             do {
                 id = generateId();
@@ -100,6 +103,7 @@ public class EventController {
 
     /**
      * Change the title of the event
+     * <br>
      * /api/events/{id}?newTitle={title}
      *
      * @param id id of the event

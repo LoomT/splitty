@@ -172,6 +172,9 @@ public class Event {
         return Objects.hash(id, creationDate);
     }
 
+    /**
+     * @return a string representation of this
+     */
     @Override
     public String toString() {
         return "Event{" +

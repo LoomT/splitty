@@ -13,10 +13,9 @@ import static org.springframework.http.HttpStatus.*;
 class EventControllerTest {
     private TestEventRepository repo;
     private EventController sut;
-    private TestRandom random;
     @BeforeEach
     void setUp() {
-        random = new TestRandom();
+        TestRandom random = new TestRandom();
         repo = new TestEventRepository();
         sut = new EventController(repo, random);
     }
@@ -38,7 +37,7 @@ class EventControllerTest {
         Participant p = new Participant("Bob");
         event.addParticipant(p);
         var actual = sut.add(event);
-        assertEquals(p, actual.getBody().getParticipants().getFirst());
+        assertEquals(p, Objects.requireNonNull(actual.getBody()).getParticipants().getFirst());
     }
 
     @Test
@@ -103,6 +102,6 @@ class EventControllerTest {
     @Test
     void randomId() {
         var added = sut.add(new Event("title"));
-        assertEquals("ABCDE", added.getBody().getId());
+        assertEquals("ABCDE", Objects.requireNonNull(added.getBody()).getId());
     }
 }
