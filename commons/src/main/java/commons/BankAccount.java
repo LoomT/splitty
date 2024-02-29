@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 public class BankAccount {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long bankId;
 
     private String beneficiary;
