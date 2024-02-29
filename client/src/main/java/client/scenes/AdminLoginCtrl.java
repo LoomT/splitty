@@ -3,7 +3,6 @@ package client.scenes;
 import client.utils.ServerUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 public class AdminLoginCtrl {
@@ -12,13 +11,7 @@ public class AdminLoginCtrl {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private Label usernameLabel;
-
-    @FXML
     private TextField usernameTextField;
-
-    @FXML
-    private Label passwordLabel;
 
     @FXML
     private TextField passwordTextField;
@@ -39,14 +32,31 @@ public class AdminLoginCtrl {
         this.mainCtrl = mainCtrl;
     }
 
+    /**
+     * Initialize method for adminLoginCtrl
+     *
+     */
+
+
     @FXML
     private void initialize() {
         setupListeners();
     }
 
+    /**
+     * Sets up the listeners for the buttons
+     *
+     */
+
     private void setupListeners() {
         loginButton.setOnAction(event -> login());
     }
+
+    /**
+     * To be implemented
+     * would log in the admin to a page where he can access admin functions
+     *
+     */
 
     private void login() {
         String username = usernameTextField.getText();
