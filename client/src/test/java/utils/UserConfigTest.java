@@ -12,7 +12,7 @@ class UserConfigTest {
      * Assert that the UserConfig instance is created
      */
     @Test
-    void createInstance() {
+    void createInstance() throws IOException {
         assertNotNull(UserConfig.createInstance());
     }
 
@@ -20,7 +20,7 @@ class UserConfigTest {
      * Assert that it initializes with the correct URL
      */
     @Test
-    void getUrl() {
+    void getUrl() throws IOException {
         UserConfig userConfig = UserConfig.createInstance();
         assertEquals("http://localhost:8080/", userConfig.getUrl());
     }
@@ -29,7 +29,7 @@ class UserConfigTest {
      * Assert that it initializes with the correct locale
      */
     @Test
-    void getLocale() {
+    void getLocale() throws IOException {
         UserConfig userConfig = UserConfig.createInstance();
         assertEquals("en", userConfig.getLocale());
     }

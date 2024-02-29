@@ -18,20 +18,16 @@ public class UserConfig {
     /**
      * The constructor is private so multiple instances can't be created
      */
-    private UserConfig() {
+    private UserConfig() throws IOException {
         configProperties = new Properties();
-        try {
-            configProperties.load(new FileInputStream(configPath));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to access the config file", e);
-        }
+        configProperties.load(new FileInputStream(configPath));
     }
     /**
      * Creates an instance of the parser
      *
      * @return the config parser singleton instance
      */
-    public static UserConfig createInstance() {
+    public static UserConfig createInstance() throws IOException {
         if(config == null) {
             config = new UserConfig();
         }

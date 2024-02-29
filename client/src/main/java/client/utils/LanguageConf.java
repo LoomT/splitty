@@ -13,7 +13,17 @@ public class LanguageConf {
 
     private static final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
 
-    private static final UserConfig userConfig = UserConfig.createInstance();
+    private static final UserConfig userConfig;
+
+    static {
+        try {
+            userConfig = UserConfig.createInstance();
+        } catch (IOException e) {
+            // show a pop-up here maybe
+            throw new RuntimeException(e);
+        }
+    }
+
     private static Locale currentLocale = Locale.of(userConfig.getLocale());
 
     private static Runnable callback = null;
@@ -53,7 +63,9 @@ public class LanguageConf {
         System.out.println("Language changed to " + newLocaleString);
         try {
             userConfig.setLocale(newLocale.toString());
-        } catch (IOException ignored){}
+        } catch (IOException e){
+            // show a pop-up here maybe or just ignore
+        }
     }
 
     /**
