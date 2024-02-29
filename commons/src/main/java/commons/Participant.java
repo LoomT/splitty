@@ -10,7 +10,7 @@ import java.util.*;
  *  participantID: ID of the participant to uniquely identify it in the database
  *  name: name of participant
  *  emailAddress: optional email address of participant which can be null
- *  expenseSet: Set of all expenses which include the participant. (can be empty)
+ *  expenseSet: Set of all expenses which the participant authored. (can be empty)
  *  bankAccountSet: The registered Bank Accounts for the participant. (can be empty)
  */
 @Entity
