@@ -117,15 +117,15 @@ class ParticipantTest {
 
     @Test
     void testEqualsOverflow() {
-        participant1.getExpenseSet().add(expense);
-        participant2.getExpenseSet().add(expense);
+        participant1.getAuthoredExpenseSet().add(expense);
+        participant2.getAuthoredExpenseSet().add(expense);
         assertNotEquals(participant1, participant2);
     }
 
     @Test
     void testEqualsDifferentExpense() {
-        participant1.getExpenseSet().add(expense);
-        participant2.getExpenseSet().add(new Expense(participant2, "test", 32,
+        participant1.getAuthoredExpenseSet().add(expense);
+        participant2.getAuthoredExpenseSet().add(new Expense(participant2, "test", 32,
                 "EUR", new ArrayList<>(), "type"));
         assertNotEquals(participant1, participant2);
     }

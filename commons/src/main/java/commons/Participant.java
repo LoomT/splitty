@@ -22,8 +22,8 @@ public class Participant {
     private String name;
     @Nullable
     private String emailAddress;
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Expense> expenseSet;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Expense> authoredExpenseSet;
     @OneToMany(cascade = CascadeType.ALL)
     private Set<BankAccount> bankAccountSet;
 
@@ -38,7 +38,7 @@ public class Participant {
     public Participant(String name) {
         this.name = name;
         emailAddress = null;
-        expenseSet = new HashSet<>();
+        authoredExpenseSet = new HashSet<>();
         bankAccountSet = new HashSet<>();
     }
 
@@ -56,12 +56,12 @@ public class Participant {
      * @param name name of the participant
      * @param email email of the participant. Can be Null
      * @param bankAccountSet bankAccount number of the participant
-     * @param expenseSet expenses of a participant if it already had some.
+     * @param authoredExpenseSet expenses of a participant if it already had some.
      */
-    public Participant(String name, @Nullable String email, Set<Expense> expenseSet,
+    public Participant(String name, @Nullable String email, Set<Expense> authoredExpenseSet,
                        Set<BankAccount> bankAccountSet ) {
         this(name, email);
-        this.expenseSet = expenseSet;
+        this.authoredExpenseSet = authoredExpenseSet;
         this.bankAccountSet = bankAccountSet;
     }
 
@@ -117,16 +117,16 @@ public class Participant {
      * getter for expenses
      * @return expenses
      */
-    public Set<Expense> getExpenseSet() {
-        return expenseSet;
+    public Set<Expense> getAuthoredExpenseSet() {
+        return authoredExpenseSet;
     }
 
     /**
      * setter for expenses
-     * @param expenseSet expenses to replace the old one
+     * @param authoredExpenseSet expenses to replace the old one
      */
-    public void setExpenseSet(Set<Expense> expenseSet) {
-        this.expenseSet = expenseSet;
+    public void setAuthoredExpenseSet(Set<Expense> authoredExpenseSet) {
+        this.authoredExpenseSet = authoredExpenseSet;
     }
 
     /**
@@ -136,7 +136,7 @@ public class Participant {
      */
     public boolean addExpense(Expense expense){
         if(expense == null) return false;
-        return expenseSet.add(expense);
+        return authoredExpenseSet.add(expense);
     }
 
     /**
@@ -179,7 +179,7 @@ public class Participant {
 
         if (participantId != that.participantId || !name.equals(that.name)) return false;
         if (!Objects.equals(emailAddress, that.emailAddress)) return false;
-        if (!expenseSet.equals(that.expenseSet)) return false;
+        if (!authoredExpenseSet.equals(that.authoredExpenseSet)) return false;
         return bankAccountSet.equals(that.bankAccountSet);
     }
 
@@ -203,7 +203,7 @@ public class Participant {
                 ", name='" + name + '\'';
         if(emailAddress != null)
             result += ", emailAddress='" + emailAddress + '\'';
-        result += ", expenseSet=" + expenseSet +
+        result += ", expenseSet=" + authoredExpenseSet +
                 ", bankAccountSet=" + bankAccountSet +
                 '}';
         return result;
