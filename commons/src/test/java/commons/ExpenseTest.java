@@ -59,18 +59,92 @@ public class ExpenseTest {
     }
 
     @Test
-    void testGetters() {
+    void testGetExpenseAuthor() {
         assertEquals(p1, e1.getExpenseAuthor());
+    }
+
+    @Test
+    void testGetPurpose() {
         assertEquals("Groceries", e1.getPurpose());
+    }
+
+    @Test
+    void testGetAmount() {
         assertEquals(20.5, e3.getAmount());
+    }
+
+    @Test
+    void testGetCurrency() {
         assertEquals("USD", e3.getCurrency());
+    }
+
+    @Test
+    void testGetExpenseParticipants() {
         assertEquals(expPart, e2.getExpenseParticipants());
+    }
+
+    @Test
+    void testGetType() {
         assertEquals("Food", e2.getType());
     }
 
     @Test
     void testIdUniqueness() {
         assertNotEquals(expenseId1, expenseId2);
+    }
+
+    @Test
+    void testSetExpenseAuthor() {
+        e1.setExpenseAuthor(p2);
+        assertEquals(p2, e1.getExpenseAuthor());
+    }
+
+    @Test
+    void testSetPurpose() {
+        e1.setPurpose("Shopping");
+        assertEquals("Shopping", e1.getPurpose());
+    }
+
+    @Test
+    void testSetAmount() {
+        e3.setAmount(27.3);
+        assertEquals(27.3, e3.getAmount());
+    }
+
+    @Test
+    void testSetCurrency() {
+        e3.setCurrency("RON");
+        assertEquals("RON", e3.getCurrency());
+    }
+
+    @Test
+    void testSetType() {
+        e2.setType("Beverages");
+        assertEquals("Beverages", e2.getType());
+    }
+
+    //Revert changes
+    @Test
+    void revertChanges() {
+        e1.setExpenseAuthor(p1);
+        e1.setPurpose("Groceries");
+        e3.setAmount(20.5);
+        e3.setCurrency("USD");
+        e2.setType("Food");
+    }
+
+    @Test
+    void testEquals() {
+        assertEquals(e1, e2);
+        assertNotEquals(e1, e3);
+        assertNotEquals(e2, e3);
+    }
+
+    @Test
+    void testHashCode() {
+        assertEquals(e1.hashCode(), e2.hashCode());
+        assertNotEquals(e1.hashCode(), e3.hashCode());
+        assertNotEquals(e2.hashCode(), e3.hashCode());
     }
 
 

@@ -136,9 +136,9 @@ public class Expense {
 
     /**
      * setter for participant
-     * @param participant
+     * @param expenseAuthor
      */
-    public void setExpenseAuthor(String participant) {
+    public void setExpenseAuthor(Participant expenseAuthor) {
         this.expenseAuthor = expenseAuthor;
     }
 
