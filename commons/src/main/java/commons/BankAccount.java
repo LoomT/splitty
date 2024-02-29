@@ -2,6 +2,11 @@ package commons;
 
 import jakarta.persistence.*;
 
+/**
+ * bankId: ID of the bank account to uniquely identify in the database
+ * beneficiary:
+ * accountNumber:
+ */
 @Entity
 public class BankAccount {
 
