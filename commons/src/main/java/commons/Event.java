@@ -159,7 +159,7 @@ public class Event {
             return false;
         }
         Event other = (Event)obj;
-        return this.id.equals(other.id);
+        return Objects.equals(id, other.id);
     }
 
     /**
