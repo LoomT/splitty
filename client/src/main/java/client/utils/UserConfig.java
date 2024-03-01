@@ -3,9 +3,6 @@ package client.utils;
 import com.google.inject.Inject;
 
 import java.io.*;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -17,16 +14,14 @@ public class UserConfig {
     private final BufferedWriter writer;
 
     /**
-     * The constructor is private so multiple instances can't be created
+     * The constructor which initializes properties from file, and opens a writer to the file
+     * @param io input output interface for config file
      */
     @Inject
-    public UserConfig(Reader reader, Writer writer) throws IOException {
-        File file = new File(UserConfig.class.getClassLoader().getResource("client/config.properties").getPath());
-        FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+    public UserConfig(IOInterface io) throws IOException {
         configProperties = new Properties();
-        configProperties.load(new BufferedReader(reader));
-//        configProperties.load(new BufferedReader(new FileReader(UserConfig.class.getClassLoader().getResource("client/config.properties").getFile())));
-        this.writer = new BufferedWriter(writer);
+        configProperties.load(new BufferedReader(io.read()));
+        this.writer = new BufferedWriter(io.write());
     }
 
     /**
@@ -35,7 +30,7 @@ public class UserConfig {
      * @return the server URL
      */
     public String getUrl() {
-        return configProperties.getProperty("serverURL");
+        return configProperties.getProperty("serverURL", "http://localhost:8080/");
     }
 
     /**
@@ -44,7 +39,7 @@ public class UserConfig {
      * @return locale
      */
     public String getLocale() {
-        return configProperties.getProperty("lang");
+        return configProperties.getProperty("lang", "en");
     }
 
     /**
@@ -56,5 +51,6 @@ public class UserConfig {
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
         configProperties.store(writer, "Changed language to " + lang);
+        writer.flush();
     }
 }
