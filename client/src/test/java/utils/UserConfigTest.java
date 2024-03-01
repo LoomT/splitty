@@ -1,19 +1,36 @@
 package utils;
 
+import client.utils.IOInterface;
 import client.utils.UserConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserConfigTest {
+    TestIO IO; // dummy IO interface
+    UserConfig userConfig;
+
+    @BeforeEach
+    void setUp() throws IOException {
+        Writer writer = new StringWriter();
+        writer.write("""
+                serverURL=http://localhost:8080/
+                lang=en""");
+        IO = new TestIO(writer);
+        userConfig = new UserConfig(IO);
+    }
+
     /**
      * Assert that the UserConfig instance is created
      */
     @Test
-    void createInstance() throws IOException {
-        assertNotNull(UserConfig.createInstance());
+    void instanceNotNull() {
+        assertNotNull(userConfig);
     }
 
     /**
@@ -21,7 +38,6 @@ class UserConfigTest {
      */
     @Test
     void getUrl() throws IOException {
-        UserConfig userConfig = UserConfig.createInstance();
         assertEquals("http://localhost:8080/", userConfig.getUrl());
     }
 
@@ -30,7 +46,6 @@ class UserConfigTest {
      */
     @Test
     void getLocale() throws IOException {
-        UserConfig userConfig = UserConfig.createInstance();
         assertEquals("en", userConfig.getLocale());
     }
 
@@ -39,10 +54,10 @@ class UserConfigTest {
      */
     @Test
     void setLocale() throws IOException {
-        UserConfig userConfig = UserConfig.createInstance();
         assertEquals("en", userConfig.getLocale());
+        assertFalse(IO.getWriter().toString().contains("nl"));
         userConfig.setLocale("nl");
         assertEquals("nl", userConfig.getLocale());
-        userConfig.setLocale("en"); // revert the setting
+        assertTrue(IO.getWriter().toString().contains("nl"));
     }
 }
