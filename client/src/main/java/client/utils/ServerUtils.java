@@ -20,6 +20,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.inject.Inject;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -29,15 +30,11 @@ import jakarta.ws.rs.core.GenericType;
 
 public class ServerUtils {
 
-    private static final String SERVER;
+    private final String SERVER;
 
-    static {
-        try {
-            SERVER = UserConfig.createInstance().getUrl();
-        } catch (IOException e) {
-            // show a pop-up here maybe
-            throw new RuntimeException(e);
-        }
+    @Inject
+    public ServerUtils(UserConfig userConfig) {
+        SERVER = userConfig.getUrl();
     }
 
     /**

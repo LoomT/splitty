@@ -1,5 +1,7 @@
 package client.utils;
 
+import com.google.inject.Inject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,24 +13,19 @@ public class LanguageConf {
 
 
 
-    private static final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
+    private final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
 
-    private static final UserConfig userConfig;
+    private final UserConfig userConfig;
 
-    static {
-        try {
-            userConfig = UserConfig.createInstance();
-        } catch (IOException e) {
-            // show a pop-up here maybe
-            throw new RuntimeException(e);
-        }
+    private Locale currentLocale;
+    private Runnable callback = null;
+    private ResourceBundle currentBundle;
+    @Inject
+    public LanguageConf(UserConfig userConfig) {
+        this.userConfig = userConfig;
+        currentLocale = Locale.of(userConfig.getLocale());
+        currentBundle = getCurrentResourceBundle();
     }
-
-    private static Locale currentLocale = Locale.of(userConfig.getLocale());
-
-    private static Runnable callback = null;
-    private static ResourceBundle currentBundle = getCurrentResourceBundle();
-
 
     /**
      * Use this function when you need to display language dependent text
@@ -36,21 +33,21 @@ public class LanguageConf {
      * @param key The key of the property in the language properties file
      * @return the value of the key in the currently set language
      */
-    public static String get(String key) {
+    public String get(String key) {
         return currentBundle.getString(key);
     }
 
     /**
      * @return the current locale in string format
      */
-    public static String getCurrentLocaleString() {
+    public String getCurrentLocaleString() {
         return currentLocale.getLanguage();
     }
 
     /**
      * @param newLocaleString the locale string to change the new language to
      */
-    public static void changeCurrentLocaleTo(String newLocaleString) {
+    public void changeCurrentLocaleTo(String newLocaleString) {
         Locale newLocale = Locale.of(newLocaleString);
         if (!availableLocales.contains(newLocale)) {
             throw new RuntimeException("The provided locale " + newLocaleString +
@@ -71,21 +68,21 @@ public class LanguageConf {
     /**
      * @return the resourcebundle for the selected locale
      */
-    private static ResourceBundle getCurrentResourceBundle() {
+    private ResourceBundle getCurrentResourceBundle() {
         return ResourceBundle.getBundle("languages", currentLocale);
     }
 
     /**
      * @return the current resource bundle
      */
-    public static ResourceBundle getLanguageResources() {
+    public ResourceBundle getLanguageResources() {
         return currentBundle;
     }
 
     /**
      * @return the available locales list converted to a list of strings
      */
-    public static List<String> getAvailableLocalesString() {
+    public List<String> getAvailableLocalesString() {
         List<String> localesString = new ArrayList<>();
         for (Locale l : availableLocales) {
             localesString.add(l.getLanguage());
@@ -96,7 +93,7 @@ public class LanguageConf {
     /**
      * @param function sets the callback for the language change
      */
-    public static void onLanguageChange(Runnable function) {
+    public void onLanguageChange(Runnable function) {
         callback = function;
     }
 }

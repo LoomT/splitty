@@ -19,6 +19,7 @@ import static com.google.inject.Guice.createInjector;
 
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
+import client.utils.UserConfig;
 import com.google.inject.Injector;
 
 import client.scenes.MainCtrl;
@@ -29,6 +30,7 @@ public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
      * Main class
@@ -46,7 +48,7 @@ public class Main extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        LanguageConf.onLanguageChange(() -> {
+        languageConf.onLanguageChange(() -> {
             // When the language is changed, this function is run
             loadLanguageResourcesAndStart(primaryStage);
         });
@@ -69,10 +71,10 @@ public class Main extends Application {
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
         var start = FXML.load(
                 StartScreenCtrl.class,
-                LanguageConf.getLanguageResources(),
+                languageConf.getLanguageResources(),
                 "client", "scenes", "StartScreen.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, start);
+        mainCtrl.initialize(primaryStage, start, languageConf);
     }
 }

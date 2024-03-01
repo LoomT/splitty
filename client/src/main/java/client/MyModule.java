@@ -16,13 +16,19 @@
 package client;
 
 import client.scenes.StartScreenCtrl;
+import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import client.utils.UserConfig;
 import com.google.inject.Binder;
 import com.google.inject.Module;
+import com.google.inject.Provides;
 import com.google.inject.Scopes;
 
 //import client.scenes.AddQuoteCtrl;
 //import client.scenes.QuoteOverviewCtrl;
 import client.scenes.MainCtrl;
+
+import java.io.*;
 
 
 public class MyModule implements Module {
@@ -36,5 +42,26 @@ public class MyModule implements Module {
     public void configure(Binder binder) {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(UserConfig.class).in(Scopes.SINGLETON);
+        binder.bind(ServerUtils.class).in(Scopes.SINGLETON);
+        binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
+    }
+
+    @Provides
+    Reader provideReader() {
+        try {
+            return new FileReader(UserConfig.class.getClassLoader().getResource("client/config.properties").getPath());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Provides
+    Writer provideWriter() {
+        try {
+            return new FileWriter(UserConfig.class.getClassLoader().getResource("client/config.properties").getFile());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

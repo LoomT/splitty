@@ -1,6 +1,10 @@
 package client.utils;
 
+import com.google.inject.Inject;
+
 import java.io.*;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -9,30 +13,22 @@ import java.util.Properties;
  * Follows singleton design pattern
  */
 public class UserConfig {
-
-    private static UserConfig config;
-    private final String configPath = Objects.requireNonNull(UserConfig.class.getClassLoader()
-            .getResource("client/config.properties")).getPath();
     private final Properties configProperties;
+    private final BufferedWriter writer;
 
     /**
      * The constructor is private so multiple instances can't be created
      */
-    private UserConfig() throws IOException {
+    @Inject
+    public UserConfig(Reader reader, Writer writer) throws IOException {
+        File file = new File(UserConfig.class.getClassLoader().getResource("client/config.properties").getPath());
+        FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
         configProperties = new Properties();
-        configProperties.load(new FileInputStream(configPath));
+        configProperties.load(new BufferedReader(reader));
+//        configProperties.load(new BufferedReader(new FileReader(UserConfig.class.getClassLoader().getResource("client/config.properties").getFile())));
+        this.writer = new BufferedWriter(writer);
     }
-    /**
-     * Creates an instance of the parser
-     *
-     * @return the config parser singleton instance
-     */
-    public static UserConfig createInstance() throws IOException {
-        if(config == null) {
-            config = new UserConfig();
-        }
-        return config;
-    }
+
     /**
      * Returns the server URL from the config
      *
@@ -59,6 +55,6 @@ public class UserConfig {
      */
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
-        configProperties.store(new FileOutputStream(configPath), "Changed language to " + lang);
+        configProperties.store(writer, "Changed language to " + lang);
     }
 }
