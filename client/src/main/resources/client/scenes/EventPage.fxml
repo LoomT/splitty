@@ -12,16 +12,16 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="$CONTROLLER_NAME$">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
       <Pane prefHeight="61.0" prefWidth="600.0" style="-fx-background-color: #ddd;">
          <children>
-            <Text layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="New Year Party">
+            <Text fx:id="eventTitle" layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="New Year Party">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" text="Send Invites" />
+            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="Send Invites" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
@@ -33,7 +33,7 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Text>
-                  <Button mnemonicParsing="false" text="Edit Participants">
+                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" text="Edit Participants">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -43,7 +43,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </HBox>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David">
+            <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David">
                <VBox.margin>
                   <Insets left="5.0" />
                </VBox.margin>
@@ -58,8 +58,8 @@
             </Text>
             <HBox>
                <children>
-                  <ChoiceBox prefWidth="150.0" />
-                  <Button mnemonicParsing="false" text="Add Expense">
+                  <ChoiceBox fx:id="participantChoiceBox" prefWidth="150.0" />
+                  <Button mnemonicParsing="false" onAction="#addExpenseClicked" text="Add Expense">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -71,21 +71,9 @@
             </HBox>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab text="All">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </Tab>
-                <Tab text="From John">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </Tab>
-                  <Tab text="Including John">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                    </content>
-                  </Tab>
+                <Tab text="All" />
+                <Tab text="From John" />
+                  <Tab text="Including John" />
               </tabs>
             </TabPane>
          </children>
