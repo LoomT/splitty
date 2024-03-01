@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.List;
 
 import client.ConfigParser;
+import commons.Event;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -40,6 +41,15 @@ public class ServerUtils {
         }
     }
 
+    public static Event getEvent(String id) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(SERVER).path("api/events/" + id)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(new GenericType<Event>() {
+                });
+    }
+
     /**
      * Sends an API call to server for quotes
      *
@@ -50,7 +60,8 @@ public class ServerUtils {
                 .target(SERVER).path("api/quotes") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {});
+                .get(new GenericType<List<Quote>>() {
+                });
     }
 
     /**

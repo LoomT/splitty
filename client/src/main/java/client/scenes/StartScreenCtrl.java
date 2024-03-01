@@ -93,5 +93,7 @@ public class StartScreenCtrl {
 //        } else {
 //
 //        }
+        System.out.println("Clicked join");
+        System.out.println(ServerUtils.getEvent(code.getText()));
     }
 }
