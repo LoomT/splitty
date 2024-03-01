@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import static client.AdminClient.*;
 
 public class AdminLoginCtrl {
 
@@ -61,6 +62,8 @@ public class AdminLoginCtrl {
     private void login() {
         String username = usernameTextField.getText();
         String password = passwordTextField.getText();
+        System.out.println(verifyPassword(password));
+
 
 
     }

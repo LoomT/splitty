@@ -1,11 +1,36 @@
 package server;
 
-import java.security.NoSuchAlgorithmException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
-import java.security.MessageDigest;
 
 public class AdminService {
+
+    private static final String resourcesFolderPath =
+            "./client/src/main/resources/client/adminPassword/";
+
+
+    /**
+     * Generates a random password for the admin
+     * Stores it in a txt file in the client part of the project
+     *
+     */
+    public static void generateAndStorePassword() {
+        String adminPassword = generateAdminPassword();
+        System.out.println("Admin password: " + adminPassword);
+        try {
+            savePasswordToFile(adminPassword);
+        } catch (IOException e) {
+            System.err.println("Error writing password to file: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Generates a random password for the admin
+     *
+     * @return the generated password
+     */
 
     static String generateAdminPassword() {
         SecureRandom random = new SecureRandom();
@@ -14,10 +39,18 @@ public class AdminService {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-    static String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(password.getBytes());
-        return Base64.getEncoder().encodeToString(hash);
+
+    /**
+     * Saves the password to the file
+     *
+     *
+     * @param adminPassword generated admin password
+     * @throws IOException if there is a problem with IO
+     */
+    private static void savePasswordToFile(String adminPassword) throws IOException {
+        try (FileWriter writer = new FileWriter(resourcesFolderPath + "adminPassword.txt")) {
+            writer.write(adminPassword);
+        }
     }
 
 }
