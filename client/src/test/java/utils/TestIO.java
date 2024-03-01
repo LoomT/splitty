@@ -18,10 +18,9 @@ public class TestIO implements IOInterface {
      * Returns a reader with the current buffer
      *
      * @return reader
-     * @throws FileNotFoundException leftover
      */
     @Override
-    public Reader read() throws FileNotFoundException {
+    public Reader read() {
         return new StringReader(writer.toString());
     }
 

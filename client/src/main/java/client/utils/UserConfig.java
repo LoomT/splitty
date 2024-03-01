@@ -11,7 +11,7 @@ import java.util.Properties;
  */
 public class UserConfig {
     private final Properties configProperties;
-    private final BufferedWriter writer;
+    private final IOInterface io;
 
     /**
      * The constructor which initializes properties from file, and opens a writer to the file
@@ -21,7 +21,7 @@ public class UserConfig {
     public UserConfig(IOInterface io) throws IOException {
         configProperties = new Properties();
         configProperties.load(new BufferedReader(io.read()));
-        this.writer = new BufferedWriter(io.write());
+        this.io = io;
     }
 
     /**
@@ -50,7 +50,8 @@ public class UserConfig {
      */
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
-        configProperties.store(writer, "Changed language to " + lang);
-        writer.flush();
+        try(BufferedWriter writer = new BufferedWriter(io.write()) ) {
+            configProperties.store(writer, "Changed language to " + lang);
+        }
     }
 }
