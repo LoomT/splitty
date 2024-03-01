@@ -19,6 +19,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
+import java.security.NoSuchAlgorithmException;
+
+import static server.AdminService.generateAdminPassword;
+import static server.AdminService.hashPassword;
+
 @SpringBootApplication
 @EntityScan(basePackages = { "commons", "server" })
 public class Main {
@@ -30,5 +35,13 @@ public class Main {
      */
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
+
+        try {
+            String adminPassword = generateAdminPassword();
+            String hashedPassword = hashPassword(adminPassword);
+            System.out.println("Hashed Admin Password: " + hashedPassword);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 }
