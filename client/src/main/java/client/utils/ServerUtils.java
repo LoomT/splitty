@@ -46,8 +46,7 @@ public class ServerUtils {
                 .target(SERVER).path("api/events/" + id)
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
-                .get(new GenericType<Event>() {
-                });
+                .get(Event.class);
     }
 
     /**
