@@ -1,6 +1,5 @@
 package utils;
 
-import client.utils.IOInterface;
 import client.utils.UserConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ class UserConfigTest {
      * Assert that it initializes with the correct URL
      */
     @Test
-    void getUrl() throws IOException {
+    void getUrl() {
         assertEquals("http://localhost:8080/", userConfig.getUrl());
     }
 
@@ -45,7 +44,7 @@ class UserConfigTest {
      * Assert that it initializes with the correct locale
      */
     @Test
-    void getLocale() throws IOException {
+    void getLocale() {
         assertEquals("en", userConfig.getLocale());
     }
 

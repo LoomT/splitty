@@ -63,9 +63,9 @@ public class MainCtrl {
         primaryStage.setScene(startScreen);
     }
 
-    /**
-     * Display overview
-     */
+//    /**
+//     * Display overview
+//     */
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");
 //        primaryStage.setScene(overview);

@@ -29,7 +29,7 @@ public class TestIO implements IOInterface {
      * Flush the buffer and return an empty writer
      *
      * @return writer
-     * @throws IOException
+     * @throws IOException if writer can not be flushed
      */
     @Override
     public Writer write() throws IOException {
