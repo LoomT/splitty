@@ -28,6 +28,7 @@ public class StartScreenCtrl {
      *
      * @param server utils
      * @param mainCtrl main scene controller
+     * @param languageConf language config instance
      */
     @Inject
     public StartScreenCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {

@@ -10,9 +10,6 @@ import java.util.ResourceBundle;
 
 
 public class LanguageConf {
-
-
-
     private final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
 
     private final UserConfig userConfig;
@@ -20,6 +17,13 @@ public class LanguageConf {
     private Locale currentLocale;
     private Runnable callback = null;
     private ResourceBundle currentBundle;
+
+    /**
+     * Language config constructor where user config
+     * is injected and currently configured language is set
+     *
+     * @param userConfig user config
+     */
     @Inject
     public LanguageConf(UserConfig userConfig) {
         this.userConfig = userConfig;

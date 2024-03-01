@@ -19,7 +19,6 @@ import static com.google.inject.Guice.createInjector;
 
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
-import client.utils.UserConfig;
 import com.google.inject.Injector;
 
 import client.scenes.MainCtrl;

@@ -16,7 +16,6 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
-import com.google.inject.Inject;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -36,8 +35,10 @@ public class MainCtrl {
      //* @param overview controller and parent
      //* @param add controller and parent
      * @param startScreen controller and scene
+     * @param languageConf language config instance
      */
-    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen, LanguageConf languageConf) {
+    public void initialize(Stage primaryStage, Pair<StartScreenCtrl,
+            Parent> startScreen, LanguageConf languageConf) {
         this.primaryStage = primaryStage;
         this.languageConf = languageConf;
         //this.overviewCtrl = overview.getKey();
