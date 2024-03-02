@@ -54,23 +54,24 @@ public class ExpenseController {
     @PostMapping("")
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
         try {
-            long authorId = expense.getExpenseAuthor().getParticipantId();
+            //save expense
+            Expense savedExpense = repoExpense.save(expense);
+
+            //get the author of the expense
+            long authorId = savedExpense.getExpenseAuthor().getParticipantId();
             Optional<Participant> optionalParticipant = repoParticipant.findById(authorId);
+
             if (optionalParticipant.isPresent()) {
                 Participant author = optionalParticipant.get();
-                author.addExpense(expense);
+
+                //updated expense saved for the author
+                author.addExpense(savedExpense);
+
+                //save the participant
                 Participant savedAuthor = repoParticipant.save(author);
 
-                Expense updatedExpense = savedAuthor.getAuthoredExpenseSet().stream()
-                        .filter(e -> e.equals(expense))
-                        .findFirst()
-                        .orElse(null);
-
-                if (updatedExpense != null) {
-                    return ResponseEntity.ok(updatedExpense);
-                } else {
-                    return ResponseEntity.badRequest().build();
-                }
+                //return the expense
+                return ResponseEntity.ok(savedExpense);
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -78,6 +79,7 @@ public class ExpenseController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 
     /**
      * delete an expense
