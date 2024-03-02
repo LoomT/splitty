@@ -11,7 +11,7 @@ import java.net.http.HttpResponse;
 public class CurrencyConverter {
 
     private static CurrencyConverter currencyParser;
-    private static Map<String, Double> currencyList;
+    private static Map<String, Double> currencyMap;
     private URI apiURI;
     private String base;
     private double conversionRate;
@@ -40,8 +40,8 @@ public class CurrencyConverter {
 
     public static CurrencyConverter createInstanceInjection(URI uri, String base){
         if(currencyParser == null) {
-            currencyList = readConfig();
-            double conversionRate = currencyList.get(base);
+            currencyMap = readConfig();
+            double conversionRate = currencyMap.get(base);
             currencyParser = new CurrencyConverter(uri, base, conversionRate);
         }
         return currencyParser;
@@ -104,13 +104,37 @@ public class CurrencyConverter {
         currencies.close();
     }
 
-    /**
-     *
-     * @param currency
-     * @return
-     */
-    public static double conversionRate(String currency){
-        return 0; //TODO
+    public boolean setBase(String base){
+        if(base == null || !currencyMap.containsKey(base)){
+            return false;
+        }
+        this.base = base;
+        this.conversionRate = currencyMap.get(base)/currencyMap.get("EUR");
+        return true;
     }
+
+    public void migration() throws IOException {
+        String path = Objects.requireNonNull(CurrencyConverter.class.getClassLoader()
+                .getResource("client/migration.properties")).getPath();
+        System.out.println(path);
+        Properties prop = new Properties();
+        InputStream in = new FileInputStream(path);
+        prop.load(in);
+        in.close();
+
+        OutputStream outputstream = new FileOutputStream(path);
+        prop.setProperty("base", String.valueOf(currencyMap.get("EUR")));
+        for(String s : currencyMap.keySet()){
+            prop.setProperty(s, String.valueOf(currencyMap.get(s)));
+        }
+
+        prop.store(outputstream, "File updated");
+        outputstream.close();
+    }
+
+    public static void main(String[] args) throws IOException {
+        CurrencyConverter.createInstance().migration();
+    }
+
 
 }

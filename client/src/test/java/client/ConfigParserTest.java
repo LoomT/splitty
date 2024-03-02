@@ -29,4 +29,9 @@ class ConfigParserTest {
         File file = new File(absolutePath + "/src/main/resources/client/config.properties");
         assertEquals(new Scanner(file).nextLine(), parser.getUrl());
     }
+
+    @Test
+    void migration() throws IOException {
+        CurrencyConverter.createInstance().migration();
+    }
 }
