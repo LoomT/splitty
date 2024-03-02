@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
-import client.utils.ServerUtils;
 import com.google.inject.Injector;
 
 import client.scenes.MainCtrl;
@@ -80,7 +79,6 @@ public class Main extends Application {
                 "client", "scenes", "StartScreen.fxml"
         );
 
-        System.out.println(ServerUtils.getEvent("EEUZK"));
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, start);

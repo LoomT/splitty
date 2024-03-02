@@ -15,11 +15,18 @@ public class EventListItem extends HBox {
     private Label label;
 
     private String eventName;
-    Runnable onRemoveCallback;
+    private Runnable onRemoveCallback;
 
 
+    /**
+     * @param eventName the name to display
+     * @param onRemove the callback to be called when the remove button ic clicked
+     */
     public EventListItem(String eventName, Runnable onRemove) {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/client/components/EventListItem.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(
+                getClass()
+                        .getResource("/client/components/EventListItem.fxml")
+        );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
 
@@ -35,6 +42,9 @@ public class EventListItem extends HBox {
     }
 
 
+    /**
+     * This is run when the x button is clicked
+     */
     @FXML
     private void onXClick() {
         System.out.println("X on button " + this.eventName);

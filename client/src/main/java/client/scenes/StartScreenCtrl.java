@@ -53,7 +53,8 @@ public class StartScreenCtrl {
             LanguageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
 
-        List<String> testList = List.of("Test1", "random event", "heres one more", "idk", "try deleting this");
+        List<String> testList = List.of("Test1", "random event",
+                "heres one more", "idk", "try deleting this");
         List<EventListItem> list = new ArrayList<>();
 
 
