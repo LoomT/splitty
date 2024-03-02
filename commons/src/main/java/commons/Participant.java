@@ -1,59 +1,68 @@
 package commons;
 import jakarta.persistence.*;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 
+/**
+ * Fields:
+ *  participantID: ID of the participant to uniquely identify it in the database
+ *  name: name of participant
+ *  emailAddress: optional email address of participant which can be null
+ *  expenseSet: Set of all expenses which the participant authored. (can be empty)
+ *  bankAccountSet: The registered Bank Accounts for the participant. (can be empty)
+ */
 @Entity
 public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id; //ID of participant should be determined systematically
-    @OneToMany(cascade = CascadeType.PERSIST)
-    private Set<Expense> expenseList;
+    private long participantId;
     private String name;
-
-    /**
-     * Use this constructed if the participant already has expenses
-     * @param name name of participant
-     * @param expenseList expenses the participant has already acquired
-     */
-    public Participant(String name, Set<Expense> expenseList) {
-        this.name = name;
-        this.expenseList = expenseList;
-    }
+    @Nullable
+    private String emailAddress;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Expense> authoredExpenseSet;
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<BankAccount> bankAccountSet;
 
     /**
      * constructor
      */
-    public Participant(){
-    }
+    public Participant(){}
 
-    /**\
-     * Use this constructed if the participant is known to
-     * not have any expenses
-     * @param name name of participant
+    /**
+     * @param name  name of the participant
      */
     public Participant(String name) {
         this.name = name;
-        this.expenseList = new HashSet<>();
+        emailAddress = null;
+        authoredExpenseSet = new HashSet<>();
+        bankAccountSet = new HashSet<>();
     }
 
     /**
-     * getter for ID
-     * @return the ID of the participant
+     * @param name  name of the participant
+     * @param email email of the participant. Can be Null
      */
-    public long getID() {
-        return id;
+    public Participant(String name, @Nullable String email) {
+        this(name);
+        this.emailAddress = email;
     }
 
     /**
-     * setter for id
-     * @param id id to be changed to
+     * constructor with expenses
+     * @param name name of the participant
+     * @param email email of the participant. Can be Null
+     * @param bankAccountSet bankAccount number of the participant
+     * @param authoredExpenseSet expenses of a participant if it already had some.
      */
-    public void setID(long id){
-        this.id = id;
+    public Participant(String name, @Nullable String email, Set<Expense> authoredExpenseSet,
+                       Set<BankAccount> bankAccountSet ) {
+        this(name, email);
+        this.authoredExpenseSet = authoredExpenseSet;
+        this.bankAccountSet = bankAccountSet;
     }
 
     /**
@@ -73,32 +82,87 @@ public class Participant {
     }
 
     /**
-     * getter for expenses
-     * @return the expenses of the participant
+     * get participant
+     * @return participant
      */
-    public Set<Expense> getExpenseList() {
-        return expenseList;
+    public long getParticipantId() {
+        return participantId;
     }
 
     /**
      *
-     * @param expenseList setter for the expenses
+     * @param participantId participantID to replace the old one
      */
-    public void setExpenseList(Set<Expense> expenseList) {
-        this.expenseList = expenseList;
+    public void setParticipantId(long participantId) {
+        this.participantId = participantId;
     }
 
+    /**
+     * emailAddress getter. Can be null
+     * @return emailAddress
+     */
+    public @Nullable String getEmailAddress() {
+        return emailAddress;
+    }
 
     /**
-     * adds an expense to the expenseList
-     * @param expense the expense to be added to the expenseList
-     * @return false if expense is null, or it is already in expenseList.
-     * Otherwise, it adds the expense to the expenseList and returns true.
+     *
+     * @param emailAddress that will replace the participants old one
      */
-    public boolean addExpense(Expense expense) {
-        if(expense == null || expenseList.contains(expense)) return false;
-        expenseList.add(expense);
-        return true;
+    public void setEmailAddress(@Nullable String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    /**
+     * getter for expenses
+     * @return expenses
+     */
+    public Set<Expense> getAuthoredExpenseSet() {
+        return authoredExpenseSet;
+    }
+
+    /**
+     * setter for expenses
+     * @param authoredExpenseSet expenses to replace the old one
+     */
+    public void setAuthoredExpenseSet(Set<Expense> authoredExpenseSet) {
+        this.authoredExpenseSet = authoredExpenseSet;
+    }
+
+    /**
+     * Add bankAccount to bankAccountSet
+     * @param expense expense to be added
+     * @return false if bankAccount is null or already in set, true otherwise
+     */
+    public boolean addExpense(Expense expense){
+        if(expense == null) return false;
+        return authoredExpenseSet.add(expense);
+    }
+
+    /**
+     * getter for bankAccountSet
+     * @return bankAccountSet
+     */
+    public Set<BankAccount> getBankAccountSet() {
+        return bankAccountSet;
+    }
+
+    /**
+     * setter for bankAccountSet
+     * @param bankAccountSet to replace the old one
+     */
+    public void setBankAccountSet(Set<BankAccount> bankAccountSet) {
+        this.bankAccountSet = bankAccountSet;
+    }
+
+    /**
+     * Add bankAccount to bankAccountSet
+     * @param bankAccount bankAccount to be added
+     * @return false if bankAccount is null or already in set, true otherwise
+     */
+    public boolean addBankAccount(BankAccount bankAccount){
+        if(bankAccount == null) return false;
+        return bankAccountSet.add(bankAccount);
     }
 
     /**
@@ -113,9 +177,10 @@ public class Participant {
 
         Participant that = (Participant) o;
 
-        if (id != that.id) return false;
-        if (!Objects.equals(name, that.name)) return false;
-        return Objects.equals(expenseList, that.expenseList);
+        if (participantId != that.participantId || !name.equals(that.name)) return false;
+        if (!Objects.equals(emailAddress, that.emailAddress)) return false;
+        if (!authoredExpenseSet.equals(that.authoredExpenseSet)) return false;
+        return bankAccountSet.equals(that.bankAccountSet);
     }
 
     /**
@@ -124,10 +189,24 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        long result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (expenseList != null ? expenseList.hashCode() : 0);
-        return (int) result;
+        return Objects.hash(participantId);
+    }
+
+    /**
+     * toString method for Participant class
+     * @return human-readable string
+     */
+    @Override
+    public String toString() {
+        String result = "Participant{" +
+                "participantId=" + participantId +
+                ", name='" + name + '\'';
+        if(emailAddress != null)
+            result += ", emailAddress='" + emailAddress + '\'';
+        result += ", expenseSet=" + authoredExpenseSet +
+                ", bankAccountSet=" + bankAccountSet +
+                '}';
+        return result;
     }
 }
 

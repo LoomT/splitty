@@ -30,14 +30,13 @@ public class Expense {
     private Participant expenseAuthor;
     @NotNull
     private String purpose;
-    @NotNull
     private double amount;
     @NotNull
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     private List<Participant> expenseParticipants;
     @NotNull
     private String type;
