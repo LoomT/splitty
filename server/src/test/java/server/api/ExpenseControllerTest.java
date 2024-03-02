@@ -12,4 +12,8 @@ import commons.Participant;
 
 
 public class ExpenseControllerTest {
+    private TestExpenseRepository repo;
+    private ExpenseController sut;
+
+
 }

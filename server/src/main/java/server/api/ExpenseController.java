@@ -11,19 +11,19 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/api/expenses")
+@RequestMapping("/api/events/{eventID}/participants/{participantID}/expenses")
 public class ExpenseController {
-    private final ExpenseRepository repo1;
-    private final ParticipantRepository repo2;
+    private final ExpenseRepository repoExpense;
+    private final ParticipantRepository repoParticipant;
 
     /**
      * constructor for expense controller
-     * @param repo1
-     * @param repo2
+     * @param repoExpense
+     * @param repoParticipant
      */
-    public ExpenseController(ExpenseRepository repo1, ParticipantRepository repo2) {
-        this.repo1 = repo1;
-        this.repo2 = repo2;
+    public ExpenseController(ExpenseRepository repoExpense, ParticipantRepository repoParticipant) {
+        this.repoExpense = repoExpense;
+        this.repoParticipant = repoParticipant;
     }
 
     /**
@@ -34,7 +34,7 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ResponseEntity<Expense> getById(@PathVariable long id) {
         try {
-            Optional<Expense> optionalExpense = repo1.findById(id);
+            Optional<Expense> optionalExpense = repoExpense.findById(id);
             if (optionalExpense.isPresent()) {
                 return ResponseEntity.ok(optionalExpense.get()); //status code 200(OK) if found
             } else {
@@ -55,12 +55,22 @@ public class ExpenseController {
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
         try {
             long authorId = expense.getExpenseAuthor().getParticipantId();
-            Optional<Participant> optionalParticipant = repo2.findById(authorId);
+            Optional<Participant> optionalParticipant = repoParticipant.findById(authorId);
             if (optionalParticipant.isPresent()) {
                 Participant author = optionalParticipant.get();
                 author.addExpense(expense);
-                repo2.save(author);
-                return ResponseEntity.ok(expense);
+                Participant savedAuthor = repoParticipant.save(author);
+
+                Expense updatedExpense = savedAuthor.getAuthoredExpenseSet().stream()
+                        .filter(e -> e.equals(expense))
+                        .findFirst()
+                        .orElse(null);
+
+                if (updatedExpense != null) {
+                    return ResponseEntity.ok(updatedExpense);
+                } else {
+                    return ResponseEntity.badRequest().build();
+                }
             } else {
                 return ResponseEntity.notFound().build();
             }
@@ -77,7 +87,7 @@ public class ExpenseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Expense> deleteById(@PathVariable long id) {
         try {
-            repo1.deleteById(id);
+            repoExpense.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -89,14 +99,14 @@ public class ExpenseController {
      * update the expense
      * @param id
      * @param updatedExpense
-     * @return status 204 if updating is successful or 404 if the expense does not exist
+     * @return status 200zz if updating is successful or 404 if the expense does not exist
      */
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Expense> updateExpense(@PathVariable long id,
                                                  @RequestBody Expense updatedExpense) {
         try {
             updatedExpense.setExpenseID(id);
-            Expense updated = repo1.save(updatedExpense);
+            Expense updated = repoExpense.save(updatedExpense);
             return ResponseEntity.ok(updated);
         }
         catch (Exception e) {
