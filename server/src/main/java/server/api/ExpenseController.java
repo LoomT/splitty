@@ -54,7 +54,7 @@ public class ExpenseController {
     @PostMapping("")
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
         try {
-            long authorId = expense.getExpenseAuthor().getID();
+            long authorId = expense.getExpenseAuthor().getParticipantId();
             Optional<Participant> optionalParticipant = repo2.findById(authorId);
             if (optionalParticipant.isPresent()) {
                 Participant author = optionalParticipant.get();
