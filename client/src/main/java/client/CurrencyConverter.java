@@ -39,8 +39,13 @@ public class CurrencyConverter {
                 .build();
 
         HttpResponse response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        Writer currencies = new FileWriter("client/currency.properties");
-        currencies.write("test");
+        FileWriter currencies = new FileWriter(Objects.requireNonNull(CurrencyConverter.class.getClassLoader()
+                .getResource("client/currencies.properties")).getPath());
+        currencies.write(response.body().toString());
+        currencies.close();
     }
 
+    public static double conversionWithBase(String currency){
+        return 0; //TODO
+    }
 }
