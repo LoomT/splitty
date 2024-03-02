@@ -27,13 +27,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 
 import commons.Expense;
 import server.database.ExpenseRepository;
 
-import static commons.Expense.*;
 
 public class TestExpenseRepository implements ExpenseRepository {
     private final List<Expense> expenses = new ArrayList<>();
@@ -329,7 +327,8 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @return a
      */
     @Override
-    public <S extends Expense, R> R findBy(Example<S> example, Function<FetchableFluentQuery<S>, R> queryFunction) {
+    public <S extends Expense, R> R findBy(Example<S> example,
+                                           Function<FetchableFluentQuery<S>, R> queryFunction) {
         return null;
     }
 

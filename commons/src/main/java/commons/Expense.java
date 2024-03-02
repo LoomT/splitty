@@ -174,6 +174,10 @@ public class Expense {
         this.type = type;
     }
 
+    /**
+     * setter for the ID of the expense
+     * @param expenseID
+     */
     public void setExpenseID(long expenseID) {
         this.expenseID = expenseID;
     }

@@ -46,6 +46,11 @@ public class ExpenseController {
 
     }
 
+    /**
+     * find participant, add the expense to it and save the participant
+     * @param expense
+     * @return the participant with the corresponding expense
+     */
     @PostMapping("")
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
         try {
@@ -64,6 +69,11 @@ public class ExpenseController {
         }
     }
 
+    /**
+     * delete an expense
+     * @param id
+     * @return status 204 if deleting is successful or 404 if the expense does not exist
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Expense> deleteById(@PathVariable long id) {
         try {
@@ -75,8 +85,15 @@ public class ExpenseController {
 
     }
 
+    /**
+     * update the expense
+     * @param id
+     * @param updatedExpense
+     * @return status 204 if updating is successful or 404 if the expense does not exist
+     */
     @PatchMapping("/{id}")
-    public ResponseEntity<Expense> updateExpense(@PathVariable long id, @RequestBody Expense updatedExpense) {
+    public ResponseEntity<Expense> updateExpense(@PathVariable long id,
+                                                 @RequestBody Expense updatedExpense) {
         try {
             updatedExpense.setExpenseID(id);
             Expense updated = repo1.save(updatedExpense);
