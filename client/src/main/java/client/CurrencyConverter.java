@@ -1,14 +1,9 @@
 package client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import net.minidev.json.JSONObject;
-import net.minidev.json.parser.JSONParser;
-import net.minidev.json.parser.ParseException;
-
+import java.io.*;
 import java.util.*;
 
 import javax.net.ssl.HttpsURLConnection;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -43,6 +38,9 @@ public class CurrencyConverter {
                 .header("base", "EUR")
                 .build();
 
+        HttpResponse response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        Writer currencies = new FileWriter("client/currency.properties");
+        currencies.write("test");
     }
 
 }
