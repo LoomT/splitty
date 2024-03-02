@@ -10,22 +10,72 @@ import java.net.http.HttpResponse;
 
 public class CurrencyConverter {
 
-    URI uri;
+    private static CurrencyConverter currencyParser;
+    private static Map<String, Double> currencyList;
+    private URI apiURI;
+    private String base;
+    private double conversionRate;
+
 
     /**
      *
-     * @param uri custom uri for dependency injection
+     * @param apiURI custom uri for dependency injection
+     * TODO add: double conversionRate
      */
-    CurrencyConverter(URI uri){
-        this.uri = uri;
+    private CurrencyConverter(URI apiURI, String base, double conversionRate){
+        this.apiURI = apiURI;
+        this.base = base;
+        this.conversionRate = conversionRate;
+    }
+
+    public static CurrencyConverter createInstance(){
+        try {
+            return createInstanceInjection(new URI ("https://openexchangerates.org/api/" +
+                    "latest.json?app_id=4368d26633d149e0b992c5bcdce76270"), "EUR");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static CurrencyConverter createInstanceInjection(URI uri, String base){
+        if(currencyParser == null) {
+            currencyList = readConfig();
+            double conversionRate = currencyList.get(base);
+            currencyParser = new CurrencyConverter(uri, base, conversionRate);
+        }
+        return currencyParser;
+    }
+
+    public static Map<String, Double> readConfig() {
+        File file = new File(Objects.requireNonNull(ConfigParser.class.getClassLoader()
+                .getResource("client/currencies.properties")).getPath());
+
+        try(FileReader fileReader = new FileReader(file)) {
+            return getCurrencyMap(fileReader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Map<String, Double> getCurrencyMap(FileReader fileReader){
+        BufferedReader reader = new BufferedReader(fileReader);
+        List<String> temp = reader.lines().toList();
+        Map<String, Double> result = new HashMap<>();
+        for(int i = 6; i<temp.size()-2; i++){
+            String[] tempArr = temp.get(i).split(": ");
+            result.put(tempArr[0].replaceAll("[, " + (char)34 + "]",""),
+                    Double.parseDouble(tempArr[1].replaceAll("[, ]","")));
+        }
+        return result;
     }
 
     /**
      * constructor with a default uri value.
      */
-    CurrencyConverter(){
+    public CurrencyConverter(){
         try{
-            this.uri = new URI("https://openexchangerates.org/api/latest.json?" +
+            this.apiURI = new URI("https://openexchangerates.org/api/latest.json?" +
                     "app_id=4368d26633d149e0b992c5bcdce76270");
         }
         catch (URISyntaxException e) {
@@ -41,9 +91,8 @@ public class CurrencyConverter {
      */
     public void getExchange() throws URISyntaxException, IOException, InterruptedException {
         HttpClient httpClient = HttpClient.newHttpClient();
-
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
+                .uri(apiURI)
                 .GET()
                 .header("base", "EUR")
                 .build();
@@ -60,7 +109,8 @@ public class CurrencyConverter {
      * @param currency
      * @return
      */
-    public static double conversionWithBase(String currency){
+    public static double conversionRate(String currency){
         return 0; //TODO
     }
+
 }
