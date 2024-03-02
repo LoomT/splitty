@@ -17,6 +17,7 @@ class CurrencyConverterTest {
             throw new RuntimeException(e);
         }
         CurrencyConverter.readConfig();
+
     }
 
     @Test
