@@ -25,15 +25,9 @@ import javafx.util.Pair;
 public class MainCtrl {
 
     private Stage primaryStage;
-
-    //private QuoteOverviewCtrl overviewCtrl;
-    private Scene overview;
-
-    //private AddQuoteCtrl addCtrl;
-    private Scene add;
-
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+    private LanguageConf languageConf;
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
@@ -44,15 +38,21 @@ public class MainCtrl {
      * @param primaryStage stage
      //* @param overview controller and parent
      //* @param add controller and parent
+     * @param languageConf the language config
      * @param startScreen controller and scene
+
      * @param eventPage controller and scene for eventpage
+     *
      */
     public void initialize(
             Stage primaryStage,
+            LanguageConf languageConf,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage
     ) {
+
         this.primaryStage = primaryStage;
+        this.languageConf = languageConf;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
 
@@ -76,9 +76,10 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        primaryStage.setTitle(LanguageConf.get("StartScreen.title"));
+        primaryStage.setTitle(languageConf.get("StartScreen.title"));
         primaryStage.setScene(startScreen);
     }
+
 
     /**
      * shows the event page
@@ -92,6 +93,7 @@ public class MainCtrl {
     /**
      * Display overview
      */
+
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");
 //        primaryStage.setScene(overview);

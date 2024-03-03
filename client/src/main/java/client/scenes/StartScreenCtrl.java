@@ -22,6 +22,7 @@ public class StartScreenCtrl {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final LanguageConf languageConf;
 
     @FXML
     private TextField title;
@@ -40,11 +41,14 @@ public class StartScreenCtrl {
      *
      * @param server   utils
      * @param mainCtrl main scene controller
+     * @param languageConf language config instance
      */
     @Inject
-    public StartScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public StartScreenCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+
+        this.languageConf = languageConf;
 
     }
 
@@ -53,10 +57,10 @@ public class StartScreenCtrl {
      */
     @FXML
     private void initialize() {
-        languageChoiceBox.setValue(LanguageConf.getCurrentLocaleString());
-        languageChoiceBox.getItems().addAll(LanguageConf.getAvailableLocalesString());
+        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+        languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
         languageChoiceBox.setOnAction(event -> {
-            LanguageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
+            languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
 
         List<String> testList = List.of("Test1", "random event",

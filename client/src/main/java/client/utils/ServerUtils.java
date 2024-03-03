@@ -17,11 +17,12 @@ package client.utils;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-import java.io.IOException;
 import java.util.List;
 
-import client.ConfigParser;
 import commons.Event;
+
+import com.google.inject.Inject;
+
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -31,14 +32,14 @@ import jakarta.ws.rs.core.GenericType;
 
 public class ServerUtils {
 
-    private static final String SERVER;
+    private final String server;
 
-    static {
-        try {
-            SERVER = ConfigParser.createInstance().getUrl();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    /**
+     * @param userConfig user configuration with server url
+     */
+    @Inject
+    public ServerUtils(UserConfig userConfig) {
+        server = userConfig.getUrl();
     }
 
     /**
@@ -47,7 +48,7 @@ public class ServerUtils {
      */
     public Event getEvent(String id) {
         return ClientBuilder.newClient(new ClientConfig())
-                .target(SERVER).path("api/events/" + id)
+                .target(server).path("api/events/" + id)
                 .request(APPLICATION_JSON)
                 .accept(APPLICATION_JSON)
                 .get(Event.class);
@@ -59,7 +60,7 @@ public class ServerUtils {
      */
     public Event createEvent(Event event) {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/events") //
+                .target(server).path("api/events") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(event, APPLICATION_JSON), Event.class);
@@ -72,7 +73,7 @@ public class ServerUtils {
      */
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
+                .target(server).path("api/quotes") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Quote>>() {
@@ -87,7 +88,7 @@ public class ServerUtils {
      */
     public Quote addQuote(Quote quote) {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(SERVER).path("api/quotes") //
+                .target(server).path("api/quotes") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);

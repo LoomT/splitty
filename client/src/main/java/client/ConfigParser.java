@@ -3,6 +3,7 @@ package client;
 
 import java.io.*;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Interacts with the config file and stores the settings
@@ -42,16 +43,16 @@ public class ConfigParser {
      * @throws IOException if config file can not be accessed
      */
     private static List<String> readConfig() throws IOException {
-//        File file = new File(Objects.requireNonNull(ConfigParser.class.getClassLoader()
-//                .getResource("client/config.properties")).getPath());
-//
-//        // try with resources auto-closes the resource
-//        try(FileReader fileReader = new FileReader(file)) {
-//            BufferedReader reader = new BufferedReader(fileReader);
-//            return reader.lines().toList();
-//        }
+        File file = new File(Objects.requireNonNull(ConfigParser.class.getClassLoader()
+                .getResource("client/config.properties")).getPath());
+
+        // try with resources auto-closes the resource
+        try(FileReader fileReader = new FileReader(file)) {
+            BufferedReader reader = new BufferedReader(fileReader);
+            return reader.lines().toList();
+        }
         // Just as test
-        return List.of("http://localhost:8080/");
+        //return List.of("http://localhost:8080/");
     }
 
     /**
