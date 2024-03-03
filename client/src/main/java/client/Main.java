@@ -33,6 +33,7 @@ public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
      * Main class
@@ -87,6 +88,6 @@ public class Main extends Application {
         );
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, start, adminLogin);
+        mainCtrl.initialize(primaryStage, start, adminLogin, languageConf);
     }
 }

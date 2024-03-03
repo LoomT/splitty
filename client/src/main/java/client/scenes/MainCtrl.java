@@ -35,6 +35,8 @@ public class MainCtrl {
     private Scene startScreen;
     private Scene adminLogin;
 
+    private LanguageConf languageConf;
+
     private AdminLoginCtrl adminLoginCtrl;
 
     /**
@@ -44,16 +46,18 @@ public class MainCtrl {
      //* @param overview controller and parent
      //* @param add controller and parent
      * @param startScreen controller and scene
+     * @param languageConf language config instance
      * @param adminLogin controller and scene
      */
     public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen,
-                           Pair<AdminLoginCtrl, Parent> adminLogin) {
+                           Pair<AdminLoginCtrl, Parent> adminLogin, LanguageConf languageConf) {
         this.primaryStage = primaryStage;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
 
         this.adminLoginCtrl = adminLogin.getKey();
         this.adminLogin = new Scene(adminLogin.getValue());
+        this.languageConf = languageConf;
 
         //this.addCtrl = add.getKey();
         //this.add = new Scene(add.getValue());
@@ -82,9 +86,9 @@ public class MainCtrl {
         primaryStage.setScene(adminLogin);
     }
 
-    /**
-     * Display overview
-     */
+//    /**
+//     * Display overview
+//     */
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");
 //        primaryStage.setScene(overview);
