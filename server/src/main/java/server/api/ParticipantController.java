@@ -23,7 +23,7 @@ public class ParticipantController {
      * @param repo Participant repository
      * @param random A random number generator
      */
-    public ParticipantController(ParticipantRepository repo, RandomGenerator random, EventRepository eventRepo) {
+    public ParticipantController(ParticipantRepository repo, EventRepository eventRepo, RandomGenerator random) {
         this.repo = repo;
         this.eventRepo = eventRepo;
         this.random = random;
@@ -40,7 +40,7 @@ public class ParticipantController {
     @GetMapping( "/{partID}")
     public ResponseEntity<Participant> getById(@PathVariable long partID, @PathVariable String eventID){
         try{
-            if(!(eventRepo.existsById(eventID) || eventRepo.getReferenceById(eventID).hasParticipant(repo.getReferenceById(partID)))) return ResponseEntity.status(401).build();
+            if(!(eventRepo.existsById(eventID) || repo.existsById(partID) && eventRepo.getReferenceById(eventID).hasParticipant(repo.getReferenceById(partID)))) return ResponseEntity.status(401).build();
             Optional<Participant> participant = repo.findById(partID);
             return participant.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         }catch (Exception e){
@@ -60,10 +60,11 @@ public class ParticipantController {
     @PostMapping({ "", "/" })
     public ResponseEntity<Participant> add(@RequestBody Participant participant, @PathVariable String eventID) {
         try {
-            if (participant == null || participant.getName() == null || participant.getName().isEmpty() || !eventRepo.existsById(eventID)) {
+            boolean test = (eventRepo.existsById(eventID));
+            if (participant == null || participant.getName() == null || participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
                 return ResponseEntity.badRequest().build();
             }
-            Event event = eventRepo.getReferenceById(eventID);
+            Event event = eventRepo.getById(eventID);
 
             long id;
             do {

@@ -15,6 +15,7 @@
  */
 package server.api;
 
+import commons.Event;
 import commons.Participant;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -31,7 +32,8 @@ import java.util.function.Function;
 @SuppressWarnings("NullableProblems")
 public class TestParticipantRepository implements ParticipantRepository {
 
-    private final List<Participant> quotes = new ArrayList<>();
+    private final List<Event> events = new ArrayList<>();
+    private final List<Participant> participants = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
 
     /**
@@ -54,7 +56,7 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public List<Participant> findAll() {
         calledMethods.add("findAll");
-        return quotes;
+        return participants;
     }
 
     /**
@@ -158,7 +160,7 @@ public class TestParticipantRepository implements ParticipantRepository {
 
     /**
      * @param id id
-     * @return quote
+     * @return participant
      */
     @Override
     public Participant getById(Long id) {
@@ -173,6 +175,7 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public Participant getReferenceById(Long id) {
         call("getReferenceById");
+        if(find(id).isEmpty()) return null;
         return find(id).get();
     }
 
@@ -181,7 +184,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return quote
      */
     private Optional<Participant> find(Long id) {
-        return quotes.stream().filter(q -> q.getParticipantId() == id).findFirst();
+        return participants.stream().filter(q -> q.getParticipantId() == id).findFirst();
     }
 
     /**
@@ -227,8 +230,8 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public <S extends Participant> S save(S entity) {
         call("save");
-        entity.setParticipantId(quotes.size());
-        quotes.add(entity);
+        entity.setParticipantId(participants.size());
+        participants.add(entity);
         return entity;
     }
 
@@ -239,6 +242,7 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public Optional<Participant> findById(Long id) {
         // TODO Auto-generated method stub
+        call("findById");
         return null;
     }
 
@@ -257,7 +261,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public long count() {
-        return quotes.size();
+        return participants.size();
     }
 
     /**
