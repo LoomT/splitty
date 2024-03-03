@@ -80,7 +80,7 @@ public class Main extends Application {
 
         var adminLogin = FXML.load(
                 AdminLoginCtrl.class,
-                LanguageConf.getLanguageResources(),
+                languageConf.getLanguageResources(),
                 "client", "scenes", "AdminLogin.fxml"
         );
 
