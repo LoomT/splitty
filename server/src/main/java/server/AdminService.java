@@ -34,7 +34,7 @@ public class AdminService {
 
     static String generateAdminPassword() {
         SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[24]; // 192 bits
+        byte[] bytes = new byte[24];
         random.nextBytes(bytes);
         return Base64.getEncoder().encodeToString(bytes);
     }

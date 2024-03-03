@@ -10,10 +10,8 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TextField layoutX="198.0" layoutY="154.0" promptText="%AdminLogin.enterUsername" />
       <PasswordField layoutX="198.0" layoutY="213.0" promptText="%AdminLogin.enterPassword" />
       <Button layoutX="365.0" layoutY="213.0" mnemonicParsing="false" text="%AdminLogin.loginBtn" />
-      <Label layoutX="198.0" layoutY="129.0" text="%AdminLogin.usernameLabel" />
       <Label layoutX="198.0" layoutY="192.0" text="%AdminLogin.passwordLabel" />
       <Label layoutX="165.0" layoutY="56.0" prefHeight="43.0" prefWidth="270.0" text="%AdminLogin.title">
          <font>

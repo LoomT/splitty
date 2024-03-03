@@ -12,9 +12,6 @@ public class AdminLoginCtrl {
     private final MainCtrl mainCtrl;
 
     @FXML
-    private TextField usernameTextField;
-
-    @FXML
     private TextField passwordTextField;
 
     @FXML
@@ -60,7 +57,6 @@ public class AdminLoginCtrl {
      */
 
     private void login() {
-        String username = usernameTextField.getText();
         String password = passwordTextField.getText();
         System.out.println(verifyPassword(password));
 
