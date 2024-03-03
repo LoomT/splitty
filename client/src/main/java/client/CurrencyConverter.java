@@ -8,8 +8,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+/**
+ * Currency converter which can scan the currencies.properties file to
+ * create a map of currencies and respective exchange rates and fetch
+ * exchange rates from openexchangerates API.
+ * Uses singleton pattern.
+ */
 public class CurrencyConverter {
 
+    private static CurrencyConverter currencyConverter;
     private static Map<String, Double> currencyMap;
     private URI apiURI;
     private String base;
@@ -19,14 +26,13 @@ public class CurrencyConverter {
 
     /**
      * @param apiURI custom uri for dependency injection
-     *                             TODO add: double conversionRate
      */
-    public CurrencyConverter(URI apiURI, String base, double conversionRate, String path) {
+    private CurrencyConverter(URI apiURI, String base, double conversionRate, String path) {
         this.apiURI = apiURI;
         this.base = base;
         this.conversionRate = conversionRate;
         this.path = path;
-        try(Reader fileReader = new FileReader(path)) {
+        try (Reader fileReader = new FileReader(path)) {
             currencyMap = initializeCurrencyMap(fileReader);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -36,24 +42,57 @@ public class CurrencyConverter {
     /**
      * default constructor for the CurrencyConverter class
      */
-    public CurrencyConverter(){
-        String path = Objects.requireNonNull(CurrencyConverter.class
-                .getClassLoader().getResource("client/migration.properties")).getPath();
+    private CurrencyConverter() {
+        String path = Objects.requireNonNull(CurrencyConverter.
+                class.getClassLoader().getResource("client/currencies.properties")).getPath();
         this.path = path;
         this.base = "EUR";
-        try(Reader fileReader = new FileReader(path)) {
+        try (Reader fileReader = new FileReader(path)) {
+            this.apiURI = new URI("https://openexchangerates.org/api/" + "latest.json?app_id=4368d26633d149e0b992c5bcdce76270");
             currencyMap = initializeCurrencyMap(fileReader);
-            this.apiURI = new URI("https://openexchangerates.org/api/" +
-                    "latest.json?app_id=4368d26633d149e0b992c5bcdce76270");
             this.conversionRate = 1;
         } catch (URISyntaxException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Map<String, Double> initializeCurrencyMap(Reader fileReader) {
+    /**
+     * @return instance of CurrencyConverter
+     */
+    public static CurrencyConverter getInstance() {
+        if (currencyConverter == null) {
+            currencyConverter = new CurrencyConverter();
+        }
+        return currencyConverter;
+    }
+
+    /**
+     * Instance creator with variables so that it can be used with testing and dependency injection
+     *
+     * @param apiURI         URI of the api used
+     * @param base           base currency used in the local application
+     * @param conversionRate value of base divided by value of Euro
+     * @param path           path of config file
+     * @return Instance of currency converter
+     */
+    public static CurrencyConverter createInstance(
+            URI apiURI, String base, double conversionRate, String path) {
+        if (currencyConverter == null) {
+            currencyConverter = new CurrencyConverter(apiURI, base, conversionRate, path);
+        }
+        return currencyConverter;
+    }
+
+    /**
+     *
+     * @param fileReader reads file to initialize the currencyMap. If the file is empty, it fetches
+     * the currencies and initializes them on the config file
+     * @return CurrencyMap created with values from the config file
+     */
+    public Map<String, Double> initializeCurrencyMap(Reader fileReader) {
         List<String> temp = new BufferedReader(fileReader).lines().toList();
         Map<String, Double> result = new HashMap<>();
+        if (temp.isEmpty()) updateExchange();
 
         for (int i = 2; i < temp.size() - 1; i++) {
             String[] tempArr = temp.get(i).split("=");
@@ -63,16 +102,11 @@ public class CurrencyConverter {
     }
 
     /**
-     * @throws URISyntaxException
-     * @throws IOException
-     * @throws InterruptedException
+     * @return a String of the http response.
      */
-    public String getExchange(){
+    public String getExchange() {
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(apiURI)
-                .GET()
-                .build();
+        HttpRequest request = HttpRequest.newBuilder().uri(apiURI).GET().build();
 
         HttpResponse response;
         try {
@@ -83,29 +117,38 @@ public class CurrencyConverter {
         return response.body().toString();
     }
 
-    public boolean updateExchange(){
-        String path = Objects.requireNonNull(CurrencyConverter.class.getClassLoader()
-                .getResource("client/migration.properties")).getPath();
+    /**
+     *
+     * @return updates the currencies.properties file by fetching
+     * up-to-date exchange data from the API.
+     */
+    public boolean updateExchange() {
         String response = getExchange();
-        if(response == null) return false;
-        List<String> propertiesList = new BufferedReader(new StringReader(response)).lines().toList();
+        if (response == null) return false;
+        List<String> propertiesList = new BufferedReader(
+                new StringReader(response)).lines().toList();
 
-        try(OutputStream outputstream = new FileOutputStream(path)) {
+        try (OutputStream outputstream = new FileOutputStream(path)) {
             Properties prop = new Properties();
-            for(int i = 7; i<propertiesList.size()-2; i++){
+            for (int i = 7; i < propertiesList.size() - 2; i++) {
                 String[] tempArr = propertiesList.get(i).split(": ");
                 prop.setProperty(tempArr[0].replaceAll("[, " + (char) 34 + "]", ""),
                         tempArr[1].replaceAll("[, ]", ""));
             }
             prop.setProperty("base", base);
-        prop.store(outputstream, "Test");
+            prop.store(outputstream, "Test");
 
-        }catch(IOException e){
+        } catch (IOException e) {
             return false;
         }
         return true;
     }
 
+    /**
+     *
+     * @param base change the base currency of the user
+     * @return true if the base currency can be changed, false otherwise
+     */
     public boolean setBase(String base) {
         if (base == null || !currencyMap.containsKey(base)) {
             return false;
@@ -115,4 +158,21 @@ public class CurrencyConverter {
         return true;
     }
 
+    /**
+     * Adds a currency to the properties file if it doesn't already exist and has valid values.
+     * @param name name of the currency
+     * @param rate rate of the currency
+     * @return true if a new currency is added, false otherwise
+     */
+    public boolean addCurrency(String name, double rate) {
+        if (name == null || rate <= 0 || currencyMap.containsKey(name)) return false;
+        try (OutputStream outputstream = new FileOutputStream(path)) {
+            Properties prop = new Properties();
+            prop.setProperty(name, String.valueOf(rate));
+            prop.store(outputstream, "new currency added");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
 }
