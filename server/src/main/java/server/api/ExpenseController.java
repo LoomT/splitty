@@ -81,7 +81,8 @@ public class ExpenseController {
     /**
      * delete an expense
      * @param id
-     * @return status 204 if deleting is successful or 404 if trying to delete an expense that does not exist
+     * @return status 204 if deleting is successful
+     * or 404 if trying to delete an expense that does not exist
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Expense> deleteById(@PathVariable long id) {
