@@ -44,8 +44,10 @@ public class MainCtrl {
      //* @param overview controller and parent
      //* @param add controller and parent
      * @param startScreen controller and scene
+     * @param adminLogin controller and scene
      */
-    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen, Pair<AdminLoginCtrl, Parent> adminLogin) {
+    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen,
+                           Pair<AdminLoginCtrl, Parent> adminLogin) {
         this.primaryStage = primaryStage;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
@@ -72,11 +74,12 @@ public class MainCtrl {
         primaryStage.setScene(startScreen);
     }
 
+    /**
+     * Display admin login
+     */
     public void showAdminLogin() {
         primaryStage.setTitle("Admin Login");
         primaryStage.setScene(adminLogin);
-        // Optional: if you have any initialization or refresh logic in your adminLoginCtrl, call it here
-        // adminLoginCtrl.refresh();
     }
 
     /**

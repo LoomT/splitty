@@ -74,6 +74,12 @@ public class StartScreenCtrl {
 //        }
     }
 
+    /**
+     * shows AdminLogin
+     *
+     * @param actionEvent action event
+     */
+
     public void showAdminLogin(ActionEvent actionEvent) {
         mainCtrl.showAdminLogin();
     }
