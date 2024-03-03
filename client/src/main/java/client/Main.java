@@ -33,15 +33,14 @@ public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+    private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
      * Main class
      *
      * @param args Runtime arguments
-     * @throws URISyntaxException if there is a URI syntax error
-     * @throws IOException        if there is a problem with IO
      */
-    public static void main(String[] args) throws URISyntaxException, IOException {
+    public static void main(String[] args){
         launch();
     }
 
@@ -49,12 +48,11 @@ public class Main extends Application {
      * Starts the application
      *
      * @param primaryStage stage
-     * @throws IOException IO exception
      */
     @Override
-    public void start(Stage primaryStage) throws IOException {
-        LanguageConf.onLanguageChange(() -> {
-            // When the language is changed, this funciton is run
+    public void start(Stage primaryStage) {
+        languageConf.onLanguageChange(() -> {
+            // When the language is changed, this function is run
             loadLanguageResourcesAndStart(primaryStage);
         });
 
@@ -76,7 +74,7 @@ public class Main extends Application {
         //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
         var start = FXML.load(
                 StartScreenCtrl.class,
-                LanguageConf.getLanguageResources(),
+                languageConf.getLanguageResources(),
                 "client", "scenes", "StartScreen.fxml"
         );
 
