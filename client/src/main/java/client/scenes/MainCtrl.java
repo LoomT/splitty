@@ -24,15 +24,9 @@ import javafx.util.Pair;
 public class MainCtrl {
 
     private Stage primaryStage;
-
-    //private QuoteOverviewCtrl overviewCtrl;
-    private Scene overview;
-
-    //private AddQuoteCtrl addCtrl;
-    private Scene add;
-
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+    private LanguageConf languageConf;
 
     /**
      * Initializes the UI
@@ -41,9 +35,12 @@ public class MainCtrl {
      //* @param overview controller and parent
      //* @param add controller and parent
      * @param startScreen controller and scene
+     * @param languageConf language config instance
      */
-    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen) {
+    public void initialize(Stage primaryStage, Pair<StartScreenCtrl,
+            Parent> startScreen, LanguageConf languageConf) {
         this.primaryStage = primaryStage;
+        this.languageConf = languageConf;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
 
@@ -62,13 +59,13 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        primaryStage.setTitle(LanguageConf.get("StartScreen.title"));
+        primaryStage.setTitle(languageConf.get("StartScreen.title"));
         primaryStage.setScene(startScreen);
     }
 
-    /**
-     * Display overview
-     */
+//    /**
+//     * Display overview
+//     */
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");
 //        primaryStage.setScene(overview);
