@@ -45,7 +45,7 @@ public class ServerUtils {
      * @param id the id of the event to get
      * @return the found event
      */
-    public static Event getEvent(String id) {
+    public Event getEvent(String id) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(SERVER).path("api/events/" + id)
                 .request(APPLICATION_JSON)
@@ -57,7 +57,7 @@ public class ServerUtils {
      * @param event the new event to be created
      * @return the created entry in the db
      */
-    public static Event createEvent(Event event) {
+    public Event createEvent(Event event) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(SERVER).path("api/events") //
                 .request(APPLICATION_JSON) //

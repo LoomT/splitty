@@ -4,14 +4,19 @@ import client.components.EventListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
+import commons.Event;
+import commons.Expense;
+import commons.Participant;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class StartScreenCtrl {
 
@@ -33,13 +38,14 @@ public class StartScreenCtrl {
     /**
      * start screen controller constructor
      *
-     * @param server utils
+     * @param server   utils
      * @param mainCtrl main scene controller
      */
     @Inject
     public StartScreenCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+
     }
 
     /**
@@ -58,10 +64,9 @@ public class StartScreenCtrl {
         List<EventListItem> list = new ArrayList<>();
 
 
-
         for (int i = 0; i < testList.size(); i++) {
             int finalI = i;
-            list.add(new EventListItem(testList.get(i), ()->{
+            list.add(new EventListItem(testList.get(i), () -> {
                 eventList.getChildren().remove(list.get(finalI));
             }));
             eventList.getChildren().add(list.get(i));
@@ -74,7 +79,7 @@ public class StartScreenCtrl {
      * Creates and joins the event with provided title
      */
     public void create() {
-        if(title.getText().isEmpty()) {
+        if (title.getText().isEmpty()) {
             // inform that title is empty
         }
         try {
@@ -85,16 +90,19 @@ public class StartScreenCtrl {
         }
     }
 
+
     /**
      * Tries to join the inputted event
      */
     public void join() {
-//        if(server.existsEvent(code.getText())) {
-//            mainCtrl.showEvent(code.getText());
-//        } else {
-//
-//        }
-        System.out.println("Clicked join");
-        System.out.println(ServerUtils.getEvent(code.getText()));
+        if (code.getText().isEmpty()) return;
+        try {
+            Event joinedEvent = server.getEvent(code.getText());
+            mainCtrl.showEventPage(joinedEvent);
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
+
+
     }
 }

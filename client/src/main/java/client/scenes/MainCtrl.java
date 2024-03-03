@@ -16,6 +16,8 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -34,6 +36,9 @@ public class MainCtrl {
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
 
+    private EventPageCtrl eventPageCtrl;
+    private Scene eventPage;
+
     /**
      * Initializes the UI
      *
@@ -42,7 +47,7 @@ public class MainCtrl {
      //* @param add controller and parent
      * @param startScreen controller and scene
      */
-    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen) {
+    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen, Pair<EventPageCtrl, Parent> eventPage) {
         this.primaryStage = primaryStage;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
@@ -53,9 +58,14 @@ public class MainCtrl {
         this.startScreenCtrl = startScreen.getKey();
         this.startScreen = new Scene(startScreen.getValue());
 
+        this.eventPageCtrl = eventPage.getKey();
+        this.eventPage = new Scene(eventPage.getValue());
+
         //showOverview();
         showStartScreen();
         primaryStage.show();
+
+
     }
 
     /**
@@ -64,6 +74,11 @@ public class MainCtrl {
     public void showStartScreen() {
         primaryStage.setTitle(LanguageConf.get("StartScreen.title"));
         primaryStage.setScene(startScreen);
+    }
+
+    public void showEventPage(Event eventToShow) {
+        eventPageCtrl.displayEvent(eventToShow);
+        primaryStage.setScene(eventPage);
     }
 
     /**
