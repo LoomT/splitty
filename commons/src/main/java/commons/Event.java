@@ -23,15 +23,12 @@ public class Event {
 
       */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int eventID;
+    private String id;
 
     private String title;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Participant> participants;
-//    private ArrayList<Expense> expenses;
-
     @Temporal(TemporalType.TIMESTAMP)
     private final Date creationDate;
 
@@ -39,23 +36,47 @@ public class Event {
      * No-Argument Constructor
      * Required by JPA
      */
-
     public Event() {
         this.creationDate = new Date();
     }
 
     /**
+     * Constructor with just the title
+     *
+     * @param title name of the event
+     */
+    public Event(String title) {
+        this();
+        this.title = title;
+        this.participants = new ArrayList<>();
+    }
+
+    /**
      * Constructor that does take arguments, uses this()
      *
-     * @param title string
+     * @param title name of the event
      * @param participants list of strings (going to be
      *                     participant objects in the future)
      */
-
     public Event(String title, List<Participant> participants) {
-        this();
-        this.title = title;
+        this(title);
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
+    }
+
+    /**
+     * @return id of the event
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Sets the id of the event
+     *
+     * @param id to set
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -72,7 +93,6 @@ public class Event {
      *
      * @param title string
      */
-
     public void setTitle(String title){
         this.title = title;
     }
@@ -92,7 +112,6 @@ public class Event {
      *                    participant (going to be an object in the future)
      * @return boolean value
      */
-
     public boolean deleteParticipant(Participant participant){
         return getParticipants().remove(participant);
     }
@@ -102,7 +121,6 @@ public class Event {
      *
      * @param participant String (In the future probably a participant object)
      */
-
     public void addParticipant(Participant participant){
         this.participants.add(participant);
     }
@@ -112,7 +130,6 @@ public class Event {
      *
      * @return participants
      */
-
     public List<Participant> getParticipants() {
         return participants;
     }
@@ -122,7 +139,6 @@ public class Event {
      *
      * @param participants list of participants
      */
-
     public void setParticipants(List<Participant> participants) {
         this.participants = participants;
     }
@@ -142,10 +158,8 @@ public class Event {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        Event other = (Event) obj;
-        return Objects.equals(title, other.title) &&
-                Objects.equals(participants, other.participants); // &&
-                // Objects.equals(creationDate, other.creationDate);
+        Event other = (Event)obj;
+        return Objects.equals(id, other.id);
     }
 
     /**
@@ -155,6 +169,19 @@ public class Event {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(title, participants, creationDate);
+        return Objects.hash(id, creationDate);
+    }
+
+    /**
+     * @return a string representation of this
+     */
+    @Override
+    public String toString() {
+        return "Event{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", participants=" + participants +
+                ", creationDate=" + creationDate +
+                '}';
     }
 }
