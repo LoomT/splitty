@@ -38,6 +38,10 @@ public class EventPageCtrl {
     private MainCtrl mainCtrl;
     private Event event;
 
+    /**
+     * @param server server utils injection
+     * @param mainCtrl mainCtrl injection
+     */
     @Inject
     public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
@@ -45,6 +49,10 @@ public class EventPageCtrl {
 
     }
 
+    /**
+     * call this function to set all the text on the eventpage to a given event
+     * @param e the event to be shown
+     */
     public void displayEvent(Event e) {
         this.event = e;
         System.out.println(e.getTitle());
@@ -61,15 +69,17 @@ public class EventPageCtrl {
             participantText.setText(p);
         }
 
-        participantChoiceBox.getItems().addAll(e.getParticipants().stream().map(Participant::getName).toList());
+        participantChoiceBox.getItems().addAll(
+                e.getParticipants().stream().map(Participant::getName).toList()
+        );
         participantChoiceBox.setValue(e.getParticipants().get(0).getName());
         selectedParticipantId = 0;
 
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
             String name = e.getParticipants().get(selectedParticipantId).getName();
-            fromTab.setText("From " + name);
-            includingTab.setText("Including " + name);
+            //fromTab.setText("From " + name);
+            //includingTab.setText("Including " + name);
         });
     }
 

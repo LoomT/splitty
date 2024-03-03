@@ -5,18 +5,18 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
+
+
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-import java.sql.SQLOutput;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+
 
 public class StartScreenCtrl {
 
