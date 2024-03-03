@@ -57,18 +57,15 @@ public class ExpenseController {
             //save expense
             Expense savedExpense = repoExpense.save(expense);
 
-            //get the author of the expense
-            long authorId = savedExpense.getExpenseAuthor().getParticipantId();
-            Optional<Participant> optionalParticipant = repoParticipant.findById(authorId);
+            Participant expenseAuthor = savedExpense.getExpenseAuthor();
 
-            if (optionalParticipant.isPresent()) {
-                Participant author = optionalParticipant.get();
+            if (expenseAuthor != null) {
 
                 //updated expense saved for the author
-                author.addExpense(savedExpense);
+                expenseAuthor.addExpense(savedExpense);
 
                 //save the participant
-                Participant savedAuthor = repoParticipant.save(author);
+                repoParticipant.save(expenseAuthor);
 
                 //return the expense
                 return ResponseEntity.ok(savedExpense);
@@ -84,11 +81,15 @@ public class ExpenseController {
     /**
      * delete an expense
      * @param id
-     * @return status 204 if deleting is successful or 404 if the expense does not exist
+     * @return status 204 if deleting is successful or 404 if trying to delete an expense that does not exist
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Expense> deleteById(@PathVariable long id) {
         try {
+            if (!repoExpense.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+
             repoExpense.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -101,13 +102,12 @@ public class ExpenseController {
      * update the expense
      * @param id
      * @param updatedExpense
-     * @return status 200zz if updating is successful or 404 if the expense does not exist
+     * @return status 200 if updating is successful or 404 if the expense does not exist
      */
     @PutMapping("/{id}")
     public ResponseEntity<Expense> updateExpense(@PathVariable long id,
                                                  @RequestBody Expense updatedExpense) {
         try {
-            updatedExpense.setExpenseID(id);
             Expense updated = repoExpense.save(updatedExpense);
             return ResponseEntity.ok(updated);
         }
