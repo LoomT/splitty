@@ -15,5 +15,6 @@
       <Button layoutX="402.0" layoutY="254.0" mnemonicParsing="false" onAction="#join" prefHeight="26.0" prefWidth="50.0" text="%StartScreen.joinBtn" />
       <Label layoutX="147.0" layoutY="213.0" prefHeight="26.0" prefWidth="170.0" text="%StartScreen.joinLabel" />
       <ChoiceBox fx:id="languageChoiceBox" layoutX="435.0" layoutY="14.0" prefWidth="150.0" />
+      <Button layoutX="20.0" layoutY="10.0" mnemonicParsing="false" onAction="#showAdminLogin" text="%StartScreen.adminLoginBtn" />
    </children>
 </AnchorPane>

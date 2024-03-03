@@ -4,6 +4,7 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
@@ -71,5 +72,9 @@ public class StartScreenCtrl {
 //        } else {
 //
 //        }
+    }
+
+    public void showAdminLogin(ActionEvent actionEvent) {
+        mainCtrl.showAdminLogin();
     }
 }

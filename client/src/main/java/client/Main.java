@@ -20,6 +20,7 @@ import static com.google.inject.Guice.createInjector;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import client.scenes.AdminLoginCtrl;
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
@@ -79,7 +80,13 @@ public class Main extends Application {
                 "client", "scenes", "StartScreen.fxml"
         );
 
+        var adminLogin = FXML.load(
+                AdminLoginCtrl.class,
+                LanguageConf.getLanguageResources(),
+                "client", "scenes", "AdminLogin.fxml"
+        );
+
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, start);
+        mainCtrl.initialize(primaryStage, start, adminLogin);
     }
 }
