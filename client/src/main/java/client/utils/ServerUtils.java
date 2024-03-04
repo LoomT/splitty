@@ -19,7 +19,10 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 import java.util.List;
 
+import commons.Event;
+
 import com.google.inject.Inject;
+
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -40,6 +43,30 @@ public class ServerUtils {
     }
 
     /**
+     * @param id the id of the event to get
+     * @return the found event
+     */
+    public Event getEvent(String id) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("api/events/" + id)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(Event.class);
+    }
+
+    /**
+     * @param event the new event to be created
+     * @return the created entry in the db
+     */
+    public Event createEvent(Event event) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("api/events") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(event, APPLICATION_JSON), Event.class);
+    }
+
+    /**
      * Sends an API call to server for quotes
      *
      * @return all quotes
@@ -49,7 +76,8 @@ public class ServerUtils {
                 .target(server).path("api/quotes") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {});
+                .get(new GenericType<List<Quote>>() {
+                });
     }
 
     /**
