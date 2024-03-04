@@ -16,6 +16,7 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
+import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -24,15 +25,12 @@ import javafx.util.Pair;
 public class MainCtrl {
 
     private Stage primaryStage;
-
-    //private QuoteOverviewCtrl overviewCtrl;
-    private Scene overview;
-
-    //private AddQuoteCtrl addCtrl;
-    private Scene add;
-
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+    private LanguageConf languageConf;
+
+    private EventPageCtrl eventPageCtrl;
+    private Scene eventPage;
 
     /**
      * Initializes the UI
@@ -40,10 +38,21 @@ public class MainCtrl {
      * @param primaryStage stage
      //* @param overview controller and parent
      //* @param add controller and parent
+     * @param languageConf the language config
      * @param startScreen controller and scene
+
+     * @param eventPage controller and scene for eventpage
+     *
      */
-    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen) {
+    public void initialize(
+            Stage primaryStage,
+            LanguageConf languageConf,
+            Pair<StartScreenCtrl, Parent> startScreen,
+            Pair<EventPageCtrl, Parent> eventPage
+    ) {
+
         this.primaryStage = primaryStage;
+        this.languageConf = languageConf;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
 
@@ -53,22 +62,38 @@ public class MainCtrl {
         this.startScreenCtrl = startScreen.getKey();
         this.startScreen = new Scene(startScreen.getValue());
 
+        this.eventPageCtrl = eventPage.getKey();
+        this.eventPage = new Scene(eventPage.getValue());
+
         //showOverview();
         showStartScreen();
         primaryStage.show();
+
+
     }
 
     /**
      * Display start screen
      */
     public void showStartScreen() {
-        primaryStage.setTitle(LanguageConf.get("StartScreen.title"));
+        primaryStage.setTitle(languageConf.get("StartScreen.title"));
         primaryStage.setScene(startScreen);
+    }
+
+
+    /**
+     * shows the event page
+     * @param eventToShow the event to display
+     */
+    public void showEventPage(Event eventToShow) {
+        eventPageCtrl.displayEvent(eventToShow);
+        primaryStage.setScene(eventPage);
     }
 
     /**
      * Display overview
      */
+
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");
 //        primaryStage.setScene(overview);

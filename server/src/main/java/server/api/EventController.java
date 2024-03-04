@@ -2,7 +2,6 @@ package server.api;
 
 import commons.Event;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
@@ -87,8 +86,7 @@ public class EventController {
      * @return status 204 if deleted successfully or 404 if the event does not exist
      */
     @DeleteMapping("/{id}")
-    @SendTo("/events/{id}")
-    public ResponseEntity<Event> deleteById(@PathVariable String id) {
+    public ResponseEntity<Event> deleteById(@PathVariable("id") String id) {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
@@ -110,7 +108,6 @@ public class EventController {
      * @return the event entity with new title
      */
     @PatchMapping("/{id}")
-    @SendTo("/events/{id}")
     public ResponseEntity<Event> changeTitleById(@PathVariable String id,
                                                  @RequestParam("newTitle") String title) {
         try {
