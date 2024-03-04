@@ -3,6 +3,7 @@ package client.scenes;
 import client.components.EventListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.UserConfig;
 import com.google.inject.Inject;
 import commons.Event;
 
@@ -36,19 +37,30 @@ public class StartScreenCtrl {
     @FXML
     private VBox eventList;
 
+    private List<String> recentEventCodes;
+    private UserConfig userConfig;
+
     /**
      * start screen controller constructor
      *
      * @param server   utils
      * @param mainCtrl main scene controller
      * @param languageConf language config instance
+     * @param userConfig the user configuration
      */
     @Inject
-    public StartScreenCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
+    public StartScreenCtrl(
+            ServerUtils server,
+            MainCtrl mainCtrl,
+            LanguageConf languageConf,
+            UserConfig userConfig
+    ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
+        this.userConfig = userConfig;
+        recentEventCodes = userConfig.getRecentEventCodes();
 
     }
 
@@ -63,14 +75,13 @@ public class StartScreenCtrl {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
 
-        List<String> testList = List.of("Test1", "random event",
-                "heres one more", "idk", "try deleting this");
+
         List<EventListItem> list = new ArrayList<>();
 
 
-        for (int i = 0; i < testList.size(); i++) {
+        for (int i = 0; i < recentEventCodes.size(); i++) {
             int finalI = i;
-            list.add(new EventListItem(testList.get(i), () -> {
+            list.add(new EventListItem(recentEventCodes.get(i), () -> {
                 eventList.getChildren().remove(list.get(finalI));
             }));
             eventList.getChildren().add(list.get(i));
