@@ -11,7 +11,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.text.Text;
 
 
-
 public class EventPageCtrl {
 
     @FXML
@@ -39,7 +38,7 @@ public class EventPageCtrl {
     private Event event;
 
     /**
-     * @param server server utils injection
+     * @param server   server utils injection
      * @param mainCtrl mainCtrl injection
      */
     @Inject
@@ -51,11 +50,11 @@ public class EventPageCtrl {
 
     /**
      * call this function to set all the text on the eventpage to a given event
+     *
      * @param e the event to be shown
      */
     public void displayEvent(Event e) {
         this.event = e;
-        System.out.println(e.getTitle());
         eventTitle.setText(e.getTitle());
 
         if (e.getParticipants().isEmpty()) {
@@ -67,13 +66,14 @@ public class EventPageCtrl {
                 if (i != e.getParticipants().size() - 1) p += ", ";
             }
             participantText.setText(p);
-        }
 
-        participantChoiceBox.getItems().addAll(
-                e.getParticipants().stream().map(Participant::getName).toList()
-        );
-        participantChoiceBox.setValue(e.getParticipants().get(0).getName());
-        selectedParticipantId = 0;
+
+            participantChoiceBox.getItems().addAll(
+                    e.getParticipants().stream().map(Participant::getName).toList()
+            );
+            participantChoiceBox.setValue(e.getParticipants().get(0).getName());
+            selectedParticipantId = 0;
+        }
 
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();

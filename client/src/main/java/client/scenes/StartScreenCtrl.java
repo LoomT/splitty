@@ -83,14 +83,13 @@ public class StartScreenCtrl {
      * Creates and joins the event with provided title
      */
     public void create() {
-        if (title.getText().isEmpty()) {
-            // inform that title is empty
-        }
+        if (title.getText().isEmpty()) return;
         try {
-            // addEvent should return the code
-            //mainCtrl.showEvent(server.addEvent(title.getText()));
+            Event createdEvent = server.createEvent(new Event(title.getText()));
+            mainCtrl.showEventPage(createdEvent);
+
         } catch (WebApplicationException e) {
-            //error
+            System.out.println("Something went wrong while creating an event");
         }
     }
 
@@ -104,7 +103,7 @@ public class StartScreenCtrl {
             Event joinedEvent = server.getEvent(code.getText());
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
-            System.out.println("Something went wrong");
+            System.out.println("Something went wrong while joining an event");
         }
 
 
