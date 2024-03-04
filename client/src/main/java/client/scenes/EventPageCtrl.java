@@ -73,13 +73,18 @@ public class EventPageCtrl {
             );
             participantChoiceBox.setValue(e.getParticipants().get(0).getName());
             selectedParticipantId = 0;
+
+            String name = e.getParticipants().get(selectedParticipantId).getName();
+            fromTab.setText("From " + name);
+            includingTab.setText("Including " + name);
         }
 
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
+
             String name = e.getParticipants().get(selectedParticipantId).getName();
-            //fromTab.setText("From " + name);
-            //includingTab.setText("Including " + name);
+            fromTab.setText("From " + name);
+            includingTab.setText("Including " + name);
         });
     }
 

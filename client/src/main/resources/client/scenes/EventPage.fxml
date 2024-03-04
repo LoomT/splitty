@@ -71,9 +71,9 @@
             </HBox>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab text="All" />
-                <Tab text="From John" />
-                  <Tab text="Including John" />
+                <Tab fx:id="allTab" text="All" />
+                <Tab fx:id="fromTab" text="From John" />
+                  <Tab fx:id="includingTab" text="Including John" />
               </tabs>
             </TabPane>
          </children>
