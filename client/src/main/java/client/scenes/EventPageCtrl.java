@@ -75,6 +75,7 @@ public class EventPageCtrl {
             selectedParticipantId = 0;
 
             String name = e.getParticipants().get(selectedParticipantId).getName();
+            // TODO make this language dependant
             fromTab.setText("From " + name);
             includingTab.setText("Including " + name);
         }
