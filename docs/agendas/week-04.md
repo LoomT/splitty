@@ -26,6 +26,7 @@
   - Announcements by the TA (3 min)
   - Decide on the next chair and minute taker. (1 min)
   - Feedback: What went well and what could be improved? (2 min)
+    - For example: MRs during the weekend
   - If anyone has anything to add to the meeting, do it now. (1 min)
   - Closure (1 min)
 
