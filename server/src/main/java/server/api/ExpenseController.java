@@ -32,7 +32,7 @@ public class ExpenseController {
      * @return ResponseEntity which contains the expense if found, or 404 Not Found otherwise
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Expense> getById(@PathVariable long id) {
+    public ResponseEntity<Expense> getById(@PathVariable long id, @PathVariable String eventID, @PathVariable String participantID) {
         try {
             Optional<Expense> optionalExpense = repoExpense.findById(id);
             if (optionalExpense.isPresent()) {
@@ -60,9 +60,6 @@ public class ExpenseController {
             Participant expenseAuthor = savedExpense.getExpenseAuthor();
 
             if (expenseAuthor != null) {
-
-                //updated expense saved for the author
-                expenseAuthor.addExpense(savedExpense);
 
                 //save the participant
                 repoParticipant.save(expenseAuthor);

@@ -23,8 +23,6 @@ public class Participant {
     @Nullable
     private String emailAddress;
     @OneToMany(cascade = CascadeType.ALL)
-    private Set<Expense> authoredExpenseSet;
-    @OneToMany(cascade = CascadeType.ALL)
     private Set<BankAccount> bankAccountSet;
 
     /**
@@ -38,7 +36,6 @@ public class Participant {
     public Participant(String name) {
         this.name = name;
         emailAddress = null;
-        authoredExpenseSet = new HashSet<>();
         bankAccountSet = new HashSet<>();
     }
 
@@ -61,7 +58,6 @@ public class Participant {
     public Participant(String name, @Nullable String email, Set<Expense> authoredExpenseSet,
                        Set<BankAccount> bankAccountSet ) {
         this(name, email);
-        this.authoredExpenseSet = authoredExpenseSet;
         this.bankAccountSet = bankAccountSet;
     }
 
@@ -114,32 +110,6 @@ public class Participant {
     }
 
     /**
-     * getter for expenses
-     * @return expenses
-     */
-    public Set<Expense> getAuthoredExpenseSet() {
-        return authoredExpenseSet;
-    }
-
-    /**
-     * setter for expenses
-     * @param authoredExpenseSet expenses to replace the old one
-     */
-    public void setAuthoredExpenseSet(Set<Expense> authoredExpenseSet) {
-        this.authoredExpenseSet = authoredExpenseSet;
-    }
-
-    /**
-     * Add bankAccount to bankAccountSet
-     * @param expense expense to be added
-     * @return false if bankAccount is null or already in set, true otherwise
-     */
-    public boolean addExpense(Expense expense){
-        if(expense == null) return false;
-        return authoredExpenseSet.add(expense);
-    }
-
-    /**
      * getter for bankAccountSet
      * @return bankAccountSet
      */
@@ -179,7 +149,6 @@ public class Participant {
 
         if (participantId != that.participantId || !name.equals(that.name)) return false;
         if (!Objects.equals(emailAddress, that.emailAddress)) return false;
-        if (!authoredExpenseSet.equals(that.authoredExpenseSet)) return false;
         return bankAccountSet.equals(that.bankAccountSet);
     }
 
@@ -189,7 +158,7 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(participantId);
+        return Objects.hash(participantId, name, emailAddress, bankAccountSet);
     }
 
     /**
@@ -203,9 +172,7 @@ public class Participant {
                 ", name='" + name + '\'';
         if(emailAddress != null)
             result += ", emailAddress='" + emailAddress + '\'';
-        result += ", expenseSet=" + authoredExpenseSet +
-                ", bankAccountSet=" + bankAccountSet +
-                '}';
+        result += ", bankAccountSet=" + bankAccountSet + '}';
         return result;
     }
 }

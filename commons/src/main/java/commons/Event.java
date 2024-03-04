@@ -6,20 +6,22 @@ import jakarta.persistence.*;
 public class Event {
     /*
       Properties:
-      Int EventID to join an event (getter + set once in constructor)
-      String title to easily differentiate two events (getter and setter)
-      List<Participants> to store all
-      active participants of an event (get, remove, edit and add method)
-      Date creationDate to store the date of creation (getter + set once in constructor)
+      * Int EventID to join an event (getter + set once in constructor)
+      * String title to easily differentiate two events (getter and setter)
+      * List<Participants> to store all
+        active participants of an event (get, remove, edit and add method)
+      * List<Expenses> to store all
+        active expenses of an event(get, remove, edit and add method)
+      * Date creationDate to store the date of creation (getter + set once in constructor)
 
       Methods:
-      Constructor to create an event
-      getters for eventID, title and creationDate
-      setter for title
-      unique event ID generator
-      get, remove, edit and add method for participants
-      equals method
-      hashing method
+      * Constructor to create an event
+      * getters for eventID, title and creationDate
+      * setter for title
+      * unique event ID generator
+      * get, remove, edit and add method for participants
+      * equals method
+      * hashing method
 
       */
     @Id
@@ -29,6 +31,8 @@ public class Event {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Participant> participants;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Expense> expenses;
     @Temporal(TemporalType.TIMESTAMP)
     private final Date creationDate;
 
@@ -144,22 +148,50 @@ public class Event {
     }
 
     /**
+     * getter for expenses
+     *
+     * @return expenses
+     */
+    public List<Expense> getExpenses() {
+        return expenses;
+    }
+
+    /**
+     * setter for expenses
+     *
+     * @param expenses list of expenses
+     */
+    public void setExpenses(List<Expense> expenses) {
+        this.expenses = expenses;
+    }
+
+    /**
+     * Adds a participant to the list of participants
+     *
+     * @param expense String (In the future probably a participant object)
+     */
+    public void addExpense(Expense expense){
+        this.expenses.add(expense);
+    }
+
+    /**
      * Equals method that checks whether two instances are equal
      * Does not take the unique eventID into consideration
      *
-     * @param obj another object
+     * @param o another object
      * @return boolean value
      */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Event other = (Event)obj;
-        return Objects.equals(id, other.id);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Event event = (Event) o;
+
+        if (!Objects.equals(id, event.id) || !Objects.equals(title, event.title)) return false;
+        if (!Objects.equals(participants, event.participants)) return false;
+        if (!Objects.equals(expenses, event.expenses)) return false;
+        return Objects.equals(creationDate, event.creationDate);
     }
 
     /**
@@ -169,7 +201,12 @@ public class Event {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, creationDate);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (participants != null ? participants.hashCode() : 0);
+        result = 31 * result + (expenses != null ? expenses.hashCode() : 0);
+        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
+        return result;
     }
 
     /**
@@ -181,6 +218,7 @@ public class Event {
                 "id='" + id + '\'' +
                 ", title='" + title + '\'' +
                 ", participants=" + participants +
+                ", expenses=" + expenses +
                 ", creationDate=" + creationDate +
                 '}';
     }
