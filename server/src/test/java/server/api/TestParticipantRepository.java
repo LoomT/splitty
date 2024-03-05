@@ -15,7 +15,6 @@
  */
 package server.api;
 
-import commons.Event;
 import commons.Participant;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,6 @@ import java.util.function.Function;
 @SuppressWarnings("NullableProblems")
 public class TestParticipantRepository implements ParticipantRepository {
 
-    private final List<Event> events = new ArrayList<>();
     private final List<Participant> participants = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
 
@@ -165,7 +163,9 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public Participant getById(Long id) {
         call("getById");
-        return find(id).get();
+        if(find(id).isPresent()) {
+            return find(id).get();
+        } else return null;
     }
 
     /**
@@ -317,7 +317,7 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public <S extends Participant> Optional<S> findOne(Example<S> example) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     /**

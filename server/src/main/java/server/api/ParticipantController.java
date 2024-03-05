@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
