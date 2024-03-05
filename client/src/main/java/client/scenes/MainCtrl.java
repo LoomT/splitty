@@ -45,12 +45,18 @@ public class MainCtrl {
      * @param languageConf the language config
      * @param startScreen controller and scene
 
-     * @param eventPage controller and scene for event page
-     * @param adminLogin controller and scene
+     * @param eventPage controller and scene for eventpage
+     *
+     * @param adminLogin admin login controller and scene
      */
-    public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen,
-                           Pair<AdminLoginCtrl, Parent> adminLogin, Pair<EventPageCtrl,
-            Parent> eventPage, LanguageConf languageConf) {
+    public void initialize(
+            Stage primaryStage,
+            LanguageConf languageConf,
+            Pair<StartScreenCtrl, Parent> startScreen,
+            Pair<EventPageCtrl, Parent> eventPage,
+            Pair<AdminLoginCtrl, Parent> adminLogin
+    ) {
+
         this.primaryStage = primaryStage;
         this.languageConf = languageConf;
         //this.overviewCtrl = overview.getKey();
@@ -121,11 +127,15 @@ public class MainCtrl {
     }
 
     /**
-     * getter for adminLoginCtrl
-     *
-     * @return adminLoginCtrl
+     * Display overview
      */
 
+
+    /**
+     * AdminLoginCtrl getter
+     *
+     * @return admin login controller
+     */
     public AdminLoginCtrl getAdminLoginCtrl() {
         return adminLoginCtrl;
     }
