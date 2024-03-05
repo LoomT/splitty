@@ -1,16 +1,21 @@
 package client;
 
+import commons.Event;
+import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import commons.Event;
 
 public class Websocket {
     private final String eventID;
@@ -25,13 +30,15 @@ public class Websocket {
         this.eventID = eventID;
     }
     public static void main(String[] args) {
-        new Websocket("ABCDE").connect();
+        new Websocket("GGKIS").connect();
     }
     public void connect() {
         CountDownLatch latch = new CountDownLatch(1);
 
         WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
+        List<MessageConverter> converterList = List.of(new MappingJackson2MessageConverter(),
+                new StringMessageConverter());
+        stompClient.setMessageConverter(new CompositeMessageConverter(converterList));
 
         String url = "ws://localhost:8080/ws"; //TODO inject this
         StompSessionHandler sessionHandler = new MyStompSessionHandler();
@@ -64,6 +71,13 @@ public class Websocket {
 
     private static class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
+        private final Map typeMap;
+
+        public MyStompSessionHandler() {
+            typeMap = new HashMap<>(Map.of("commons.Event", Event.class,
+                    "java.lang.String", String.class));
+        }
+
         /**
          * Executes after successfully connecting to the server
          *
@@ -77,7 +91,7 @@ public class Websocket {
 
         @Override
         public Type getPayloadType(StompHeaders headers) {
-            return Event.class;
+            return (Type) typeMap.get(headers.get("type").getFirst());
         }
 
         /**

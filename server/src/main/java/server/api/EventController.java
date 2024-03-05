@@ -1,10 +1,13 @@
 package server.api;
 
 import commons.Event;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
 
@@ -13,6 +16,7 @@ import java.util.random.RandomGenerator;
 public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
+    private final SimpMessagingTemplate template;
 
     /**
      * Constructor with repository and random number generator injections
@@ -20,9 +24,12 @@ public class EventController {
      * @param repo Event repository
      * @param random A random number generator
      */
-    public EventController(EventRepository repo, RandomGenerator random) {
+    @Autowired
+    public EventController(EventRepository repo, RandomGenerator random,
+                           SimpMessagingTemplate template) {
         this.repo = repo;
         this.random = random;
+        this.template = template;
     }
 
     /**
@@ -90,7 +97,9 @@ public class EventController {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
-                return ResponseEntity.status(204).build();
+                template.convertAndSend("/event/" + id, "delete",
+                        Map.of("action", "delete", "type", String.class.getTypeName()));
+                return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -115,7 +124,10 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
-                return ResponseEntity.ok(repo.save(event));
+                Event changed = repo.save(event);
+                template.convertAndSend("/event/" + id, changed,
+                        Map.of("action", "titleChange", "type", Event.class.getTypeName()));
+                return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
