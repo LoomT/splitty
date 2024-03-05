@@ -5,7 +5,7 @@
 | Location: | Flux Hall B     |
 | Chair | Adam Sztano     |
 | Minute Taker | Bogdan          |
-| Attendees: | To be filled in |
+| Attendees: | Adam, Guney, Bogdan, Liam, Kajus, Thomas |
 ### Agenda Items:
 - ##### Intro (5 min)
   - Opening by chair (1 min)
