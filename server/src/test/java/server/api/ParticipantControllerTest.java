@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,37 +25,44 @@ public class ParticipantControllerTest {
 
         partRepo = new TestParticipantRepository();
         eventRepo = new TestEventRepository();
+
         eventRepo.save(event);
+
         TestRandom random = new TestRandom();
         eventContr = new EventController(eventRepo, random);
-        partContr = new ParticipantController(partRepo, eventRepo, random);
+        partContr = new ParticipantController(partRepo, eventRepo);
     }
 
     @Test
     public void databaseIsUsed(){
-        partContr.add(new Participant(), "event");
+        partContr.add(new Participant("name"), event.getId());
         assertTrue(eventRepo.getCalledMethods().contains("save"));
     }
 
     @Test
     void noGetById() {
         var actual = partContr.getById(1, "non-existing id");
-        assertTrue(eventRepo.getCalledMethods().contains("existsById"));
-        assertEquals(UNAUTHORIZED, actual.getStatusCode());
+        assertTrue(eventRepo.getCalledMethods().contains("findById"));
+        assertEquals(NOT_FOUND, actual.getStatusCode());
     }
 
     @Test
     void getById(){
         Participant participant = new Participant("name");
-        long id = participant.getParticipantId();
+        partRepo.save(participant);
         var savedEvent = eventContr.add(event);
         var saved = partContr.add(participant, event.getId());
-        var actual = partContr.getById(5, event.getId());
+        long tst = participant.getParticipantId();
+        List<Event> list = eventRepo.findAll();
+        List<Participant> listo = partRepo.findAll();
+        String test = event.getId();
+        long id = participant.getParticipantId();
+        var actual = partContr.getById(participant.getParticipantId(), event.getId());
         partRepo.getReferenceById(participant.getParticipantId());
         assertEquals(OK, savedEvent.getStatusCode());
-        assertEquals(INTERNAL_SERVER_ERROR, saved.getStatusCode()); //should be ok
-        assertEquals(UNAUTHORIZED, actual.getStatusCode());
-        assertTrue(partRepo.getCalledMethods().contains("existsById") && partRepo.getCalledMethods().contains("getReferenceById"));
+        assertEquals(OK, saved.getStatusCode());
+        assertEquals(OK, actual.getStatusCode()); //should be ok instead of INTERNAL ERROR
+        assertTrue(partRepo.getCalledMethods().contains("getReferenceById"));
         assertTrue(eventRepo.getCalledMethods().contains("existsById") && eventRepo.getCalledMethods().contains("save"));
     }
 }

@@ -7,26 +7,23 @@ import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.random.RandomGenerator;
 
 @RestController
-@RequestMapping("/api/events/{eventID}/participants/")
+@RequestMapping("/api/events/{eventID}/participants")
 public class ParticipantController {
     private final ParticipantRepository repo;
     private final EventRepository eventRepo;
-    private final RandomGenerator random;
 
     /**
      * Constructor with repository and random number generator injections
      *
      * @param repo Participant repository
-     * @param random A random number generator
      */
-    public ParticipantController(ParticipantRepository repo, EventRepository eventRepo, RandomGenerator random) {
+    public ParticipantController(ParticipantRepository repo, EventRepository eventRepo) {
         this.repo = repo;
         this.eventRepo = eventRepo;
-        this.random = random;
     }
 
     /**
@@ -40,7 +37,15 @@ public class ParticipantController {
     @GetMapping( "/{partID}")
     public ResponseEntity<Participant> getById(@PathVariable long partID, @PathVariable String eventID){
         try{
-            if(!(eventRepo.existsById(eventID) || repo.existsById(partID) && eventRepo.getReferenceById(eventID).hasParticipant(repo.getReferenceById(partID)))) return ResponseEntity.status(401).build();
+            List<Participant> list = repo.findAll();
+            long test1 = partID;
+            Optional<Participant> test = repo.findById(partID);
+            if(eventRepo.findById(eventID).isEmpty() || repo.findById(partID).isEmpty()) {
+                return ResponseEntity.status(404).build();
+            }
+            if(!eventRepo.findById(eventID).get().hasParticipant(repo.findById(partID).get())){
+                return ResponseEntity.status(401).build();
+            }
             Optional<Participant> participant = repo.findById(partID);
             return participant.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         }catch (Exception e){
@@ -60,21 +65,18 @@ public class ParticipantController {
     @PostMapping({ "", "/" })
     public ResponseEntity<Participant> add(@RequestBody Participant participant, @PathVariable String eventID) {
         try {
-            boolean test = (eventRepo.existsById(eventID));
+            boolean test = !(eventRepo.existsById(eventID));
+            List<Event> list = eventRepo.findAll();
             if (participant == null || participant.getName() == null || participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
                 return ResponseEntity.badRequest().build();
             }
-            Event event = eventRepo.getById(eventID);
-
-            long id;
-            do {
-                id = random.nextLong();
-            } while (repo.existsById(id));
-
-            participant.setParticipantId(id);
-            event.addParticipant(participant);
-            eventRepo.save(event);
-            return ResponseEntity.ok(participant);
+            if (eventRepo.findById(eventID).isPresent()) {
+                Event event = eventRepo.findById(eventID).get();
+                event.addParticipant(participant);
+                eventRepo.save(event);
+                return ResponseEntity.ok(participant);
+            }
+            return ResponseEntity.internalServerError().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -97,16 +99,20 @@ public class ParticipantController {
             Optional<Event> search = eventRepo.findById(eventID);
             if(search.isPresent() && repo.existsById(partID)) {
                 Event event = search.get();
-                if(event.hasParticipant(repo.getReferenceById(partID))){
-                    repo.getReferenceById(partID).setName(name);
-                    repo.getReferenceById(partID).setEmailAddress(email);
-                    eventRepo.save(event);
-                    return ResponseEntity.ok(repo.getReferenceById(partID));
+                Optional<Participant> optional = repo.findById(partID);
+
+                if(optional.isPresent()){
+                    Participant participant = optional.get();
+                    if(event.hasParticipant(participant)){
+                        participant.setName(name);
+                        participant.setEmailAddress(email);
+                        eventRepo.save(event);
+                        return ResponseEntity.ok(repo.getReferenceById(partID));
+                    } else return ResponseEntity.status(401).build();
                 }
-                return ResponseEntity.status(401).build();
             }
 
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(404).build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

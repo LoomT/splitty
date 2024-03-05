@@ -243,7 +243,7 @@ public class TestParticipantRepository implements ParticipantRepository {
     public Optional<Participant> findById(Long id) {
         // TODO Auto-generated method stub
         call("findById");
-        return null;
+        return participants.stream().filter(e -> e.getParticipantId() == id).findAny();
     }
 
     /**
