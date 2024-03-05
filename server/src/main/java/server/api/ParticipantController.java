@@ -21,7 +21,8 @@ public class ParticipantController {
      * @param repo Participant repository
      * @param eventRepo Event repository
      */
-    public ParticipantController(ParticipantRepository repo, EventRepository eventRepo) {
+    public ParticipantController(ParticipantRepository repo,
+                                 EventRepository eventRepo) {
         this.repo = repo;
         this.eventRepo = eventRepo;
     }
@@ -35,7 +36,8 @@ public class ParticipantController {
      * @return the requested participant entity or else a 404 'not found' response
      */
     @GetMapping( "/{partID}")
-    public ResponseEntity<Participant> getById(@PathVariable long partID, @PathVariable String eventID){
+    public ResponseEntity<Participant> getById(@PathVariable long partID,
+                                               @PathVariable String eventID){
         try{
             if(eventRepo.findById(eventID).isEmpty() || repo.findById(partID).isEmpty()) {
                 return ResponseEntity.status(404).build();
@@ -44,7 +46,8 @@ public class ParticipantController {
                 return ResponseEntity.status(401).build();
             }
             Optional<Participant> participant = repo.findById(partID);
-            return participant.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+            return participant.map(ResponseEntity::ok).orElseGet(
+                    () -> ResponseEntity.notFound().build());
         }catch (Exception e){
             return ResponseEntity.internalServerError().build();
         }
@@ -60,9 +63,11 @@ public class ParticipantController {
      * @return the saved entity with an assigned ID
      */
     @PostMapping({ "", "/" })
-    public ResponseEntity<Participant> add(@RequestBody Participant participant, @PathVariable String eventID) {
+    public ResponseEntity<Participant> add(@RequestBody Participant participant,
+                                           @PathVariable String eventID) {
         try {
-            if (participant == null || participant.getName() == null || participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
+            if (participant == null || participant.getName() == null ||
+                    participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
                 return ResponseEntity.badRequest().build();
             }
             if (eventRepo.findById(eventID).isPresent()) {
@@ -89,8 +94,10 @@ public class ParticipantController {
      *  or 401 if the participant is not accessible from the specified event
      */
     @PatchMapping("/{partID}")
-    public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID, @PathVariable long partID,
-                                                 @RequestParam("newName") String name, @RequestParam String email) {
+    public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID,
+                                                           @PathVariable long partID,
+                                                           @RequestParam("newName") String name,
+                                                           @RequestParam String email) {
         try {
             Optional<Event> search = eventRepo.findById(eventID);
             if(search.isPresent() && repo.existsById(partID)) {
@@ -119,16 +126,21 @@ public class ParticipantController {
      *
      * @param partID id of participant to remove
      * @param eventID id of the Event in which the participant is located at
-     * @return status 204 if deleted successfully, 404 if the participant and/or event does not exist or 401 if participant is not part of the accessed event
+     * @return status 204 if deleted successfully,
+     * 404 if the participant and/or event does not exist or
+     * 401 if participant is not part of the accessed event
      */
     @DeleteMapping("/{partID}")
-    public ResponseEntity<Event> deleteById(@PathVariable long partID, @PathVariable String eventID) {
+    public ResponseEntity<Event> deleteById(@PathVariable long partID,
+                                            @PathVariable String eventID) {
         try {
             if(eventRepo.existsById(eventID)) {
                 Event event = eventRepo.findById(eventID).get();
                 if(event.hasParticipant(repo.getReferenceById(partID))){
-                    if (repo.existsById(partID) && eventRepo.findById(eventID).isPresent() && repo.findById(partID).isPresent()) {
-                        eventRepo.findById(eventID).get().deleteParticipant(repo.findById(partID).get());
+                    if (repo.existsById(partID) && eventRepo.findById(eventID).isPresent()
+                            && repo.findById(partID).isPresent()) {
+                        eventRepo.findById(eventID).get()
+                                .deleteParticipant(repo.findById(partID).get());
                         repo.deleteById(partID);
                         eventRepo.save(event);
                         return ResponseEntity.status(204).build();
