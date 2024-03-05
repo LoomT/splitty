@@ -8,6 +8,7 @@ import commons.Event;
 
 
 import jakarta.ws.rs.WebApplicationException;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
@@ -108,5 +109,15 @@ public class StartScreenCtrl {
         }
 
 
+    }
+
+    /**
+     * shows AdminLogin
+     *
+     * @param actionEvent action event
+     */
+
+    public void showAdminLogin(ActionEvent actionEvent) {
+        mainCtrl.showAdminLogin();
     }
 }
