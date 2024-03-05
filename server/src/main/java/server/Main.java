@@ -32,6 +32,6 @@ public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
 
-        generateAndStorePassword();
+        System.out.println("Admin password: " + getAdminPassword());
     }
 }

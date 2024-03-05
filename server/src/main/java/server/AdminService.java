@@ -7,24 +7,8 @@ import java.util.Base64;
 
 public class AdminService {
 
-    private static final String resourcesFolderPath =
-            "./client/src/main/resources/client/adminPassword/";
+    private static final String adminPassword = generateAdminPassword();
 
-
-    /**
-     * Generates a random password for the admin
-     * Stores it in a txt file in the client part of the project
-     *
-     */
-    public static void generateAndStorePassword() {
-        String adminPassword = generateAdminPassword();
-        System.out.println("Admin password: " + adminPassword);
-        try {
-            savePasswordToFile(adminPassword);
-        } catch (IOException e) {
-            System.err.println("Error writing password to file: " + e.getMessage());
-        }
-    }
 
     /**
      * Generates a random password for the admin
@@ -39,18 +23,16 @@ public class AdminService {
         return Base64.getEncoder().encodeToString(bytes);
     }
 
-
     /**
-     * Saves the password to the file
+     * Getter for the admin password
      *
-     *
-     * @param adminPassword generated admin password
-     * @throws IOException if there is a problem with IO
+     * @return the admin password
      */
-    private static void savePasswordToFile(String adminPassword) throws IOException {
-        try (FileWriter writer = new FileWriter(resourcesFolderPath + "adminPassword.txt")) {
-            writer.write(adminPassword);
-        }
+
+    static String getAdminPassword() {
+        return adminPassword;
     }
+
+
 
 }

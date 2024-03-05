@@ -1,5 +1,7 @@
 package client;
 
+
+
 public class AdminClient {
 
 
@@ -10,8 +12,8 @@ public class AdminClient {
      * @return boolean value
      */
     public static boolean verifyPassword(String inputPassword) {
-        String storedPassword = "123";
+        String adminServiceAttribute = "123";
 
-        return storedPassword.equals(inputPassword);
+        return adminServiceAttribute.equals(inputPassword);
     }
 }
