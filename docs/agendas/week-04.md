@@ -31,3 +31,49 @@
   - Closure (1 min)
 
 Total planned meeting time: 55 min + 5 min buffer
+
+# Notes
+
+## Agenda item 1: Code of conduct and knock-out criteria
+
+- Good job with the code of conduct, the feedback on it was very good
+- Not everyone has succeeded in meeting the knock-out criteria, thus some clarifications were made:
+  - Apart from creating the MR and merging another MR, everyone needs to approve the reviewed MR through the **Approve button**
+  - Again, make sure to have at least **3** commits, **100** lines of Java code and a comment of minimum **100** characters
+
+## Agenda item 2: Progress during last week
+
+### Code contribution
+- Each person managed to do the assigned task
+- The following were added: controllers for the classes Event, Expense and Participant, Event page and some functionality, Admin page and a Currency converter
+
+### Closing issues
+- When creating a MR, make sure to also resolve or close the corresponding issue in order to be more organized
+- Assigning a branch to the issue will close it automatically
+
+### Improvements and bugs of the current app
+- The language persists when you restart the app
+- Bug: it does not show the previously joined events
+- No back button on the Event page
+
+### Agenda item 3: Development
+- Focus more on the frontend this week, as well as testing for it (integration tests)
+- Implement websockets throughout the project
+- Converting the endpoints
+- Tasks regarding the admin
+- Manage to see all events and event codes
+- Since there is no official meeting next week, we have established to organise one on Thursday (14/03/2024), hour to be discussed
+
+## Other key points
+- Try to merge more often and earlier
+- Have a MR that works on its own rather than having something really complex that fails at the end of the week
+
+
+## Action points
+- More focus on frontend and making sure the backend works fine
+- Don't forget to do the 2 assignments (Buddycheck, Tasks and Planning) by **Friday 11:59 PM**
+- Try to start working earlier to avoid having to review code on Sunday
+
+---
+- Next minute taker: Thomas
+- Next chair: Kajus
