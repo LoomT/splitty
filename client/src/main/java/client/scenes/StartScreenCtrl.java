@@ -1,13 +1,23 @@
 package client.scenes;
 
+import client.components.EventListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
+import commons.Event;
+
+
 import jakarta.ws.rs.WebApplicationException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class StartScreenCtrl {
 
@@ -24,10 +34,13 @@ public class StartScreenCtrl {
     @FXML
     private ChoiceBox<String> languageChoiceBox;
 
+    @FXML
+    private VBox eventList;
+
     /**
      * start screen controller constructor
      *
-     * @param server utils
+     * @param server   utils
      * @param mainCtrl main scene controller
      * @param languageConf language config instance
      */
@@ -35,7 +48,9 @@ public class StartScreenCtrl {
     public StartScreenCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+
         this.languageConf = languageConf;
+
     }
 
     /**
@@ -48,6 +63,20 @@ public class StartScreenCtrl {
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
+
+        List<String> testList = List.of("Test1", "random event",
+                "heres one more", "idk", "try deleting this");
+        List<EventListItem> list = new ArrayList<>();
+
+
+        for (int i = 0; i < testList.size(); i++) {
+            int finalI = i;
+            list.add(new EventListItem(testList.get(i), () -> {
+                eventList.getChildren().remove(list.get(finalI));
+            }));
+            eventList.getChildren().add(list.get(i));
+
+        }
     }
 
 
@@ -55,7 +84,7 @@ public class StartScreenCtrl {
      * Creates and joins the event with provided title
      */
     public void create() {
-        if(title.getText().isEmpty()) {
+        if (title.getText().isEmpty()) {
             // inform that title is empty
         }
         try {
@@ -66,15 +95,20 @@ public class StartScreenCtrl {
         }
     }
 
+
     /**
      * Tries to join the inputted event
      */
     public void join() {
-//        if(server.existsEvent(code.getText())) {
-//            mainCtrl.showEvent(code.getText());
-//        } else {
-//
-//        }
+        if (code.getText().isEmpty()) return;
+        try {
+            Event joinedEvent = server.getEvent(code.getText());
+            mainCtrl.showEventPage(joinedEvent);
+        } catch (Exception e) {
+            System.out.println("Something went wrong");
+        }
+
+
     }
 
     /**

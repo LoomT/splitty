@@ -16,6 +16,7 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
+import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -32,26 +33,36 @@ public class MainCtrl {
 
     private AdminLoginCtrl adminLoginCtrl;
 
+    private EventPageCtrl eventPageCtrl;
+    private Scene eventPage;
+
     /**
      * Initializes the UI
      *
      * @param primaryStage stage
      //* @param overview controller and parent
      //* @param add controller and parent
+     * @param languageConf the language config
      * @param startScreen controller and scene
+
+     * @param eventPage controller and scene for eventpage
+     *
      * @param languageConf language config instance
      * @param adminLogin controller and scene
      */
     public void initialize(Stage primaryStage, Pair<StartScreenCtrl, Parent> startScreen,
                            Pair<AdminLoginCtrl, Parent> adminLogin, LanguageConf languageConf) {
+    public void initialize(
+            Stage primaryStage,
+            LanguageConf languageConf,
+            Pair<StartScreenCtrl, Parent> startScreen,
+            Pair<EventPageCtrl, Parent> eventPage
+    ) {
+
         this.primaryStage = primaryStage;
         this.languageConf = languageConf;
         //this.overviewCtrl = overview.getKey();
         //this.overview = new Scene(overview.getValue());
-
-        this.adminLoginCtrl = adminLogin.getKey();
-        this.adminLogin = new Scene(adminLogin.getValue());
-        this.languageConf = languageConf;
 
         //this.addCtrl = add.getKey();
         //this.add = new Scene(add.getValue());
@@ -59,9 +70,14 @@ public class MainCtrl {
         this.startScreenCtrl = startScreen.getKey();
         this.startScreen = new Scene(startScreen.getValue());
 
+        this.eventPageCtrl = eventPage.getKey();
+        this.eventPage = new Scene(eventPage.getValue());
+
         //showOverview();
         showStartScreen();
         primaryStage.show();
+
+
     }
 
     /**
@@ -83,6 +99,20 @@ public class MainCtrl {
 //    /**
 //     * Display overview
 //     */
+
+    /**
+     * shows the event page
+     * @param eventToShow the event to display
+     */
+    public void showEventPage(Event eventToShow) {
+        eventPageCtrl.displayEvent(eventToShow);
+        primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * Display overview
+     */
+
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");
 //        primaryStage.setScene(overview);

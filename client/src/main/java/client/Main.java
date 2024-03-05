@@ -18,6 +18,11 @@ package client;
 import static com.google.inject.Guice.createInjector;
 
 import client.scenes.AdminLoginCtrl;
+
+
+
+import client.scenes.EventPageCtrl;
+
 import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
@@ -47,6 +52,7 @@ public class Main extends Application {
      * @param primaryStage stage
      */
     @Override
+
     public void start(Stage primaryStage) {
         languageConf.onLanguageChange(() -> {
             // When the language is changed, this function is run
@@ -81,7 +87,16 @@ public class Main extends Application {
                 "client", "scenes", "AdminLogin.fxml"
         );
 
+
+        var eventPage = FXML.load(
+                EventPageCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "EventPage.fxml"
+        );
+
+
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, start, adminLogin, languageConf);
+        mainCtrl.initialize(primaryStage, languageConf, start, eventPage);
+
     }
 }
