@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.utils.ServerUtils;
+import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,7 +33,7 @@ public class AdminLoginCtrl {
      * @param server utils
      * @param mainCtrl main scene controller
      */
-
+    @Inject
     public AdminLoginCtrl(ServerUtils server, MainCtrl mainCtrl) {
 
         this.server = server;
