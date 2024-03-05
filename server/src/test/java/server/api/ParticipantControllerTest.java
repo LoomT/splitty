@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
 
 public class ParticipantControllerTest {
@@ -52,11 +51,6 @@ public class ParticipantControllerTest {
         partRepo.save(participant);
         var savedEvent = eventContr.add(event);
         var saved = partContr.add(participant, event.getId());
-        long tst = participant.getParticipantId();
-        List<Event> list = eventRepo.findAll();
-        List<Participant> listo = partRepo.findAll();
-        String test = event.getId();
-        long id = participant.getParticipantId();
         var actual = partContr.getById(participant.getParticipantId(), event.getId());
         partRepo.getReferenceById(participant.getParticipantId());
         assertEquals(OK, savedEvent.getStatusCode());
@@ -64,5 +58,39 @@ public class ParticipantControllerTest {
         assertEquals(OK, actual.getStatusCode()); //should be ok instead of INTERNAL ERROR
         assertTrue(partRepo.getCalledMethods().contains("getReferenceById"));
         assertTrue(eventRepo.getCalledMethods().contains("existsById") && eventRepo.getCalledMethods().contains("save"));
+    }
+
+    @Test
+    void EditById(){
+        Participant participantOld = new Participant("old name", "old email");
+        partRepo.save(participantOld);
+        partContr.add(participantOld, event.getId());
+        long partID = participantOld.getParticipantId();
+        Participant participantOldFromDatabase = partRepo.findById(partID).get();
+        assertEquals(participantOldFromDatabase.getName(), "old name");
+        assertEquals(participantOldFromDatabase.getEmailAddress(), "old email");
+        partContr.editParticipantById(event.getId(), partID, "new name", "new email");
+        assertTrue(partRepo.findById(partID).isPresent());
+        Participant participantNew = partRepo.findById(partID).get();
+        assertTrue(partRepo.getCalledMethods().contains("save"));
+        assertTrue(partRepo.getCalledMethods().contains("findById"));
+        assertTrue(partRepo.getCalledMethods().contains("existsById"));
+        assertTrue(partRepo.getCalledMethods().contains("getReferenceById"));
+        assertEquals(participantNew.getName(), "new name");
+        assertEquals(participantNew.getEmailAddress(), "new email");
+    }
+
+    @Test
+    void removeById(){
+        Participant participant = new Participant("name");
+        partRepo.save(participant);
+        long partID = participant.getParticipantId();
+        partContr.add(participant, event.getId());
+        assertTrue(partRepo.findById(partID).isPresent());
+        assertTrue(eventRepo.findById(event.getId()).isPresent());
+        assertTrue(eventRepo.findById(event.getId()).get().getParticipants().contains(participant));
+        assertTrue(partRepo.existsById(partID));
+        partContr.deleteById(partID, event.getId());
+        assertFalse(partRepo.existsById(partID));
     }
 }

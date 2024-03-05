@@ -269,8 +269,8 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public void deleteById(Long id) {
-        // TODO Auto-generated method stub
-
+        calledMethods.add("deleteById");
+        participants.removeIf(p -> p.getParticipantId() == id);
     }
 
     /**

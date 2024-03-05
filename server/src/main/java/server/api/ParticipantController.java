@@ -37,9 +37,6 @@ public class ParticipantController {
     @GetMapping( "/{partID}")
     public ResponseEntity<Participant> getById(@PathVariable long partID, @PathVariable String eventID){
         try{
-            List<Participant> list = repo.findAll();
-            long test1 = partID;
-            Optional<Participant> test = repo.findById(partID);
             if(eventRepo.findById(eventID).isEmpty() || repo.findById(partID).isEmpty()) {
                 return ResponseEntity.status(404).build();
             }
@@ -65,8 +62,6 @@ public class ParticipantController {
     @PostMapping({ "", "/" })
     public ResponseEntity<Participant> add(@RequestBody Participant participant, @PathVariable String eventID) {
         try {
-            boolean test = !(eventRepo.existsById(eventID));
-            List<Event> list = eventRepo.findAll();
             if (participant == null || participant.getName() == null || participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
                 return ResponseEntity.badRequest().build();
             }
@@ -128,11 +123,12 @@ public class ParticipantController {
     public ResponseEntity<Event> deleteById(@PathVariable long partID, @PathVariable String eventID) {
         try {
             if(eventRepo.existsById(eventID)) {
-                Event event = eventRepo.getReferenceById(eventID);
+                Event event = eventRepo.findById(eventID).get();
                 if(event.hasParticipant(repo.getReferenceById(partID))){
-                    if (repo.existsById(partID)) {
-                        eventRepo.getReferenceById(eventID).deleteParticipant(repo.getReferenceById(partID));
+                    if (repo.existsById(partID) && eventRepo.findById(eventID).isPresent() && repo.findById(partID).isPresent()) {
+                        eventRepo.findById(eventID).get().deleteParticipant(repo.findById(partID).get());
                         repo.deleteById(partID);
+                        eventRepo.save(event);
                         return ResponseEntity.status(204).build();
                     }
                 }
