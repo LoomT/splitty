@@ -127,9 +127,7 @@ public class MainCtrl {
     }
 
     /**
-     * getter for adminLoginCtrl
-     *
-     * @return adminLoginCtrl
+     * Display overview
      */
 
 
