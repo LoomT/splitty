@@ -5,8 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,11 +14,9 @@ class UserConfigTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        Writer writer = new StringWriter();
-        writer.write("""
+        IO = new TestIO("""
                 serverURL=http://localhost:8080/
                 lang=en""");
-        IO = new TestIO(writer);
         userConfig = new UserConfig(IO);
     }
 
@@ -54,9 +50,9 @@ class UserConfigTest {
     @Test
     void setLocale() throws IOException {
         assertEquals("en", userConfig.getLocale());
-        assertFalse(IO.getWriter().toString().contains("nl"));
+        assertFalse(IO.getContent().contains("nl"));
         userConfig.setLocale("nl");
         assertEquals("nl", userConfig.getLocale());
-        assertTrue(IO.getWriter().toString().contains("nl"));
+        assertTrue(IO.getContent().contains("nl"));
     }
 }
