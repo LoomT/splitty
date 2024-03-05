@@ -1,7 +1,5 @@
 package server;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
