@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.text.Font?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="client.scenes.AdminLoginCtrl"
+            prefHeight="400.0" prefWidth="600.0">
+        <children>
+            <TextField layoutX="198.0" layoutY="154.0" promptText="%AdminLogin.enterUsername" />
+            <PasswordField layoutX="198.0" layoutY="213.0" promptText="%AdminLogin.enterPassword" />
+            <Button layoutX="365.0" layoutY="213.0" mnemonicParsing="false" text="%AdminLogin.loginBtn" />
+            <Label layoutX="198.0" layoutY="129.0" text="%AdminLogin.usernameLabel" />
+            <Label layoutX="198.0" layoutY="192.0" text="%AdminLogin.passwordLabel" />
+            <Label layoutX="165.0" layoutY="56.0" prefHeight="43.0" prefWidth="270.0" text="%AdminLogin.title">
+                <font>
+                    <Font size="29.0" />
+                </font>
+            </Label>
+        </children>
+</AnchorPane>
+
+
