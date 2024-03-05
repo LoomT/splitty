@@ -19,6 +19,7 @@ public class ParticipantController {
      * Constructor with repository and random number generator injections
      *
      * @param repo Participant repository
+     * @param eventRepo Event repository
      */
     public ParticipantController(ParticipantRepository repo, EventRepository eventRepo) {
         this.repo = repo;
@@ -80,6 +81,7 @@ public class ParticipantController {
      * Change the name of a participant
      * /api/events/{eventID}/participants/{partID}?newName={name}&newEmail={email}
      *
+     * @param eventID id of the Event
      * @param partID id of the participant
      * @param name new name for participant
      * @param email new email for participant
@@ -116,6 +118,7 @@ public class ParticipantController {
      * removes a participant
      *
      * @param partID id of participant to remove
+     * @param eventID id of the Event in which the participant is located at
      * @return status 204 if deleted successfully, 404 if the participant and/or event does not exist or 401 if participant is not part of the accessed event
      */
     @DeleteMapping("/{partID}")
