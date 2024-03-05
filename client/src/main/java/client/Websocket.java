@@ -1,5 +1,6 @@
 package client;
 
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.StringMessageConverter;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -9,6 +10,7 @@ import java.lang.reflect.Type;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import commons.Event;
 
 public class Websocket {
     private final String eventID;
@@ -29,7 +31,7 @@ public class Websocket {
         CountDownLatch latch = new CountDownLatch(1);
 
         WebSocketStompClient stompClient = new WebSocketStompClient(new StandardWebSocketClient());
-        stompClient.setMessageConverter(new StringMessageConverter());
+        stompClient.setMessageConverter(new MappingJackson2MessageConverter());
 
         String url = "ws://localhost:8080/ws"; //TODO inject this
         StompSessionHandler sessionHandler = new MyStompSessionHandler();
@@ -45,8 +47,10 @@ public class Websocket {
         Scanner scanner = new Scanner(System.in);
         while(true) {
             String msg = scanner.nextLine();
-            System.out.println("Sending " + msg);
-            send(msg);
+            if(msg.isEmpty()) break;
+            Event event = new Event(msg);
+            System.out.println("Sending event\n" + event);
+            send(event);
         }
 //        try {
 //            latch.await();
@@ -54,8 +58,8 @@ public class Websocket {
 //            throw new RuntimeException(e);
 //        }
     }
-    public void send(String msg) {
-        stompSession.send("/app/event/" + eventID, msg);
+    public void send(Event msg) {
+        stompSession.send("/app/" + eventID, msg);
     }
 
     private static class MyStompSessionHandler extends StompSessionHandlerAdapter {
@@ -73,7 +77,7 @@ public class Websocket {
 
         @Override
         public Type getPayloadType(StompHeaders headers) {
-            return super.getPayloadType(headers);
+            return Event.class;
         }
 
         /**
@@ -84,7 +88,7 @@ public class Websocket {
          */
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
-            System.out.println("Received " + payload);
+            System.out.println("Received\n" + payload);
         }
 
         @Override

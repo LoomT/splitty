@@ -1,5 +1,6 @@
 package server.api;
 
+import commons.Event;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -13,10 +14,11 @@ public class Websocket {
      * @param id event id
      * @return the same message
      */
-    @MessageMapping("/event/{id}")
+    @MessageMapping("/{id}")
     @SendTo("/event/{id}")
-    public String broadcast(@Payload String message, @DestinationVariable String id) {
+    public Event broadcast(@Payload Event message, @DestinationVariable String id) {
         System.out.println("Server received message " + message + " on channel " + id);
+        message.setId("id");
         return message;
     }
 }
