@@ -75,7 +75,9 @@ public class MainCtrl {
      */
     public void showStartScreen() {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
+        startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
+
     }
 
 

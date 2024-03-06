@@ -90,6 +90,11 @@ public class EventPageCtrl {
     }
 
     @FXML
+    private void backButtonClicked() {
+        mainCtrl.showStartScreen();
+    }
+
+    @FXML
     private void tabSelectionChanged() {
 
     }

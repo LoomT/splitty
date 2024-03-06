@@ -37,16 +37,16 @@ public class StartScreenCtrl {
     @FXML
     private VBox eventList;
 
-    private List<String> recentEventCodes;
+
     private UserConfig userConfig;
 
     /**
      * start screen controller constructor
      *
-     * @param server   utils
-     * @param mainCtrl main scene controller
+     * @param server       utils
+     * @param mainCtrl     main scene controller
      * @param languageConf language config instance
-     * @param userConfig the user configuration
+     * @param userConfig   the user configuration
      */
     @Inject
     public StartScreenCtrl(
@@ -60,7 +60,6 @@ public class StartScreenCtrl {
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        recentEventCodes = userConfig.getRecentEventCodes();
 
     }
 
@@ -74,9 +73,14 @@ public class StartScreenCtrl {
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
+        reloadEventCodes();
 
+    }
 
+    private void reloadEventCodes() {
+        List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
+        eventList.getChildren().clear();
 
 
         for (int i = 0; i < recentEventCodes.size(); i++) {
@@ -87,6 +91,16 @@ public class StartScreenCtrl {
             eventList.getChildren().add(list.get(i));
 
         }
+    }
+
+    /**
+     * Call this when you want to load/reload the start screen,
+     * for example when you exit the event page with the back button to reset the fields.
+     */
+    public void reset() {
+        title.setText("");
+        code.setText("");
+        reloadEventCodes();
     }
 
 

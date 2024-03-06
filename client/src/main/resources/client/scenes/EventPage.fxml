@@ -78,5 +78,6 @@
             </TabPane>
          </children>
       </VBox>
+      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="Back" />
    </children>
 </AnchorPane>
