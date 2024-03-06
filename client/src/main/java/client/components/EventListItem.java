@@ -23,6 +23,7 @@ public class EventListItem extends HBox {
     /**
      * @param eventName the name to display
      * @param onRemove the callback to be called when the remove button ic clicked
+     * @param onClick the callback for when the eventcode is clicked
      */
     public EventListItem(String eventName, Runnable onRemove, Consumer<String> onClick) {
         FXMLLoader fxmlLoader = new FXMLLoader(
