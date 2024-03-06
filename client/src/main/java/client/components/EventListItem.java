@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 public class EventListItem extends HBox {
     @FXML
@@ -16,13 +17,14 @@ public class EventListItem extends HBox {
 
     private String eventName;
     private Runnable onRemoveCallback;
+    private Consumer<String> onClickCallback;
 
 
     /**
      * @param eventName the name to display
      * @param onRemove the callback to be called when the remove button ic clicked
      */
-    public EventListItem(String eventName, Runnable onRemove) {
+    public EventListItem(String eventName, Runnable onRemove, Consumer<String> onClick) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass()
                         .getResource("/client/components/EventListItem.fxml")
@@ -38,6 +40,7 @@ public class EventListItem extends HBox {
 
         this.eventName = eventName;
         this.onRemoveCallback = onRemove;
+        this.onClickCallback = onClick;
         label.setText(eventName);
     }
 
@@ -47,7 +50,11 @@ public class EventListItem extends HBox {
      */
     @FXML
     private void onXClick() {
-        System.out.println("X on button " + this.eventName);
         onRemoveCallback.run();
+    }
+
+    @FXML
+    private void eventCodeClicked() {
+        onClickCallback.accept(this.eventName);
     }
 }

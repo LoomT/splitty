@@ -77,6 +77,9 @@ public class StartScreenCtrl {
 
     }
 
+    /**
+     * This method fetches the event codes and updates the list
+     */
     private void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
@@ -85,9 +88,15 @@ public class StartScreenCtrl {
 
         for (int i = 0; i < recentEventCodes.size(); i++) {
             int finalI = i;
-            list.add(new EventListItem(recentEventCodes.get(i), () -> {
-                eventList.getChildren().remove(list.get(finalI));
-            }));
+            list.add(
+                    new EventListItem(
+                            recentEventCodes.get(i),
+                            () -> {
+                                eventList.getChildren().remove(list.get(finalI));
+                            },
+                            (String c) -> {
+                                code.setText(c);
+                            }));
             eventList.getChildren().add(list.get(i));
 
         }
