@@ -18,6 +18,7 @@ public class UserConfig {
 
     /**
      * The constructor which initializes properties from file, and opens a writer to the file
+     *
      * @param io input output interface for config file
      */
     @Inject
@@ -53,7 +54,7 @@ public class UserConfig {
      */
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
-        try(BufferedWriter writer = new BufferedWriter(io.write()) ) {
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed language to " + lang);
         }
     }
@@ -84,21 +85,20 @@ public class UserConfig {
      * @param code the 5 letter code of the event to store in the config file
      */
     public void setMostRecentEventCode(String code) {
-        System.out.println("Writing code " +code);
+        System.out.println("Writing code " + code);
         List<String> currentCodes = getRecentEventCodes();
         currentCodes.remove(code);
         currentCodes.addFirst(code);
-        String strToWrite = "";
-        for (int i = 0; i< currentCodes.size(); i++) {
+        StringBuilder strToWrite = new StringBuilder();
+        for (int i = 0; i < currentCodes.size(); i++) {
             String curr = currentCodes.get(i);
-            strToWrite += curr;
+            strToWrite.append(curr);
             if (i < currentCodes.size() - 1) {
-                strToWrite += ",";
+                strToWrite.append(",");
             }
         }
-        configProperties.setProperty("recentEventCodes", strToWrite);
-        try {
-            BufferedWriter writer = new BufferedWriter(io.write());
+        configProperties.setProperty("recentEventCodes", strToWrite.toString());
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Set most recent event code: " + code);
         } catch (Exception e) {
             System.out.println("Something went wrong while writing to the config file.");
