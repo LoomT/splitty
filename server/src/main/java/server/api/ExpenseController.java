@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 
@@ -62,17 +63,19 @@ public class ExpenseController {
             if (expenseAuthor != null) {
 
                 //updated expense saved for the author
+                expenseAuthor.setAuthoredExpenseSet(new HashSet<>());
                 expenseAuthor.addExpense(savedExpense);
 
                 //save the participant
                 repoParticipant.save(expenseAuthor);
 
                 //return the expense
-                return ResponseEntity.ok(savedExpense);
+                return ResponseEntity.ok().body(savedExpense);
             } else {
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -110,6 +113,7 @@ public class ExpenseController {
                                                  @RequestBody Expense updatedExpense) {
         try {
             Expense updated = repoExpense.save(updatedExpense);
+            updated.setExpenseID(id);
             return ResponseEntity.ok(updated);
         }
         catch (Exception e) {

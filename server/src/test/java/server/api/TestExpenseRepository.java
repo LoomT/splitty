@@ -127,6 +127,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public Expense getReferenceById(Long id) {
+        call("getReferenceById");
         return null;
     }
 
@@ -199,6 +200,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public Optional<Expense> findById(Long id) {
+        call("findById");
         return expenses.stream().filter(e -> e.getExpenseID() == id).findAny();
     }
 
