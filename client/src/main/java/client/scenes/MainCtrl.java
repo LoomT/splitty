@@ -28,7 +28,11 @@ public class MainCtrl {
     private Stage primaryStage;
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+    private Scene adminLogin;
+
     private LanguageConf languageConf;
+
+    private AdminLoginCtrl adminLoginCtrl;
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
@@ -43,19 +47,24 @@ public class MainCtrl {
      * @param startScreen controller and scene
      * @param eventPage controller and scene for eventpage
      *
+     * @param adminLogin admin login controller and scene
      */
     public void initialize(
             Stage primaryStage,
             LanguageConf languageConf,
             UserConfig userConfig,
             Pair<StartScreenCtrl, Parent> startScreen,
-            Pair<EventPageCtrl, Parent> eventPage
+            Pair<EventPageCtrl, Parent> eventPage,
+            Pair<AdminLoginCtrl, Parent> adminLogin
     ) {
 
         this.primaryStage = primaryStage;
         this.languageConf = languageConf;
         this.userConfig = userConfig;
 
+
+        this.adminLoginCtrl = adminLogin.getKey();
+        this.adminLogin = new Scene(adminLogin.getValue());
 
         this.startScreenCtrl = startScreen.getKey();
         this.startScreen = new Scene(startScreen.getValue());
@@ -80,6 +89,13 @@ public class MainCtrl {
 
     }
 
+    /**
+     * Display admin login
+     */
+    public void showAdminLogin() {
+        primaryStage.setTitle("Admin Login");
+        primaryStage.setScene(adminLogin);
+    }
 
     /**
      * shows the event page
@@ -91,9 +107,49 @@ public class MainCtrl {
         primaryStage.setScene(eventPage);
     }
 
+
+    /**
+     * Getter for startScreenCtrl
+     *
+     * @return startScreenCtrl
+     */
+    public StartScreenCtrl getStartScreenCtrl() {
+        return startScreenCtrl;
+    }
+
+
+    /**
+     * setter for startScreenCtrl
+     *
+     * @param startScreenCtrl start screen controller
+     */
+    public void setStartScreenCtrl(StartScreenCtrl startScreenCtrl) {
+        this.startScreenCtrl = startScreenCtrl;
+    }
+
     /**
      * Display overview
      */
+
+
+    /**
+     * AdminLoginCtrl getter
+     *
+     * @return admin login controller
+     */
+    public AdminLoginCtrl getAdminLoginCtrl() {
+        return adminLoginCtrl;
+    }
+
+    /**
+     * setter for adminLoginCtrl
+     *
+     * @param adminLoginCtrl admin login controller
+     */
+    public void setAdminLoginCtrl(AdminLoginCtrl adminLoginCtrl) {
+        this.adminLoginCtrl = adminLoginCtrl;
+    }
+
 
 //    public void showOverview() {
 //        primaryStage.setTitle("Quotes: Overview");

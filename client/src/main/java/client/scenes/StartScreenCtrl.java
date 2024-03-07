@@ -142,4 +142,12 @@ public class StartScreenCtrl {
 
 
     }
+
+
+    /**
+     * Display admin login
+     */
+    public void showAdminLogin() {
+        mainCtrl.showAdminLogin();
+    }
 }
