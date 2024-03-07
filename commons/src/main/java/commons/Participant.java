@@ -53,10 +53,8 @@ public class Participant {
      * @param name name of the participant
      * @param email email of the participant. Can be Null
      * @param bankAccountSet bankAccount number of the participant
-     * @param authoredExpenseSet expenses of a participant if it already had some.
      */
-    public Participant(String name, @Nullable String email, Set<Expense> authoredExpenseSet,
-                       Set<BankAccount> bankAccountSet ) {
+    public Participant(String name, @Nullable String email, Set<BankAccount> bankAccountSet ) {
         this(name, email);
         this.bankAccountSet = bankAccountSet;
     }

@@ -59,12 +59,14 @@ public class Event {
      * Constructor that does take arguments, uses this()
      *
      * @param title name of the event
-     * @param participants list of strings (going to be
-     *                     participant objects in the future)
+     * @param participants participants within an event
+     * @param expenses expenses within the event
+     *
      */
-    public Event(String title, List<Participant> participants) {
+    public Event(String title, List<Participant> participants, List<Expense> expenses) {
         this(title);
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
+        this.expenses = expenses;
     }
 
     /**
@@ -146,6 +148,13 @@ public class Event {
     public void setParticipants(List<Participant> participants) {
         this.participants = participants;
     }
+
+    /**
+     * delete method for expenses
+     * @param expense expense to be removed
+     * @return true iff removal was successful, false otherwise
+     */
+    public boolean deleteExpense(Expense expense){return expenses.remove(expense);}
 
     /**
      * getter for expenses

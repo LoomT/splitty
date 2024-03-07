@@ -37,10 +37,6 @@ public class Expense {
     @NotNull
     private Date date;
     @ManyToMany
-    @JoinTable(name = "order_item_mapping",
-            joinColumns = {@JoinColumn(name = "order_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "item_id", referencedColumnName = "id")})
-    @MapKey(name = "itemName")
     private List<Participant> expenseParticipants;
     @NotNull
     private String type;
