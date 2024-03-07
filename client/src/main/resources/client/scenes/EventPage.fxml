@@ -71,12 +71,13 @@
             </HBox>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab text="All" />
-                <Tab text="From John" />
-                  <Tab text="Including John" />
+                <Tab fx:id="allTab" text="All" />
+                <Tab fx:id="fromTab" text="From John" />
+                  <Tab fx:id="includingTab" text="Including John" />
               </tabs>
             </TabPane>
          </children>
       </VBox>
+      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="Back" />
    </children>
 </AnchorPane>
