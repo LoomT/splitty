@@ -230,6 +230,13 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public <S extends Participant> S save(S entity) {
         call("save");
+        for(Participant e : participants){
+            if(e.getParticipantId() == entity.getParticipantId()){
+                participants.remove(e);
+                participants.add(entity);
+                return entity;
+            }
+        }
         entity.setParticipantId(participants.size());
         participants.add(entity);
         return entity;

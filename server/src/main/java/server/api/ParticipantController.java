@@ -70,8 +70,9 @@ public class ParticipantController {
                     participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
                 return ResponseEntity.badRequest().build();
             }
-            if (eventRepo.findById(eventID).isPresent()) {
-                Event event = eventRepo.findById(eventID).get();
+            Optional<Event> optionalEvent = eventRepo.findById(eventID);
+            if (optionalEvent.isPresent()) {
+                Event event = optionalEvent.get();
                 event.addParticipant(participant);
                 eventRepo.save(event);
                 return ResponseEntity.ok(participant);
@@ -88,16 +89,14 @@ public class ParticipantController {
      *
      * @param eventID id of the Event
      * @param partID id of the participant
-     * @param name new name for participant
-     * @param email new email for participant
+     * @param participant new participant to replace the old one
      * @return the participant entity with new title.
      *  or 401 if the participant is not accessible from the specified event
      */
-    @PatchMapping("/{partID}")
+    @PutMapping("/{partID}")
     public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID,
                                                            @PathVariable long partID,
-                                                           @RequestParam("newName") String name,
-                                                           @RequestParam String email) {
+                                                           @RequestBody Participant participant) {
         try {
             Optional<Event> search = eventRepo.findById(eventID);
             if(search.isPresent() && repo.existsById(partID)) {
@@ -105,10 +104,12 @@ public class ParticipantController {
                 Optional<Participant> optional = repo.findById(partID);
 
                 if(optional.isPresent()){
-                    Participant participant = optional.get();
-                    if(event.hasParticipant(participant)){
-                        participant.setName(name);
-                        participant.setEmailAddress(email);
+                    Participant oldParticipant = optional.get();
+                    if(event.hasParticipant(oldParticipant)){
+                        event.deleteParticipant(oldParticipant);
+                        participant.setParticipantId(partID);
+                        event.addParticipant(participant);
+                        repo.save(participant);
                         eventRepo.save(event);
                         return ResponseEntity.ok(repo.getReferenceById(partID));
                     } else return ResponseEntity.status(401).build();
@@ -134,17 +135,14 @@ public class ParticipantController {
     public ResponseEntity<Event> deleteById(@PathVariable long partID,
                                             @PathVariable String eventID) {
         try {
-            if(eventRepo.existsById(eventID)) {
+            if(eventRepo.findById(eventID).isPresent() && repo.findById(partID).isPresent()) {
                 Event event = eventRepo.findById(eventID).get();
-                if(event.hasParticipant(repo.getReferenceById(partID))){
-                    if (repo.existsById(partID) && eventRepo.findById(eventID).isPresent()
-                            && repo.findById(partID).isPresent()) {
-                        eventRepo.findById(eventID).get()
-                                .deleteParticipant(repo.findById(partID).get());
-                        repo.deleteById(partID);
-                        eventRepo.save(event);
-                        return ResponseEntity.status(204).build();
-                    }
+                Participant participant = repo.findById(partID).get();
+                if(event.hasParticipant(participant)){
+                    event.deleteParticipant(participant);
+                    repo.deleteById(partID);
+                    eventRepo.save(event);
+                    return ResponseEntity.status(204).build();
                 }
                 return ResponseEntity.status(401).build();
             }

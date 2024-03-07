@@ -54,7 +54,7 @@ public class ParticipantControllerTest {
         partRepo.getReferenceById(participant.getParticipantId());
         assertEquals(OK, savedEvent.getStatusCode());
         assertEquals(OK, saved.getStatusCode());
-        assertEquals(OK, actual.getStatusCode()); //should be ok instead of INTERNAL ERROR
+        assertEquals(OK, actual.getStatusCode());
         assertTrue(partRepo.getCalledMethods().contains("getReferenceById"));
         assertTrue(eventRepo.getCalledMethods().contains("existsById") && eventRepo.getCalledMethods().contains("save"));
     }
@@ -62,21 +62,31 @@ public class ParticipantControllerTest {
     @Test
     void EditById(){
         Participant participantOld = new Participant("old name", "old email");
+        Participant participantNew = new Participant("new name", "new email");
+
         partRepo.save(participantOld);
         partContr.add(participantOld, event.getId());
         long partID = participantOld.getParticipantId();
         Participant participantOldFromDatabase = partRepo.findById(partID).get();
+
         assertEquals(participantOldFromDatabase.getName(), "old name");
         assertEquals(participantOldFromDatabase.getEmailAddress(), "old email");
-        partContr.editParticipantById(event.getId(), partID, "new name", "new email");
+
+        partContr.editParticipantById(event.getId(), partID, participantNew);
         assertTrue(partRepo.findById(partID).isPresent());
-        Participant participantNew = partRepo.findById(partID).get();
+        Participant participantActual = partRepo.findById(partID).get();
+
         assertTrue(partRepo.getCalledMethods().contains("save"));
         assertTrue(partRepo.getCalledMethods().contains("findById"));
         assertTrue(partRepo.getCalledMethods().contains("existsById"));
-        assertTrue(partRepo.getCalledMethods().contains("getReferenceById"));
-        assertEquals(participantNew.getName(), "new name");
-        assertEquals(participantNew.getEmailAddress(), "new email");
+
+        assertTrue(eventRepo.findById(event.getId()).isPresent());
+        Event retrievedEvent = eventRepo.findById(event.getId()).get();
+
+        assertTrue(retrievedEvent.hasParticipant(participantNew));
+        assertFalse(retrievedEvent.hasParticipant(participantOld));
+        assertEquals(participantActual.getName(), "new name");
+        assertEquals(participantActual.getEmailAddress(), "new email");
     }
 
     @Test
