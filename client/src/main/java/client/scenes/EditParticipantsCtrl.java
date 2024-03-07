@@ -29,8 +29,8 @@ public class EditParticipantsCtrl {
     private MainCtrl mainCtrl;
 
     /**
-     * @param server
-     * @param mainCtrl
+     * @param server   serverutils instance
+     * @param mainCtrl main control instance
      */
     @Inject
     public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl) {
@@ -39,22 +39,27 @@ public class EditParticipantsCtrl {
 
     }
 
+    /**
+     * Call this function when showing this page
+     *
+     * @param e the event to edit the participants for
+     */
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
 
         chooseParticipant.getItems().add("New Participant");
         chooseParticipant
-                .getItems()
-                .addAll(
-                        e.getParticipants()
-                                .stream()
-                                .map(Participant::getName)
-                                .toList()
-                );
+            .getItems()
+            .addAll(
+                e.getParticipants()
+                    .stream()
+                    .map(Participant::getName)
+                    .toList()
+            );
 
         chooseParticipant.setValue("New Participant");
-        chooseParticipant.setOnAction((_event)->{
+        chooseParticipant.setOnAction((event1) -> {
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
             if (index == 0) {
                 nameField.setText("");
@@ -71,11 +76,17 @@ public class EditParticipantsCtrl {
 
     }
 
+    /**
+     * Handler for the back button
+     */
     @FXML
     private void backButtonClicked() {
         mainCtrl.showEventPage(event);
     }
 
+    /**
+     * Handler for the save button
+     */
     @FXML
     private void saveButtonClicked() {
 

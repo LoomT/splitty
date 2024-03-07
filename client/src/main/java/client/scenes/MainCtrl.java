@@ -117,6 +117,10 @@ public class MainCtrl {
         primaryStage.setScene(eventPage);
     }
 
+    /**
+     * shows the participant editor page
+     * @param eventToShow the event to show the participant editor for
+     */
     public void showEditParticipantsPage(Event eventToShow) {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
         primaryStage.setTitle("Edit participants");
