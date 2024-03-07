@@ -46,7 +46,7 @@ public class EventPageCtrl {
     public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-
+        websocket = new Websocket(this);
     }
 
     /**
@@ -89,7 +89,6 @@ public class EventPageCtrl {
             includingTab.setText("Including " + name);
         });
 
-        websocket = new Websocket(this);
         websocket.connect(e.getId());
     }
 
@@ -106,6 +105,7 @@ public class EventPageCtrl {
     @FXML
     private void backButtonClicked() {
         mainCtrl.showStartScreen();
+        websocket.disconnect();
     }
 
     @FXML
