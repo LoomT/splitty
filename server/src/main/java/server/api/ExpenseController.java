@@ -28,14 +28,11 @@ public class ExpenseController {
 
     /**
      * retrieves an expense according to its id
-     * @param id
+     * @param id id of the expense
      * @return ResponseEntity which contains the expense if found, or 404 Not Found otherwise
-     * @param eventID ID of the event
-     * @param participantID ID of the participant
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Expense> getById(@PathVariable long id, @PathVariable String eventID,
-                                           @PathVariable String participantID) {
+    public ResponseEntity<Expense> getById(@PathVariable long id) {
         try {
             Optional<Expense> optionalExpense = repoExpense.findById(id);
             if (optionalExpense.isPresent()) {
