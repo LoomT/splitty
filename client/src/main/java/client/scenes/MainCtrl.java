@@ -16,6 +16,7 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
+import client.utils.UserConfig;
 import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -35,6 +36,7 @@ public class MainCtrl {
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
+    private UserConfig userConfig;
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
@@ -43,11 +45,9 @@ public class MainCtrl {
      * Initializes the UI
      *
      * @param primaryStage stage
-     //* @param overview controller and parent
-     //* @param add controller and parent
      * @param languageConf the language config
+     * @param userConfig the user configuration
      * @param startScreen controller and scene
-
      * @param eventPage controller and scene for eventpage
      *
      * @param adminLogin admin login controller and scene
@@ -56,6 +56,7 @@ public class MainCtrl {
     public void initialize(
             Stage primaryStage,
             LanguageConf languageConf,
+            UserConfig userConfig,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
             Pair<AdminLoginCtrl, Parent> adminLogin,
@@ -64,11 +65,8 @@ public class MainCtrl {
 
         this.primaryStage = primaryStage;
         this.languageConf = languageConf;
-        //this.overviewCtrl = overview.getKey();
-        //this.overview = new Scene(overview.getValue());
+        this.userConfig = userConfig;
 
-        //this.addCtrl = add.getKey();
-        //this.add = new Scene(add.getValue());
 
         this.adminLoginCtrl = adminLogin.getKey();
         this.adminLogin = new Scene(adminLogin.getValue());
@@ -94,7 +92,9 @@ public class MainCtrl {
      */
     public void showStartScreen() {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
+        startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
+
     }
 
     /**
@@ -110,6 +110,7 @@ public class MainCtrl {
      * @param eventToShow the event to display
      */
     public void showEventPage(Event eventToShow) {
+        userConfig.setMostRecentEventCode(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         primaryStage.setScene(eventPage);
     }
