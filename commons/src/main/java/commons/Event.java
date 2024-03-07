@@ -19,7 +19,7 @@ public class Event {
       * getters for eventID, title and creationDate
       * setter for title
       * unique event ID generator
-      * get, remove, edit and add method for participants
+      * get, remove, edit and add method for participants, and expenses
       * equals method
       * hashing method
 
