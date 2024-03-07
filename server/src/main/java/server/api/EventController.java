@@ -23,6 +23,7 @@ public class EventController {
      *
      * @param repo Event repository
      * @param random A random number generator
+     * @param template websocket object used to send updates to everyone
      */
     @Autowired
     public EventController(EventRepository repo, RandomGenerator random,

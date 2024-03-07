@@ -24,11 +24,15 @@ public class Websocket {
     /**
      * Websocket client constructor
      *
-     * @param eventID event invite code to connect to
+     * @param ctrl event page controller
      */
     public Websocket(EventPageCtrl ctrl) {
         this.ctrl = ctrl;
     }
+
+    /**
+     * @param eventID event id
+     */
     public void connect(String eventID) {
         this.eventID = eventID;
 //        CountDownLatch latch = new CountDownLatch(1);
@@ -63,6 +67,10 @@ public class Websocket {
 ////            throw new RuntimeException(e);
 ////        }
     }
+
+    /**
+     * @param msg message to send
+     */
     public void send(Event msg) {
         stompSession.send("/app/" + eventID, msg);
     }
