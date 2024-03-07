@@ -21,19 +21,19 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="Send Invites" />
+            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="%EventPage.sendInvites" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
          <children>
             <HBox>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Participants">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.participants">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Text>
-                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" text="Edit Participants">
+                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" text="%EventPage.editParticipants">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -48,7 +48,7 @@
                   <Insets left="5.0" />
                </VBox.margin>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Expenses">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.expenses">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -59,7 +59,7 @@
             <HBox>
                <children>
                   <ChoiceBox fx:id="participantChoiceBox" prefWidth="150.0" />
-                  <Button mnemonicParsing="false" onAction="#addExpenseClicked" text="Add Expense">
+                  <Button fx:id="addExpenseButton" mnemonicParsing="false" onAction="#addExpenseClicked" text="%EventPage.addExpense">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -71,13 +71,13 @@
             </HBox>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab fx:id="allTab" text="All" />
+                <Tab fx:id="allTab" text="%EventPage.all" />
                 <Tab fx:id="fromTab" text="From John" />
                   <Tab fx:id="includingTab" text="Including John" />
               </tabs>
             </TabPane>
          </children>
       </VBox>
-      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="Back" />
+      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="%EventPage.back" />
    </children>
 </AnchorPane>

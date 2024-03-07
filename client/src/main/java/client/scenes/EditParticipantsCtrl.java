@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -30,15 +31,18 @@ public class EditParticipantsCtrl {
     private Event event;
     private ServerUtils server;
     private MainCtrl mainCtrl;
+    private LanguageConf languageConf;
 
     /**
      * @param server   serverutils instance
      * @param mainCtrl main control instance
+     * @param languageConf the language config instance
      */
     @Inject
-    public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.languageConf = languageConf;
 
     }
 
@@ -50,8 +54,9 @@ public class EditParticipantsCtrl {
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        chooseParticipant.getItems().clear();
 
-        chooseParticipant.getItems().add("New Participant");
+        chooseParticipant.getItems().add(languageConf.get("EditP.newParticipant"));
         chooseParticipant
             .getItems()
             .addAll(
@@ -61,18 +66,20 @@ public class EditParticipantsCtrl {
                     .toList()
             );
 
-        chooseParticipant.setValue("New Participant");
-        saveButton.setText("Create Participant");
+        chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
+        saveButton.setText(languageConf.get("EditP.createParticipant"));
+        System.out.println("displaying edit page");
         chooseParticipant.setOnAction((event1) -> {
+            System.out.println("on action");
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
             if (index == 0) {
-                saveButton.setText("Create Participant");
+                saveButton.setText(languageConf.get("EditP.createParticipant"));
                 nameField.setText("");
                 emailField.setText("");
                 ibanField.setText("");
                 bicField.setText("");
             } else {
-                saveButton.setText("Save");
+                saveButton.setText(languageConf.get("EditP.save"));
                 Participant p = event.getParticipants().get(index - 1);
                 nameField.setText(p.getName());
                 emailField.setText(p.getEmailAddress());

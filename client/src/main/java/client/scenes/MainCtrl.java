@@ -123,7 +123,7 @@ public class MainCtrl {
      */
     public void showEditParticipantsPage(Event eventToShow) {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
-        primaryStage.setTitle("Edit participants");
+        primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
         primaryStage.setScene(editParticipants);
     }
 

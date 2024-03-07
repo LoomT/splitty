@@ -18,11 +18,11 @@
    <children>
       <VBox layoutY="58.0" prefHeight="343.0" prefWidth="174.0" style="-fx-background-color: #ddd;">
          <children>
-            <Button mnemonicParsing="false" onAction="#backButtonClicked" text="Back">
+            <Button mnemonicParsing="false" onAction="#backButtonClicked" text="%EditP.back">
                <VBox.margin>
                   <Insets top="5.0" />
                </VBox.margin></Button>
-            <Label text="Create or edit participant" wrapText="true">
+            <Label text="%EditP.createOrEditP" wrapText="true">
                <VBox.margin>
                   <Insets bottom="5.0" top="10.0" />
                </VBox.margin>
@@ -54,7 +54,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Name" />
+            <Label text="%EditP.name" />
             <Label text="Email" GridPane.rowIndex="1" />
             <Label text="IBAN" GridPane.rowIndex="2" />
             <Label text="BIC" GridPane.rowIndex="3" />
