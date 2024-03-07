@@ -4,6 +4,7 @@ import commons.Event;
 import commons.Participant;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -16,6 +17,7 @@ public class ParticipantControllerTest {
     private Event event;
     private TestParticipantRepository partRepo;
     private ParticipantController partContr;
+    private SimpMessagingTemplate template;
     @BeforeEach
     public void setup(){
         event = new Event("title");
@@ -27,8 +29,9 @@ public class ParticipantControllerTest {
         eventRepo.save(event);
 
         TestRandom random = new TestRandom();
-        eventContr = new EventController(eventRepo, random);
-        partContr = new ParticipantController(partRepo, eventRepo);
+        template = new SimpMessagingTemplateTest((message, timeout) -> false);
+        eventContr = new EventController(eventRepo, random, template);
+        partContr = new ParticipantController(partRepo, eventRepo, template);
     }
 
     @Test
