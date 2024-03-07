@@ -51,6 +51,7 @@ public class MainCtrl {
      * @param eventPage controller and scene for eventpage
      *
      * @param adminLogin admin login controller and scene
+     * @param adminOverview admin overview controller and scene
      */
     public void initialize(
             Stage primaryStage,
