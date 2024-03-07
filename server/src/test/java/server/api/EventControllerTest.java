@@ -98,7 +98,7 @@ class EventControllerTest {
         var added = sut.add(new Event("title"));
         String id = added.getBody().getId();
         sut.deleteById(id);
-        assertEquals("/event/" + id, template.destination);
+        assertEquals("/event/" + id, template.getDestination());
     }
 
     @Test
@@ -106,7 +106,7 @@ class EventControllerTest {
         var added = sut.add(new Event("title"));
         String id = added.getBody().getId();
         sut.deleteById(id);
-        assertEquals("delete", template.payload);
+        assertEquals("delete", template.getPayload());
     }
 
     @Test
@@ -114,10 +114,10 @@ class EventControllerTest {
         var added = sut.add(new Event("title"));
         String id = added.getBody().getId();
         sut.deleteById(id);
-        assertTrue(template.headers.containsKey("action"));
-        assertEquals("delete", template.headers.get("action"));
-        assertTrue(template.headers.containsKey("type"));
-        assertEquals("java.lang.String", template.headers.get("type"));
+        assertTrue(template.getHeaders().containsKey("action"));
+        assertEquals("delete", template.getHeaders().get("action"));
+        assertTrue(template.getHeaders().containsKey("type"));
+        assertEquals("java.lang.String", template.getHeaders().get("type"));
     }
 
     @Test
@@ -134,14 +134,14 @@ class EventControllerTest {
         Event event = added.getBody();
         String id = event.getId();
         sut.changeTitleById(id, "new title");
-        assertEquals("/event/" + id, template.destination);
-        assertEquals("titleChange", template.headers.get("action"));
-        assertEquals("new title", template.payload);
+        assertEquals("/event/" + id, template.getDestination());
+        assertEquals("titleChange", template.getHeaders().get("action"));
+        assertEquals("new title", template.getPayload());
     }
 
     @Test
     void randomId() {
         var added = sut.add(new Event("title"));
-        assertEquals("ABCDE", Objects.requireNonNull(added.getBody()).getId());
+        assertEquals("BCDEF", Objects.requireNonNull(added.getBody()).getId());
     }
 }
