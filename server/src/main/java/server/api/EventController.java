@@ -99,7 +99,7 @@ public class EventController {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
                 template.convertAndSend("/event/" + id, "delete",
-                        Map.of("action", "delete", "type", String.class.getTypeName()));
+                        Map.of("action", "deleteEvent", "type", String.class.getTypeName()));
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();

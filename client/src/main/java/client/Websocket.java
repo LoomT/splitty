@@ -52,20 +52,6 @@ public class Websocket {
         // Subscribe to specific event channel
         stompSession.subscribe("/event/" + eventID, sessionHandler);
 
-        // Testing
-//        Scanner scanner = new Scanner(System.in);
-//        while(true) {
-//            String msg = scanner.nextLine();
-//            if(msg.isEmpty()) break;
-//            Event event = new Event(msg);
-//            System.out.println("Sending event\n" + event);
-//            send(event);
-//        }
-////        try {
-////            latch.await();
-////        } catch (InterruptedException e) {
-////            throw new RuntimeException(e);
-////        }
     }
 
     /**
@@ -109,9 +95,16 @@ public class Websocket {
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
             System.out.println("Received\n" + payload);
-            if(headers.get("action").getFirst().equals("titleChange")) {
-                String title = (String)payload;
-                ctrl.changeTitle(title);
+            String action = headers.get("action").getFirst();
+            switch(action) {
+                case "titleChange" -> ctrl.changeTitle((String)payload);
+//                case "deleteEvent" -> ctrl.deleteEvent();
+//                case "addParticipant" -> ctrl.addParticipant((Participant)payload);
+//                case "updateParticipant" -> ctrl.updateParticipant((Participant)payload);
+//                case "removeParticipant" -> ctrl.removeParticipant((Long)payload);
+//                case "addExpense" -> ctrl.addExpense((Expense)payload);
+//                case "updateExpense" -> ctrl.updateExpense((Expense)payload);
+//                case "removeExpense" -> ctrl.removeExpense((Long)payload);
             }
         }
 

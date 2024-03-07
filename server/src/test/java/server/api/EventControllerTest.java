@@ -115,7 +115,7 @@ class EventControllerTest {
         String id = added.getBody().getId();
         sut.deleteById(id);
         assertTrue(template.getHeaders().containsKey("action"));
-        assertEquals("delete", template.getHeaders().get("action"));
+        assertEquals("deleteEvent", template.getHeaders().get("action"));
         assertTrue(template.getHeaders().containsKey("type"));
         assertEquals("java.lang.String", template.getHeaders().get("type"));
     }
