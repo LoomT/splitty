@@ -31,6 +31,18 @@ public class AdminService {
         return adminPassword;
     }
 
+    /**
+     * Verifies the input password with the stored password
+     *
+     * @param inputPassword password read in AdminLoginCtrl
+     * @return boolean value
+     */
+    public static boolean verifyPassword(String inputPassword) {
+        String adminServiceAttribute = getAdminPassword();
+
+        return adminServiceAttribute.equals(inputPassword);
+    }
+
 
 
 }
