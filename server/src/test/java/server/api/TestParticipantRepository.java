@@ -27,12 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.random.RandomGenerator;
 
 @SuppressWarnings("NullableProblems")
 public class TestParticipantRepository implements ParticipantRepository {
 
     private final List<Participant> participants = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
+    private final RandomGenerator random = new TestRandom();
 
     /**
      * @return called methods
@@ -84,15 +86,9 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public <S extends Participant> List<S> saveAll(Iterable<S> entities) {
-        for(Participant part: entities){
-            for(Participant p : participants){
-                if(part.getParticipantId() == p.getParticipantId()){
-                    participants.remove(p);
-                    participants.add(part);
-                }
-            }
-        }
-        return null;
+        List<S> saved = new ArrayList<>();
+        entities.forEach(e -> saved.add(save(e)));
+        return saved;
     }
 
     /**
@@ -244,7 +240,7 @@ public class TestParticipantRepository implements ParticipantRepository {
                 return entity;
             }
         }
-        entity.setParticipantId(participants.size());
+        entity.setParticipantId(random.nextLong());
         participants.add(entity);
         return entity;
     }

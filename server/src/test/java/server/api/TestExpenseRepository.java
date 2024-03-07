@@ -15,27 +15,24 @@
  */
 package server.api;
 
+import commons.Expense;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import server.database.ExpenseRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 
-
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-
-
-import commons.Expense;
-import server.database.ExpenseRepository;
-
-
 public class TestExpenseRepository implements ExpenseRepository {
     private final List<Expense> expenses = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
+    private final TestRandom random = new TestRandom();
 
     /**
      * @return called methods
@@ -158,7 +155,9 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public <S extends Expense> List<S> saveAll(Iterable<S> entities) {
-        return null;
+        List<S> saved = new ArrayList<>();
+        entities.forEach(e -> saved.add(save(e)));
+        return saved;
     }
 
     /**
@@ -189,6 +188,16 @@ public class TestExpenseRepository implements ExpenseRepository {
     @Override
     public <S extends Expense> S save(S entity) {
         call("save");
+        // check if there is already an expense with the same id and overwrite it if yes
+        for(Expense e : expenses) {
+            if(e.getExpenseID() == entity.getExpenseID()) {
+                expenses.remove(e);
+                expenses.add(entity);
+                return entity;
+            }
+        }
+        // if it's a new expense, generate an id and save
+        entity.setExpenseID(random.nextLong());
         expenses.add(entity);
         return entity;
     }
