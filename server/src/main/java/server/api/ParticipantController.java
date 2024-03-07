@@ -23,6 +23,7 @@ public class ParticipantController {
      *
      * @param repo Participant repository
      * @param eventRepo Event repository
+     * @param template websocket object used to send updates to everyone
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,
@@ -116,7 +117,8 @@ public class ParticipantController {
 
                     eventRepo.save(event);
                     template.convertAndSend("/event/" + eventID, participant,
-                            Map.of("action", "updateParticipant", "type", Participant.class.getTypeName()));
+                            Map.of("action", "updateParticipant",
+                                    "type", Participant.class.getTypeName()));
                     return ResponseEntity.noContent().build();
                 } else return ResponseEntity.status(401).build();
             } return ResponseEntity.notFound().build();
@@ -148,7 +150,8 @@ public class ParticipantController {
                     repo.deleteById(partID);
                     eventRepo.save(event);
                     template.convertAndSend("/event/" + eventID, partID,
-                            Map.of("action", "deleteParticipant", "type", Long.class.getTypeName()));
+                            Map.of("action", "deleteParticipant",
+                                    "type", Long.class.getTypeName()));
                     return ResponseEntity.noContent().build();
                 }
                 return ResponseEntity.status(401).build();
