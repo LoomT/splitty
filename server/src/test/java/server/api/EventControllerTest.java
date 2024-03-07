@@ -13,12 +13,12 @@ import static org.springframework.http.HttpStatus.*;
 class EventControllerTest {
     private TestEventRepository repo;
     private EventController sut;
-    private SimpMessagingTemplateTest template;
+    private TestSimpMessagingTemplate template;
     @BeforeEach
     void setUp() {
         TestRandom random = new TestRandom();
         repo = new TestEventRepository();
-        template = new SimpMessagingTemplateTest((message, timeout) -> false);
+        template = new TestSimpMessagingTemplate((message, timeout) -> false);
         sut = new EventController(repo, random, template);
     }
     @Test

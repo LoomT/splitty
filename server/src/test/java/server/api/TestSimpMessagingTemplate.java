@@ -6,7 +6,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.Map;
 
-public class SimpMessagingTemplateTest extends SimpMessagingTemplate {
+public class TestSimpMessagingTemplate extends SimpMessagingTemplate {
     public String destination;
     public Object payload;
     public Map<String, Object> headers;
@@ -16,7 +16,7 @@ public class SimpMessagingTemplateTest extends SimpMessagingTemplate {
      *
      * @param messageChannel the message channel (never {@code null})
      */
-    public SimpMessagingTemplateTest(MessageChannel messageChannel) {
+    public TestSimpMessagingTemplate(MessageChannel messageChannel) {
         super(messageChannel);
     }
 
@@ -28,7 +28,7 @@ public class SimpMessagingTemplateTest extends SimpMessagingTemplate {
     }
     @Override
     public String toString() {
-        return "SimpMessagingTemplateTest{" +
+        return "TestSimpMessagingTemplate{" +
                 "destination='" + destination + '\'' +
                 ", payload=" + payload +
                 ", headers=" + headers +
