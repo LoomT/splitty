@@ -150,7 +150,7 @@ public class ParticipantController {
                     repo.deleteById(partID);
                     eventRepo.save(event);
                     template.convertAndSend("/event/" + eventID, partID,
-                            Map.of("action", "deleteParticipant",
+                            Map.of("action", "removeParticipant",
                                     "type", Long.class.getTypeName()));
                     return ResponseEntity.noContent().build();
                 }
