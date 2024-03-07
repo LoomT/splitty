@@ -112,7 +112,7 @@ public class ParticipantController {
                     eventRepo.save(event);
                     return ResponseEntity.ok(repo.getReferenceById(partID));
                 } else return ResponseEntity.status(401).build();
-            } return ResponseEntity.status(401).build();
+            } return ResponseEntity.status(404).build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
