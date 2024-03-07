@@ -54,5 +54,11 @@ public class AdminLoginCtrl {
 
 
     }
+
+    @FXML
+    private void backButtonClicked() {
+        mainCtrl.showStartScreen();
+    }
+
 }
 
