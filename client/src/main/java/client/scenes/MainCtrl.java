@@ -36,6 +36,9 @@ public class MainCtrl {
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
+    private Scene adminOverview;
+    private AdminOverviewCtrl adminOverviewCtrl;
+
     /**
      * Initializes the UI
      *
@@ -54,7 +57,8 @@ public class MainCtrl {
             LanguageConf languageConf,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
-            Pair<AdminLoginCtrl, Parent> adminLogin
+            Pair<AdminLoginCtrl, Parent> adminLogin,
+            Pair<AdminOverviewCtrl, Parent> adminOverview
     ) {
 
         this.primaryStage = primaryStage;
@@ -73,6 +77,9 @@ public class MainCtrl {
 
         this.eventPageCtrl = eventPage.getKey();
         this.eventPage = new Scene(eventPage.getValue());
+
+        this.adminOverviewCtrl = adminOverview.getKey();
+        this.adminOverview = new Scene(adminOverview.getValue());
 
         //showOverview();
         showStartScreen();
@@ -93,7 +100,7 @@ public class MainCtrl {
      * Display admin login
      */
     public void showAdminLogin() {
-        primaryStage.setTitle("Admin Login");
+        primaryStage.setTitle(languageConf.get("AdminLogin.title"));
         primaryStage.setScene(adminLogin);
     }
 
@@ -104,6 +111,14 @@ public class MainCtrl {
     public void showEventPage(Event eventToShow) {
         eventPageCtrl.displayEvent(eventToShow);
         primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * shows the admin overview
+     */
+    public void showAdminOverview() {
+        primaryStage.setTitle("Admin Overview");
+        primaryStage.setScene(adminOverview);
     }
 
 

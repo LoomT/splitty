@@ -17,17 +17,12 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
-import client.scenes.AdminLoginCtrl;
+import client.scenes.*;
 
 
-
-import client.scenes.EventPageCtrl;
-
-import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
 
-import client.scenes.MainCtrl;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -94,9 +89,15 @@ public class Main extends Application {
                 "client", "scenes", "EventPage.fxml"
         );
 
+        var adminOverview = FXML.load(
+                AdminOverviewCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "AdminOverview.fxml"
+        );
+
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, languageConf, start, eventPage, adminLogin);
+        mainCtrl.initialize(primaryStage, languageConf, start, eventPage, adminLogin, adminOverview);
 
     }
 }
