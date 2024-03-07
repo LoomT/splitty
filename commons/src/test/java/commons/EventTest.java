@@ -34,6 +34,7 @@ public class EventTest {
     void setUp() {
         participantList = new ArrayList<>();
         participantList.add(new Participant());
+        expenseList = new ArrayList<>();
         expenseList.add(new Expense());
         event = new Event("Test Event", new ArrayList<>(), null);
         event1 = new Event("Title", List.of(new Participant("Person1", "p1"),

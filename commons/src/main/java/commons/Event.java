@@ -66,7 +66,7 @@ public class Event {
     public Event(String title, List<Participant> participants, List<Expense> expenses) {
         this(title);
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
-        this.expenses = expenses;
+        this.expenses = Objects.requireNonNullElseGet(expenses, ArrayList::new);
     }
 
     /**
