@@ -17,6 +17,7 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import client.scenes.AdminLoginCtrl;
 
 
 
@@ -83,6 +84,13 @@ public class Main extends Application {
                 "client", "scenes", "StartScreen.fxml"
         );
 
+        var adminLogin = FXML.load(
+                AdminLoginCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "AdminLogin.fxml"
+        );
+
+
         var eventPage = FXML.load(
                 EventPageCtrl.class,
                 languageConf.getLanguageResources(),
@@ -91,7 +99,8 @@ public class Main extends Application {
 
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, languageConf, userConfig, start, eventPage);
+
+        mainCtrl.initialize(primaryStage, languageConf, userConfig, start, eventPage, adminLogin);
 
     }
 }
