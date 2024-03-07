@@ -107,7 +107,7 @@ public class EventPageCtrl {
 
     @FXML
     private void editParticipantsClicked() {
-
+        mainCtrl.showEditParticipantsPage(event);
     }
 
     @FXML

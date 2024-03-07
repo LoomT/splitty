@@ -36,6 +36,9 @@ public class MainCtrl {
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
+
+    private EditParticipantsCtrl editParticipantsCtrl;
+    private Scene editParticipants;
     private UserConfig userConfig;
 
     /**
@@ -46,16 +49,17 @@ public class MainCtrl {
      * @param userConfig the user configuration
      * @param startScreen controller and scene
      * @param eventPage controller and scene for eventpage
-     *
      * @param adminLogin admin login controller and scene
-     */
+     * @param editParticipantsPage controller and scene for editParticipants
+     * */
     public void initialize(
             Stage primaryStage,
             LanguageConf languageConf,
             UserConfig userConfig,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
-            Pair<AdminLoginCtrl, Parent> adminLogin
+            Pair<AdminLoginCtrl, Parent> adminLogin,
+            Pair<EditParticipantsCtrl, Parent> editParticipantsPage
     ) {
 
         this.primaryStage = primaryStage;
@@ -71,6 +75,9 @@ public class MainCtrl {
 
         this.eventPageCtrl = eventPage.getKey();
         this.eventPage = new Scene(eventPage.getValue());
+
+        this.editParticipantsCtrl = editParticipantsPage.getKey();
+        this.editParticipants = new Scene(editParticipantsPage.getValue());
 
         //showOverview();
         showStartScreen();
@@ -89,6 +96,8 @@ public class MainCtrl {
 
     }
 
+
+
     /**
      * Display admin login
      */
@@ -104,7 +113,14 @@ public class MainCtrl {
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
+        primaryStage.setTitle(eventToShow.getTitle());
         primaryStage.setScene(eventPage);
+    }
+
+    public void showEditParticipantsPage(Event eventToShow) {
+        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
+        primaryStage.setTitle("Edit participants");
+        primaryStage.setScene(editParticipants);
     }
 
 
