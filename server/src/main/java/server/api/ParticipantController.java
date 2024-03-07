@@ -99,24 +99,20 @@ public class ParticipantController {
                                                            @RequestBody Participant participant) {
         try {
             Optional<Event> search = eventRepo.findById(eventID);
-            if(search.isPresent() && repo.existsById(partID)) {
+            Optional<Participant> optional = repo.findById(partID);
+            if(search.isPresent() && optional.isPresent()) {
                 Event event = search.get();
-                Optional<Participant> optional = repo.findById(partID);
+                Participant oldParticipant = optional.get();
 
-                if(optional.isPresent()){
-                    Participant oldParticipant = optional.get();
-                    if(event.hasParticipant(oldParticipant)){
-                        event.deleteParticipant(oldParticipant);
-                        participant.setParticipantId(partID);
-                        event.addParticipant(participant);
-                        repo.save(participant);
-                        eventRepo.save(event);
-                        return ResponseEntity.ok(repo.getReferenceById(partID));
-                    } else return ResponseEntity.status(401).build();
-                }
-            }
+                if(event.hasParticipant(oldParticipant)){
+                    event.deleteParticipant(oldParticipant);
+                    participant.setParticipantId(partID);
+                    event.addParticipant(participant);
 
-            return ResponseEntity.status(404).build();
+                    eventRepo.save(event);
+                    return ResponseEntity.ok(repo.getReferenceById(partID));
+                } else return ResponseEntity.status(401).build();
+            } return ResponseEntity.status(401).build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -135,9 +131,11 @@ public class ParticipantController {
     public ResponseEntity<Event> deleteById(@PathVariable long partID,
                                             @PathVariable String eventID) {
         try {
-            if(eventRepo.findById(eventID).isPresent() && repo.findById(partID).isPresent()) {
-                Event event = eventRepo.findById(eventID).get();
-                Participant participant = repo.findById(partID).get();
+            Optional<Event> eventFound = eventRepo.findById(eventID);
+            Optional<Participant> participantFound = repo.findById(partID);
+            if(eventFound.isPresent()  && participantFound.isPresent()) {
+                Event event = eventFound.get();
+                Participant participant = participantFound.get();
                 if(event.hasParticipant(participant)){
                     event.deleteParticipant(participant);
                     repo.deleteById(partID);

@@ -22,7 +22,7 @@ public class ParticipantControllerTest {
         event.setId("event");
 
         partRepo = new TestParticipantRepository();
-        eventRepo = new TestEventRepository();
+        eventRepo = new TestEventRepository(partRepo);
 
         eventRepo.save(event);
 
@@ -78,15 +78,14 @@ public class ParticipantControllerTest {
 
         assertTrue(partRepo.getCalledMethods().contains("save"));
         assertTrue(partRepo.getCalledMethods().contains("findById"));
-        assertTrue(partRepo.getCalledMethods().contains("existsById"));
 
         assertTrue(eventRepo.findById(event.getId()).isPresent());
         Event retrievedEvent = eventRepo.findById(event.getId()).get();
 
         assertTrue(retrievedEvent.hasParticipant(participantNew));
         assertFalse(retrievedEvent.hasParticipant(participantOld));
-        assertEquals(participantActual.getName(), "new name");
-        assertEquals(participantActual.getEmailAddress(), "new email");
+        assertEquals("new name", participantActual.getName());
+        assertEquals("new email", participantActual.getEmailAddress());
     }
 
     @Test

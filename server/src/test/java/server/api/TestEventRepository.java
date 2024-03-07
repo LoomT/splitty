@@ -35,6 +35,20 @@ public class TestEventRepository implements EventRepository {
     private final List<Event> events = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
 
+    private TestParticipantRepository partRepo;
+
+    /**
+     * default constructor
+     */
+    public TestEventRepository(){}
+
+    /**
+     * @param repo participant repo to save participants
+     */
+    public TestEventRepository(TestParticipantRepository repo){
+        partRepo = repo;
+    }
+
     /**
      * @return called methods
      */
@@ -226,7 +240,11 @@ public class TestEventRepository implements EventRepository {
     @Override
     public <S extends Event> S save(S entity) {
         call("save");
+        events.removeIf(e -> entity.getId().equals(e.getId()));
         events.add(entity);
+        if(partRepo != null){
+            partRepo.saveAll(entity.getParticipants());
+        }
         return entity;
     }
 
