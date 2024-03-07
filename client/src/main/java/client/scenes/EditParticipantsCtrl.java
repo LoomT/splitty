@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
@@ -23,6 +24,8 @@ public class EditParticipantsCtrl {
     private TextField ibanField;
     @FXML
     private TextField bicField;
+    @FXML
+    private Button saveButton;
 
     private Event event;
     private ServerUtils server;
@@ -59,14 +62,17 @@ public class EditParticipantsCtrl {
             );
 
         chooseParticipant.setValue("New Participant");
+        saveButton.setText("Create Participant");
         chooseParticipant.setOnAction((event1) -> {
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
             if (index == 0) {
+                saveButton.setText("Create Participant");
                 nameField.setText("");
                 emailField.setText("");
                 ibanField.setText("");
                 bicField.setText("");
             } else {
+                saveButton.setText("Save");
                 Participant p = event.getParticipants().get(index - 1);
                 nameField.setText(p.getName());
                 emailField.setText(p.getEmailAddress());

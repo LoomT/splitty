@@ -64,6 +64,6 @@
             <TextField fx:id="bicField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
          </children>
       </GridPane>
-      <Button layoutX="478.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" />
+      <Button fx:id="saveButton" layoutX="478.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" AnchorPane.rightAnchor="81.2" />
    </children>
 </AnchorPane>
