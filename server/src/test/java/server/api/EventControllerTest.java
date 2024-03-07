@@ -13,17 +13,20 @@ import static org.springframework.http.HttpStatus.*;
 class EventControllerTest {
     private TestEventRepository repo;
     private EventController sut;
+
     @BeforeEach
     void setUp() {
         TestRandom random = new TestRandom();
         repo = new TestEventRepository();
         sut = new EventController(repo, random);
     }
+
     @Test
     public void databaseIsUsed() {
         sut.add(new Event("title"));
         assertTrue(repo.getCalledMethods().contains("save"));
     }
+
     @Test
     void noGetById() {
         var actual = sut.getById("a");
