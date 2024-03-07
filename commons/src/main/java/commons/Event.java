@@ -149,6 +149,19 @@ public class Event {
     }
 
     /**
+     * checks whether a specified participant is in the participants list
+     *
+     * @param participant participant to search for
+     * @return boolean value to indicate whether the participant is part of the event
+     */
+    public boolean hasParticipant(Participant participant){
+        for (Participant value : participants) {
+            if (participant.equals(value)) return true;
+        }
+        return false;
+    }
+
+    /**
      * Equals method that checks whether two instances are equal
      * Does not take the unique eventID into consideration
      *

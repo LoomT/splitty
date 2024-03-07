@@ -3,7 +3,10 @@ package client.utils;
 import com.google.inject.Inject;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.Scanner;
 
 /**
  * Interacts with the config file and stores the settings
@@ -15,6 +18,7 @@ public class UserConfig {
 
     /**
      * The constructor which initializes properties from file, and opens a writer to the file
+     *
      * @param io input output interface for config file
      */
     @Inject
@@ -50,8 +54,54 @@ public class UserConfig {
      */
     public void setLocale(String lang) throws IOException {
         configProperties.setProperty("lang", lang);
-        try(BufferedWriter writer = new BufferedWriter(io.write()) ) {
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed language to " + lang);
+        }
+    }
+
+    /**
+     * @return the codes for the recently accessed events
+     */
+    public List<String> getRecentEventCodes() {
+        String codes = configProperties.getProperty("recentEventCodes");
+        if (codes.isEmpty()) {
+            return new ArrayList<>();
+        }
+        Scanner scanner = new Scanner(codes);
+        scanner.useDelimiter(",");
+        List<String> recentCodes = new ArrayList<>();
+        while (scanner.hasNext()) {
+            String code = scanner.next();
+            if (code.length() != 5) {
+                System.out.println("Incorrectly read code: " + code);
+                continue;
+            }
+            recentCodes.add(code);
+        }
+        return recentCodes;
+    }
+
+    /**
+     * @param code the 5 letter code of the event to store in the config file
+     */
+    public void setMostRecentEventCode(String code) {
+        System.out.println("Writing code " + code);
+        List<String> currentCodes = getRecentEventCodes();
+        currentCodes.remove(code);
+        currentCodes.addFirst(code);
+        StringBuilder strToWrite = new StringBuilder();
+        for (int i = 0; i < currentCodes.size(); i++) {
+            String curr = currentCodes.get(i);
+            strToWrite.append(curr);
+            if (i < currentCodes.size() - 1) {
+                strToWrite.append(",");
+            }
+        }
+        configProperties.setProperty("recentEventCodes", strToWrite.toString());
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Set most recent event code: " + code);
+        } catch (Exception e) {
+            System.out.println("Something went wrong while writing to the config file.");
         }
     }
 }
