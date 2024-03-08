@@ -1,33 +1,33 @@
 package server.api;
 
 import commons.Expense;
-import commons.Participant;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.database.EventRepository;
 import server.database.ExpenseRepository;
-import server.database.ParticipantRepository;
 
 import java.util.Optional;
 
-
 @RestController
-@RequestMapping("/api/events/{eventID}/participants/{participantID}/expenses")
+@RequestMapping("/api/events/{eventID}/expenses")
 public class ExpenseController {
     private final ExpenseRepository repoExpense;
-    private final ParticipantRepository repoParticipant;
+    private final EventRepository repoEvent;
 
     /**
      * constructor for expense controller
+     *
      * @param repoExpense
-     * @param repoParticipant
+     * @param repoEvent
      */
-    public ExpenseController(ExpenseRepository repoExpense, ParticipantRepository repoParticipant) {
+    public ExpenseController(ExpenseRepository repoExpense, EventRepository repoEvent) {
         this.repoExpense = repoExpense;
-        this.repoParticipant = repoParticipant;
+        this.repoEvent = repoEvent;
     }
 
     /**
      * retrieves an expense according to its id
+     *
      * @param id id of the expense
      * @return ResponseEntity which contains the expense if found, or 404 Not Found otherwise
      */
@@ -48,27 +48,18 @@ public class ExpenseController {
 
     /**
      * find participant, add the expense to it and save the participant
+     *
      * @param expense
      * @return the participant with the corresponding expense
      */
     @PostMapping("")
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense) {
         try {
-            //save expense
-            Expense savedExpense = repoExpense.save(expense);
-
-            Participant expenseAuthor = savedExpense.getExpenseAuthor();
-
-            if (expenseAuthor != null) {
-
-                //save the participant
-                repoParticipant.save(expenseAuthor);
-
-                //return the expense
-                return ResponseEntity.ok(savedExpense);
-            } else {
-                return ResponseEntity.notFound().build();
+            if (expense == null || expense.getPurpose() == null || expense.getPurpose().isEmpty()) {
+                return ResponseEntity.badRequest().build();
             }
+            Expense savedExpense = repoExpense.save(expense);
+            return ResponseEntity.ok(savedExpense);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -77,6 +68,7 @@ public class ExpenseController {
 
     /**
      * delete an expense
+     *
      * @param id
      * @return status 204 if deleting is successful
      * or 404 if trying to delete an expense that does not exist
@@ -98,6 +90,7 @@ public class ExpenseController {
 
     /**
      * update the expense
+     *
      * @param id
      * @param updatedExpense
      * @return status 200 if updating is successful or 404 if the expense does not exist
@@ -108,11 +101,11 @@ public class ExpenseController {
         try {
             Expense updated = repoExpense.save(updatedExpense);
             return ResponseEntity.ok(updated);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
 
 }
+

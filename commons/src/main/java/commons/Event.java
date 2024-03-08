@@ -53,6 +53,7 @@ public class Event {
         this();
         this.title = title;
         this.participants = new ArrayList<>();
+        this.expenses = new ArrayList<>();
     }
 
     /**

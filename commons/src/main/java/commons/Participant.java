@@ -12,6 +12,7 @@ import java.util.*;
  *  emailAddress: optional email address of participant which can be null
  *  expenseSet: Set of all expenses which the participant authored. (can be empty)
  *  bankAccountSet: The registered Bank Accounts for the participant. (can be empty)
+ *  getter setter equals hashcode toString methods
  */
 @Entity
 public class Participant {
