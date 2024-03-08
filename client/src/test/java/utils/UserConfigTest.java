@@ -5,8 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,11 +15,10 @@ class UserConfigTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        Writer writer = new StringWriter();
-        writer.write("""
+        IO = new TestIO("""
                 serverURL=http://localhost:8080/
-                lang=en""");
-        IO = new TestIO(writer);
+                lang=en
+                recentEventCodes=hello,there""");
         userConfig = new UserConfig(IO);
     }
 
@@ -54,9 +52,32 @@ class UserConfigTest {
     @Test
     void setLocale() throws IOException {
         assertEquals("en", userConfig.getLocale());
-        assertFalse(IO.getWriter().toString().contains("nl"));
+        assertFalse(IO.getContent().contains("nl"));
         userConfig.setLocale("nl");
         assertEquals("nl", userConfig.getLocale());
-        assertTrue(IO.getWriter().toString().contains("nl"));
+        assertTrue(IO.getContent().contains("nl"));
+    }
+
+    /**
+     * tests if the config can correctly read and parse the event codes
+     */
+    @Test
+    void getRecentEventCodes() {
+        List<String> eventCodes = List.of("hello", "there");
+        assertEquals(eventCodes, userConfig.getRecentEventCodes());
+    }
+
+    /**
+     * tests the behavior of updating the event codes
+     */
+    @Test
+    void setMostRecentEventCode() {
+        List<String> eventCodes = List.of("world", "hello", "there");
+        userConfig.setMostRecentEventCode("world");
+        assertEquals(eventCodes, userConfig.getRecentEventCodes());
+        List<String> eventCodes2 = List.of("hello", "world", "there");
+        userConfig.setMostRecentEventCode("hello");
+        assertEquals(eventCodes2, userConfig.getRecentEventCodes());
+
     }
 }
