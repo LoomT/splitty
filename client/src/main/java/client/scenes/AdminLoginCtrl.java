@@ -40,29 +40,29 @@ public class AdminLoginCtrl {
         this.mainCtrl = mainCtrl;
     }
 
-//    @FXML
-//    private void initialize() {
-//        setupListeners();
-//    }
 
-//    private void setupListeners() {
-//        loginButton.setOnAction(event -> login());
-//    }
-//
-//    private void login() {
-//        String password = passwordTextField.getText();
-//
-//
-//    }
 
+    /**
+     * Method to handle the back button click
+     *
+     */
     @FXML
     private void backButtonClicked() {
         mainCtrl.showStartScreen();
     }
 
+
+    /**
+     * Method to handle the login button click
+     *
+     */
     @FXML
     private void loginButtonClicked() {
-        mainCtrl.showAdminOverview();
+        String password = passwordTextField.getText();
+        String adminPassword = server.getPassword();
+        if (password.equals(adminPassword)) {
+            mainCtrl.showAdminOverview();
+        }
     }
 
 }

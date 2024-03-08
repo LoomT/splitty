@@ -93,4 +93,16 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
     }
+
+    /**
+     * @return the admin password
+     */
+
+    public String getPassword(){
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/password") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(String.class);
+    }
 }
