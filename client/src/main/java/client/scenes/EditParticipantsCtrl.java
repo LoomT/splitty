@@ -54,6 +54,13 @@ public class EditParticipantsCtrl {
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+
+        saveButton.setText(languageConf.get("EditP.createParticipant"));
+        nameField.setText("");
+        emailField.setText("");
+        ibanField.setText("");
+        bicField.setText("");
+
         chooseParticipant.getItems().clear();
 
         chooseParticipant.getItems().add(languageConf.get("EditP.newParticipant"));
@@ -67,11 +74,11 @@ public class EditParticipantsCtrl {
             );
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
-        saveButton.setText(languageConf.get("EditP.createParticipant"));
-        System.out.println("displaying edit page");
+
+
         chooseParticipant.setOnAction((event1) -> {
-            System.out.println("on action");
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
+            if (index < 0) return;
             if (index == 0) {
                 saveButton.setText(languageConf.get("EditP.createParticipant"));
                 nameField.setText("");

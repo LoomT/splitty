@@ -67,7 +67,6 @@ public class EventPageCtrl {
         eventTitle.setText(e.getTitle());
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
-
         if (e.getParticipants().isEmpty()) {
             participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
             allTab.setStyle("-fx-opacity:0");
@@ -106,6 +105,7 @@ public class EventPageCtrl {
 
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
+            if (selectedParticipantId < 0) return;
 
             String name = e.getParticipants().get(selectedParticipantId).getName();
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
