@@ -112,10 +112,10 @@ public class ParticipantController {
 
             List<Expense> expenses = event.getExpenses();
             for (Expense e : expenses) {
-                if (e.getExpenseAuthor().equals(participant)) {
+                if (e.getExpenseAuthor().equals(oldParticipant)) {
                     e.setExpenseAuthor(participant);
                 }
-                if(e.getExpenseParticipants().remove(participant))
+                if(e.getExpenseParticipants().remove(oldParticipant))
                     e.getExpenseParticipants().add(participant);
             }
 
