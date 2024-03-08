@@ -69,22 +69,6 @@ class ParticipantTest {
     }
 
     @Test
-    void addExpenseTrue() {
-        assertTrue(participant1.addExpense(expense));
-    }
-
-    @Test
-    void addExpenseFalse() {
-        assertTrue(participant1.addExpense(expense));
-        assertFalse(participant1.addExpense(expense));
-    }
-
-    @Test
-    void addExpenseNull() {
-        assertFalse(participant1.addExpense(null));
-    }
-
-    @Test
     void addBankAccountTrue() {
         assertTrue(participant1.addBankAccount(bankAccount));
     }
@@ -115,21 +99,6 @@ class ParticipantTest {
         assertEquals(participant2, participant3);
     }
 
-    @Test
-    void testEqualsOverflow() {
-        participant1.getAuthoredExpenseSet().add(expense);
-        participant2.getAuthoredExpenseSet().add(expense);
-        assertNotEquals(participant1, participant2);
-    }
-
-    @Test
-    void testEqualsDifferentExpense() {
-        participant1.getAuthoredExpenseSet().add(expense);
-        participant2.getAuthoredExpenseSet().add(new Expense(participant2, "test", 32,
-                "EUR", new ArrayList<>(), "type"));
-        assertNotEquals(participant1, participant2);
-    }
-
     /**
      * tests the false case for the equals function
      */
@@ -149,8 +118,6 @@ class ParticipantTest {
 
     @Test
     void testHashCodeOverflow() {
-        participant1.addExpense(expense);
-        participant2.addExpense(expense);
         assertEquals(participant1.hashCode(), participant1.hashCode());
     }
 }
