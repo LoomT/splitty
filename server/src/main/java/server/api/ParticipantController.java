@@ -3,10 +3,12 @@ package server.api;
 import commons.Event;
 import commons.Participant;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -14,17 +16,21 @@ import java.util.Optional;
 public class ParticipantController {
     private final ParticipantRepository repo;
     private final EventRepository eventRepo;
+    private final SimpMessagingTemplate template;
 
     /**
      * Constructor with repository and random number generator injections
      *
      * @param repo      Participant repository
      * @param eventRepo Event repository
+     * @param template websocket object used to send updates to everyone
      */
     public ParticipantController(ParticipantRepository repo,
-                                 EventRepository eventRepo) {
+                                 EventRepository eventRepo,
+                                 SimpMessagingTemplate template) {
         this.repo = repo;
         this.eventRepo = eventRepo;
+        this.template = template;
     }
 
     /**
@@ -66,18 +72,18 @@ public class ParticipantController {
     public ResponseEntity<Participant> add(@RequestBody Participant participant,
                                            @PathVariable String eventID) {
         try {
+            Optional<Event> optionalEvent = eventRepo.findById(eventID);
             if (participant == null || participant.getName() == null ||
-                    participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
+                    participant.getName().isEmpty() || optionalEvent.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            if (optionalEvent.isPresent()) {
-                Event event = optionalEvent.get();
-                event.addParticipant(participant);
-                eventRepo.save(event);
-                return ResponseEntity.ok(participant);
-            }
-            return ResponseEntity.internalServerError().build();
+            Participant saved = repo.save(participant);
+            Event event = optionalEvent.get();
+            event.addParticipant(saved);
+            eventRepo.save(event);
+            template.convertAndSend("/event/" + eventID, saved,
+                    Map.of("action", "addParticipant", "type", Participant.class.getTypeName()));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -110,10 +116,14 @@ public class ParticipantController {
                     event.addParticipant(participant);
 
                     eventRepo.save(event);
-                    return ResponseEntity.ok(repo.getReferenceById(partID));
+                    template.convertAndSend("/event/" + eventID, participant,
+                            Map.of("action", "updateParticipant",
+                                    "type", Participant.class.getTypeName()));
+                    return ResponseEntity.noContent().build();
                 } else return ResponseEntity.status(401).build();
-            }
-            return ResponseEntity.status(404).build();
+
+            } return ResponseEntity.notFound().build();
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -141,7 +151,10 @@ public class ParticipantController {
                     event.deleteParticipant(participant);
                     repo.deleteById(partID);
                     eventRepo.save(event);
-                    return ResponseEntity.status(204).build();
+                    template.convertAndSend("/event/" + eventID, partID,
+                            Map.of("action", "removeParticipant",
+                                    "type", Long.class.getTypeName()));
+                    return ResponseEntity.noContent().build();
                 }
                 return ResponseEntity.status(401).build();
             }

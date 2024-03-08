@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 
 public class TestRandom implements RandomGenerator {
 
-    private int offset = 0;
+    private int offset = 1;
 
     /**
      * Returns a sequentially chosen {@code long} value.
@@ -15,7 +15,7 @@ public class TestRandom implements RandomGenerator {
      */
     @Override
     public long nextLong() {
-        return offset;
+        return offset++;
     }
 
     /**

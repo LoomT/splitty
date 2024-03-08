@@ -1,6 +1,12 @@
 package commons;
-import java.util.*;
+
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 public class Event {
@@ -28,7 +34,7 @@ public class Event {
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Participant> participants;
+    private List<Participant> participants = new ArrayList<>();;
     @Temporal(TemporalType.TIMESTAMP)
     private final Date creationDate;
 
@@ -45,10 +51,9 @@ public class Event {
      *
      * @param title name of the event
      */
-    public Event(String title) {
+    public Event(@NotNull String title) {
         this();
         this.title = title;
-        this.participants = new ArrayList<>();
     }
 
     /**
@@ -58,7 +63,7 @@ public class Event {
      * @param participants list of strings (going to be
      *                     participant objects in the future)
      */
-    public Event(String title, List<Participant> participants) {
+    public Event(@NotNull String title, @NotNull List<Participant> participants) {
         this(title);
         this.participants = Objects.requireNonNullElseGet(participants, ArrayList::new);
     }

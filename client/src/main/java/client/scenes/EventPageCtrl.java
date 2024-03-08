@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
+import client.Websocket;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -9,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tab;
-
 import javafx.scene.text.Text;
 
 
@@ -38,6 +38,7 @@ public class EventPageCtrl {
 
     private int selectedParticipantId;
 
+    private Websocket websocket;
 
     private ServerUtils server;
     private MainCtrl mainCtrl;
@@ -45,7 +46,7 @@ public class EventPageCtrl {
     private Event event;
 
     /**
-     * @param server   server utils injection
+     * @param server server utils injection
      * @param mainCtrl mainCtrl injection
      * @param languageConf the language config instance
      */
@@ -54,6 +55,7 @@ public class EventPageCtrl {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
+        this.websocket = new Websocket(this);
 
     }
 
@@ -111,10 +113,23 @@ public class EventPageCtrl {
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
         });
+
+        websocket.connect(e.getId());
+    }
+
+    /**
+     * Changes the title of the event
+     *
+     * @param newTitle new title of the event
+     */
+    public void changeTitle(String newTitle) {
+        event.setTitle(newTitle);
+        eventTitle.setText(newTitle);
     }
 
     @FXML
     private void backButtonClicked() {
+        websocket.disconnect();
         mainCtrl.showStartScreen();
     }
 
