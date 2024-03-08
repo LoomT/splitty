@@ -109,7 +109,8 @@ public class EditParticipantsCtrl {
      */
     @FXML
     private void saveButtonClicked() {
-        System.out.println("Creating/saving participant " + chooseParticipant.getSelectionModel().getSelectedIndex());
+        System.out.println("Creating/saving participant " +
+                chooseParticipant.getSelectionModel().getSelectedIndex());
 
     }
 }
