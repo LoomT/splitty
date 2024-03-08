@@ -185,6 +185,24 @@ public class Event {
     }
 
     /**
+     *
+     * @param participant participant to be checked
+     * @return true iff participant is in list, false otherwise
+     */
+    public boolean hasParticipant(Participant participant){
+        return participants.contains(participant);
+    }
+
+    /**
+     *
+     * @param expense expense to be checked
+     * @return true iff expense is in list, false otherwise
+     */
+    public boolean hasExpense(Expense expense){
+        return expenses.contains(expense);
+    }
+
+    /**
      * Equals method that checks whether two instances are equal
      * Does not take the unique eventID into consideration
      *
