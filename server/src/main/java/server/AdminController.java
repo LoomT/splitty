@@ -23,7 +23,7 @@ public class AdminController {
 
     /**
      * Verify the input password
-     * @param inputPassword
+     * @param inputPassword the password to verify
      * @return ResponseEntity
      */
 
