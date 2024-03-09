@@ -107,13 +107,16 @@ public class ParticipantController {
                                                            @PathVariable long partID,
                                                            @RequestBody Participant participant) {
         try {
-            if(participant.getParticipantId() != partID)
-                ResponseEntity.badRequest().build();
+            if (participant == null || participant.getName() == null
+                    || participant.getName().isEmpty()
+                    || participant.getParticipantId() != partID) {
+                return ResponseEntity.badRequest().build();
+            }
 
             Optional<Event> optionalEvent = eventRepo.findById(eventID);
             Optional<Participant> optionalParticipant = repo.findById(partID);
             if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
-                return ResponseEntity.status(404).build();
+                return ResponseEntity.notFound().build();
             Event event = optionalEvent.get();
             Participant oldParticipant = optionalParticipant.get();
 
@@ -169,6 +172,4 @@ public class ParticipantController {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
 }

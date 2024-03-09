@@ -51,7 +51,7 @@ public class ExpenseController {
             }
             Event event = optionalEvent.get();
             Expense expense = optionalExpense.get();
-            if(!event.hasExpense(expense) || expense.getExpenseID() != id){
+            if(!event.hasExpense(expense)) {
                 return ResponseEntity.status(401).build();
             }
             return ResponseEntity.ok(expense); //status code 200(OK) if found
@@ -67,7 +67,7 @@ public class ExpenseController {
      * @param eventID ID of the event expense is a part of
      * @return the participant with the corresponding expense
      */
-    @PostMapping("")
+    @PostMapping({"", "/"})
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense,
                                               @PathVariable String eventID) {
         try {
@@ -112,12 +112,11 @@ public class ExpenseController {
             }
             Event event = optionalEvent.get();
             Expense expense = optionalExpense.get();
-            if(!event.hasExpense(expense) || expense.getExpenseID() != id){
+            if(!event.hasExpense(expense)) {
                 return ResponseEntity.status(401).build();
             }
 
             event.deleteExpense(expense);
-//            repoExpense.deleteById(id);
             repoEvent.save(event);
             simp.convertAndSend("/event/" + eventID, id,
                     Map.of("action", "removeExpense", "type", Long.class.getTypeName()));
@@ -150,7 +149,7 @@ public class ExpenseController {
             }
             Event event = optionalEvent.get();
             Expense expense = optionalExpense.get();
-            if(!event.hasExpense(expense) || expense.getExpenseID() != id){
+            if(!event.hasExpense(expense)) {
                 return ResponseEntity.status(401).build();
             }
             if(!new HashSet<>(event.getParticipants())
@@ -160,7 +159,6 @@ public class ExpenseController {
             event.deleteExpense(expense);
             event.addExpense(updatedExpense);
             repoEvent.save(event);
-//            repoExpense.save(expense);
             simp.convertAndSend("/event/" + eventID, updatedExpense,
                     Map.of("action", "updateExpense", "type", Expense.class.getTypeName()));
             return ResponseEntity.noContent().build();
@@ -168,6 +166,11 @@ public class ExpenseController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    /**
+     * @param expense expense to check
+     * @return true iff any required fields are null or empty
+     */
     private boolean checkForBadExpenseFields(Expense expense) {
         return expense == null || expense.getExpenseAuthor() == null
                 || expense.getPurpose() == null || expense.getPurpose().isEmpty()
