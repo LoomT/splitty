@@ -23,6 +23,7 @@ import commons.Event;
 
 import com.google.inject.Inject;
 
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -104,5 +105,27 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .get(String.class);
+    }
+
+
+    /**
+     * Verify the input password
+     * @param inputPassword the password to verify
+     * @return boolean
+     */
+
+    public boolean verifyPassword(String inputPassword) {
+        Response response = ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/verify") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(inputPassword, APPLICATION_JSON));
+
+
+        boolean isValid = response.getStatus() == Response.Status.OK.getStatusCode();
+
+        response.close();
+
+        return isValid;
     }
 }

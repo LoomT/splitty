@@ -2,10 +2,7 @@ package server;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AdminController {
@@ -28,7 +25,7 @@ public class AdminController {
      */
 
     @PostMapping("/admin/verify")
-    public ResponseEntity<String> verifyPassword(@RequestParam String inputPassword) {
+    public ResponseEntity<String> verifyPassword(@RequestBody String inputPassword) {
         boolean isValid = AdminService.verifyPassword(inputPassword);
         if (isValid) {
             return ResponseEntity.ok("Password is correct.");

@@ -27,7 +27,7 @@ public class AdminService {
      * @return the admin password
      */
 
-    static String getAdminPassword() {
+    public static String getAdminPassword() {
         return adminPassword;
     }
 

@@ -11,13 +11,6 @@ public class AdminLoginCtrl {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
-
-    @FXML
-    private Label usernameLabel;
-
-    @FXML
-    private TextField usernameTextField;
-
     @FXML
     private Label passwordLabel;
 
@@ -59,9 +52,10 @@ public class AdminLoginCtrl {
     @FXML
     private void loginButtonClicked() {
         String password = passwordTextField.getText();
-        String adminPassword = server.getPassword();
-        if (password.equals(adminPassword)) {
+        if (server.verifyPassword(password)) {
             mainCtrl.showAdminOverview();
+        } else {
+            passwordLabel.setText("Incorrect password");
         }
     }
 
