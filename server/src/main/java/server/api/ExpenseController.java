@@ -3,10 +3,13 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ExpenseRepository;
 
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -14,16 +17,20 @@ import java.util.Optional;
 public class ExpenseController {
     private final ExpenseRepository repoExpense;
     private final EventRepository repoEvent;
+    private final SimpMessagingTemplate simp;
 
     /**
      * constructor for expense controller
      *
      * @param repoExpense repo of the Expenses
      * @param repoEvent repo of the Events
+     * @param simp websocket object to send messages to event subscribers
      */
-    public ExpenseController(ExpenseRepository repoExpense, EventRepository repoEvent) {
+    public ExpenseController(ExpenseRepository repoExpense, EventRepository repoEvent,
+                             SimpMessagingTemplate simp) {
         this.repoExpense = repoExpense;
         this.repoEvent = repoEvent;
+        this.simp = simp;
     }
 
     /**
@@ -37,22 +44,20 @@ public class ExpenseController {
     public ResponseEntity<Expense> getById(@PathVariable long id,
                                            @PathVariable String eventID) {
         try {
-            if(repoEvent.findById(eventID).isEmpty() || repoExpense.findById(id).isEmpty()) {
-                return ResponseEntity.status(404).build();
+            Optional<Event> optionalEvent = repoEvent.findById(eventID);
+            Optional<Expense> optionalExpense = repoExpense.findById(id);
+            if(optionalEvent.isEmpty() || optionalExpense.isEmpty()) {
+                return ResponseEntity.notFound().build();
             }
-            if(!repoEvent.findById(eventID).get().hasExpense(repoExpense.findById(id).get())){
+            Event event = optionalEvent.get();
+            Expense expense = optionalExpense.get();
+            if(!event.hasExpense(expense) || expense.getExpenseID() != id){
                 return ResponseEntity.status(401).build();
             }
-            Optional<Expense> optionalExpense = repoExpense.findById(id);
-            if (optionalExpense.isPresent()) {
-                return ResponseEntity.ok(optionalExpense.get()); //status code 200(OK) if found
-            } else {
-                return ResponseEntity.notFound().build(); //status code 404(Not Found) if not found
-            }
+            return ResponseEntity.ok(expense); //status code 200(OK) if found
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
-
     }
 
     /**
@@ -66,20 +71,22 @@ public class ExpenseController {
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense,
                                               @PathVariable String eventID) {
         try {
-            if (expense == null || expense.getExpenseAuthor() == null
-                    || expense.getPurpose() == null || expense.getPurpose().isEmpty()
-                    || expense.getCurrency() == null || expense.getCurrency().isEmpty()
-                    || expense.getDate() == null || expense.getExpenseParticipants() == null
-                    || expense.getType() == null || expense.getType().isEmpty()) {
+            if (checkForBadExpenseFields(expense) || expense.getExpenseID() != 0) {
                 return ResponseEntity.badRequest().build();
             }
             Optional<Event> optionalEvent = repoEvent.findById(eventID);
             if (optionalEvent.isEmpty())
-                return ResponseEntity.internalServerError().build();
-
-            optionalEvent.get().addExpense(expense);
+                return ResponseEntity.notFound().build();
+            Event event = optionalEvent.get();
+            if(!new HashSet<>(event.getParticipants()).containsAll(expense.getExpenseParticipants())
+                    || !event.hasParticipant(expense.getExpenseAuthor()))
+                return ResponseEntity.badRequest().build();
+            Expense saved = repoExpense.save(expense);
+            optionalEvent.get().addExpense(saved);
             repoEvent.save(optionalEvent.get());
-            return ResponseEntity.ok(expense);
+            simp.convertAndSend("/event/" + eventID, saved,
+                    Map.of("action", "addExpense", "type", Expense.class.getTypeName()));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -98,20 +105,23 @@ public class ExpenseController {
     public ResponseEntity<Expense> deleteById(@PathVariable long id,
                                               @PathVariable String eventID) {
         try {
-            Optional<Event> eventFound = repoEvent.findById(eventID);
-            Optional<Expense> expenseFound = repoExpense.findById(id);
-            if(eventFound.isEmpty() || expenseFound.isEmpty())
+            Optional<Event> optionalEvent = repoEvent.findById(eventID);
+            Optional<Expense> optionalExpense = repoExpense.findById(id);
+            if(optionalEvent.isEmpty() || optionalExpense.isEmpty()) {
                 return ResponseEntity.notFound().build();
-
-            Event event = eventFound.get();
-            Expense expense = expenseFound.get();
-            if(!event.hasExpense(expense))
-                return ResponseEntity.notFound().build(); //I need to check this
+            }
+            Event event = optionalEvent.get();
+            Expense expense = optionalExpense.get();
+            if(!event.hasExpense(expense) || expense.getExpenseID() != id){
+                return ResponseEntity.status(401).build();
+            }
 
             event.deleteExpense(expense);
-            repoExpense.deleteById(id);
+//            repoExpense.deleteById(id);
             repoEvent.save(event);
-            return ResponseEntity.status(204).build();
+            simp.convertAndSend("/event/" + eventID, id,
+                    Map.of("action", "removeExpense", "type", Long.class.getTypeName()));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -131,26 +141,39 @@ public class ExpenseController {
                                                  @RequestBody Expense updatedExpense,
                                                  @PathVariable String eventID) {
         try {
-            Optional<Event> eventFound = repoEvent.findById(eventID);
-            Optional<Expense> expenseFound = repoExpense.findById(id);
-            if(eventFound.isEmpty() || expenseFound.isEmpty()
-                    || !eventFound.get().hasExpense(expenseFound.get()))
+            if(checkForBadExpenseFields(updatedExpense) || updatedExpense.getExpenseID() != id)
+                return ResponseEntity.badRequest().build();
+            Optional<Event> optionalEvent = repoEvent.findById(eventID);
+            Optional<Expense> optionalExpense = repoExpense.findById(id);
+            if(optionalEvent.isEmpty() || optionalExpense.isEmpty()) {
                 return ResponseEntity.notFound().build();
-
-            Event event = eventFound.get();
-            Expense expense = expenseFound.get();
-
+            }
+            Event event = optionalEvent.get();
+            Expense expense = optionalExpense.get();
+            if(!event.hasExpense(expense) || expense.getExpenseID() != id){
+                return ResponseEntity.status(401).build();
+            }
+            if(!new HashSet<>(event.getParticipants())
+                    .containsAll(updatedExpense.getExpenseParticipants()) ||
+                    !event.hasParticipant(updatedExpense.getExpenseAuthor()))
+                return ResponseEntity.badRequest().build();
             event.deleteExpense(expense);
             event.addExpense(updatedExpense);
-            updatedExpense.setExpenseID(id);
             repoEvent.save(event);
-
-            return ResponseEntity.status(204).build();
+//            repoExpense.save(expense);
+            simp.convertAndSend("/event/" + eventID, updatedExpense,
+                    Map.of("action", "updateExpense", "type", Expense.class.getTypeName()));
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
+    private boolean checkForBadExpenseFields(Expense expense) {
+        return expense == null || expense.getExpenseAuthor() == null
+                || expense.getPurpose() == null || expense.getPurpose().isEmpty()
+                || expense.getCurrency() == null || expense.getCurrency().isEmpty()
+                || expense.getExpenseParticipants() == null
+                || expense.getType() == null || expense.getType().isEmpty();
+    }
 }
 
