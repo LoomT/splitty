@@ -15,19 +15,20 @@
  */
 package server.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
+import commons.Event;
+import commons.Expense;
+import commons.Participant;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-
-import commons.Event;
 import server.database.EventRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 @SuppressWarnings("NullableProblems")
 public class TestEventRepository implements EventRepository {
@@ -36,6 +37,7 @@ public class TestEventRepository implements EventRepository {
     private final List<String> calledMethods = new ArrayList<>();
 
     private TestParticipantRepository partRepo;
+    private TestExpenseRepository expenseRepo;
 
     /**
      * default constructor
@@ -50,6 +52,14 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
+     * @param partRepo participant repo to save participants
+     * @param expRepo expense repo
+     */
+    public TestEventRepository(TestParticipantRepository partRepo, TestExpenseRepository expRepo) {
+        this(partRepo);
+        this.expenseRepo = expRepo;
+    }
+    /**
      * @return called methods
      */
     public List<String> getCalledMethods() {
@@ -62,7 +72,6 @@ public class TestEventRepository implements EventRepository {
     private void call(String name) {
         calledMethods.add(name);
     }
-
     /**
      * @return all Events
      */
@@ -243,7 +252,22 @@ public class TestEventRepository implements EventRepository {
         events.removeIf(e -> entity.getId().equals(e.getId()));
         events.add(entity);
         if(partRepo != null){
+            partRepo.getParticipants().removeIf(p -> {
+                for(Participant pp : entity.getParticipants())
+                    if(pp.getParticipantId() == p.getParticipantId())
+                        return false;
+                return true;
+            });
             partRepo.saveAll(entity.getParticipants());
+        }
+        if(expenseRepo != null) {
+            expenseRepo.getExpenses().removeIf(e -> {
+                for(Expense ee : expenseRepo.getExpenses())
+                    if(ee.getExpenseID() == e.getExpenseID())
+                        return false;
+                return true;
+            });
+            expenseRepo.saveAll(entity.getExpenses());
         }
         return entity;
     }

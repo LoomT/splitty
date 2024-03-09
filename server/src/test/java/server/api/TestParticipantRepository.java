@@ -50,6 +50,9 @@ public class TestParticipantRepository implements ParticipantRepository {
         calledMethods.add(name);
     }
 
+    public List<Participant> getParticipants() {
+        return participants;
+    }
     /**
      * @return all quotes
      */
@@ -235,14 +238,25 @@ public class TestParticipantRepository implements ParticipantRepository {
         call("save");
         for(Participant e : participants){
             if(e.getParticipantId() == entity.getParticipantId()){
-                participants.remove(e);
-                participants.add(entity);
-                return entity;
+                replaceFields(e, entity);
+                return (S) e;
             }
         }
         entity.setParticipantId(random.nextLong());
         participants.add(entity);
         return entity;
+    }
+
+    /**
+     * Replaces the old participant while keeping the same object address
+     *
+     * @param oldPart old participant
+     * @param newPart new participant
+     */
+    private void replaceFields(Participant oldPart, Participant newPart) {
+        oldPart.setName(newPart.getName());
+        oldPart.setEmailAddress(newPart.getEmailAddress());
+        oldPart.setBankAccountSet(newPart.getBankAccountSet());
     }
 
     /**
@@ -288,7 +302,8 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public void delete(Participant entity) {
-        // TODO Auto-generated method stub
+        calledMethods.add("delete");
+        participants.remove(entity);
 
     }
 
@@ -315,8 +330,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public void deleteAll() {
-        // TODO Auto-generated method stub
-
+        participants.clear();
     }
 
     /**

@@ -11,7 +11,6 @@ import static org.springframework.http.HttpStatus.*;
 public class ParticipantControllerTest {
 
     private TestEventRepository eventRepo;
-    private EventController eventContr;
     private Event event;
     private TestParticipantRepository partRepo;
     private ParticipantController partContr;
@@ -26,7 +25,7 @@ public class ParticipantControllerTest {
 
         TestRandom random = new TestRandom();
         template = new TestSimpMessagingTemplate((message, timeout) -> false);
-        eventContr = new EventController(eventRepo, random, template);
+        EventController eventContr = new EventController(eventRepo, random, template);
         event = eventContr.add(event).getBody();
         partContr = new ParticipantController(partRepo, eventRepo, template);
     }
@@ -82,7 +81,7 @@ public class ParticipantControllerTest {
         partContr.add(new Participant("old name", "old email"), event.getId());
         Participant participantOld = (Participant) template.getPayload();
         long partID = participantOld.getParticipantId();
-
+        participantNew.setParticipantId(partID);
         assertEquals(participantOld.getName(), "old name");
         assertEquals(participantOld.getEmailAddress(), "old email");
 
@@ -97,7 +96,6 @@ public class ParticipantControllerTest {
         Event retrievedEvent = eventRepo.findById(event.getId()).get();
 
         assertTrue(retrievedEvent.hasParticipant(participantNew));
-        assertFalse(retrievedEvent.hasParticipant(participantOld));
 
     }
     @Test
