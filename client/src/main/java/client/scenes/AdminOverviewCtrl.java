@@ -4,6 +4,7 @@ import client.components.EventListItem;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import com.google.inject.Inject;
+import commons.Event;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 
@@ -45,7 +46,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void initialize() {
-        reloadEventCodes();
+        loadAllEvents();
     }
 
 
@@ -77,6 +78,38 @@ public class AdminOverviewCtrl {
             eventList.getChildren().add(list.get(i));
 
         }
+    }
+
+    /**
+     * Method to get all the events into the list
+     *
+     */
+    private void loadAllEvents() {
+        List<Event> allEvents = server.getEvents();
+        List<EventListItem> list = new ArrayList<>();
+        List<String> eventTitles = new ArrayList<>();
+        for (Event e: allEvents) {
+            eventTitles.add(e.getTitle());
+
+        }
+
+        eventList.getChildren().clear();
+
+
+        for (int i = 0; i < allEvents.size(); i++) {
+            int finalI = i;
+            list.add(
+                    new EventListItem(
+                            eventTitles.get(i),
+                            () -> {
+                                eventList.getChildren().remove(list.get(finalI));
+                            },
+                            (String c) -> {
+
+                            }));
+            eventList.getChildren().add(list.get(i));
+        }
+
     }
 
 

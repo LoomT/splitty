@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
 
@@ -121,5 +122,13 @@ public class EventController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    /**
+     * @return all events
+     */
+    @GetMapping(path = { "", "/all"})
+    public List<Event> getAll() {
+        return repo.findAll();
     }
 }

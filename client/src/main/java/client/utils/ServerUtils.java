@@ -128,4 +128,19 @@ public class ServerUtils {
 
         return isValid;
     }
+
+
+    /**
+     * Sends an API call to server for events
+     *
+     * @return all quotes
+     */
+    public List<Event> getEvents() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("api/events/all") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Event>>() {
+                });
+    }
 }
