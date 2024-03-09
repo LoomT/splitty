@@ -46,6 +46,14 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void initialize() {
+    }
+
+    /**
+     * Method to handle the refresh button click
+     *
+     */
+    @FXML
+    private void refreshButtonClicked() {
         loadAllEvents();
     }
 
@@ -85,7 +93,7 @@ public class AdminOverviewCtrl {
      *
      */
     private void loadAllEvents() {
-        List<Event> allEvents = server.getEvents();
+        List<Event> allEvents = server.getEvents(AdminLoginCtrl.getPassword());
         List<EventListItem> list = new ArrayList<>();
         List<String> eventTitles = new ArrayList<>();
         for (Event e: allEvents) {

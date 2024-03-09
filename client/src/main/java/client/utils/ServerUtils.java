@@ -132,15 +132,17 @@ public class ServerUtils {
 
     /**
      * Sends an API call to server for events
+     * @param inputPassword the password to verify
      *
      * @return all quotes
      */
-    public List<Event> getEvents() {
+    public List<Event> getEvents(String inputPassword) {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("api/events/all") //
+                .target(server).path("admin/events") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Event>>() {
-                });
+                .post(Entity.entity(inputPassword, APPLICATION_JSON),
+                            new GenericType<List<Event>>() {
+                    });
     }
 }
