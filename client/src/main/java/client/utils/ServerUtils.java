@@ -95,17 +95,7 @@ public class ServerUtils {
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
     }
 
-    /**
-     * @return the admin password
-     */
 
-    public String getPassword(){
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("admin/password") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(String.class);
-    }
 
 
     /**
@@ -140,9 +130,9 @@ public class ServerUtils {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/events") //
                 .request(APPLICATION_JSON) //
+                .header("Authorization", inputPassword)
                 .accept(APPLICATION_JSON) //
-                .post(Entity.entity(inputPassword, APPLICATION_JSON),
-                            new GenericType<List<Event>>() {
-                    });
+                .get(new GenericType<List<Event>>() {
+                });
     }
 }

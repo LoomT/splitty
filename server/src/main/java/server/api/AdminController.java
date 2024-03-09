@@ -1,9 +1,10 @@
-package server;
+package server.api;
 
 import commons.Event;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import server.AdminService;
 import server.database.EventRepository;
 
 import java.util.List;
@@ -22,15 +23,7 @@ public class AdminController {
         this.repo = repo;
     }
 
-    /**
-     * Get the admin password
-     * @return the admin password
-     */
 
-    @GetMapping("/admin/password")
-    public ResponseEntity<String> getAdminPassword() {
-        return ResponseEntity.ok(AdminService.getAdminPassword());
-    }
 
 
     /**
@@ -55,8 +48,9 @@ public class AdminController {
      * @return all events
      * @param inputPassword the password to verify
      */
-    @PostMapping("admin/events")
-    public ResponseEntity<List<Event>> getAll(@RequestBody String inputPassword) {
+    @GetMapping ("admin/events")
+    public ResponseEntity<List<Event>> getAll(@RequestHeader("Authorization")
+                                                  String inputPassword) {
         boolean isValid = AdminService.verifyPassword(inputPassword);
         if (isValid) {
             return ResponseEntity.ok(repo.findAll());
