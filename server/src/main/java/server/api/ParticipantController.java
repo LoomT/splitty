@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,21 +18,21 @@ import java.util.Optional;
 public class ParticipantController {
     private final ParticipantRepository repo;
     private final EventRepository eventRepo;
-    private final SimpMessagingTemplate template;
+    private final SimpMessagingTemplate simp;
 
     /**
      * Constructor with repository and random number generator injections
      *
      * @param repo Participant repository
      * @param eventRepo Event repository
-     * @param template websocket object used to send updates to everyone
+     * @param simp websocket object used to send updates to everyone
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,
-                                 SimpMessagingTemplate template) {
+                                 SimpMessagingTemplate simp) {
         this.repo = repo;
         this.eventRepo = eventRepo;
-        this.template = template;
+        this.simp = simp;
     }
 
     /**
@@ -46,15 +47,16 @@ public class ParticipantController {
     public ResponseEntity<Participant> getById(@PathVariable long partID,
                                                @PathVariable String eventID){
         try{
-            if(eventRepo.findById(eventID).isEmpty() || repo.findById(partID).isEmpty()) {
-                return ResponseEntity.status(404).build();
+            Optional<Event> optionalEvent = eventRepo.findById(eventID);
+            Optional<Participant> optionalParticipant = repo.findById(partID);
+            if(optionalEvent.isEmpty() || optionalParticipant.isEmpty()) {
+                return ResponseEntity.notFound().build();
             }
-            if(!eventRepo.findById(eventID).get().hasParticipant(repo.findById(partID).get())){
+            Participant participant = optionalParticipant.get();
+            if(!optionalEvent.get().hasParticipant(participant)){
                 return ResponseEntity.status(401).build();
             }
-            Optional<Participant> participant = repo.findById(partID);
-            return participant.map(ResponseEntity::ok).orElseGet(
-                    () -> ResponseEntity.notFound().build());
+            return ResponseEntity.ok(participant);
         }catch (Exception e){
             return ResponseEntity.internalServerError().build();
         }
@@ -74,15 +76,15 @@ public class ParticipantController {
                                            @PathVariable String eventID) {
         try {
             Optional<Event> optionalEvent = eventRepo.findById(eventID);
+            if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
             if (participant == null || participant.getName() == null ||
-                    participant.getName().isEmpty() || optionalEvent.isEmpty()) {
+                    participant.getName().isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            Participant saved = repo.save(participant);
             Event event = optionalEvent.get();
-            event.addParticipant(saved);
+            event.addParticipant(participant);
             eventRepo.save(event);
-            template.convertAndSend("/event/" + eventID, saved,
+            simp.convertAndSend("/event/" + eventID, participant,
                     Map.of("action", "addParticipant", "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -105,18 +107,21 @@ public class ParticipantController {
                                                            @PathVariable long partID,
                                                            @RequestBody Participant participant) {
         try {
-            Optional<Event> search = eventRepo.findById(eventID);
-            Optional<Participant> optional = repo.findById(partID);
-            if (search.isEmpty() || optional.isEmpty())
+            if(participant.getParticipantId() != partID)
+                ResponseEntity.badRequest().build();
+
+            Optional<Event> optionalEvent = eventRepo.findById(eventID);
+            Optional<Participant> optionalParticipant = repo.findById(partID);
+            if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
                 return ResponseEntity.status(404).build();
-            Event event = search.get();
-            Participant oldParticipant = optional.get();
+            Event event = optionalEvent.get();
+            Participant oldParticipant = optionalParticipant.get();
 
             if (!event.hasParticipant(oldParticipant))
                 return ResponseEntity.status(401).build();
 
             repo.save(participant);
-            template.convertAndSend("/event/" + eventID, participant,
+            simp.convertAndSend("/event/" + eventID, participant,
                     Map.of("action", "updateParticipant",
                             "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
@@ -138,16 +143,25 @@ public class ParticipantController {
     public ResponseEntity<Event> deleteById(@PathVariable long partID,
                                             @PathVariable String eventID) {
         try {
-            Optional<Event> eventFound = eventRepo.findById(eventID);
-            Optional<Participant> participantFound = repo.findById(partID);
-            if (eventFound.isEmpty() || participantFound.isEmpty())
+            Optional<Event> optionalEvent = eventRepo.findById(eventID);
+            Optional<Participant> optionalParticipant = repo.findById(partID);
+            if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
                 return ResponseEntity.notFound().build();
-            Event event = eventFound.get();
-            Participant participant = participantFound.get();
+            Event event = optionalEvent.get();
+            Participant participant = optionalParticipant.get();
+
             if (!event.hasParticipant(participant))
                 return ResponseEntity.status(401).build();
-            repo.deleteById(partID);
-            template.convertAndSend("/event/" + eventID, partID,
+
+            List<Expense> expenses = event.getExpenses();
+            expenses.removeIf(expense -> expense.getExpenseAuthor().equals(participant));
+            for (Expense e : expenses) {
+                e.getExpenseParticipants().remove(participant);
+            }
+
+            event.deleteParticipant(participant);
+            eventRepo.save(event);
+            simp.convertAndSend("/event/" + eventID, partID,
                     Map.of("action", "removeParticipant",
                             "type", Long.class.getTypeName()));
             return ResponseEntity.noContent().build();
