@@ -124,11 +124,4 @@ public class EventController {
         }
     }
 
-    /**
-     * @return all events
-     */
-    @GetMapping(path = { "", "/all"})
-    public List<Event> getAll() {
-        return repo.findAll();
-    }
 }
