@@ -1,12 +1,14 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -87,11 +89,11 @@ public class ParticipantController {
      * Change the name of a participant
      * /api/events/{eventID}/participants/{partID}?newName={name}&newEmail={email}
      *
-     * @param eventID id of the Event
-     * @param partID id of the participant
+     * @param eventID     id of the Event
+     * @param partID      id of the participant
      * @param participant new participant to replace the old one
      * @return the participant entity with new title.
-     *  or 401 if the participant is not accessible from the specified event
+     * or 401 if the participant is not accessible from the specified event
      */
     @PutMapping("/{partID}")
     public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID,
@@ -100,19 +102,31 @@ public class ParticipantController {
         try {
             Optional<Event> search = eventRepo.findById(eventID);
             Optional<Participant> optional = repo.findById(partID);
-            if(search.isPresent() && optional.isPresent()) {
-                Event event = search.get();
-                Participant oldParticipant = optional.get();
+            if (search.isEmpty() || optional.isEmpty())
+                return ResponseEntity.status(404).build();
+            Event event = search.get();
+            Participant oldParticipant = optional.get();
 
-                if(event.hasParticipant(oldParticipant)){
-                    event.deleteParticipant(oldParticipant);
-                    participant.setParticipantId(partID);
-                    event.addParticipant(participant);
+            if (!event.hasParticipant(oldParticipant))
+                return ResponseEntity.status(401).build();
 
-                    eventRepo.save(event);
-                    return ResponseEntity.ok(repo.getReferenceById(partID));
-                } else return ResponseEntity.status(401).build();
-            } return ResponseEntity.status(404).build();
+            List<Expense> expenses = event.getExpenses();
+            for (Expense e : expenses) {
+                if (e.getExpenseAuthor().equals(oldParticipant)) {
+                    e.setExpenseAuthor(participant);
+                }
+                if(e.getExpenseParticipants().remove(oldParticipant))
+                    e.getExpenseParticipants().add(participant);
+            }
+
+            event.deleteParticipant(oldParticipant);
+            participant.setParticipantId(partID);
+            event.addParticipant(participant);
+
+            eventRepo.save(event);
+            return ResponseEntity.ok(repo.getReferenceById(partID));
+
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -121,7 +135,7 @@ public class ParticipantController {
     /**
      * removes a participant
      *
-     * @param partID id of participant to remove
+     * @param partID  id of participant to remove
      * @param eventID id of the Event in which the participant is located at
      * @return status 204 if deleted successfully,
      * 404 if the participant and/or event does not exist or
@@ -133,18 +147,33 @@ public class ParticipantController {
         try {
             Optional<Event> eventFound = eventRepo.findById(eventID);
             Optional<Participant> participantFound = repo.findById(partID);
-            if(eventFound.isPresent()  && participantFound.isPresent()) {
-                Event event = eventFound.get();
-                Participant participant = participantFound.get();
-                if(event.hasParticipant(participant)){
-                    event.deleteParticipant(participant);
-                    repo.deleteById(partID);
-                    eventRepo.save(event);
-                    return ResponseEntity.status(204).build();
-                }
+            if (eventFound.isEmpty() || participantFound.isEmpty())
+                return ResponseEntity.notFound().build();
+            Event event = eventFound.get();
+            Participant participant = participantFound.get();
+            if (!event.hasParticipant(participant))
                 return ResponseEntity.status(401).build();
+
+            List<Expense> toBeDeleted = event.getExpenses();
+            List<Expense> expenses = event.getExpenses();
+            for (Expense e : expenses) {
+                if (e.getExpenseAuthor().equals(participant)) {
+                    toBeDeleted.add(e);
+                    continue;
+                }
+                e.getExpenseParticipants().remove(participant);
             }
-            return ResponseEntity.notFound().build();
+            for (Expense e : toBeDeleted) {
+                expenses.remove(e);
+                //this also deletes the expense the participant authored
+                //from the event class
+            }
+            event.deleteParticipant(participant);
+            repo.deleteById(partID);
+            eventRepo.save(event);
+            return ResponseEntity.status(204).build();
+
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
