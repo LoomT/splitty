@@ -65,13 +65,13 @@ public class EditParticipantsCtrl {
 
         chooseParticipant.getItems().add(languageConf.get("EditP.newParticipant"));
         chooseParticipant
-                .getItems()
-                .addAll(
-                        e.getParticipants()
-                                .stream()
-                                .map(Participant::getName)
-                                .toList()
-                );
+            .getItems()
+            .addAll(
+                e.getParticipants()
+                    .stream()
+                    .map(Participant::getName)
+                    .toList()
+            );
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
 
