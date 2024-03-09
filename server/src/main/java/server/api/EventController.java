@@ -16,21 +16,21 @@ import java.util.random.RandomGenerator;
 public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
-    private final SimpMessagingTemplate template;
+    private final SimpMessagingTemplate simp;
 
     /**
      * Constructor with repository and random number generator injections
      *
      * @param repo Event repository
      * @param random A random number generator
-     * @param template websocket object used to send updates to everyone
+     * @param simp websocket object used to send updates to everyone
      */
     @Autowired
     public EventController(EventRepository repo, RandomGenerator random,
-                           SimpMessagingTemplate template) {
+                           SimpMessagingTemplate simp) {
         this.repo = repo;
         this.random = random;
-        this.template = template;
+        this.simp = simp;
     }
 
     /**
@@ -98,7 +98,7 @@ public class EventController {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
-                template.convertAndSend("/event/" + id, "delete",
+                simp.convertAndSend("/event/" + id, "delete",
                         Map.of("action", "deleteEvent", "type", String.class.getTypeName()));
                 return ResponseEntity.noContent().build();
             }
@@ -125,7 +125,7 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
-                template.convertAndSend("/event/" + id, title,
+                simp.convertAndSend("/event/" + id, title,
                         Map.of("action", "titleChange", "type", String.class.getTypeName()));
                 return ResponseEntity.noContent().build();
             }
