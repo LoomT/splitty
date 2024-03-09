@@ -23,6 +23,7 @@ import commons.Event;
 
 import com.google.inject.Inject;
 
+import commons.Participant;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -67,13 +68,49 @@ public class ServerUtils {
     }
 
     /**
+     * @param eventId     tbe event in which the participant should be created
+     * @param participant the participant to be created
+     */
+    public void createParticipant(String eventId, Participant participant) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("api/events/" + eventId + "/participants")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
+    }
+
+    /**
+     * @param eventId     the event in which the participant should be updated
+     * @param participant the participant to be updated
+     */
+    public void updateParticipant(String eventId, Participant participant) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventId + "/participant/" + participant.getParticipantId())
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
+    }
+
+    /**
+     * @param eventId       the event in which the participant should be deleted
+     * @param participantId the participant to be deleted
+     */
+    public void deleteParticipant(String eventId, String participantId) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventId + "/participant/" + participantId)
+                .request(APPLICATION_JSON)
+                .delete();
+    }
+
+    /**
      * Sends an API call to server for quotes
      *
      * @return all quotes
      */
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("api/quotes") //
+                .target(server)
+                .path("api/quotes") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Quote>>() {

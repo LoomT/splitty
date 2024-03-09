@@ -34,8 +34,8 @@ public class EditParticipantsCtrl {
     private LanguageConf languageConf;
 
     /**
-     * @param server   serverutils instance
-     * @param mainCtrl main control instance
+     * @param server       serverutils instance
+     * @param mainCtrl     main control instance
      * @param languageConf the language config instance
      */
     @Inject
@@ -65,13 +65,13 @@ public class EditParticipantsCtrl {
 
         chooseParticipant.getItems().add(languageConf.get("EditP.newParticipant"));
         chooseParticipant
-            .getItems()
-            .addAll(
-                e.getParticipants()
-                    .stream()
-                    .map(Participant::getName)
-                    .toList()
-            );
+                .getItems()
+                .addAll(
+                        e.getParticipants()
+                                .stream()
+                                .map(Participant::getName)
+                                .toList()
+                );
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
 
@@ -109,8 +109,23 @@ public class EditParticipantsCtrl {
      */
     @FXML
     private void saveButtonClicked() {
-        System.out.println("Creating/saving participant " +
-                chooseParticipant.getSelectionModel().getSelectedIndex());
+        int index = chooseParticipant.getSelectionModel().getSelectedIndex();
+        System.out.println("Creating/saving participant " + index);
+
+        String name = nameField.getText();
+        String email = emailField.getText();
+
+        if (index < 0) return;
+        if (index == 0) {
+            // create a new participant
+            Participant newP = new Participant(name, email);
+            server.createParticipant(event.getId(),newP);
+        } else {
+            Participant currP = event.getParticipants().get(index -1);
+            currP.setName(name);
+            currP.setEmailAddress(email);
+            server.updateParticipant(event.getId(), currP);
+        }
 
     }
 }

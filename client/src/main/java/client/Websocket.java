@@ -80,7 +80,7 @@ public class Websocket {
         @Override
         public void afterConnected(@NonNull StompSession session,
                                    @NonNull StompHeaders connectedHeaders) {
-            System.out.println("connected");
+            System.out.println("WS connected");
         }
 
         @Override

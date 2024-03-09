@@ -29,7 +29,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 
-
+@SuppressWarnings("NullableProblems")
 public class TestExpenseRepository implements ExpenseRepository {
     private final List<Expense> expenses = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
@@ -49,6 +49,12 @@ public class TestExpenseRepository implements ExpenseRepository {
         calledMethods.add(name);
     }
 
+    /**
+     * @return expense list
+     */
+    public List<Expense> getExpenses() {
+        return expenses;
+    }
     /**
      * flush
      */
@@ -192,15 +198,30 @@ public class TestExpenseRepository implements ExpenseRepository {
         // check if there is already an expense with the same id and overwrite it if yes
         for(Expense e : expenses) {
             if(e.getExpenseID() == entity.getExpenseID()) {
-                expenses.remove(e);
-                expenses.add(entity);
-                return entity;
+                replaceFields(e, entity);
+                return (S) e;
             }
         }
         // if it's a new expense, generate an id and save
         entity.setExpenseID(random.nextLong());
         expenses.add(entity);
         return entity;
+    }
+
+    /**
+     * Replaces the old expense while keeping the same object address
+     *
+     * @param oldExp old expense
+     * @param newExp new expense
+     */
+    private void replaceFields(Expense oldExp, Expense newExp) {
+        oldExp.setAmount(newExp.getAmount());
+        oldExp.setCurrency(newExp.getCurrency());
+        oldExp.setExpenseAuthor(newExp.getExpenseAuthor());
+        oldExp.setPurpose(newExp.getPurpose());
+        oldExp.setType(newExp.getType());
+        oldExp.getExpenseParticipants().clear();
+        oldExp.getExpenseParticipants().addAll(newExp.getExpenseParticipants());
     }
 
     /**
@@ -267,7 +288,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public void deleteAll() {
-
+        expenses.clear();
     }
 
     /**
