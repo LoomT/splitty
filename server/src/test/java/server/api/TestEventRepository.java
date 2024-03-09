@@ -240,7 +240,7 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * Saves an entity to the database
+     * Save the event to the database, cascading changes to participants and expenses
      *
      * @param entity to save
      * @param <S> class of entity
@@ -251,22 +251,20 @@ public class TestEventRepository implements EventRepository {
         call("save");
         events.removeIf(e -> entity.getId().equals(e.getId()));
         events.add(entity);
+        // Cascades any changes to participants and expenses
         if(partRepo != null){
-            partRepo.getParticipants().removeIf(p -> {
-                for(Participant pp : entity.getParticipants())
-                    if(pp.getParticipantId() == p.getParticipantId())
-                        return false;
-                return true;
-            });
+            // Deletes participants that are no longer in the event entity
+            partRepo.getParticipants().removeIf(p -> entity.getParticipants()
+                    .stream()
+                    .map(Participant::getParticipantId)
+                    .noneMatch(id -> id == p.getParticipantId()));
             partRepo.saveAll(entity.getParticipants());
         }
         if(expenseRepo != null) {
-            expenseRepo.getExpenses().removeIf(e -> {
-                for(Expense ee : expenseRepo.getExpenses())
-                    if(ee.getExpenseID() == e.getExpenseID())
-                        return false;
-                return true;
-            });
+            expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
+                    .stream()
+                    .mapToLong(Expense::getExpenseID)
+                    .noneMatch(id -> id == e.getExpenseID()));
             expenseRepo.saveAll(entity.getExpenses());
         }
         return entity;

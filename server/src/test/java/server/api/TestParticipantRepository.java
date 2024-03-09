@@ -50,6 +50,9 @@ public class TestParticipantRepository implements ParticipantRepository {
         calledMethods.add(name);
     }
 
+    /**
+     * @return participant list
+     */
     public List<Participant> getParticipants() {
         return participants;
     }

@@ -48,6 +48,9 @@ public class TestExpenseRepository implements ExpenseRepository {
         calledMethods.add(name);
     }
 
+    /**
+     * @return expense list
+     */
     public List<Expense> getExpenses() {
         return expenses;
     }
