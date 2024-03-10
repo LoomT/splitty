@@ -16,6 +16,7 @@
 package server;
 
 import java.util.Random;
+import java.util.random.RandomGenerator;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,10 +25,10 @@ import org.springframework.context.annotation.Configuration;
 public class Config {
 
     /**
-     * @return A new Random instance
+     * @return A new Random generator instance
      */
     @Bean
-    public Random getRandom() {
+    public RandomGenerator getRandomGenerator() {
         return new Random();
     }
 }

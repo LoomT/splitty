@@ -30,14 +30,13 @@ public class Expense {
     private Participant expenseAuthor;
     @NotNull
     private String purpose;
-    @NotNull
     private double amount;
     @NotNull
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull
     private Date date;
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany
     private List<Participant> expenseParticipants;
     @NotNull
     private String type;
@@ -136,9 +135,9 @@ public class Expense {
 
     /**
      * setter for participant
-     * @param participant
+     * @param expenseAuthor
      */
-    public void setExpenseAuthor(String participant) {
+    public void setExpenseAuthor(Participant expenseAuthor) {
         this.expenseAuthor = expenseAuthor;
     }
 
@@ -172,6 +171,14 @@ public class Expense {
      */
     public void setType(String type) {
         this.type = type;
+    }
+
+    /**
+     * setter for the ID of the expense
+     * @param expenseID
+     */
+    public void setExpenseID(long expenseID) {
+        this.expenseID = expenseID;
     }
 
     /**

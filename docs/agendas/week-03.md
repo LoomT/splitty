@@ -1,11 +1,11 @@
-| Key          | Value           |
-|--------------|-----------------|
-| Date:        | 27/02/2024      |
-| Time:        | 13.45           |
-| Location:    | Flux Hall B     |
-| Chair        | Thomas Rothfusz |
-| Minute Taker | Liam Forster    |
-| Attendees:   | 6               |
+| Key          | Value                                     |
+|--------------|-------------------------------------------|
+| Date:        | 27/02/2024                                |
+| Time:        | 13.45                                     |
+| Location:    | Flux Hall B                               |
+| Chair        | Thomas Rothfusz                           |
+| Minute Taker | Liam Forster                              |
+| Attendees:   | Adam, Guney, Bogdan, Liam, Kajus, Thomas  |
 
 Agenda Items:
 Intro (5 min)
