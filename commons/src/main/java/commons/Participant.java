@@ -1,8 +1,11 @@
 package commons;
+
 import jakarta.persistence.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 
 /**
@@ -20,10 +23,11 @@ public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long participantId;
+    @Column(nullable = false)
     private String name;
     @Nullable
     private String emailAddress;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BankAccount> bankAccountSet;
 
     /**

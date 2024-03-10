@@ -14,8 +14,10 @@ public class BankAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long bankId;
 
+    @Column(nullable = false)
     private String beneficiary;
 
+    @Column(nullable = false)
     private String accountNumber;
 
     /**
