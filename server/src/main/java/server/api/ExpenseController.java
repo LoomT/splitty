@@ -63,7 +63,6 @@ public class ExpenseController {
             if (expenseAuthor != null) {
 
                 //updated expense saved for the author
-                expenseAuthor.setAuthoredExpenseSet(new HashSet<>());
                 expenseAuthor.addExpense(savedExpense);
 
                 //save the participant
@@ -112,14 +111,18 @@ public class ExpenseController {
     public ResponseEntity<Expense> updateExpense(@PathVariable long id,
                                                  @RequestBody Expense updatedExpense) {
         try {
+            if (updatedExpense.getExpenseID() != id) {
+                return ResponseEntity.badRequest().build();
+            }
+
             Expense updated = repoExpense.save(updatedExpense);
-            updated.setExpenseID(id);
+
             return ResponseEntity.ok(updated);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 
 
 }
