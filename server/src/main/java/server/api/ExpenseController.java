@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
-import java.util.HashSet;
 import java.util.Optional;
 
 
