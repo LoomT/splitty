@@ -23,6 +23,7 @@ import commons.Event;
 
 import com.google.inject.Inject;
 
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 import commons.Quote;
@@ -92,5 +93,46 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    }
+
+
+
+
+    /**
+     * Verify the input password
+     * @param inputPassword the password to verify
+     * @return boolean
+     */
+
+    public boolean verifyPassword(String inputPassword) {
+        Response response = ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/verify") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(inputPassword, APPLICATION_JSON));
+
+
+        boolean isValid = response.getStatus() == Response.Status.OK.getStatusCode();
+
+        response.close();
+
+        return isValid;
+    }
+
+
+    /**
+     * Sends an API call to server for events
+     * @param inputPassword the password to verify
+     *
+     * @return all quotes
+     */
+    public List<Event> getEvents(String inputPassword) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/events") //
+                .request(APPLICATION_JSON) //
+                .header("Authorization", inputPassword)
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Event>>() {
+                });
     }
 }

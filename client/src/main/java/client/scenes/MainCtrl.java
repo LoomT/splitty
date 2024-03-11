@@ -38,6 +38,9 @@ public class MainCtrl {
     private Scene eventPage;
     private UserConfig userConfig;
 
+    private Scene adminOverview;
+    private AdminOverviewCtrl adminOverviewCtrl;
+
     /**
      * Initializes the UI
      *
@@ -48,6 +51,7 @@ public class MainCtrl {
      * @param eventPage controller and scene for eventpage
      *
      * @param adminLogin admin login controller and scene
+     * @param adminOverview admin overview controller and scene
      */
     public void initialize(
             Stage primaryStage,
@@ -55,7 +59,8 @@ public class MainCtrl {
             UserConfig userConfig,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
-            Pair<AdminLoginCtrl, Parent> adminLogin
+            Pair<AdminLoginCtrl, Parent> adminLogin,
+            Pair<AdminOverviewCtrl, Parent> adminOverview
     ) {
 
         this.primaryStage = primaryStage;
@@ -71,6 +76,9 @@ public class MainCtrl {
 
         this.eventPageCtrl = eventPage.getKey();
         this.eventPage = new Scene(eventPage.getValue());
+
+        this.adminOverviewCtrl = adminOverview.getKey();
+        this.adminOverview = new Scene(adminOverview.getValue());
 
         //showOverview();
         showStartScreen();
@@ -93,7 +101,7 @@ public class MainCtrl {
      * Display admin login
      */
     public void showAdminLogin() {
-        primaryStage.setTitle("Admin Login");
+        primaryStage.setTitle(languageConf.get("AdminLogin.title"));
         primaryStage.setScene(adminLogin);
     }
 
@@ -105,6 +113,14 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * shows the admin overview
+     */
+    public void showAdminOverview() {
+        primaryStage.setTitle("Admin Overview");
+        primaryStage.setScene(adminOverview);
     }
 
 
