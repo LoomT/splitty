@@ -152,6 +152,56 @@ public class ParticipantControllerTest {
     }
 
     @Test
+    void unauthorizedGetById(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("title");
+        event1.setId("id1");
+        event2.setId("id2");
+        Participant participant = new Participant("name");
+        event1.addParticipant(participant);
+        eventRepo.save(event1);
+        eventRepo.save(event2);
+        var savedSucces = partContr.add(participant, "BCDEF");
+        var getByID401 = partContr.getById(2, "id2");
+        assertEquals(NO_CONTENT, savedSucces.getStatusCode());
+        assertEquals(UNAUTHORIZED, getByID401.getStatusCode());
+    }
+
+    @Test
+    void unauthorizedEditById(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("title");
+        event1.setId("id1");
+        event2.setId("id2");
+        Participant participant = new Participant("old name");
+        Participant editedParticipant = new Participant("new name");
+        editedParticipant.setParticipantId(2);
+        event1.addParticipant(participant);
+        eventRepo.save(event1);
+        eventRepo.save(event2);
+        var saved = partContr.add(participant, "BCDEF");
+        var editByID401 = partContr.editParticipantById("id2", 2, editedParticipant);
+        assertEquals(NO_CONTENT, saved.getStatusCode());
+        assertEquals(UNAUTHORIZED, editByID401.getStatusCode());
+    }
+
+    @Test
+    void unauthorizedDeleteById(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("title");
+        event1.setId("id1");
+        event2.setId("id2");
+        Participant participant = new Participant("old name");
+        event1.addParticipant(participant);
+        eventRepo.save(event1);
+        eventRepo.save(event2);
+        var saved = partContr.add(participant, "BCDEF");
+        var editByID401 = partContr.deleteById( 2, "id2");
+        assertEquals(NO_CONTENT, saved.getStatusCode());
+        assertEquals(UNAUTHORIZED, editByID401.getStatusCode());
+    }
+
+    @Test
     void removeWebsocket() {
         Participant participant = new Participant("name");
         partContr.add(participant, event.getId());
