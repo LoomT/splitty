@@ -113,6 +113,45 @@ public class ParticipantControllerTest {
     }
 
     @Test
+    void invalidRequestEvent(){
+        Participant participant = new Participant("name", null);
+        String eventIDNotExist = "event";
+        var response = partContr.add(participant, eventIDNotExist);
+        assertEquals(NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNull(){
+        Event exist = new Event("title");
+        String existID = "words";
+        exist.setId(existID);
+        eventRepo.save(exist);
+        Participant notExist = null;
+        var response = partContr.add(notExist, existID);
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNameNull(){
+        Event event = new Event("title");
+        event.setId("id");
+        Participant participant = new Participant();
+        eventRepo.save(event);
+        var response = partContr.add(participant, "id");
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNameEmpty(){
+        Event event = new Event("title");
+        event.setId("id");
+        Participant participant = new Participant("");
+        eventRepo.save(event);
+        var response = partContr.add(participant, "id");
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
     void removeWebsocket() {
         Participant participant = new Participant("name");
         partContr.add(participant, event.getId());
