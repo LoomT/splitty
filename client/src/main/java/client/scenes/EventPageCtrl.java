@@ -1,7 +1,7 @@
 package client.scenes;
 
-import client.Websocket;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
@@ -46,7 +46,9 @@ public class EventPageCtrl {
     public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-        websocket = new Websocket(this);
+        websocket = new Websocket();
+        websocket.on("titleChange", (newTitle) -> {event.setTitle(((String)newTitle));
+            eventTitle.setText(((String)newTitle));});
     }
 
     /**

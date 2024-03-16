@@ -1,6 +1,5 @@
-package client;
+package client.utils;
 
-import client.scenes.EventPageCtrl;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
@@ -18,27 +17,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class Websocket {
-    private final EventPageCtrl ctrl;
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private String url;
+    private final String url;
+    private final Map<String, Consumer<Object>> functions;
 
     /**
      * Websocket client constructor
      *
-     * @param ctrl event page controller
      */
-    public Websocket(EventPageCtrl ctrl) {
-        this.ctrl = ctrl;
+    public Websocket() {
+        functions = new HashMap<>();
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         List<MessageConverter> converterList = List.of(new MappingJackson2MessageConverter(),
                 new StringMessageConverter());
         stompClient.setMessageConverter(new CompositeMessageConverter(converterList));
 
-        url = "ws://localhost:8080/ws"; //TODO everything
+        url = "ws://localhost:8080/ws"; //TODO inject
         sessionHandler = new MyStompSessionHandler();
     }
 
@@ -61,6 +60,24 @@ public class Websocket {
     public void disconnect() {
         stompSession.disconnect();
     }
+
+    /**
+     * Sets the function for provided name
+     * <pre>
+     * available functions:
+     * titleChange(String)
+     * deleteEvent()
+     * addParticipant(Participant)
+     * updateParticipant(Participant)
+     * removeParticipant(id)
+     * addExpense(Expense)
+     * updateExpense(Expense)
+     * removeExpense(id)
+     * </pre>
+     * @param name name of the function
+     * @param consumer function that consumes type of payload and payload in that order
+     */
+    public void on(String name, Consumer<Object> consumer) {functions.put(name, consumer);}
 
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
@@ -97,20 +114,8 @@ public class Websocket {
          */
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
-//            System.out.println("Received\n" + payload);
             String action = headers.get("action").getFirst();
-            switch(action) {
-                case "titleChange" -> ctrl.changeTitle((String)payload);
-                //TODO implement these methods
-//                case "deleteEvent" -> ctrl.deleteEvent();
-//                case "addParticipant" -> ctrl.addParticipant((Participant)payload);
-//                case "updateParticipant" -> ctrl.updateParticipant((Participant)payload);
-//                case "removeParticipant" -> ctrl.removeParticipant((Long)payload);
-//                case "addExpense" -> ctrl.addExpense((Expense)payload);
-//                case "updateExpense" -> ctrl.updateExpense((Expense)payload);
-//                case "removeExpense" -> ctrl.removeExpense((Long)payload);
-                default -> System.out.println("Unknown action");
-            }
+            functions.get(action).accept(payload);
         }
 
         @Override
