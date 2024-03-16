@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+// Index the title for faster sorting by title for admin,
+@Table(indexes = {
+        @Index(name = "idx_event_title", columnList = "title")
+})
 public class Event {
     /*
       Properties:
@@ -31,8 +35,10 @@ public class Event {
 
       */
     @Id
+    @Column(nullable = false, length = 5)
     private String id;
 
+    @Column(nullable = false)
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
