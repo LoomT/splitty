@@ -16,7 +16,6 @@ public class ExpenseControllerTest {
     private TestExpenseRepository expenseRepo;
     private ExpenseController expenseContr;
     private TestParticipantRepository partRepo;
-    private ParticipantController partContr;
     private Expense expense;
     private Participant p1, p2, expAuth;
 
