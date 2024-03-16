@@ -125,6 +125,7 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
+                repo.save(event);
                 simp.convertAndSend("/event/" + id, title,
                         Map.of("action", "titleChange", "type", String.class.getTypeName()));
                 return ResponseEntity.noContent().build();
