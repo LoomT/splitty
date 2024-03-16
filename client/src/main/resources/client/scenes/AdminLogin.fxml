@@ -8,14 +8,15 @@
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="client.scenes.AdminLoginCtrl"
             prefHeight="400.0" prefWidth="600.0">
-    <PasswordField layoutX="198.0" layoutY="213.0" promptText="%AdminLogin.enterPassword"/>
-    <Button fx:id="loginButton" layoutX="365.0" layoutY="213.0" mnemonicParsing="false" text="%AdminLogin.loginBtn"/>
+    <PasswordField fx:id="passwordTextField" layoutX="198.0" layoutY="213.0" promptText="%AdminLogin.enterPassword"/>
+    <Button fx:id="loginButton" layoutX="365.0" layoutY="213.0" mnemonicParsing="false"  onAction="#loginButtonClicked" text="%AdminLogin.loginBtn"/>
     <Label layoutX="198.0" layoutY="192.0" text="%AdminLogin.passwordLabel"/>
-    <Label layoutX="165.0" layoutY="56.0" prefHeight="43.0" prefWidth="270.0" text="%AdminLogin.title">
+    <Label  layoutX="150" layoutY="50" text="%AdminLogin.title">
         <font>
-            <Font size="29.0"/>
+            <Font size="50"/>
         </font>
     </Label>
+    <Button layoutX="20" layoutY="10" mnemonicParsing="false" onAction="#backButtonClicked" text="Back" />
 </AnchorPane>
 
 

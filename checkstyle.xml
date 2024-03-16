@@ -40,6 +40,7 @@
             <property name="severity" value="warning"/>
             <property name="tokens" value="METHOD_DEF, CTOR_DEF"/>
             <property name="max" value="10"/>
+
         </module>
         <module name="CyclomaticComplexity">
             <property name="severity" value="warning"/>
