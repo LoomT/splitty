@@ -103,7 +103,7 @@ public class ServerUtils {
     }
 
     /**
-     * Sends an API call to server for quotes
+     * S ends an API call to server for quotes
      *
      * @return all quotes
      */
