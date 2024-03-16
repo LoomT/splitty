@@ -32,10 +32,10 @@ public class EventPageCtrl {
     private ChoiceBox<String> participantChoiceBox;
     private int selectedParticipantId;
 
-    private Websocket websocket;
+    private final Websocket websocket;
 
-    private ServerUtils server;
-    private MainCtrl mainCtrl;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
     private Event event;
 
     /**
@@ -96,17 +96,6 @@ public class EventPageCtrl {
 
         websocket.connect(e.getId());
     }
-
-    /**
-     * Changes the title of the event
-     *
-     * @param newTitle new title of the event
-     */
-    public void changeTitle(String newTitle) {
-        event.setTitle(newTitle);
-        eventTitle.setText(newTitle);
-    }
-
     @FXML
     private void backButtonClicked() {
         mainCtrl.showStartScreen();
