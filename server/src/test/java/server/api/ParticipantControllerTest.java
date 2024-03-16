@@ -126,8 +126,7 @@ public class ParticipantControllerTest {
         String existID = "words";
         exist.setId(existID);
         eventRepo.save(exist);
-        Participant notExist = null;
-        var response = partContr.add(notExist, existID);
+        var response = partContr.add(null, existID);
         assertEquals(BAD_REQUEST, response.getStatusCode());
     }
 
@@ -152,6 +151,44 @@ public class ParticipantControllerTest {
     }
 
     @Test
+    void editParticipantNonExisting(){
+        Event exist = new Event("title");
+        String existID = "words";
+        exist.setId(existID);
+        eventRepo.save(exist);
+        Participant validParticipant = new Participant("name");
+        var response = partContr.editParticipantById(existID, 0, validParticipant);
+        assertEquals(NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void editParticipantInvalid(){
+        Event exist = new Event("title");
+        String existID = "words";
+        Participant existingParticipant = new Participant("name");
+        exist.addParticipant(existingParticipant);
+        exist.setId(existID);
+        eventRepo.save(exist);
+        Participant participantNameNull = new Participant();
+        Participant participantNameEmpty = new Participant("");
+        var responseNull = partContr.editParticipantById(existID, 2, null);
+        var responseNameNull = partContr.editParticipantById(existID, 2, participantNameNull);
+        var responseNameEmpty = partContr.editParticipantById(existID, 2, participantNameEmpty);
+        assertEquals(BAD_REQUEST, responseNull.getStatusCode());
+        assertEquals(BAD_REQUEST, responseNameNull.getStatusCode());
+        assertEquals(BAD_REQUEST, responseNameEmpty.getStatusCode());
+    }
+    @Test
+    void deleteParticipantNonExisting(){
+        Event exist = new Event("title");
+        String existID = "words";
+        exist.setId(existID);
+        eventRepo.save(exist);
+        var response = partContr.deleteById(0, existID);
+        assertEquals(NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void unauthorizedGetById(){
         Event event1 = new Event("title");
         Event event2 = new Event("title");
@@ -161,9 +198,9 @@ public class ParticipantControllerTest {
         event1.addParticipant(participant);
         eventRepo.save(event1);
         eventRepo.save(event2);
-        var savedSucces = partContr.add(participant, "BCDEF");
+        var savedSuccess = partContr.add(participant, "BCDEF");
         var getByID401 = partContr.getById(2, "id2");
-        assertEquals(NO_CONTENT, savedSucces.getStatusCode());
+        assertEquals(NO_CONTENT, savedSuccess.getStatusCode());
         assertEquals(UNAUTHORIZED, getByID401.getStatusCode());
     }
 
