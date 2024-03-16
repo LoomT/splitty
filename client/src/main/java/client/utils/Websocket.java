@@ -1,5 +1,6 @@
 package client.utils;
 
+import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
@@ -29,15 +30,17 @@ public class Websocket {
     /**
      * Websocket client constructor
      *
+     * @param config config for url of the websocket address
      */
-    public Websocket() {
+    @Inject
+    public Websocket(UserConfig config) {
         functions = new HashMap<>();
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         List<MessageConverter> converterList = List.of(new MappingJackson2MessageConverter(),
                 new StringMessageConverter());
         stompClient.setMessageConverter(new CompositeMessageConverter(converterList));
 
-        url = "ws://localhost:8080/ws"; //TODO inject
+        this.url = "ws:" + config.getUrl() + "ws";
         sessionHandler = new MyStompSessionHandler();
     }
 

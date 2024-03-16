@@ -10,8 +10,7 @@ import java.util.Objects;
 
 @Entity
 // Index the title for faster sorting by title for admin,
-@Table(indexes = {
-        @Index(name = "idx_event_title", columnList = "title")
+@Table(indexes = {@Index(name = "idx_event_title", columnList = "title")
 })
 public class Event {
     /*

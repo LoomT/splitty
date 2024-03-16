@@ -41,14 +41,17 @@ public class EventPageCtrl {
     /**
      * @param server server utils injection
      * @param mainCtrl mainCtrl injection
+     * @param websocket websocket client
      */
     @Inject
-    public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl, Websocket websocket) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-        websocket = new Websocket();
-        websocket.on("titleChange", (newTitle) -> {event.setTitle(((String)newTitle));
-            eventTitle.setText(((String)newTitle));});
+        this.websocket = websocket;
+        websocket.on("titleChange", (newTitle) -> {
+            event.setTitle(((String)newTitle));
+            eventTitle.setText(((String)newTitle));
+        });
     }
 
     /**
