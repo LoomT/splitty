@@ -18,7 +18,7 @@ public class ParticipantController {
     /**
      * Constructor with repository and random number generator injections
      *
-     * @param repo Participant repository
+     * @param repo      Participant repository
      * @param eventRepo Event repository
      */
     public ParticipantController(ParticipantRepository repo,
@@ -35,20 +35,20 @@ public class ParticipantController {
      * @param partID  id of participant to search for
      * @return the requested participant entity or else a 404 'not found' response
      */
-    @GetMapping( "/{partID}")
+    @GetMapping("/{partID}")
     public ResponseEntity<Participant> getById(@PathVariable long partID,
-                                               @PathVariable String eventID){
-        try{
-            if(eventRepo.findById(eventID).isEmpty() || repo.findById(partID).isEmpty()) {
+                                               @PathVariable String eventID) {
+        try {
+            if (eventRepo.findById(eventID).isEmpty() || repo.findById(partID).isEmpty()) {
                 return ResponseEntity.status(404).build();
             }
-            if(!eventRepo.findById(eventID).get().hasParticipant(repo.findById(partID).get())){
+            if (!eventRepo.findById(eventID).get().hasParticipant(repo.findById(partID).get())) {
                 return ResponseEntity.status(401).build();
             }
             Optional<Participant> participant = repo.findById(partID);
             return participant.map(ResponseEntity::ok).orElseGet(
                     () -> ResponseEntity.notFound().build());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -59,10 +59,10 @@ public class ParticipantController {
      * Generates an ID for the participant, adds it to the database and sends it back to the client
      *
      * @param participant to be saved to the database
-     * @param eventID id to which the participant is to be added
+     * @param eventID     id to which the participant is to be added
      * @return the saved entity with an assigned ID
      */
-    @PostMapping({ "", "/" })
+    @PostMapping({"", "/"})
     public ResponseEntity<Participant> add(@RequestBody Participant participant,
                                            @PathVariable String eventID) {
         try {
@@ -70,8 +70,9 @@ public class ParticipantController {
                     participant.getName().isEmpty() || !(eventRepo.existsById(eventID))) {
                 return ResponseEntity.badRequest().build();
             }
-            if (eventRepo.findById(eventID).isPresent()) {
-                Event event = eventRepo.findById(eventID).get();
+            Optional<Event> optionalEvent = eventRepo.findById(eventID);
+            if (optionalEvent.isPresent()) {
+                Event event = optionalEvent.get();
                 event.addParticipant(participant);
                 eventRepo.save(event);
                 return ResponseEntity.ok(participant);
@@ -86,35 +87,32 @@ public class ParticipantController {
      * Change the name of a participant
      * /api/events/{eventID}/participants/{partID}?newName={name}&newEmail={email}
      *
-     * @param eventID id of the Event
-     * @param partID id of the participant
-     * @param name new name for participant
-     * @param email new email for participant
+     * @param eventID     id of the Event
+     * @param partID      id of the participant
+     * @param participant new participant to replace the old one
      * @return the participant entity with new title.
-     *  or 401 if the participant is not accessible from the specified event
+     * or 401 if the participant is not accessible from the specified event
      */
-    @PatchMapping("/{partID}")
+    @PutMapping("/{partID}")
     public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID,
                                                            @PathVariable long partID,
-                                                           @RequestParam("newName") String name,
-                                                           @RequestParam String email) {
+                                                           @RequestBody Participant participant) {
         try {
             Optional<Event> search = eventRepo.findById(eventID);
-            if(search.isPresent() && repo.existsById(partID)) {
+            Optional<Participant> optional = repo.findById(partID);
+            if (search.isPresent() && optional.isPresent()) {
                 Event event = search.get();
-                Optional<Participant> optional = repo.findById(partID);
+                Participant oldParticipant = optional.get();
 
-                if(optional.isPresent()){
-                    Participant participant = optional.get();
-                    if(event.hasParticipant(participant)){
-                        participant.setName(name);
-                        participant.setEmailAddress(email);
-                        eventRepo.save(event);
-                        return ResponseEntity.ok(repo.getReferenceById(partID));
-                    } else return ResponseEntity.status(401).build();
-                }
+                if (event.hasParticipant(oldParticipant)) {
+                    event.deleteParticipant(oldParticipant);
+                    participant.setParticipantId(partID);
+                    event.addParticipant(participant);
+
+                    eventRepo.save(event);
+                    return ResponseEntity.ok(repo.getReferenceById(partID));
+                } else return ResponseEntity.status(401).build();
             }
-
             return ResponseEntity.status(404).build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -124,7 +122,7 @@ public class ParticipantController {
     /**
      * removes a participant
      *
-     * @param partID id of participant to remove
+     * @param partID  id of participant to remove
      * @param eventID id of the Event in which the participant is located at
      * @return status 204 if deleted successfully,
      * 404 if the participant and/or event does not exist or
@@ -134,17 +132,16 @@ public class ParticipantController {
     public ResponseEntity<Event> deleteById(@PathVariable long partID,
                                             @PathVariable String eventID) {
         try {
-            if(eventRepo.existsById(eventID)) {
-                Event event = eventRepo.findById(eventID).get();
-                if(event.hasParticipant(repo.getReferenceById(partID))){
-                    if (repo.existsById(partID) && eventRepo.findById(eventID).isPresent()
-                            && repo.findById(partID).isPresent()) {
-                        eventRepo.findById(eventID).get()
-                                .deleteParticipant(repo.findById(partID).get());
-                        repo.deleteById(partID);
-                        eventRepo.save(event);
-                        return ResponseEntity.status(204).build();
-                    }
+            Optional<Event> eventFound = eventRepo.findById(eventID);
+            Optional<Participant> participantFound = repo.findById(partID);
+            if (eventFound.isPresent() && participantFound.isPresent()) {
+                Event event = eventFound.get();
+                Participant participant = participantFound.get();
+                if (event.hasParticipant(participant)) {
+                    event.deleteParticipant(participant);
+                    repo.deleteById(partID);
+                    eventRepo.save(event);
+                    return ResponseEntity.status(204).build();
                 }
                 return ResponseEntity.status(401).build();
             }

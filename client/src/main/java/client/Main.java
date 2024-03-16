@@ -17,16 +17,13 @@ package client;
 
 import static com.google.inject.Guice.createInjector;
 
+import client.scenes.*;
 
 
-
-import client.scenes.EventPageCtrl;
-
-import client.scenes.StartScreenCtrl;
 import client.utils.LanguageConf;
+import client.utils.UserConfig;
 import com.google.inject.Injector;
 
-import client.scenes.MainCtrl;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -34,6 +31,8 @@ public class Main extends Application {
 
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
+
+    private static final UserConfig userConfig = INJECTOR.getInstance(UserConfig.class);
     private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
@@ -41,7 +40,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch();
     }
 
@@ -80,15 +79,36 @@ public class Main extends Application {
                 "client", "scenes", "StartScreen.fxml"
         );
 
+        var adminLogin = FXML.load(
+                AdminLoginCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "AdminLogin.fxml"
+        );
+
+
         var eventPage = FXML.load(
                 EventPageCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EventPage.fxml"
         );
 
+        var editParticipants = FXML.load(
+                EditParticipantsCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "EditParticipants.fxml"
+        );
+
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, languageConf, start, eventPage);
 
+        mainCtrl.initialize(
+                primaryStage,
+                languageConf,
+                userConfig,
+                start,
+                eventPage,
+                adminLogin,
+                editParticipants
+        );
     }
 }

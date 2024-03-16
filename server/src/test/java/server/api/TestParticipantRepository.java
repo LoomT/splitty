@@ -84,7 +84,14 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public <S extends Participant> List<S> saveAll(Iterable<S> entities) {
-        // TODO Auto-generated method stub
+        for(Participant part: entities){
+            for(Participant p : participants){
+                if(part.getParticipantId() == p.getParticipantId()){
+                    participants.remove(p);
+                    participants.add(part);
+                }
+            }
+        }
         return null;
     }
 
@@ -230,6 +237,13 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public <S extends Participant> S save(S entity) {
         call("save");
+        for(Participant e : participants){
+            if(e.getParticipantId() == entity.getParticipantId()){
+                participants.remove(e);
+                participants.add(entity);
+                return entity;
+            }
+        }
         entity.setParticipantId(participants.size());
         participants.add(entity);
         return entity;
