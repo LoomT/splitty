@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.Websocket;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -7,9 +8,7 @@ import commons.Participant;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tab;
-
 import javafx.scene.text.Text;
-
 
 
 public class EventPageCtrl {
@@ -33,6 +32,7 @@ public class EventPageCtrl {
     private ChoiceBox<String> participantChoiceBox;
     private int selectedParticipantId;
 
+    private Websocket websocket;
 
     private ServerUtils server;
     private MainCtrl mainCtrl;
@@ -46,16 +46,16 @@ public class EventPageCtrl {
     public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-
+        websocket = new Websocket(this);
     }
 
     /**
      * call this function to set all the text on the eventpage to a given event
+     *
      * @param e the event to be shown
      */
     public void displayEvent(Event e) {
         this.event = e;
-        System.out.println(e.getTitle());
         eventTitle.setText(e.getTitle());
 
         if (e.getParticipants().isEmpty()) {
@@ -67,20 +67,45 @@ public class EventPageCtrl {
                 if (i != e.getParticipants().size() - 1) p += ", ";
             }
             participantText.setText(p);
-        }
 
-        participantChoiceBox.getItems().addAll(
-                e.getParticipants().stream().map(Participant::getName).toList()
-        );
-        participantChoiceBox.setValue(e.getParticipants().get(0).getName());
-        selectedParticipantId = 0;
+
+            participantChoiceBox.getItems().addAll(
+                    e.getParticipants().stream().map(Participant::getName).toList()
+            );
+            participantChoiceBox.setValue(e.getParticipants().get(0).getName());
+            selectedParticipantId = 0;
+
+            String name = e.getParticipants().get(selectedParticipantId).getName();
+            // TODO make this language dependant
+            fromTab.setText("From " + name);
+            includingTab.setText("Including " + name);
+        }
 
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
+
             String name = e.getParticipants().get(selectedParticipantId).getName();
-            //fromTab.setText("From " + name);
-            //includingTab.setText("Including " + name);
+            fromTab.setText("From " + name);
+            includingTab.setText("Including " + name);
         });
+
+        websocket.connect(e.getId());
+    }
+
+    /**
+     * Changes the title of the event
+     *
+     * @param newTitle new title of the event
+     */
+    public void changeTitle(String newTitle) {
+        event.setTitle(newTitle);
+        eventTitle.setText(newTitle);
+    }
+
+    @FXML
+    private void backButtonClicked() {
+        mainCtrl.showStartScreen();
+        websocket.disconnect();
     }
 
     @FXML

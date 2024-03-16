@@ -15,19 +15,20 @@
  */
 package server.api;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-
+import commons.Event;
+import commons.Expense;
+import commons.Participant;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-
-import commons.Event;
 import server.database.EventRepository;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
 @SuppressWarnings("NullableProblems")
 public class TestEventRepository implements EventRepository {
@@ -35,6 +36,29 @@ public class TestEventRepository implements EventRepository {
     private final List<Event> events = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
 
+    private TestParticipantRepository partRepo;
+    private TestExpenseRepository expenseRepo;
+
+    /**
+     * default constructor
+     */
+    public TestEventRepository(){}
+
+    /**
+     * @param repo participant repo to save participants
+     */
+    public TestEventRepository(TestParticipantRepository repo){
+        partRepo = repo;
+    }
+
+    /**
+     * @param partRepo participant repo to save participants
+     * @param expRepo expense repo
+     */
+    public TestEventRepository(TestParticipantRepository partRepo, TestExpenseRepository expRepo) {
+        this(partRepo);
+        this.expenseRepo = expRepo;
+    }
     /**
      * @return called methods
      */
@@ -48,7 +72,6 @@ public class TestEventRepository implements EventRepository {
     private void call(String name) {
         calledMethods.add(name);
     }
-
     /**
      * @return all Events
      */
@@ -217,7 +240,7 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * Saves an entity to the database
+     * Save the event to the database, cascading changes to participants and expenses
      *
      * @param entity to save
      * @param <S> class of entity
@@ -226,7 +249,24 @@ public class TestEventRepository implements EventRepository {
     @Override
     public <S extends Event> S save(S entity) {
         call("save");
+        events.removeIf(e -> entity.getId().equals(e.getId()));
         events.add(entity);
+        // Cascades any changes to participants and expenses
+        if(partRepo != null){
+            // Deletes participants that are no longer in the event entity
+            partRepo.getParticipants().removeIf(p -> entity.getParticipants()
+                    .stream()
+                    .map(Participant::getParticipantId)
+                    .noneMatch(id -> id == p.getParticipantId()));
+            partRepo.saveAll(entity.getParticipants());
+        }
+        if(expenseRepo != null) {
+            expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
+                    .stream()
+                    .mapToLong(Expense::getExpenseID)
+                    .noneMatch(id -> id == e.getExpenseID()));
+            expenseRepo.saveAll(entity.getExpenses());
+        }
         return entity;
     }
 

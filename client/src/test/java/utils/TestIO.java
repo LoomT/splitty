@@ -2,16 +2,21 @@ package utils;
 
 import client.utils.IOInterface;
 
-import java.io.*;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 public class TestIO implements IOInterface {
-    private final Writer writer;
+    private StringBuffer buffer;
 
     /**
-     * @param writer writer with initial config data
+     * Constructs a test IO instance to mock a file IO
+     *
+     * @param content initial buffer content
      */
-    public TestIO(Writer writer) {
-        this.writer = writer;
+    public TestIO(String content) {
+        buffer = new StringBuffer(content);
     }
 
     /**
@@ -21,27 +26,27 @@ public class TestIO implements IOInterface {
      */
     @Override
     public Reader read() {
-        return new StringReader(writer.toString());
+        return new StringReader(buffer.toString());
     }
 
     /**
      * Flush the buffer and return an empty writer
      *
      * @return writer
-     * @throws IOException if writer can not be flushed
      */
     @Override
-    public Writer write() throws IOException {
-        writer.flush();
+    public Writer write() {
+        StringWriter writer = new StringWriter();
+        buffer = writer.getBuffer();
         return writer;
     }
 
     /**
-     * Returns the writer for testing purposes
+     * Returns the content of the buffer for testing purposes
      *
-     * @return the writer
+     * @return the content of the buffer
      */
-    public Writer getWriter() {
-        return writer;
+    public String getContent() {
+        return buffer.toString();
     }
 }
