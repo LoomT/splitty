@@ -2,6 +2,7 @@ package server.api;
 
 import commons.Event;
 import commons.Participant;
+import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -119,6 +120,6 @@ public class ParticipantControllerTest {
         long partID = ((Participant)template.getPayload()).getParticipantId();
         partContr.deleteById(partID, event.getId());
         assertEquals(partID, template.getPayload());
-        assertEquals("removeParticipant", template.getHeaders().get("action"));
+        assertEquals(WebsocketActions.REMOVE_PARTICIPANT, template.getHeaders().get("action"));
     }
 }
