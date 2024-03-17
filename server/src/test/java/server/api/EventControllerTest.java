@@ -13,20 +13,19 @@ import static org.springframework.http.HttpStatus.*;
 class EventControllerTest {
     private TestEventRepository repo;
     private EventController sut;
-
+    private TestSimpMessagingTemplate template;
     @BeforeEach
     void setUp() {
         TestRandom random = new TestRandom();
         repo = new TestEventRepository();
-        sut = new EventController(repo, random);
+        template = new TestSimpMessagingTemplate((message, timeout) -> false);
+        sut = new EventController(repo, random, template);
     }
-
     @Test
     public void databaseIsUsed() {
         sut.add(new Event("title"));
         assertTrue(repo.getCalledMethods().contains("save"));
     }
-
     @Test
     void noGetById() {
         var actual = sut.getById("a");
@@ -95,16 +94,54 @@ class EventControllerTest {
     }
 
     @Test
+    void deleteWebsocketDestination() {
+        var added = sut.add(new Event("title"));
+        String id = added.getBody().getId();
+        sut.deleteById(id);
+        assertEquals("/event/" + id, template.getDestination());
+    }
+
+    @Test
+    void deleteWebsocketPayload() {
+        var added = sut.add(new Event("title"));
+        String id = added.getBody().getId();
+        sut.deleteById(id);
+        assertEquals("delete", template.getPayload());
+    }
+
+    @Test
+    void deleteWebsocketHeaders() {
+        var added = sut.add(new Event("title"));
+        String id = added.getBody().getId();
+        sut.deleteById(id);
+        assertTrue(template.getHeaders().containsKey("action"));
+        assertEquals("deleteEvent", template.getHeaders().get("action"));
+        assertTrue(template.getHeaders().containsKey("type"));
+        assertEquals("java.lang.String", template.getHeaders().get("type"));
+    }
+
+    @Test
     void changeTitleById() {
         var added = sut.add(new Event("title"));
         String id = Objects.requireNonNull(added.getBody()).getId();
         var actual = sut.changeTitleById(id, "new title");
-        assertEquals("new title", Objects.requireNonNull(actual.getBody()).getTitle());
+        assertEquals(NO_CONTENT, actual.getStatusCode());
+    }
+
+    @Test
+    void changeTitleByIdWebsocket() {
+        var added = sut.add(new Event("title"));
+        Event event = added.getBody();
+        String id = event.getId();
+        sut.changeTitleById(id, "new title");
+        assertEquals("/event/" + id, template.getDestination());
+        assertEquals("titleChange", template.getHeaders().get("action"));
+        assertEquals("new title", template.getPayload());
     }
 
     @Test
     void randomId() {
         var added = sut.add(new Event("title"));
-        assertEquals("ABCDE", Objects.requireNonNull(added.getBody()).getId());
+        assertEquals("BCDEF", Objects.requireNonNull(added.getBody()).getId());
     }
 }
