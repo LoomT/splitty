@@ -114,6 +114,132 @@ public class ParticipantControllerTest {
     }
 
     @Test
+    void invalidRequestEvent(){
+        Participant participant = new Participant("name", null);
+        String eventIDNotExist = "event";
+        var response = partContr.add(participant, eventIDNotExist);
+        assertEquals(NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNull(){
+        Event exist = new Event("title");
+        String existID = "words";
+        exist.setId(existID);
+        eventRepo.save(exist);
+        var response = partContr.add(null, existID);
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNameNull(){
+        Event event = new Event("title");
+        event.setId("id");
+        Participant participant = new Participant();
+        eventRepo.save(event);
+        var response = partContr.add(participant, "id");
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void addParticipantNameEmpty(){
+        Event event = new Event("title");
+        event.setId("id");
+        Participant participant = new Participant("");
+        eventRepo.save(event);
+        var response = partContr.add(participant, "id");
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    void editParticipantNonExisting(){
+        Event exist = new Event("title");
+        String existID = "words";
+        exist.setId(existID);
+        eventRepo.save(exist);
+        Participant validParticipant = new Participant("name");
+        var response = partContr.editParticipantById(existID, 0, validParticipant);
+        assertEquals(NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void editParticipantInvalid(){
+        Event exist = new Event("title");
+        String existID = "words";
+        Participant existingParticipant = new Participant("name");
+        exist.addParticipant(existingParticipant);
+        exist.setId(existID);
+        eventRepo.save(exist);
+        Participant participantNameNull = new Participant();
+        Participant participantNameEmpty = new Participant("");
+        var responseNull = partContr.editParticipantById(existID, 2, null);
+        var responseNameNull = partContr.editParticipantById(existID, 2, participantNameNull);
+        var responseNameEmpty = partContr.editParticipantById(existID, 2, participantNameEmpty);
+        assertEquals(BAD_REQUEST, responseNull.getStatusCode());
+        assertEquals(BAD_REQUEST, responseNameNull.getStatusCode());
+        assertEquals(BAD_REQUEST, responseNameEmpty.getStatusCode());
+    }
+    @Test
+    void deleteParticipantNonExisting(){
+        Event exist = new Event("title");
+        String existID = "words";
+        exist.setId(existID);
+        eventRepo.save(exist);
+        var response = partContr.deleteById(0, existID);
+        assertEquals(NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void unauthorizedGetById(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("title");
+        event1.setId("id1");
+        event2.setId("id2");
+        Participant participant = new Participant("name");
+        event1.addParticipant(participant);
+        eventRepo.save(event1);
+        eventRepo.save(event2);
+        var savedSuccess = partContr.add(participant, "BCDEF");
+        var getByID401 = partContr.getById(2, "id2");
+        assertEquals(NO_CONTENT, savedSuccess.getStatusCode());
+        assertEquals(UNAUTHORIZED, getByID401.getStatusCode());
+    }
+
+    @Test
+    void unauthorizedEditById(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("title");
+        event1.setId("id1");
+        event2.setId("id2");
+        Participant participant = new Participant("old name");
+        Participant editedParticipant = new Participant("new name");
+        editedParticipant.setParticipantId(2);
+        event1.addParticipant(participant);
+        eventRepo.save(event1);
+        eventRepo.save(event2);
+        var saved = partContr.add(participant, "BCDEF");
+        var editByID401 = partContr.editParticipantById("id2", 2, editedParticipant);
+        assertEquals(NO_CONTENT, saved.getStatusCode());
+        assertEquals(UNAUTHORIZED, editByID401.getStatusCode());
+    }
+
+    @Test
+    void unauthorizedDeleteById(){
+        Event event1 = new Event("title");
+        Event event2 = new Event("title");
+        event1.setId("id1");
+        event2.setId("id2");
+        Participant participant = new Participant("old name");
+        event1.addParticipant(participant);
+        eventRepo.save(event1);
+        eventRepo.save(event2);
+        var saved = partContr.add(participant, "BCDEF");
+        var editByID401 = partContr.deleteById( 2, "id2");
+        assertEquals(NO_CONTENT, saved.getStatusCode());
+        assertEquals(UNAUTHORIZED, editByID401.getStatusCode());
+    }
+
+    @Test
     void removeWebsocket() {
         Participant participant = new Participant("name");
         partContr.add(participant, event.getId());
