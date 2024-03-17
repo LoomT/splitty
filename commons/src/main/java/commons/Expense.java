@@ -2,7 +2,7 @@ package commons;
 
 
 import jakarta.persistence.*;
-import org.jetbrains.annotations.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -31,6 +31,7 @@ public class Expense {
     @NotNull
     private String purpose;
     private double amount;
+    @Column(length = 3)
     @NotNull
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)

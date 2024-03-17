@@ -37,7 +37,7 @@ public class ServerUtils {
      */
     @Inject
     public ServerUtils(UserConfig userConfig) {
-        server = userConfig.getUrl();
+        server = "http:" + userConfig.getUrl();
     }
 
     /**

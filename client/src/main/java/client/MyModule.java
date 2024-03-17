@@ -15,13 +15,12 @@
  */
 package client;
 
+import client.scenes.MainCtrl;
 import client.scenes.StartScreenCtrl;
 import client.utils.*;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
-
-import client.scenes.MainCtrl;
 
 public class MyModule implements Module {
 
@@ -39,6 +38,6 @@ public class MyModule implements Module {
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
         binder.bind(IOInterface.class).toInstance(new FileIO(UserConfig.class.getClassLoader()
                 .getResource("client/config.properties")));
-
+        binder.bind(Websocket.class).in(Scopes.SINGLETON);
     }
 }

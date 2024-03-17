@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.WebsocketActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -99,7 +100,8 @@ public class EventController {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
                 simp.convertAndSend("/event/" + id, "delete",
-                        Map.of("action", "deleteEvent", "type", String.class.getTypeName()));
+                        Map.of("action", WebsocketActions.DELETE_EVENT,
+                                "type", String.class.getTypeName()));
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();
@@ -125,8 +127,10 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
+                repo.save(event);
                 simp.convertAndSend("/event/" + id, title,
-                        Map.of("action", "titleChange", "type", String.class.getTypeName()));
+                        Map.of("action", WebsocketActions.TITLE_CHANGE,
+                                "type", String.class.getTypeName()));
                 return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();

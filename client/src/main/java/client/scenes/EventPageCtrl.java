@@ -1,10 +1,11 @@
 package client.scenes;
 
-import client.Websocket;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import commons.WebsocketActions;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tab;
@@ -32,21 +33,26 @@ public class EventPageCtrl {
     private ChoiceBox<String> participantChoiceBox;
     private int selectedParticipantId;
 
-    private Websocket websocket;
+    private final Websocket websocket;
 
-    private ServerUtils server;
-    private MainCtrl mainCtrl;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
     private Event event;
 
     /**
      * @param server server utils injection
      * @param mainCtrl mainCtrl injection
+     * @param websocket websocket client
      */
     @Inject
-    public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl, Websocket websocket) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-        websocket = new Websocket(this);
+        this.websocket = websocket;
+        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> {
+            event.setTitle(((String)newTitle));
+            eventTitle.setText(((String)newTitle));
+        });
     }
 
     /**
@@ -91,17 +97,6 @@ public class EventPageCtrl {
 
         websocket.connect(e.getId());
     }
-
-    /**
-     * Changes the title of the event
-     *
-     * @param newTitle new title of the event
-     */
-    public void changeTitle(String newTitle) {
-        event.setTitle(newTitle);
-        eventTitle.setText(newTitle);
-    }
-
     @FXML
     private void backButtonClicked() {
         mainCtrl.showStartScreen();
