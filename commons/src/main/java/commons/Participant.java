@@ -1,11 +1,8 @@
 package commons;
-
 import jakarta.persistence.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -15,7 +12,6 @@ import java.util.Set;
  *  emailAddress: optional email address of participant which can be null
  *  expenseSet: Set of all expenses which the participant authored. (can be empty)
  *  bankAccountSet: The registered Bank Accounts for the participant. (can be empty)
- *  getter setter equals hashcode toString methods
  */
 @Entity
 public class Participant {
@@ -23,11 +19,12 @@ public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long participantId;
-    @Column(nullable = false)
     private String name;
     @Nullable
     private String emailAddress;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
+    private Set<Expense> authoredExpenseSet;
+    @OneToMany(cascade = CascadeType.ALL)
     private Set<BankAccount> bankAccountSet;
 
     /**
@@ -41,6 +38,7 @@ public class Participant {
     public Participant(String name) {
         this.name = name;
         emailAddress = null;
+        authoredExpenseSet = new HashSet<>();
         bankAccountSet = new HashSet<>();
     }
 
@@ -58,9 +56,12 @@ public class Participant {
      * @param name name of the participant
      * @param email email of the participant. Can be Null
      * @param bankAccountSet bankAccount number of the participant
+     * @param authoredExpenseSet expenses of a participant if it already had some.
      */
-    public Participant(String name, @Nullable String email, Set<BankAccount> bankAccountSet ) {
+    public Participant(String name, @Nullable String email, Set<Expense> authoredExpenseSet,
+                       Set<BankAccount> bankAccountSet ) {
         this(name, email);
+        this.authoredExpenseSet = authoredExpenseSet;
         this.bankAccountSet = bankAccountSet;
     }
 
@@ -113,6 +114,32 @@ public class Participant {
     }
 
     /**
+     * getter for expenses
+     * @return expenses
+     */
+    public Set<Expense> getAuthoredExpenseSet() {
+        return authoredExpenseSet;
+    }
+
+    /**
+     * setter for expenses
+     * @param authoredExpenseSet expenses to replace the old one
+     */
+    public void setAuthoredExpenseSet(Set<Expense> authoredExpenseSet) {
+        this.authoredExpenseSet = authoredExpenseSet;
+    }
+
+    /**
+     * Add bankAccount to bankAccountSet
+     * @param expense expense to be added
+     * @return false if bankAccount is null or already in set, true otherwise
+     */
+    public boolean addExpense(Expense expense){
+        if(expense == null) return false;
+        return authoredExpenseSet.add(expense);
+    }
+
+    /**
      * getter for bankAccountSet
      * @return bankAccountSet
      */
@@ -152,6 +179,7 @@ public class Participant {
 
         if (participantId != that.participantId || !name.equals(that.name)) return false;
         if (!Objects.equals(emailAddress, that.emailAddress)) return false;
+        if (!authoredExpenseSet.equals(that.authoredExpenseSet)) return false;
         return bankAccountSet.equals(that.bankAccountSet);
     }
 
@@ -161,7 +189,7 @@ public class Participant {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(participantId, name, emailAddress, bankAccountSet);
+        return Objects.hash(participantId);
     }
 
     /**
@@ -175,7 +203,9 @@ public class Participant {
                 ", name='" + name + '\'';
         if(emailAddress != null)
             result += ", emailAddress='" + emailAddress + '\'';
-        result += ", bankAccountSet=" + bankAccountSet + '}';
+        result += ", expenseSet=" + authoredExpenseSet +
+                ", bankAccountSet=" + bankAccountSet +
+                '}';
         return result;
     }
 }

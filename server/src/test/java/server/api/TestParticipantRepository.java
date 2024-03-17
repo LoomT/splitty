@@ -27,14 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.random.RandomGenerator;
 
 @SuppressWarnings("NullableProblems")
 public class TestParticipantRepository implements ParticipantRepository {
 
     private final List<Participant> participants = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
-    private final RandomGenerator random = new TestRandom();
 
     /**
      * @return called methods
@@ -50,12 +48,6 @@ public class TestParticipantRepository implements ParticipantRepository {
         calledMethods.add(name);
     }
 
-    /**
-     * @return participant list
-     */
-    public List<Participant> getParticipants() {
-        return participants;
-    }
     /**
      * @return all quotes
      */
@@ -92,9 +84,15 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public <S extends Participant> List<S> saveAll(Iterable<S> entities) {
-        List<S> saved = new ArrayList<>();
-        entities.forEach(e -> saved.add(save(e)));
-        return saved;
+        for(Participant part: entities){
+            for(Participant p : participants){
+                if(part.getParticipantId() == p.getParticipantId()){
+                    participants.remove(p);
+                    participants.add(part);
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -241,25 +239,14 @@ public class TestParticipantRepository implements ParticipantRepository {
         call("save");
         for(Participant e : participants){
             if(e.getParticipantId() == entity.getParticipantId()){
-                replaceFields(e, entity);
-                return (S) e;
+                participants.remove(e);
+                participants.add(entity);
+                return entity;
             }
         }
-        entity.setParticipantId(random.nextLong());
+        entity.setParticipantId(participants.size());
         participants.add(entity);
         return entity;
-    }
-
-    /**
-     * Replaces the old participant while keeping the same object address
-     *
-     * @param oldPart old participant
-     * @param newPart new participant
-     */
-    private void replaceFields(Participant oldPart, Participant newPart) {
-        oldPart.setName(newPart.getName());
-        oldPart.setEmailAddress(newPart.getEmailAddress());
-        oldPart.setBankAccountSet(newPart.getBankAccountSet());
     }
 
     /**
@@ -305,8 +292,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public void delete(Participant entity) {
-        calledMethods.add("delete");
-        participants.remove(entity);
+        // TODO Auto-generated method stub
 
     }
 
@@ -333,7 +319,8 @@ public class TestParticipantRepository implements ParticipantRepository {
      */
     @Override
     public void deleteAll() {
-        participants.clear();
+        // TODO Auto-generated method stub
+
     }
 
     /**

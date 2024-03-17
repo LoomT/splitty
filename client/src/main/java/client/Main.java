@@ -40,7 +40,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch();
     }
 
@@ -92,16 +92,23 @@ public class Main extends Application {
                 "client", "scenes", "EventPage.fxml"
         );
 
-        var adminOverview = FXML.load(
-                AdminOverviewCtrl.class,
+        var editParticipants = FXML.load(
+                EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(),
-                "client", "scenes", "AdminOverview.fxml"
+                "client", "scenes", "EditParticipants.fxml"
         );
 
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, languageConf, userConfig, start, eventPage,
-                adminLogin, adminOverview);
 
+        mainCtrl.initialize(
+                primaryStage,
+                languageConf,
+                userConfig,
+                start,
+                eventPage,
+                adminLogin,
+                editParticipants
+        );
     }
 }

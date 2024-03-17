@@ -15,20 +15,19 @@
  */
 package server.api;
 
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-import server.database.EventRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
+import commons.Event;
+import server.database.EventRepository;
 
 @SuppressWarnings("NullableProblems")
 public class TestEventRepository implements EventRepository {
@@ -37,7 +36,6 @@ public class TestEventRepository implements EventRepository {
     private final List<String> calledMethods = new ArrayList<>();
 
     private TestParticipantRepository partRepo;
-    private TestExpenseRepository expenseRepo;
 
     /**
      * default constructor
@@ -52,14 +50,6 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * @param partRepo participant repo to save participants
-     * @param expRepo expense repo
-     */
-    public TestEventRepository(TestParticipantRepository partRepo, TestExpenseRepository expRepo) {
-        this(partRepo);
-        this.expenseRepo = expRepo;
-    }
-    /**
      * @return called methods
      */
     public List<String> getCalledMethods() {
@@ -72,6 +62,7 @@ public class TestEventRepository implements EventRepository {
     private void call(String name) {
         calledMethods.add(name);
     }
+
     /**
      * @return all Events
      */
@@ -103,7 +94,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param entities to save
-     * @param <S> clas
+     * @param <S>      clas
      * @return list of saved
      */
     @Override
@@ -123,7 +114,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param entity entity
-     * @param <S> class
+     * @param <S>    class
      * @return saved entity
      */
     @Override
@@ -134,7 +125,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param entities to save
-     * @param <S> class
+     * @param <S>      class
      * @return list
      */
     @Override
@@ -208,7 +199,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S> class
+     * @param <S>     class
      * @return list
      */
     @Override
@@ -219,8 +210,8 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param sort sort
-     * @param <S> class
+     * @param sort    sort
+     * @param <S>     class
      * @return list of Events
      */
     @Override
@@ -240,10 +231,10 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * Save the event to the database, cascading changes to participants and expenses
+     * Saves an entity to the database
      *
      * @param entity to save
-     * @param <S> class of entity
+     * @param <S>    class of entity
      * @return saved entity
      */
     @Override
@@ -251,21 +242,8 @@ public class TestEventRepository implements EventRepository {
         call("save");
         events.removeIf(e -> entity.getId().equals(e.getId()));
         events.add(entity);
-        // Cascades any changes to participants and expenses
         if(partRepo != null){
-            // Deletes participants that are no longer in the event entity
-            partRepo.getParticipants().removeIf(p -> entity.getParticipants()
-                    .stream()
-                    .map(Participant::getParticipantId)
-                    .noneMatch(id -> id == p.getParticipantId()));
             partRepo.saveAll(entity.getParticipants());
-        }
-        if(expenseRepo != null) {
-            expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
-                    .stream()
-                    .mapToLong(Expense::getExpenseID)
-                    .noneMatch(id -> id == e.getExpenseID()));
-            expenseRepo.saveAll(entity.getExpenses());
         }
         return entity;
     }
@@ -345,7 +323,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S> class
+     * @param <S>     class
      * @return Event
      */
     @Override
@@ -355,9 +333,9 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * @param example entity
+     * @param example  entity
      * @param pageable p
-     * @param <S> class
+     * @param <S>      class
      * @return page
      */
     @Override
@@ -368,7 +346,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S> class
+     * @param <S>     class
      * @return count
      */
     @Override
@@ -379,7 +357,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S> class
+     * @param <S>     class
      * @return true iff exists
      */
     @Override
@@ -389,10 +367,10 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * @param example entity
+     * @param example       entity
      * @param queryFunction function
-     * @param <S> class
-     * @param <R> a
+     * @param <S>           class
+     * @param <R>           a
      * @return a
      */
     @Override
