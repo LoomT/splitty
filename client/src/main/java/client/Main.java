@@ -15,17 +15,14 @@
  */
 package client;
 
-import static com.google.inject.Guice.createInjector;
-
 import client.scenes.*;
-
-
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import com.google.inject.Injector;
-
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+import static com.google.inject.Guice.createInjector;
 
 public class Main extends Application {
 
@@ -40,7 +37,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args){
         launch();
     }
 
@@ -92,23 +89,16 @@ public class Main extends Application {
                 "client", "scenes", "EventPage.fxml"
         );
 
-        var editParticipants = FXML.load(
-                EditParticipantsCtrl.class,
+        var adminOverview = FXML.load(
+                AdminOverviewCtrl.class,
                 languageConf.getLanguageResources(),
-                "client", "scenes", "EditParticipants.fxml"
+                "client", "scenes", "AdminOverview.fxml"
         );
 
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        mainCtrl.initialize(primaryStage, languageConf, userConfig, start, eventPage,
+                adminLogin, adminOverview);
 
-        mainCtrl.initialize(
-                primaryStage,
-                languageConf,
-                userConfig,
-                start,
-                eventPage,
-                adminLogin,
-                editParticipants
-        );
     }
 }
