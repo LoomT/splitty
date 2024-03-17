@@ -139,8 +139,6 @@ public class StartScreenCtrl {
         } catch (Exception e) {
             System.out.println("Something went wrong while joining an event");
         }
-
-
     }
 
 

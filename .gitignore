@@ -30,7 +30,6 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-/.jpb/jpb-settings.xml
 
 ### NetBeans ###
 /nbproject/private/

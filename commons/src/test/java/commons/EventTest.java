@@ -27,20 +27,17 @@ public class EventTest {
     private Event event;
     private Event event1;
     private Event event2;
-    List<Participant> participantList;
-    List<Expense> expenseList;
+    List<Participant> list;
 
     @BeforeEach
     void setUp() {
-        participantList = new ArrayList<>();
-        participantList.add(new Participant());
-        expenseList = new ArrayList<>();
-        expenseList.add(new Expense());
-        event = new Event("Test Event", new ArrayList<>(), null);
+        list = new ArrayList<>();
+        list.add(new Participant());
+        event = new Event("Test Event", new ArrayList<>());
         event1 = new Event("Title", List.of(new Participant("Person1", "p1"),
-                new Participant("Person2", "p2")), null);
+                new Participant("Person2", "p2")));
         event2 = new Event("Title", List.of(new Participant("Person1", "p1"),
-                new Participant("Person2", "p2")), null);
+                new Participant("Person2", "p2")));
     }
 
     @Test
@@ -48,7 +45,7 @@ public class EventTest {
         String title = "Test Event";
         List<Participant> participants = Arrays.asList(new Participant("Person1", "p1"),
                 new Participant("Person2", "p2"));
-        Event event = new Event(title, participants, null);
+        Event event = new Event(title, participants);
         assertEquals(title, event.getTitle());
         assertEquals(participants.size(), event.getParticipants().size());
         assertTrue(event.getParticipants().containsAll(participants));
@@ -58,7 +55,7 @@ public class EventTest {
     @Test
     void testConstructorNullParticipants() {
         String title = "Test Event";
-        Event event = new Event(title, null, null);
+        Event event = new Event(title, null);
         assertNotNull(event);
         assertEquals(title, event.getTitle());
         assertNotNull(event.getParticipants());
@@ -70,7 +67,7 @@ public class EventTest {
     @Test
     void testCreationDate() {
         Event event = new Event("Test Event", List.of(
-                new Participant("John Doe", "jd")), null);
+                new Participant("John Doe", "jd")));
         assertNotNull(event.getCreationDate());
         assertTrue(event.getCreationDate().getTime() <= System.currentTimeMillis());
     }
@@ -78,14 +75,14 @@ public class EventTest {
     @Test
     public void EventGetterTest(){
         String title = "title";
-        Event test = new Event(title, null, null);
+        Event test = new Event(title, null);
         assertEquals("title", test.getTitle());
     }
 
     @Test
     public void EventSetterTest(){
         String title = "title";
-        Event test = new Event(title, null, null);
+        Event test = new Event(title, null);
         assertEquals("title", test.getTitle());
         test.setTitle("newTitle");
         assertEquals("newTitle", test.getTitle());
@@ -99,8 +96,8 @@ public class EventTest {
 
     @Test
     void testDifferentInstance() {
-        Event event1 = new Event("Title", participantList, null);
-        Event event2 = new Event("Title", participantList, null);
+        Event event1 = new Event("Title", list);
+        Event event2 = new Event("Title", list);
         assertEquals(event1, event2);
     }
 
@@ -143,9 +140,9 @@ public class EventTest {
         for(int i = 0; i<4; i++){
             testList.add(new Participant("Person"+i, "test"+i));
         }
-        Event event1 = new Event("title", null, null);
+        Event event1 = new Event("title", null);
         event1.setParticipants(testList);
-        Event event2 = new Event("title", testList, null);
+        Event event2 = new Event("title", testList);
         assertEquals(event1.getParticipants(), event2.getParticipants());
     }
 
@@ -158,57 +155,19 @@ public class EventTest {
     }
 
     @Test
-    void addingExpenseTest() {
-        Participant author = new Participant("test", "test");
-        Expense expense  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
-        event.addExpense(expense);
-        assertEquals(event.getExpenses().getFirst(), expense);
-    }
-
-    @Test
-    void settingExpenseTest(){
-        List<Expense> testList = new ArrayList<>();
-        Participant author = new Participant("test", "test");
-        for(int i = 0; i<4; i++){
-            testList.add(new Expense(author, "test" + i, 2.0, "EUR",
-                    new ArrayList<>(), "test" + i));
-        }
-        Event event1 = new Event("title", null, null);
-        event1.setExpenses(testList);
-        Event event2 = new Event("title", null, testList);
-        assertEquals(event1.getExpenses(), event2.getExpenses());
-    }
-
-    @Test
-    void testExpenseParticipant() {
-        Participant author = new Participant("test", "test");
-        Expense expense  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
-        event.addExpense(expense);
-        assertTrue(event.deleteExpense(expense));
-        assertFalse(event.getExpenses().contains(expense));
-    }
-
-    @Test
     void testDeleteNothing() {
-        Participant author = new Participant("test", "test");
-        Expense expense  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
-        assertFalse(event.deleteExpense(expense));
-        assertFalse(event.getExpenses().contains(expense));
+        Participant participant = new Participant("Person", "test");
+        event.deleteParticipant(participant);
+        assertFalse(event.getParticipants().contains(participant));
     }
 
     @Test
     void testParticipantList() {
-        Participant author = new Participant("test", "test");
-        Expense expense1  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
-        Expense expense2  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
-        event.addExpense(expense1);
-        event.addExpense(expense2);
-        event.deleteExpense(expense1);
-        assertTrue(event.getExpenses().contains(expense2) && event.getExpenses().size() == 1);
+        Participant participant1 = new Participant("Person123", "test123");
+        Participant participant2 = new Participant("Person123", "test123");
+        event.addParticipant(participant1);
+        event.addParticipant(participant2);
+        event.deleteParticipant(participant1);
+        assertTrue(event.getParticipants().contains(participant2) && event.getParticipants().size() == 1);
     }
 }
