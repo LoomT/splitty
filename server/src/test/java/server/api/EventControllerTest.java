@@ -14,7 +14,9 @@ import static org.springframework.http.HttpStatus.*;
 class EventControllerTest {
     private TestEventRepository repo;
     private EventController sut;
+
     private TestSimpMessagingTemplate template;
+
     @BeforeEach
     void setUp() {
         TestRandom random = new TestRandom();

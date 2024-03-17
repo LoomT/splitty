@@ -66,27 +66,26 @@ public class Main extends Application {
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {
         // Load all the FXML here:
-
-        //var overview = FXML.load(QuoteOverviewCtrl.class,
-        // "client", "scenes", "QuoteOverview.fxml");
-        //var add = FXML.load(AddQuoteCtrl.class, "client", "scenes", "AddQuote.fxml");
         var start = FXML.load(
                 StartScreenCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "StartScreen.fxml"
         );
-
         var adminLogin = FXML.load(
                 AdminLoginCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminLogin.fxml"
         );
-
-
         var eventPage = FXML.load(
                 EventPageCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EventPage.fxml"
+        );
+
+        var editParticipants = FXML.load(
+                EditParticipantsCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "EditParticipants.fxml"
         );
 
         var adminOverview = FXML.load(
@@ -94,11 +93,18 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
-
-
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, languageConf, userConfig, start, eventPage,
-                adminLogin, adminOverview);
+
+        mainCtrl.initialize(
+                primaryStage,
+                languageConf,
+                userConfig,
+                start,
+                eventPage,
+                adminLogin,
+                editParticipants,
+                adminOverview
+        );
 
     }
 }

@@ -134,7 +134,8 @@ public class StartScreenCtrl {
             Event joinedEvent = server.getEvent(code.getText());
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
-            System.out.println("Something went wrong while joining an event");
+            throw e;
+            //System.out.println("Something went wrong while joining an event");
         }
 
 
