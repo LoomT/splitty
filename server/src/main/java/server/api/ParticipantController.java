@@ -3,6 +3,7 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class ParticipantController {
     /**
      * Constructor with repository and random number generator injections
      *
-     * @param repo      Participant repository
+     * @param repo Participant repository
      * @param eventRepo Event repository
      * @param simp websocket object used to send updates to everyone
      */
@@ -43,9 +44,8 @@ public class ParticipantController {
      * @param partID  id of participant to search for
      * @return the requested participant entity or else a 404 'not found' response
      */
-    @GetMapping("/{partID}")
+    @GetMapping( "/{partID}")
     public ResponseEntity<Participant> getById(@PathVariable long partID,
-
                                                @PathVariable String eventID){
         try{
             Optional<Event> optionalEvent = eventRepo.findById(eventID);
@@ -59,7 +59,6 @@ public class ParticipantController {
             }
             return ResponseEntity.ok(participant);
         }catch (Exception e){
-
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -70,10 +69,10 @@ public class ParticipantController {
      * Generates an ID for the participant, adds it to the database and sends it back to the client
      *
      * @param participant to be saved to the database
-     * @param eventID     id to which the participant is to be added
+     * @param eventID id to which the participant is to be added
      * @return the saved entity with an assigned ID
      */
-    @PostMapping({"", "/"})
+    @PostMapping({ "", "/" })
     public ResponseEntity<Participant> add(@RequestBody Participant participant,
                                            @PathVariable String eventID) {
         try {
@@ -87,7 +86,8 @@ public class ParticipantController {
             event.addParticipant(participant);
             eventRepo.save(event);
             simp.convertAndSend("/event/" + eventID, participant,
-                    Map.of("action", "addParticipant", "type", Participant.class.getTypeName()));
+                    Map.of("action", WebsocketActions.ADD_PARTICIPANT,
+                            "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -98,11 +98,11 @@ public class ParticipantController {
      * Change the name of a participant
      * /api/events/{eventID}/participants/{partID}?newName={name}&newEmail={email}
      *
-     * @param eventID     id of the Event
-     * @param partID      id of the participant
+     * @param eventID id of the Event
+     * @param partID id of the participant
      * @param participant new participant to replace the old one
      * @return the participant entity with new title.
-     * or 401 if the participant is not accessible from the specified event
+     *  or 401 if the participant is not accessible from the specified event
      */
     @PutMapping("/{partID}")
     public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID,
@@ -127,7 +127,7 @@ public class ParticipantController {
 
             repo.save(participant);
             simp.convertAndSend("/event/" + eventID, participant,
-                    Map.of("action", "updateParticipant",
+                    Map.of("action", WebsocketActions.UPDATE_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -138,7 +138,7 @@ public class ParticipantController {
     /**
      * removes a participant
      *
-     * @param partID  id of participant to remove
+     * @param partID id of participant to remove
      * @param eventID id of the Event in which the participant is located at
      * @return status 204 if deleted successfully,
      * 404 if the participant and/or event does not exist or
@@ -167,7 +167,7 @@ public class ParticipantController {
             event.deleteParticipant(participant);
             eventRepo.save(event);
             simp.convertAndSend("/event/" + eventID, partID,
-                    Map.of("action", "removeParticipant",
+                    Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
                             "type", Long.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

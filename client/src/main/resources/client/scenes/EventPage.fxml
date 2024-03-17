@@ -70,11 +70,11 @@
                </padding>
             </HBox>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-              <tabs>
-                <Tab fx:id="allTab" text="%EventPage.all" />
-                <Tab fx:id="fromTab" text="From John" />
+               <tabs>
+                  <Tab fx:id="allTab" text="%EventPage.all" />
+                  <Tab fx:id="fromTab" text="From John" />
                   <Tab fx:id="includingTab" text="Including John" />
-              </tabs>
+               </tabs>
             </TabPane>
          </children>
       </VBox>

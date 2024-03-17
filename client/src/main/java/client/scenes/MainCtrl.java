@@ -33,12 +33,11 @@ public class MainCtrl {
     private LanguageConf languageConf;
 
     private AdminLoginCtrl adminLoginCtrl;
+    private EditParticipantsCtrl editParticipantsCtrl;
+    private Scene editParticipants;
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
-
-    private EditParticipantsCtrl editParticipantsCtrl;
-    private Scene editParticipants;
     private UserConfig userConfig;
 
     private Scene adminOverview;
@@ -81,12 +80,12 @@ public class MainCtrl {
         this.eventPageCtrl = eventPage.getKey();
         this.eventPage = new Scene(eventPage.getValue());
 
+
         this.editParticipantsCtrl = editParticipantsPage.getKey();
         this.editParticipants = new Scene(editParticipantsPage.getValue());
 
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
-
 
         //showOverview();
         showStartScreen();
@@ -105,7 +104,6 @@ public class MainCtrl {
 
     }
 
-
     /**
      * Display admin login
      */
@@ -122,7 +120,6 @@ public class MainCtrl {
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        primaryStage.setTitle(eventToShow.getTitle());
         primaryStage.setScene(eventPage);
     }
 

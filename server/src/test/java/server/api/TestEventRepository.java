@@ -103,7 +103,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param entities to save
-     * @param <S>      clas
+     * @param <S> clas
      * @return list of saved
      */
     @Override
@@ -123,7 +123,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param entity entity
-     * @param <S>    class
+     * @param <S> class
      * @return saved entity
      */
     @Override
@@ -134,7 +134,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param entities to save
-     * @param <S>      class
+     * @param <S> class
      * @return list
      */
     @Override
@@ -208,7 +208,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return list
      */
     @Override
@@ -219,8 +219,8 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param sort    sort
-     * @param <S>     class
+     * @param sort sort
+     * @param <S> class
      * @return list of Events
      */
     @Override
@@ -243,7 +243,7 @@ public class TestEventRepository implements EventRepository {
      * Save the event to the database, cascading changes to participants and expenses
      *
      * @param entity to save
-     * @param <S>    class of entity
+     * @param <S> class of entity
      * @return saved entity
      */
     @Override
@@ -345,7 +345,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return Event
      */
     @Override
@@ -355,9 +355,9 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * @param example  entity
+     * @param example entity
      * @param pageable p
-     * @param <S>      class
+     * @param <S> class
      * @return page
      */
     @Override
@@ -368,7 +368,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return count
      */
     @Override
@@ -379,7 +379,7 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return true iff exists
      */
     @Override
@@ -389,10 +389,10 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
-     * @param example       entity
+     * @param example entity
      * @param queryFunction function
-     * @param <S>           class
-     * @param <R>           a
+     * @param <S> class
+     * @param <R> a
      * @return a
      */
     @Override

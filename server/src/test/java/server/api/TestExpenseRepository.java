@@ -65,7 +65,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param entity entity
-     * @param <S>    class
+     * @param <S> class
      * @return saved entity
      */
     @Override
@@ -75,7 +75,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param entities to save
-     * @param <S>      class
+     * @param <S> class
      * @return list
      */
     @Override
@@ -136,7 +136,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return list
      */
     @Override
@@ -146,8 +146,8 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param example entity
-     * @param sort    sort
-     * @param <S>     class
+     * @param sort sort
+     * @param <S> class
      * @return list of Expenses
      */
     @Override
@@ -157,7 +157,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param entities to save
-     * @param <S>      class
+     * @param <S> class
      * @return list of saved entities
      */
     @Override
@@ -189,7 +189,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * Saves an entity to the database
      *
      * @param entity to save
-     * @param <S>    class of entity
+     * @param <S> class of entity
      * @return saved entity
      */
     @Override
@@ -311,7 +311,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return Expense
      */
     @Override
@@ -320,9 +320,9 @@ public class TestExpenseRepository implements ExpenseRepository {
     }
 
     /**
-     * @param example  entity
+     * @param example entity
      * @param pageable p
-     * @param <S>      class
+     * @param <S> class
      * @return page
      */
     @Override
@@ -332,7 +332,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return count
      */
     @Override
@@ -342,7 +342,7 @@ public class TestExpenseRepository implements ExpenseRepository {
 
     /**
      * @param example entity
-     * @param <S>     class
+     * @param <S> class
      * @return true if and only idf it exists
      */
     @Override
@@ -351,10 +351,10 @@ public class TestExpenseRepository implements ExpenseRepository {
     }
 
     /**
-     * @param example       entity
+     * @param example entity
      * @param queryFunction function
-     * @param <S>           class
-     * @param <R>           a
+     * @param <S> class
+     * @param <R> a
      * @return a
      */
     @Override

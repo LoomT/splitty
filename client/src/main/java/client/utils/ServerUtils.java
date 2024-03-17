@@ -15,13 +15,8 @@
  */
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
-import java.util.List;
-
-import commons.Event;
-
 import com.google.inject.Inject;
+
 
 import commons.Participant;
 
@@ -29,10 +24,18 @@ import jakarta.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.ClientConfig;
 
+import commons.Event;
+
 import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.client.ClientConfig;
+
+import java.util.List;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class ServerUtils {
 
@@ -43,7 +46,7 @@ public class ServerUtils {
      */
     @Inject
     public ServerUtils(UserConfig userConfig) {
-        server = userConfig.getUrl();
+        server = "http:" + userConfig.getUrl();
     }
 
     /**

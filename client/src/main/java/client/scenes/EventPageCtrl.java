@@ -1,155 +1,167 @@
-    package client.scenes;
-
-    import client.utils.LanguageConf;
-    import client.Websocket;
-    import client.utils.ServerUtils;
-    import com.google.inject.Inject;
-    import commons.Event;
-    import commons.Participant;
-    import javafx.fxml.FXML;
-    import javafx.scene.control.Button;
-    import javafx.scene.control.ChoiceBox;
-    import javafx.scene.control.Tab;
-    import javafx.scene.text.Text;
+package client.scenes;
 
 
-    public class EventPageCtrl {
-
-        @FXML
-        private Text eventTitle;
-
-        @FXML
-        private Text participantText;
-
-        @FXML
-        private Tab allTab;
-
-        @FXML
-        private Tab fromTab;
-
-        @FXML
-        private Tab includingTab;
-
-        @FXML
-        private ChoiceBox<String> participantChoiceBox;
-        @FXML
-        private Button addExpenseButton;
+import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import client.utils.Websocket;
+import com.google.inject.Inject;
+import commons.Event;
+import commons.Participant;
+import commons.WebsocketActions;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Tab;
+import javafx.scene.text.Text;
 
 
-        private int selectedParticipantId;
+public class EventPageCtrl {
 
-        private Websocket websocket;
+    @FXML
+    private Text eventTitle;
 
-        private ServerUtils server;
-        private MainCtrl mainCtrl;
-        private LanguageConf languageConf;
-        private Event event;
+    @FXML
+    private Text participantText;
 
-        /**
-         * @param server server utils injection
-         * @param mainCtrl mainCtrl injection
-         * @param languageConf the language config instance
-         */
-        @Inject
-        public EventPageCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
-            this.server = server;
-            this.mainCtrl = mainCtrl;
-            this.languageConf = languageConf;
-            this.websocket = new Websocket(this);
+    @FXML
+    private Tab allTab;
 
-        }
+    @FXML
+    private Tab fromTab;
 
-        /**
-         * call this function to set all the text on the eventpage to a given event
-         *
-         * @param e the event to be shown
-         */
-        public void displayEvent(Event e) {
-            this.event = e;
-            eventTitle.setText(e.getTitle());
-            participantChoiceBox.getItems().clear();
-            participantChoiceBox.setValue("");
-            if (e.getParticipants().isEmpty()) {
-                participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
-                allTab.setStyle("-fx-opacity:0");
-                allTab.setDisable(true);
-                fromTab.setStyle("-fx-opacity:0");
-                fromTab.setDisable(true);
-                includingTab.setStyle("-fx-opacity:0");
-                includingTab.setDisable(true);
-                addExpenseButton.setDisable(true);
-            } else {
-                allTab.setStyle("-fx-opacity:1");
-                allTab.setDisable(false);
-                fromTab.setStyle("-fx-opacity:1");
-                fromTab.setDisable(false);
-                includingTab.setStyle("-fx-opacity:1");
-                includingTab.setDisable(false);
-                addExpenseButton.setDisable(false);
-                StringBuilder p = new StringBuilder();
-                for (int i = 0; i < e.getParticipants().size(); i++) {
-                    p.append(e.getParticipants().get(i).getName());
-                    if (i != e.getParticipants().size() - 1) p.append(", ");
-                }
-                participantText.setText(p.toString());
+    @FXML
+    private Tab includingTab;
 
-                participantChoiceBox.getItems().addAll(
-                        e.getParticipants().stream().map(Participant::getName).toList()
-                );
-                participantChoiceBox.setValue(e.getParticipants().get(0).getName());
-                selectedParticipantId = 0;
-                String name = e.getParticipants().get(selectedParticipantId).getName();
-                fromTab.setText(languageConf.get("EventPage.from") + " " + name);
-                includingTab.setText(languageConf.get("EventPage.including") + " " + name);
-            }
-
-            participantChoiceBox.setOnAction(event -> {
-                selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
-                if (selectedParticipantId < 0) return;
-                String name = e.getParticipants().get(selectedParticipantId).getName();
-                fromTab.setText(languageConf.get("EventPage.from") + " " + name);
-                includingTab.setText(languageConf.get("EventPage.including") + " " + name);
-            });
-
-            websocket.connect(e.getId());
-        }
-
-        /**
-         * Changes the title of the event
-         *
-         * @param newTitle new title of the event
-         */
-        public void changeTitle(String newTitle) {
-            event.setTitle(newTitle);
-            eventTitle.setText(newTitle);
-        }
-
-        @FXML
-        private void backButtonClicked() {
-            websocket.disconnect();
-            mainCtrl.showStartScreen();
-        }
-
-        @FXML
-        private void tabSelectionChanged() {
-
-        }
+    @FXML
+    private ChoiceBox<String> participantChoiceBox;
+    @FXML
+    private Button addExpenseButton;
 
 
-        @FXML
-        private void sendInvitesClicked() {
+    private int selectedParticipantId;
 
-        }
+    private Websocket websocket;
 
-        @FXML
-        private void editParticipantsClicked() {
-            mainCtrl.showEditParticipantsPage(event);
-        }
+    private ServerUtils server;
+    private MainCtrl mainCtrl;
+    private LanguageConf languageConf;
+    private Event event;
 
-        @FXML
-        private void addExpenseClicked() {
+    /**
+     * @param server       server utils injection
+     * @param mainCtrl     mainCtrl injection
+     * @param languageConf the language config instance
+     * @param websocket the websocket instance
+     */
+    @Inject
+    public EventPageCtrl(
+        ServerUtils server,
+        MainCtrl mainCtrl,
+        LanguageConf languageConf,
+        Websocket websocket
+    ) {
+        this.server = server;
+        this.mainCtrl = mainCtrl;
+        this.languageConf = languageConf;
 
-        }
+        this.websocket = websocket;
+        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> {
+            event.setTitle(((String) newTitle));
+            eventTitle.setText(((String) newTitle));
+        });
 
 
     }
+
+    /**
+     * call this function to set all the text on the eventpage to a given event
+     *
+     * @param e the event to be shown
+     */
+    public void displayEvent(Event e) {
+        this.event = e;
+        eventTitle.setText(e.getTitle());
+        participantChoiceBox.getItems().clear();
+        participantChoiceBox.setValue("");
+        if (e.getParticipants().isEmpty()) {
+            participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
+            allTab.setStyle("-fx-opacity:0");
+            allTab.setDisable(true);
+            fromTab.setStyle("-fx-opacity:0");
+            fromTab.setDisable(true);
+            includingTab.setStyle("-fx-opacity:0");
+            includingTab.setDisable(true);
+            addExpenseButton.setDisable(true);
+        } else {
+            allTab.setStyle("-fx-opacity:1");
+            allTab.setDisable(false);
+            fromTab.setStyle("-fx-opacity:1");
+            fromTab.setDisable(false);
+            includingTab.setStyle("-fx-opacity:1");
+            includingTab.setDisable(false);
+            addExpenseButton.setDisable(false);
+            StringBuilder p = new StringBuilder();
+            for (int i = 0; i < e.getParticipants().size(); i++) {
+                p.append(e.getParticipants().get(i).getName());
+                if (i != e.getParticipants().size() - 1) p.append(", ");
+            }
+            participantText.setText(p.toString());
+
+            participantChoiceBox.getItems().addAll(
+                    e.getParticipants().stream().map(Participant::getName).toList()
+            );
+            participantChoiceBox.setValue(e.getParticipants().get(0).getName());
+            selectedParticipantId = 0;
+            String name = e.getParticipants().get(selectedParticipantId).getName();
+            fromTab.setText(languageConf.get("EventPage.from") + " " + name);
+            includingTab.setText(languageConf.get("EventPage.including") + " " + name);
+        }
+
+        participantChoiceBox.setOnAction(event -> {
+            selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
+            if (selectedParticipantId < 0) return;
+            String name = e.getParticipants().get(selectedParticipantId).getName();
+            fromTab.setText(languageConf.get("EventPage.from") + " " + name);
+            includingTab.setText(languageConf.get("EventPage.including") + " " + name);
+        });
+        websocket.connect(e.getId());
+    }
+
+    /**
+     * Changes the title of the event
+     *
+     * @param newTitle new title of the event
+     */
+    public void changeTitle(String newTitle) {
+        event.setTitle(newTitle);
+        eventTitle.setText(newTitle);
+    }
+
+    @FXML
+    private void backButtonClicked() {
+        websocket.disconnect();
+        mainCtrl.showStartScreen();
+    }
+
+    @FXML
+    private void tabSelectionChanged() {
+
+    }
+
+
+    @FXML
+    private void sendInvitesClicked() {
+
+    }
+
+    @FXML
+    private void editParticipantsClicked() {
+        mainCtrl.showEditParticipantsPage(event);
+    }
+
+    @FXML
+    private void addExpenseClicked() {
+
+    }
+
+}
