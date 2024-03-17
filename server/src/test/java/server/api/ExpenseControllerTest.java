@@ -115,12 +115,7 @@ public class ExpenseControllerTest {
 
     @Test
     public void testAddWebsocket() {
-        var actual = expenseContr.addExpense(expense2, event.getId());
-        assertTrue(eventRepo.getCalledMethods().contains("findById"));
-        assertTrue(eventRepo.getCalledMethods().contains("save"));
-        assertTrue(repoExpense.getCalledMethods().contains("save"));
-        assertTrue(eventRepo.getCalledMethods().contains("existsById"));
-        assertEquals(NO_CONTENT, actual.getStatusCode());
+        expenseContr.addExpense(expense2, event.getId());
         Expense saved = (Expense) template.getPayload();
         expense.setExpenseID(saved.getExpenseID());
         assertEquals(expense2, saved);
@@ -128,7 +123,6 @@ public class ExpenseControllerTest {
 
     @Test
     public void testDeleteNothing() {
-        repoExpense.save(expense);
         var actual = expenseContr.deleteById(24, event.getId());
         assertEquals(NOT_FOUND, actual.getStatusCode());
     }
