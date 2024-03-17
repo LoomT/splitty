@@ -134,6 +134,7 @@ public class Expense {
         return type;
     }
 
+
     /**
      * setter for participant
      * @param expenseAuthor
@@ -181,6 +182,7 @@ public class Expense {
     public void setExpenseID(long expenseID) {
         this.expenseID = expenseID;
     }
+
 
     /**
      * equals method
