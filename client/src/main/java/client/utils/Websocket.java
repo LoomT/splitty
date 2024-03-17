@@ -1,9 +1,10 @@
-package client;
+package client.utils;
 
-import client.scenes.EventPageCtrl;
+import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -14,31 +15,34 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class Websocket {
-    private final EventPageCtrl ctrl;
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private String url;
+    private final String url;
+    private final EnumMap<WebsocketActions, Consumer<Object>> functions;
 
     /**
      * Websocket client constructor
      *
-     * @param ctrl event page controller
+     * @param config config for url of the websocket address
      */
-    public Websocket(EventPageCtrl ctrl) {
-        this.ctrl = ctrl;
+    @Inject
+    public Websocket(UserConfig config) {
+        functions = new EnumMap<>(WebsocketActions.class);
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         List<MessageConverter> converterList = List.of(new MappingJackson2MessageConverter(),
                 new StringMessageConverter());
         stompClient.setMessageConverter(new CompositeMessageConverter(converterList));
 
-        url = "ws://localhost:8080/ws"; //TODO everything
+        this.url = "ws:" + config.getUrl() + "ws";
         sessionHandler = new MyStompSessionHandler();
     }
 
@@ -60,6 +64,26 @@ public class Websocket {
      */
     public void disconnect() {
         stompSession.disconnect();
+    }
+
+    /**
+     * Sets the function for provided name
+     * <pre>
+     * available functions:
+     * titleChange(String)
+     * deleteEvent()
+     * addParticipant(Participant)
+     * updateParticipant(Participant)
+     * removeParticipant(id)
+     * addExpense(Expense)
+     * updateExpense(Expense)
+     * removeExpense(id)
+     * </pre>
+     * @param action enum name of the function
+     * @param consumer function that consumes type of payload and payload in that order
+     */
+    public void on(WebsocketActions action, Consumer<Object> consumer) {
+        functions.put(action, consumer);
     }
 
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {
@@ -97,20 +121,8 @@ public class Websocket {
          */
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
-//            System.out.println("Received\n" + payload);
-            String action = headers.get("action").getFirst();
-            switch(action) {
-                case "titleChange" -> ctrl.changeTitle((String)payload);
-                //TODO implement these methods
-//                case "deleteEvent" -> ctrl.deleteEvent();
-//                case "addParticipant" -> ctrl.addParticipant((Participant)payload);
-//                case "updateParticipant" -> ctrl.updateParticipant((Participant)payload);
-//                case "removeParticipant" -> ctrl.removeParticipant((Long)payload);
-//                case "addExpense" -> ctrl.addExpense((Expense)payload);
-//                case "updateExpense" -> ctrl.updateExpense((Expense)payload);
-//                case "removeExpense" -> ctrl.removeExpense((Long)payload);
-                default -> System.out.println("Unknown action");
-            }
+            WebsocketActions action = WebsocketActions.valueOf(headers.get("action").getFirst());
+            functions.get(action).accept(payload);
         }
 
         @Override
