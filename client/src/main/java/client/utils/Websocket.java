@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +27,7 @@ public class Websocket {
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
     private final String url;
-    private final Map<String, Consumer<Object>> functions;
+    private final EnumMap<WebsocketActions, Consumer<Object>> functions;
 
     /**
      * Websocket client constructor
@@ -34,7 +36,7 @@ public class Websocket {
      */
     @Inject
     public Websocket(UserConfig config) {
-        functions = new HashMap<>();
+        functions = new EnumMap<>(WebsocketActions.class);
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         List<MessageConverter> converterList = List.of(new MappingJackson2MessageConverter(),
                 new StringMessageConverter());
@@ -77,10 +79,12 @@ public class Websocket {
      * updateExpense(Expense)
      * removeExpense(id)
      * </pre>
-     * @param name name of the function
+     * @param action enum name of the function
      * @param consumer function that consumes type of payload and payload in that order
      */
-    public void on(String name, Consumer<Object> consumer) {functions.put(name, consumer);}
+    public void on(WebsocketActions action, Consumer<Object> consumer) {
+        functions.put(action, consumer);
+    }
 
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
@@ -117,7 +121,7 @@ public class Websocket {
          */
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
-            String action = headers.get("action").getFirst();
+            WebsocketActions action = WebsocketActions.valueOf(headers.get("action").getFirst());
             functions.get(action).accept(payload);
         }
 

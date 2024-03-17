@@ -5,6 +5,7 @@ import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import commons.WebsocketActions;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Tab;
@@ -48,7 +49,7 @@ public class EventPageCtrl {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.websocket = websocket;
-        websocket.on("titleChange", (newTitle) -> {
+        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> {
             event.setTitle(((String)newTitle));
             eventTitle.setText(((String)newTitle));
         });
