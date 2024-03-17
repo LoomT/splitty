@@ -135,4 +135,5 @@ public class EventController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 }
