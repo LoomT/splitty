@@ -3,6 +3,7 @@ package server.api;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
 
+import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -166,7 +167,7 @@ public class ExpenseControllerTest {
         long id = ((Expense)template.getPayload()).getExpenseID();
         expenseContr.deleteById(id, event.getId());
         assertEquals(id, template.getPayload());
-        assertEquals("removeExpense", template.getHeaders().get("action"));
+        assertEquals(WebsocketActions.REMOVE_EXPENSE, template.getHeaders().get("action"));
     }
 
     @Test
