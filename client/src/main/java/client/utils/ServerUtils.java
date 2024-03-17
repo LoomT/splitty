@@ -91,7 +91,7 @@ public class ServerUtils {
     public void updateParticipant(String eventId, Participant participant) {
         ClientBuilder.newClient(new ClientConfig())
                 .target(server)
-                .path("api/events/" + eventId + "/participant/" + participant.getParticipantId())
+                .path("api/events/" + eventId + "/participants/" + participant.getParticipantId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
     }
@@ -103,7 +103,7 @@ public class ServerUtils {
     public void deleteParticipant(String eventId, String participantId) {
         ClientBuilder.newClient(new ClientConfig())
                 .target(server)
-                .path("api/events/" + eventId + "/participant/" + participantId)
+                .path("api/events/" + eventId + "/participants/" + participantId)
                 .request(APPLICATION_JSON)
                 .delete();
     }
