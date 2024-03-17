@@ -2,6 +2,7 @@ package server.api;
 
 import commons.Event;
 import commons.Expense;
+import commons.WebsocketActions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +86,8 @@ public class ExpenseController {
             optionalEvent.get().addExpense(saved);
             repoEvent.save(optionalEvent.get());
             simp.convertAndSend("/event/" + eventID, saved,
-                    Map.of("action", "addExpense", "type", Expense.class.getTypeName()));
+                    Map.of("action", WebsocketActions.ADD_EXPENSE,
+                            "type", Expense.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -119,7 +121,8 @@ public class ExpenseController {
             event.deleteExpense(expense);
             repoEvent.save(event);
             simp.convertAndSend("/event/" + eventID, id,
-                    Map.of("action", "removeExpense", "type", Long.class.getTypeName()));
+                    Map.of("action", WebsocketActions.REMOVE_EXPENSE,
+                            "type", Long.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -160,7 +163,8 @@ public class ExpenseController {
             event.addExpense(updatedExpense);
             repoEvent.save(event);
             simp.convertAndSend("/event/" + eventID, updatedExpense,
-                    Map.of("action", "updateExpense", "type", Expense.class.getTypeName()));
+                    Map.of("action", WebsocketActions.UPDATE_EXPENSE,
+                            "type", Expense.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

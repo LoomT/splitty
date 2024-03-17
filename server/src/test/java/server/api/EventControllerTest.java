@@ -2,6 +2,7 @@ package server.api;
 
 import commons.Event;
 import commons.Participant;
+import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -115,7 +116,7 @@ class EventControllerTest {
         String id = added.getBody().getId();
         sut.deleteById(id);
         assertTrue(template.getHeaders().containsKey("action"));
-        assertEquals("deleteEvent", template.getHeaders().get("action"));
+        assertEquals(WebsocketActions.DELETE_EVENT, template.getHeaders().get("action"));
         assertTrue(template.getHeaders().containsKey("type"));
         assertEquals("java.lang.String", template.getHeaders().get("type"));
     }
@@ -135,7 +136,7 @@ class EventControllerTest {
         String id = event.getId();
         sut.changeTitleById(id, "new title");
         assertEquals("/event/" + id, template.getDestination());
-        assertEquals("titleChange", template.getHeaders().get("action"));
+        assertEquals(WebsocketActions.TITLE_CHANGE, template.getHeaders().get("action"));
         assertEquals("new title", template.getPayload());
     }
 

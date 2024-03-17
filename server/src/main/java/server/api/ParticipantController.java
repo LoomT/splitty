@@ -3,6 +3,7 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +86,8 @@ public class ParticipantController {
             event.addParticipant(participant);
             eventRepo.save(event);
             simp.convertAndSend("/event/" + eventID, participant,
-                    Map.of("action", "addParticipant", "type", Participant.class.getTypeName()));
+                    Map.of("action", WebsocketActions.ADD_PARTICIPANT,
+                            "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -125,7 +127,7 @@ public class ParticipantController {
 
             repo.save(participant);
             simp.convertAndSend("/event/" + eventID, participant,
-                    Map.of("action", "updateParticipant",
+                    Map.of("action", WebsocketActions.UPDATE_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
@@ -165,7 +167,7 @@ public class ParticipantController {
             event.deleteParticipant(participant);
             eventRepo.save(event);
             simp.convertAndSend("/event/" + eventID, partID,
-                    Map.of("action", "removeParticipant",
+                    Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
                             "type", Long.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
