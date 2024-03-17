@@ -36,10 +36,10 @@ public class MainCtrl {
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
-
-    private EditParticipantsCtrl editParticipantsCtrl;
-    private Scene editParticipants;
     private UserConfig userConfig;
+
+    private Scene adminOverview;
+    private AdminOverviewCtrl adminOverviewCtrl;
 
     /**
      * Initializes the UI
@@ -49,9 +49,10 @@ public class MainCtrl {
      * @param userConfig the user configuration
      * @param startScreen controller and scene
      * @param eventPage controller and scene for eventpage
+     *
      * @param adminLogin admin login controller and scene
-     * @param editParticipantsPage controller and scene for editParticipants
-     * */
+     * @param adminOverview admin overview controller and scene
+     */
     public void initialize(
             Stage primaryStage,
             LanguageConf languageConf,
@@ -59,7 +60,7 @@ public class MainCtrl {
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
             Pair<AdminLoginCtrl, Parent> adminLogin,
-            Pair<EditParticipantsCtrl, Parent> editParticipantsPage
+            Pair<AdminOverviewCtrl, Parent> adminOverview
     ) {
 
         this.primaryStage = primaryStage;
@@ -76,8 +77,8 @@ public class MainCtrl {
         this.eventPageCtrl = eventPage.getKey();
         this.eventPage = new Scene(eventPage.getValue());
 
-        this.editParticipantsCtrl = editParticipantsPage.getKey();
-        this.editParticipants = new Scene(editParticipantsPage.getValue());
+        this.adminOverviewCtrl = adminOverview.getKey();
+        this.adminOverview = new Scene(adminOverview.getValue());
 
         //showOverview();
         showStartScreen();
@@ -96,13 +97,11 @@ public class MainCtrl {
 
     }
 
-
-
     /**
      * Display admin login
      */
     public void showAdminLogin() {
-        primaryStage.setTitle("Admin Login");
+        primaryStage.setTitle(languageConf.get("AdminLogin.title"));
         primaryStage.setScene(adminLogin);
     }
 
@@ -113,18 +112,15 @@ public class MainCtrl {
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        primaryStage.setTitle(eventToShow.getTitle());
         primaryStage.setScene(eventPage);
     }
 
     /**
-     * shows the participant editor page
-     * @param eventToShow the event to show the participant editor for
+     * shows the admin overview
      */
-    public void showEditParticipantsPage(Event eventToShow) {
-        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
-        primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
-        primaryStage.setScene(editParticipants);
+    public void showAdminOverview() {
+        primaryStage.setTitle("Admin Overview");
+        primaryStage.setScene(adminOverview);
     }
 
 

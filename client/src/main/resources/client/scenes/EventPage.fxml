@@ -1,17 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
-
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
       <Pane prefHeight="61.0" prefWidth="600.0" style="-fx-background-color: #ddd;">
@@ -21,19 +13,19 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="%EventPage.sendInvites" />
+            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="Send Invites" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
          <children>
             <HBox>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.participants">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Participants">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Text>
-                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" text="%EventPage.editParticipants">
+                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" text="Edit Participants">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -48,7 +40,7 @@
                   <Insets left="5.0" />
                </VBox.margin>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.expenses">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Expenses">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
@@ -59,7 +51,7 @@
             <HBox>
                <children>
                   <ChoiceBox fx:id="participantChoiceBox" prefWidth="150.0" />
-                  <Button fx:id="addExpenseButton" mnemonicParsing="false" onAction="#addExpenseClicked" text="%EventPage.addExpense">
+                  <Button mnemonicParsing="false" onAction="#addExpenseClicked" text="Add Expense">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
@@ -71,13 +63,13 @@
             </HBox>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
               <tabs>
-                <Tab fx:id="allTab" text="%EventPage.all" />
+                <Tab fx:id="allTab" text="All" />
                 <Tab fx:id="fromTab" text="From John" />
                   <Tab fx:id="includingTab" text="Including John" />
               </tabs>
             </TabPane>
          </children>
       </VBox>
-      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="%EventPage.back" />
+      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="Back" />
    </children>
 </AnchorPane>
