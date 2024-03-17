@@ -50,9 +50,8 @@ public class ExpenseControllerTest {
         List<Expense> temp = new ArrayList<>();
         temp.add(expense);
         event = new Event("title", expPart, temp);
-        event.setId("10");
-        eventContr.add(event);
-        expense.setEventId(event.getId());
+        var added = eventContr.add(event);
+        event = added.getBody();
     }
 
     @Test
@@ -75,7 +74,6 @@ public class ExpenseControllerTest {
     public void testGetByIdUnauthorized() {
         Expense anotherExpense = new Expense();
         anotherExpense.setExpenseID(5);
-        anotherExpense.setEventId(event.getId());
         repoExpense.save(anotherExpense);
         var actual = expenseContr.getById(anotherExpense.getExpenseID(), event.getId());
 
