@@ -40,6 +40,7 @@ public class Expense {
     private List<Participant> expenseParticipants;
     @NotNull
     private String type;
+    private String eventId;
 
     /**
      * constructor for Expense class
@@ -134,6 +135,14 @@ public class Expense {
     }
 
     /**
+     * getter for event id
+     * @return the id of the event associated with the expense
+     */
+    public String getEventId() {
+        return eventId;
+    }
+
+    /**
      * setter for participant
      * @param expenseAuthor
      */
@@ -179,6 +188,14 @@ public class Expense {
      */
     public void setExpenseID(long expenseID) {
         this.expenseID = expenseID;
+    }
+
+    /**
+     * setter for event id
+     * @param eventId
+     */
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
     }
 
     /**
