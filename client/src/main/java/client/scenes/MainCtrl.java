@@ -20,8 +20,11 @@ import client.utils.UserConfig;
 import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+
+import java.io.File;
 
 public class MainCtrl {
 
@@ -140,6 +143,16 @@ public class MainCtrl {
     public void showAdminOverview() {
         primaryStage.setTitle("Admin Overview");
         primaryStage.setScene(adminOverview);
+    }
+
+    /**
+     * Opens the system file chooser to save something
+     *
+     * @param fileChooser file chooser
+     * @return opened file
+     */
+    public File showSaveFileDialog(FileChooser fileChooser) {
+        return fileChooser.showSaveDialog(primaryStage);
     }
 
 

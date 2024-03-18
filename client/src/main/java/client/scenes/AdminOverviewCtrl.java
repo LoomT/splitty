@@ -1,13 +1,17 @@
 package client.scenes;
 
-import client.components.EventListItem;
+import client.components.EventListItemAdmin;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +21,7 @@ public class AdminOverviewCtrl {
     private final MainCtrl mainCtrl;
 
     private UserConfig userConfig;
-
+    private File initialDirectory;
 
     @FXML
     private VBox eventList;
@@ -36,7 +40,7 @@ public class AdminOverviewCtrl {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.userConfig = userConfig;
-
+        this.initialDirectory = new FileChooser().getInitialDirectory();
     }
 
 
@@ -64,42 +68,12 @@ public class AdminOverviewCtrl {
     }
 
     /**
-     * This method fetches the event codes and updates the list
-     */
-    private void reloadEventCodes() {
-        List<String> recentEventCodes = userConfig.getRecentEventCodes();
-        List<EventListItem> list = new ArrayList<>();
-        eventList.getChildren().clear();
-
-
-        for (int i = 0; i < recentEventCodes.size(); i++) {
-            int finalI = i;
-            list.add(
-                    new EventListItem(
-                            recentEventCodes.get(i),
-                            () -> {
-                                eventList.getChildren().remove(list.get(finalI));
-                            },
-                            (String c) -> {
-
-                            }));
-            eventList.getChildren().add(list.get(i));
-
-        }
-    }
-
-    /**
      * Method to get all the events into the list
      *
      */
     private void loadAllEvents() {
         List<Event> allEvents = server.getEvents(AdminLoginCtrl.getPassword());
-        List<EventListItem> list = new ArrayList<>();
-        List<String> eventTitles = new ArrayList<>();
-        for (Event e: allEvents) {
-            eventTitles.add(e.getTitle());
-
-        }
+        List<EventListItemAdmin> list = new ArrayList<>();
 
         eventList.getChildren().clear();
 
@@ -107,14 +81,42 @@ public class AdminOverviewCtrl {
         for (int i = 0; i < allEvents.size(); i++) {
             int finalI = i;
             list.add(
-                    new EventListItem(
-                            eventTitles.get(i),
-                            () -> {
-                                eventList.getChildren().remove(list.get(finalI));
-                            },
-                            (String c) -> {
+                new EventListItemAdmin(
+                    allEvents.get(i).getTitle(),
+                    allEvents.get(i).getId(),
+                    () -> {
+                        eventList.getChildren().remove(list.get(finalI));
+                    },
+                    () -> {
+                        // download the event json
+                        Event event = allEvents.get(finalI);
+                        FileChooser fileChooser = new FileChooser();
+                        FileChooser.ExtensionFilter extensionFilter =
+                                new FileChooser.ExtensionFilter("JSON files", "*.json");
+                        fileChooser.getExtensionFilters().add(extensionFilter);
+                        fileChooser.setInitialDirectory(initialDirectory);
 
-                            }));
+                        File file = mainCtrl.showSaveFileDialog(fileChooser);
+                        if(file == null) {
+                            System.out.println("Selected file is null");
+                            return;
+                        }
+                        // Save the file directory the file was saved in
+                        // to be used next time for better UX
+                        initialDirectory = file.getParentFile();
+
+                        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+                            ObjectWriter ow = new ObjectMapper().writer()
+                                    .withDefaultPrettyPrinter();
+                            String json = ow.writeValueAsString(event);
+                            writer.write(json);
+                        } catch (IOException e) {
+                            System.out.println("Failed to save the event");
+                        }
+                    },
+                    () -> {
+                        // TODO display the event
+                    }));
             eventList.getChildren().add(list.get(i));
         }
 
