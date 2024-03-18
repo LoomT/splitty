@@ -15,10 +15,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -27,7 +24,7 @@ public class Websocket {
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
     private final String url;
-    private final EnumMap<WebsocketActions, Consumer<Object>> functions;
+    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
 
     /**
      * Websocket client constructor
@@ -36,7 +33,10 @@ public class Websocket {
      */
     @Inject
     public Websocket(UserConfig config) {
+        // Initialize the enum map with all enum values
         functions = new EnumMap<>(WebsocketActions.class);
+        resetAllActions();
+
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         List<MessageConverter> converterList = List.of(new MappingJackson2MessageConverter(),
                 new StringMessageConverter());
@@ -47,6 +47,8 @@ public class Websocket {
     }
 
     /**
+     * Subscribe to updates of a particular event
+     *
      * @param eventID event id
      */
     public void connect(String eventID) {
@@ -83,7 +85,23 @@ public class Websocket {
      * @param consumer function that consumes type of payload and payload in that order
      */
     public void on(WebsocketActions action, Consumer<Object> consumer) {
-        functions.put(action, consumer);
+        functions.get(action).add(consumer);
+    }
+
+    /**
+     * Removes all listeners set for a particular action
+     *
+     * @param action websocket action to reset all listeners for
+     */
+    public void resetAction(WebsocketActions action) {
+        functions.put(action, new HashSet<>());
+    }
+
+    /**
+     * Resets all action listeners
+     */
+    public void resetAllActions() {
+        EnumSet.allOf(WebsocketActions.class).forEach(this::resetAction);
     }
 
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {
@@ -121,8 +139,13 @@ public class Websocket {
          */
         @Override
         public void handleFrame(StompHeaders headers, Object payload) {
-            WebsocketActions action = WebsocketActions.valueOf(headers.get("action").getFirst());
-            functions.get(action).accept(payload);
+            try {
+                WebsocketActions action = WebsocketActions
+                        .valueOf(headers.get("action").getFirst());
+                functions.get(action).forEach(consumer -> consumer.accept(payload));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Server sent an unknown action");
+            }
         }
 
         @Override
