@@ -14,13 +14,17 @@ public class AdminController {
 
     private final EventRepository repo;
 
+    private final AdminService admS;
+
 
     /**
      * Constructor with repository injection
      * @param repo Event repository
+     * @param adminService Admin service
      */
-    public AdminController(EventRepository repo) {
+    public AdminController(EventRepository repo, AdminService adminService) {
         this.repo = repo;
+        this.admS = adminService;
     }
 
 
@@ -34,7 +38,7 @@ public class AdminController {
 
     @PostMapping("/admin/verify")
     public ResponseEntity<String> verifyPassword(@RequestBody String inputPassword) {
-        boolean isValid = AdminService.verifyPassword(inputPassword);
+        boolean isValid = admS.verifyPassword(inputPassword);
         if (isValid) {
             return ResponseEntity.ok("Password is correct.");
         } else {
@@ -51,7 +55,7 @@ public class AdminController {
     @GetMapping ("admin/events")
     public ResponseEntity<List<Event>> getAll(@RequestHeader("Authorization")
                                                   String inputPassword) {
-        boolean isValid = AdminService.verifyPassword(inputPassword);
+        boolean isValid = admS.verifyPassword(inputPassword);
         if (isValid) {
             return ResponseEntity.ok(repo.findAll());
         } else {
