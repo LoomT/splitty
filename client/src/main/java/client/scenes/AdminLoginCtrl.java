@@ -20,8 +20,6 @@ public class AdminLoginCtrl {
     @FXML
     private Button loginButton;
 
-    private static String password;
-
     /**
      * adminLogin screen controller constructor
      *
@@ -54,21 +52,11 @@ public class AdminLoginCtrl {
     @FXML
     private void loginButtonClicked() {
         String password = passwordTextField.getText();
-        AdminLoginCtrl.password = password;
         if (server.verifyPassword(password)) {
-            mainCtrl.showAdminOverview();
+            mainCtrl.showAdminOverview(password);
         } else {
             passwordLabel.setText("Incorrect password");
         }
-    }
-
-    /**
-     * Getter for the password
-     *
-     * @return String
-     */
-    public static String getPassword() {
-        return password;
     }
 
 }
