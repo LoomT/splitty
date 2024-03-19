@@ -139,8 +139,10 @@ public class MainCtrl {
 
     /**
      * shows the admin overview
+     * @param password admin password
      */
-    public void showAdminOverview() {
+    public void showAdminOverview(String password) {
+        adminOverviewCtrl.loadAllEvents(password);
         primaryStage.setTitle("Admin Overview");
         primaryStage.setScene(adminOverview);
     }

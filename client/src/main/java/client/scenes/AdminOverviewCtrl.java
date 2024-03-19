@@ -25,6 +25,7 @@ public class AdminOverviewCtrl {
 
     @FXML
     private VBox eventList;
+    private String password;
 
 
     /**
@@ -52,27 +53,34 @@ public class AdminOverviewCtrl {
     private void initialize() {
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     /**
      * Method to handle the refresh button click
      *
      */
     @FXML
     private void refreshButtonClicked() {
-        loadAllEvents();
+        loadAllEvents(password);
     }
 
 
+    /**
+     * Show admin login screen when back button is clicked
+     */
     @FXML
     private void backButtonClicked() {
-        mainCtrl.showStartScreen();
+        mainCtrl.showAdminLogin();
     }
 
     /**
      * Method to get all the events into the list
      *
      */
-    private void loadAllEvents() {
-        List<Event> allEvents = server.getEvents(AdminLoginCtrl.getPassword());
+    public void loadAllEvents(String password) {
+        List<Event> allEvents = server.getEvents(password);
         List<EventListItemAdmin> list = new ArrayList<>();
 
         eventList.getChildren().clear();
