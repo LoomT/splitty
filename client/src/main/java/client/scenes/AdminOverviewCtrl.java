@@ -41,7 +41,7 @@ public class AdminOverviewCtrl {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.userConfig = userConfig;
-        this.initialDirectory = null;
+        this.initialDirectory = userConfig.getInitialExportDirectory();
     }
 
 
@@ -95,35 +95,7 @@ public class AdminOverviewCtrl {
                     allEvents.get(i).getTitle(),
                     allEvents.get(i).getId(),
                     () -> eventList.getChildren().remove(list.get(finalI)),
-                    () -> {
-                        // download the event json
-                        Event event = allEvents.get(finalI);
-                        FileChooser fileChooser = new FileChooser();
-                        FileChooser.ExtensionFilter extensionFilter =
-                                new FileChooser.ExtensionFilter("JSON files", "*.json");
-                        fileChooser.getExtensionFilters().add(extensionFilter);
-                        if(initialDirectory != null && initialDirectory.exists())
-                            fileChooser.setInitialDirectory(initialDirectory);
-                        else initialDirectory = null;
-
-                        File file = mainCtrl.showSaveFileDialog(fileChooser);
-                        if(file == null) {
-                            System.out.println("Selected file is null");
-                            return;
-                        }
-                        // Save the file directory the file was saved in
-                        // to be used next time for better UX
-                        initialDirectory = file.getParentFile();
-
-                        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
-                            ObjectWriter ow = new ObjectMapper().writer()
-                                    .withDefaultPrettyPrinter();
-                            String json = ow.writeValueAsString(event);
-                            writer.write(json);
-                        } catch (IOException e) {
-                            System.out.println("Failed to save the event");
-                        }
-                    },
+                    () -> eventExportHandler(allEvents.get(finalI)),
                     () -> {
                         // TODO display the event
                     }));
@@ -132,5 +104,40 @@ public class AdminOverviewCtrl {
 
     }
 
+    /**
+     * Prompts the user with the file chooser
+     * and exports the event in JSON to the selected file
+     *
+     * @param event event to export
+     */
+    public void eventExportHandler(Event event) {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter =
+                new FileChooser.ExtensionFilter("JSON files", "*.json");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        if(initialDirectory != null && initialDirectory.exists())
+            fileChooser.setInitialDirectory(initialDirectory);
+        else initialDirectory = null;
+
+        File file = mainCtrl.showSaveFileDialog(fileChooser);
+        if(file == null) {
+            System.out.println("No file selected");
+            return;
+        }
+        // Save the file directory the file was saved in
+        // to be used next time for better UX
+        initialDirectory = file.getParentFile();
+        // persist the export directory
+        userConfig.setInitialExportDirectory(initialDirectory);
+
+        try (Writer writer = new BufferedWriter(new FileWriter(file))) {
+            ObjectWriter ow = new ObjectMapper().writer()
+                    .withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(event);
+            writer.write(json);
+        } catch (IOException e) {
+            System.out.println("Failed to save the event");
+        }
+    }
 
 }
