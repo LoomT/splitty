@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Text?>
+
+
+<BorderPane fx:id="errorPopupPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="110.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.ErrorPopupCtrl">
+   <top>
+      <AnchorPane prefHeight="25.0" prefWidth="250.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" layoutX="60.0" prefHeight="25.0" prefWidth="140.0">
+               <children>
+                  <Text fx:id="errorHeader" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
+   </top>
+   <left>
+      <Pane prefHeight="96.0" prefWidth="96.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="errorImage" fitHeight="96.0" fitWidth="96.0" layoutX="1.0" layoutY="-5.0">
+               <image>
+                  <Image url="@icons8-error-96.png" />
+               </image>
+            </ImageView>
+         </children>
+      </Pane>
+   </left>
+   <center>
+      <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" prefHeight="45.0" prefWidth="154.0">
+               <children>
+                  <Text fx:id="errorDescription" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+               </children>
+            </HBox>
+         </children>
+      </Pane>
+   </center>
+</BorderPane>
