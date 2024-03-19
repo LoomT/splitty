@@ -53,6 +53,9 @@ public class AdminOverviewCtrl {
     private void initialize() {
     }
 
+    /**
+     * @param password the admin password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
@@ -63,7 +66,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void refreshButtonClicked() {
-        loadAllEvents(password);
+        loadAllEvents();
     }
 
 
@@ -77,9 +80,8 @@ public class AdminOverviewCtrl {
 
     /**
      * Method to get all the events into the list
-     *
      */
-    public void loadAllEvents(String password) {
+    public void loadAllEvents() {
         List<Event> allEvents = server.getEvents(password);
         List<EventListItemAdmin> list = new ArrayList<>();
 

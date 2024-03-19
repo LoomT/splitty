@@ -53,7 +53,7 @@ public class MainCtrl {
      * @param languageConf         the language config
      * @param userConfig           the user configuration
      * @param startScreen          controller and scene
-     * @param eventPage            controller and scene for eventpage
+     * @param eventPage            controller and scene for event page
      * @param adminLogin           admin login controller and scene
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
@@ -142,7 +142,8 @@ public class MainCtrl {
      * @param password admin password
      */
     public void showAdminOverview(String password) {
-        adminOverviewCtrl.loadAllEvents(password);
+        adminOverviewCtrl.setPassword(password);
+        adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle("Admin Overview");
         primaryStage.setScene(adminOverview);
     }
