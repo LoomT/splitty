@@ -20,7 +20,7 @@ public class AdminOverviewCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
 
-    private UserConfig userConfig;
+    private final UserConfig userConfig;
     private File initialDirectory;
 
     @FXML
@@ -41,7 +41,7 @@ public class AdminOverviewCtrl {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.userConfig = userConfig;
-        this.initialDirectory = new FileChooser().getInitialDirectory();
+        this.initialDirectory = null;
     }
 
 
@@ -94,9 +94,7 @@ public class AdminOverviewCtrl {
                 new EventListItemAdmin(
                     allEvents.get(i).getTitle(),
                     allEvents.get(i).getId(),
-                    () -> {
-                        eventList.getChildren().remove(list.get(finalI));
-                    },
+                    () -> eventList.getChildren().remove(list.get(finalI)),
                     () -> {
                         // download the event json
                         Event event = allEvents.get(finalI);
@@ -104,7 +102,9 @@ public class AdminOverviewCtrl {
                         FileChooser.ExtensionFilter extensionFilter =
                                 new FileChooser.ExtensionFilter("JSON files", "*.json");
                         fileChooser.getExtensionFilters().add(extensionFilter);
-                        fileChooser.setInitialDirectory(initialDirectory);
+                        if(initialDirectory != null && initialDirectory.exists())
+                            fileChooser.setInitialDirectory(initialDirectory);
+                        else initialDirectory = null;
 
                         File file = mainCtrl.showSaveFileDialog(fileChooser);
                         if(file == null) {
