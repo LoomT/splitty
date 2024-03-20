@@ -111,6 +111,7 @@ public class AdminOverviewCtrl {
                 throw new RuntimeException(e);
             }
         }
+        loadAllEvents();
     }
 
     /**
