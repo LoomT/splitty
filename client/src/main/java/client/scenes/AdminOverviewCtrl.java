@@ -96,7 +96,10 @@ public class AdminOverviewCtrl {
                     allEvents.get(i).getId(),
                     () -> {
                         int status = server.deleteEvent(allEvents.get(finalI).getId());
-                        if(status != 204) System.out.println("Server did not delete the event " + status);
+                        if(status != 204) {
+                            System.out.println("Server did not delete the event " + status);
+                            // TODO maybe trow an error message or smth
+                        }
                         allEvents.remove(finalI);
                         eventList.getChildren().remove(list.get(finalI));
                     },

@@ -65,6 +65,12 @@ public class ServerUtils {
                 .post(Entity.entity(event, APPLICATION_JSON), Event.class);
     }
 
+    /**
+     * Sends a delete request for event
+     *
+     * @param id event id
+     * @return status code
+     */
     public int deleteEvent(String id) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("api/events/" + id)
