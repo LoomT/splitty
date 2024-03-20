@@ -2,19 +2,23 @@ package server;
 
 import org.springframework.stereotype.Component;
 
-import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.random.RandomGenerator;
 
 @Component
 public class AdminService {
 
     private final String adminPassword;
 
+    private final RandomGenerator random;
+
 
     /**
      * Constructor for AdminService
+     * @param random RandomGenerator
      */
-    public AdminService() {
+    public AdminService(RandomGenerator random) {
+        this.random = random;
         adminPassword = generateAdminPassword();
     }
 
@@ -25,8 +29,7 @@ public class AdminService {
      * @return the generated password
      */
 
-    static String generateAdminPassword() {
-        SecureRandom random = new SecureRandom();
+    String generateAdminPassword() {
         byte[] bytes = new byte[24];
         random.nextBytes(bytes);
         String password = Base64.getEncoder().encodeToString(bytes);
@@ -56,6 +59,12 @@ public class AdminService {
         return adminServiceAttribute.equals(inputPassword);
     }
 
-
-
+    /**
+     * Getter for RandomGenerator
+     *
+     * @return RandomGenerator
+     */
+    public RandomGenerator getRandom() {
+        return random;
+    }
 }

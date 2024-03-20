@@ -2,8 +2,14 @@ package server.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ContextConfiguration;
 import server.AdminService;
+
+import java.security.SecureRandom;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -12,9 +18,14 @@ public class AdminControllerTest {
 
     private AdminController adminController;
 
+    private AdminService adminService;
+
+
     @BeforeEach
     public void setUp() {
-        adminController = new AdminController(null, new AdminService());
+        TestRandom random = new TestRandom();
+        adminService = new AdminService(random);
+        adminController = new AdminController(null, adminService);
     }
 
     @Test
