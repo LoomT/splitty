@@ -127,6 +127,13 @@ public class Expense {
     }
 
     /**
+     * @param newParticipants expense participant list to set
+     */
+    public void setExpenseParticipants(List<Participant> newParticipants) {
+        expenseParticipants = newParticipants;
+    }
+
+    /**
      * getter for type
      * @return the type of expense
      */
