@@ -30,7 +30,7 @@ public class AdminControllerTest {
 
     @Test
     public void testVerifyPasswordOk() {
-        String testPassword = adminController.getAdmS().getAdminPassword();
+        String testPassword = adminService.getAdminPassword();
 
         ResponseEntity<String> response = adminController.verifyPassword(testPassword);
 

@@ -61,13 +61,4 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
-
-    /**
-     * Getter for the admin service
-     * @return the admin service
-     */
-
-    public AdminService getAdmS() {
-        return admS;
-    }
 }

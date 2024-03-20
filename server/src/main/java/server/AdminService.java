@@ -58,13 +58,4 @@ public class AdminService {
 
         return adminServiceAttribute.equals(inputPassword);
     }
-
-    /**
-     * Getter for RandomGenerator
-     *
-     * @return RandomGenerator
-     */
-    public RandomGenerator getRandom() {
-        return random;
-    }
 }
