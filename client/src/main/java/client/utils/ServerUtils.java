@@ -16,16 +16,8 @@
 package client.utils;
 
 import com.google.inject.Inject;
-
-
-import commons.Participant;
-
-import jakarta.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientConfig;
-
 import commons.Event;
-
+import commons.Participant;
 import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -176,5 +168,22 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Event>>() {
                 });
+    }
+
+    /**
+     * Sends an API call to add the event
+     * The ids of expenses and participants gets reassigned so use the returned event!
+     *
+     * @param password admin password
+     * @param event event to import
+     * @return imported event
+     */
+    public Event importEvent(String password, Event event) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("admin/events")
+                .request(APPLICATION_JSON)
+                .header("Authorization", password)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(event, APPLICATION_JSON), Event.class);
     }
 }

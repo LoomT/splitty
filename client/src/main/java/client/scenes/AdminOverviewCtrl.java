@@ -4,6 +4,7 @@ import client.components.EventListItemAdmin;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
@@ -76,6 +77,40 @@ public class AdminOverviewCtrl {
     @FXML
     private void backButtonClicked() {
         mainCtrl.showAdminLogin();
+    }
+
+    /**
+     * Opens the file chooser and imports the selected JSON files as events
+     */
+    @FXML
+    private void importButtonClicked() {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extensionFilter =
+                new FileChooser.ExtensionFilter("JSON files", "*.json");
+        fileChooser.getExtensionFilters().add(extensionFilter);
+        if(initialDirectory != null && initialDirectory.exists())
+            fileChooser.setInitialDirectory(initialDirectory);
+        else initialDirectory = null;
+
+        List<File> files = mainCtrl.showOpenMultipleFileDialog(fileChooser);
+
+        if(files == null) {
+            System.out.println("No files selected");
+            return;
+        }
+
+        ObjectReader reader = new ObjectMapper().reader().forType(Event.class);
+        for(File file : files) {
+            try {
+                Event event = reader.readValue(file);
+                Event saved = server.importEvent(password, event);
+                if(!event.equals(saved)) {
+                    System.out.println("Saved event " + event.getId() + " is different");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**
