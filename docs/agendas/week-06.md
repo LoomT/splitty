@@ -1,11 +1,11 @@
-| Key | Value           |
-| --- |-----------------|
-| Date: | 19/03/2024      |
-| Time: | 13:45           |
-| Location: | Flux Hall B     |
-| Chair | Kajus Kuncaitis |
-| Minute Taker | Thomas          |
-| Attendees: | to be filled in |
+| Key | Value                                    |
+| --- |------------------------------------------|
+| Date: | 19/03/2024                               |
+| Time: | 13:45                                    |
+| Location: | Flux Hall B                              |
+| Chair | Kajus Kuncaitis                          |
+| Minute Taker | Thomas                                   |
+| Attendees: | Kajus, Thomas, Liam, Güney, Bogdan, Adam |
 ### Agenda Items:
 - ##### Intro (3 min)
   - Opening by chair (1 min)
