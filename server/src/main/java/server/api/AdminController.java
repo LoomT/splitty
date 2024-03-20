@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +21,13 @@ public class AdminController {
     /**
      * Constructor with repository injection
      * @param repo Event repository
-     * @param adminService Admin service
+     * @param admS Admin service
      */
-    public AdminController(EventRepository repo, AdminService adminService) {
+    @Autowired
+    public AdminController(EventRepository repo, AdminService admS) {
         this.repo = repo;
-        this.admS = adminService;
+        this.admS = admS;
     }
-
-
-
 
     /**
      * Verify the input password
@@ -61,5 +60,14 @@ public class AdminController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+    }
+
+    /**
+     * Getter for the admin service
+     * @return the admin service
+     */
+
+    public AdminService getAdmS() {
+        return admS;
     }
 }

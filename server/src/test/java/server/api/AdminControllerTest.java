@@ -2,27 +2,24 @@ package server.api;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.springframework.http.ResponseEntity;
 import server.AdminService;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.MockitoAnnotations.openMocks;
 
 @SuppressWarnings("deprecation")
 public class AdminControllerTest {
 
-    @InjectMocks
     private AdminController adminController;
 
     @BeforeEach
     public void setUp() {
-        openMocks(this);
+        adminController = new AdminController(null, new AdminService());
     }
 
     @Test
     public void testVerifyPasswordOk() {
-        String testPassword = AdminService.getAdminPassword();
+        String testPassword = adminController.getAdmS().getAdminPassword();
 
         ResponseEntity<String> response = adminController.verifyPassword(testPassword);
 
