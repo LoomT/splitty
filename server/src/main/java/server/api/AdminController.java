@@ -1,6 +1,9 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,12 +52,17 @@ public class AdminController {
     /**
      * Adds the event to the database.
      * Manually reassigns participant instances in expenses to the ones in the participant list
-     * because the repository treats them as separate entities otherwise.
+     * because the repository treats them as separate entities otherwise.<p>
      * The ids of participants and expenses get reassigned!
      *
      * @param inputPassword admin password
      * @param event event to import
-     * @return imported event
+     * @return
+     * Returns 200 ok with saved event in body if successful<p>
+     * Returns 400 bad request if a participant in an expense is missing from the participant list<p>
+     * Returns 401 unauthorized if password is incorrect<p>
+     * Returns 409 conflict if an event with the same id already exists<p>
+     * Returns 500 server error if something terrible happens<p>
      */
     @PostMapping("/admin/events")
     public ResponseEntity<Event> addEvent(@RequestHeader("Authorization") String inputPassword,
@@ -62,6 +70,8 @@ public class AdminController {
         if(!admS.verifyPassword(inputPassword))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         try {
+            if(repo.existsById(event.getId()))
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             List<Participant> participants = event.getParticipants();
             for(Expense expense : event.getExpenses()) {
                 Optional<Participant> newExpenseAuthor = participants.stream()
@@ -90,6 +100,9 @@ public class AdminController {
             }
             Event saved = repo.save(event);
             return ResponseEntity.ok(saved);
+
+        } catch (MissingResourceException e) {
+            return ResponseEntity.badRequest().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
