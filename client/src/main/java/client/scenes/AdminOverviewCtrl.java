@@ -11,6 +11,7 @@ import commons.Event;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -79,40 +80,7 @@ public class AdminOverviewCtrl {
         mainCtrl.showAdminLogin();
     }
 
-    /**
-     * Opens the file chooser and imports the selected JSON files as events
-     */
-    @FXML
-    private void importButtonClicked() {
-        FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extensionFilter =
-                new FileChooser.ExtensionFilter("JSON files", "*.json");
-        fileChooser.getExtensionFilters().add(extensionFilter);
-        if(initialDirectory != null && initialDirectory.exists())
-            fileChooser.setInitialDirectory(initialDirectory);
-        else initialDirectory = null;
 
-        List<File> files = mainCtrl.showOpenMultipleFileDialog(fileChooser);
-
-        if(files == null) {
-            System.out.println("No files selected");
-            return;
-        }
-
-        ObjectReader reader = new ObjectMapper().reader().forType(Event.class);
-        for(File file : files) {
-            try {
-                Event event = reader.readValue(file);
-                Event saved = server.importEvent(password, event);
-                if(!event.equals(saved)) {
-                    System.out.println("Saved event " + event.getId() + " is different");
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        loadAllEvents();
-    }
 
     /**
      * Method to get all the events into the list
@@ -122,7 +90,6 @@ public class AdminOverviewCtrl {
         List<EventListItemAdmin> list = new ArrayList<>();
 
         eventList.getChildren().clear();
-
 
         for (int i = 0; i < allEvents.size(); i++) {
             int finalI = i;
@@ -141,12 +108,12 @@ public class AdminOverviewCtrl {
     }
 
     /**
-     * Prompts the user with the file chooser
-     * and exports the event in JSON to the selected file
+     * Initializes the file chooser with json extension filter
+     * and the initial directory
      *
-     * @param event event to export
+     * @return file chooser
      */
-    public void eventExportHandler(Event event) {
+    private @NotNull FileChooser initFileChooser() {
         FileChooser fileChooser = new FileChooser();
         FileChooser.ExtensionFilter extensionFilter =
                 new FileChooser.ExtensionFilter("JSON files", "*.json");
@@ -154,6 +121,17 @@ public class AdminOverviewCtrl {
         if(initialDirectory != null && initialDirectory.exists())
             fileChooser.setInitialDirectory(initialDirectory);
         else initialDirectory = null;
+        return fileChooser;
+    }
+
+    /**
+     * Prompts the user with the file chooser
+     * and exports the event in JSON to the selected file
+     *
+     * @param event event to export
+     */
+    public void eventExportHandler(Event event) {
+        FileChooser fileChooser = initFileChooser();
 
         File file = mainCtrl.showSaveFileDialog(fileChooser);
         if(file == null) {
@@ -176,4 +154,38 @@ public class AdminOverviewCtrl {
         }
     }
 
+    /**
+     * Opens the file chooser and imports the selected JSON files as events
+     */
+    @FXML
+    private void importButtonClicked() {
+        FileChooser fileChooser = initFileChooser();
+
+        List<File> files = mainCtrl.showOpenMultipleFileDialog(fileChooser);
+
+        if(files == null) {
+            System.out.println("No files selected");
+            return;
+        }
+        // Get distinct parent directory of opened files
+        List<File> parents = files.stream().map(File::getParentFile).distinct().toList();
+        // If all files were opened from the same directory
+        // save that file directory to be used next time for better UX
+        if(parents.size() == 1) {
+            initialDirectory = parents.getFirst();
+            // persist the directory
+            userConfig.setInitialExportDirectory(initialDirectory);
+        }
+
+        ObjectReader reader = new ObjectMapper().reader().forType(Event.class);
+        for(File file : files) {
+            try {
+                Event event = reader.readValue(file);
+                server.importEvent(password, event);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        loadAllEvents();
+    }
 }
