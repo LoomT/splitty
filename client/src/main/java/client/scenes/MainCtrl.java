@@ -17,6 +17,8 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
+import client.utils.Websocket;
+import com.google.inject.Inject;
 import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -45,6 +47,16 @@ public class MainCtrl {
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
+    private Websocket websocket;
+
+    /**
+     * @param websocket the websocket instance
+     */
+    @Inject
+    public MainCtrl(Websocket websocket) {
+        this.websocket = websocket;
+
+    }
 
     /**
      * Initializes the UI
@@ -122,6 +134,8 @@ public class MainCtrl {
      */
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
+        websocket.disconnect();
+        websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         primaryStage.setScene(eventPage);
     }

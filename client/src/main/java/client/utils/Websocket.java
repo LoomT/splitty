@@ -5,6 +5,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
+import javafx.application.Platform;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -65,6 +66,7 @@ public class Websocket {
      * Disconnect the websocket from the server
      */
     public void disconnect() {
+        if (stompSession == null) return;
         stompSession.disconnect();
     }
 
@@ -142,7 +144,17 @@ public class Websocket {
             try {
                 WebsocketActions action = WebsocketActions
                         .valueOf(headers.get("action").getFirst());
-                functions.get(action).forEach(consumer -> consumer.accept(payload));
+                functions.get(action).forEach(consumer -> {
+                    // This is necessary to run the Javafx updates on the same
+                    // thread as the app is run on, and not the WS thread
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            consumer.accept(payload);
+                        }
+                    });
+                });
+
             } catch (IllegalArgumentException e) {
                 System.out.println("Server sent an unknown action");
             }
