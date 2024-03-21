@@ -2,9 +2,11 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import commons.WebsocketActions;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -32,6 +34,8 @@ public class EditParticipantsCtrl {
     private ServerUtils server;
     private MainCtrl mainCtrl;
     private LanguageConf languageConf;
+    private Websocket websocket;
+    private String previousEventId = "";
 
     /**
      * @param server       serverutils instance
@@ -39,10 +43,12 @@ public class EditParticipantsCtrl {
      * @param languageConf the language config instance
      */
     @Inject
-    public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
+    public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf, Websocket websocket) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
+        this.websocket = websocket;
+
 
     }
 
@@ -86,6 +92,57 @@ public class EditParticipantsCtrl {
             }
         });
 
+    }
+
+    private void registerParticipantChangeListener() {
+        if (previousEventId.equals(event.getId())) return;
+        previousEventId = event.getId();
+        websocket.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
+        websocket.resetAction(WebsocketActions.ADD_PARTICIPANT);
+        websocket.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
+
+        websocket.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part)->{
+            Participant p = (Participant) part;
+            int index = -1;
+            for (int i = 0; i < event.getParticipants().size(); i++) {
+                Participant curr = event.getParticipants().get(i);
+                if (curr.getParticipantId() == p.getParticipantId()) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The updated participant's ID ("
+                        + p.getParticipantId()+
+                        ") does not match with any ID's of the already existing participants");
+            }
+            event.getParticipants().remove(index);
+            event.getParticipants().add(index, p);
+            displayEditParticipantsPage(event);
+        });
+        websocket.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
+            Participant p = (Participant) part;
+            event.getParticipants().add(p);
+            displayEditParticipantsPage(event);
+        });
+        websocket.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
+            long partId = (long) part;
+            int index = -1;
+            for (int i = 0; i < event.getParticipants().size(); i++) {
+                Participant curr = event.getParticipants().get(i);
+                if (curr.getParticipantId() == partId) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The deleted participant's ID ("
+                        + partId+
+                        ") does not match with any ID's of the already existing participants");
+            }
+            event.getParticipants().remove(index);
+            displayEditParticipantsPage(event);
+        });
     }
 
     private void resetFields() {
