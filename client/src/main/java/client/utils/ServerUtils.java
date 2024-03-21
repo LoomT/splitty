@@ -178,12 +178,12 @@ public class ServerUtils {
      * @param event event to import
      * @return imported event
      */
-    public Event importEvent(String password, Event event) {
+    public Response importEvent(String password, Event event) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("admin/events")
                 .request(APPLICATION_JSON)
                 .header("Authorization", password)
                 .accept(APPLICATION_JSON)
-                .post(Entity.entity(event, APPLICATION_JSON), Event.class);
+                .post(Entity.entity(event, APPLICATION_JSON));
     }
 }

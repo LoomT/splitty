@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
+import jakarta.ws.rs.core.Response;
 import javafx.fxml.FXML;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -181,7 +182,17 @@ public class AdminOverviewCtrl {
         for(File file : files) {
             try {
                 Event event = reader.readValue(file);
-                server.importEvent(password, event);
+                Response response = server.importEvent(password, event);
+                switch (response.getStatus()) {
+                    case 400 -> {
+                        System.out.println("Missing participants from the participant list");
+                        // TODO display an error message that the JSON file is incorrect
+                    }
+                    case 409 -> {
+                        System.out.println("Event already exists in the database");
+                        // TODO maybe show this error to the client in the UI
+                    }
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
