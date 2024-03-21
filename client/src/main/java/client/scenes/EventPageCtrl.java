@@ -125,7 +125,6 @@ public class EventPageCtrl {
                 if (i != e.getParticipants().size() - 1) p.append(", ");
             }
             participantText.setText(p.toString());
-
             participantChoiceBox.getItems().addAll(
                     e.getParticipants().stream().map(Participant::getName).toList()
             );
@@ -135,13 +134,16 @@ public class EventPageCtrl {
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
         }
-
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
             if (selectedParticipantId < 0) return;
             String name = e.getParticipants().get(selectedParticipantId).getName();
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
+            fromListView.getItems().clear();
+            includingListView.getItems().clear();
+            createExpensesFrom(e, name);
+            createExpensesIncluding(e, name);
         });
         websocket.connect(e.getId());
     }
@@ -153,6 +155,9 @@ public class EventPageCtrl {
     public void displayExpenses(Event e) {
         String selectedName = extractSelectedName();
         tabSelectionChanged(e, selectedName);
+
+//        createExpensesFrom(e, selectedName);
+//        createExpensesIncluding(e, selectedName);
     }
 
 
@@ -190,9 +195,13 @@ public class EventPageCtrl {
 
                 if (selectedTab == allTab) {
                     createAllExpenses(e);
+                    createExpensesFrom(e, selectedParticipantName);
+                    createExpensesIncluding(e, selectedParticipantName);
                 } else if (selectedTab == fromTab) {
+                    fromListView.getItems().clear();
                     createExpensesFrom(e, selectedParticipantName);
                 } else if (selectedTab == includingTab) {
+                    includingListView.getItems().clear();
                     createExpensesIncluding(e, selectedParticipantName);
                 }
 
@@ -340,6 +349,7 @@ public class EventPageCtrl {
      * @return the name
      */
     public String extractSelectedName() {
+        System.out.println(participantChoiceBox.getValue());
         return participantChoiceBox.getValue();
     }
 
