@@ -31,8 +31,8 @@ public class AdminOverviewCtrl {
     /**
      * adminOverview screen controller constructor
      *
-     * @param server   utils
-     * @param mainCtrl main scene controller
+     * @param server     utils
+     * @param mainCtrl   main scene controller
      * @param userConfig the user configuration
      */
     @Inject
@@ -47,7 +47,6 @@ public class AdminOverviewCtrl {
 
     /**
      * This method is called when the fxml is loaded
-     *
      */
     @FXML
     private void initialize() {
@@ -62,7 +61,6 @@ public class AdminOverviewCtrl {
 
     /**
      * Method to handle the refresh button click
-     *
      */
     @FXML
     private void refreshButtonClicked() {
@@ -87,21 +85,27 @@ public class AdminOverviewCtrl {
 
         eventList.getChildren().clear();
 
-
         for (int i = 0; i < allEvents.size(); i++) {
             int finalI = i;
             list.add(
                 new EventListItemAdmin(
                     allEvents.get(i).getTitle(),
                     allEvents.get(i).getId(),
-                    () -> eventList.getChildren().remove(list.get(finalI)),
+                    () -> {
+                        int status = server.deleteEvent(allEvents.get(finalI).getId());
+                        if(status != 204) {
+                            System.out.println("Server did not delete the event " + status);
+                            // TODO maybe trow an error message or smth
+                        }
+                        allEvents.remove(finalI);
+                        eventList.getChildren().remove(list.get(finalI));
+                    },
                     () -> eventExportHandler(allEvents.get(finalI)),
                     () -> {
                         // TODO display the event
                     }));
             eventList.getChildren().add(list.get(i));
         }
-
     }
 
     /**
@@ -115,12 +119,12 @@ public class AdminOverviewCtrl {
         FileChooser.ExtensionFilter extensionFilter =
                 new FileChooser.ExtensionFilter("JSON files", "*.json");
         fileChooser.getExtensionFilters().add(extensionFilter);
-        if(initialDirectory != null && initialDirectory.exists())
+        if (initialDirectory != null && initialDirectory.exists())
             fileChooser.setInitialDirectory(initialDirectory);
         else initialDirectory = null;
 
         File file = mainCtrl.showSaveFileDialog(fileChooser);
-        if(file == null) {
+        if (file == null) {
             System.out.println("No file selected");
             return;
         }
@@ -139,5 +143,4 @@ public class AdminOverviewCtrl {
             System.out.println("Failed to save the event");
         }
     }
-
 }
