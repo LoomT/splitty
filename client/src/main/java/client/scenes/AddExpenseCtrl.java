@@ -1,0 +1,238 @@
+package client.scenes;
+
+import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import com.google.inject.Inject;
+import commons.Event;
+import commons.Participant;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.*;
+import javafx.scene.text.TextFlow;
+import commons.Expense;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AddExpenseCtrl {
+    private boolean splitAll;
+
+    @FXML
+    private ChoiceBox<String> expenseAuthor;
+
+    @FXML
+    private TextField purpose;
+
+    @FXML
+    private TextField amount;
+
+    @FXML
+    private ChoiceBox<String> currency;
+
+    @FXML
+    private DatePicker date;
+
+    @FXML
+    private CheckBox equalSplit;
+
+    @FXML
+    private CheckBox partialSplit;
+
+    @FXML
+    private TextFlow expenseParticipants;
+
+    @FXML
+    private ChoiceBox<String> type;
+
+    @FXML
+    private Button abort;
+
+    @FXML
+    private Button add;
+
+    private ServerUtils server;
+    private MainCtrl mainCtrl;
+    private LanguageConf languageConf;
+    private Expense expense;
+    private List<Participant> selectedParticipants = new ArrayList<>();
+
+    /**
+     * @param server   serverutils instance
+     * @param mainCtrl main control instance
+
+     */
+    @Inject
+    public AddExpenseCtrl(ServerUtils server, MainCtrl mainCtrl) {
+        this.server = server;
+        this.mainCtrl = mainCtrl;
+    }
+
+    /**
+     * Method for displaying the page with a blank expense.
+     * @param event the event page to return to
+     */
+    public void displayAddExpensePage(Event event) {
+        populateAuthorChoiceBox(event);
+        populateTypeBox();
+        purpose.clear();
+        amount.clear();
+        populateCurrencyChoiceBox();
+        date.setValue(LocalDate.now());
+        splitAll = false;
+
+        populateSplitPeople(event);
+
+
+        equalSplit.setOnAction(e -> {
+            if (equalSplit.isSelected()) {
+                splitAll = true;
+                partialSplit.setSelected(false);
+                disablePartialSplitCheckboxes(true);
+            }
+        });
+
+        partialSplit.setOnAction(e -> {
+            if (partialSplit.isSelected()) {
+                splitAll = false;
+                equalSplit.setSelected(false);
+                disablePartialSplitCheckboxes(false);
+            }
+        });
+
+
+        add.setOnAction(x -> {
+            boolean addedExpense = handleAddButton(event);
+            if (addedExpense) {
+                mainCtrl.showEventPage(event);
+            } else {
+            }
+            mainCtrl.showEventPage(event);
+
+            resetExpenseFields();
+        });
+
+        abort.setOnAction(x -> mainCtrl.showEventPage(event));
+
+    }
+
+    /**
+     * @param event
+     * Fill the choices for the author of the expense.
+     */
+    public void populateAuthorChoiceBox(Event event) {
+        if (expenseAuthor.getItems().size() == 0) {
+            expenseAuthor
+                .getItems()
+                .addAll(
+                    event.getParticipants()
+                            .stream()
+                            .map(Participant::getName)
+                            .toList()
+                );
+        }
+
+    }
+
+    /**
+     * Fill the choices with currency.
+     */
+    public void populateCurrencyChoiceBox() {
+        List<String> currencies = new ArrayList<>();
+        currencies.add("USD");
+        currencies.add("EUR");
+        currencies.add("GBP");
+        currencies.add("JPY");
+        currency.getItems().clear();
+        currency.getItems().addAll(currencies);
+    }
+
+
+    /**
+     * Behavior for add button.
+     * @param ev
+     * @return true if added succesfully, false otherwise
+     */
+    public boolean handleAddButton(Event ev) {
+        LocalDate expDate = date.getValue();
+        String expPurpose = purpose.getText();
+        String selectedParticipantName = expenseAuthor.getValue();
+        Participant selectedParticipant = ev.getParticipants().stream()
+                .filter(participant -> participant.getName().equals(selectedParticipantName))
+                .findFirst().orElse(null);
+        if (selectedParticipant == null) {
+            return false;
+        }
+
+        double expAmount = Double.parseDouble(amount.getText());
+        String expCurrency = currency.getValue();
+        List<Participant> expPart = new ArrayList<>();
+
+        expPart.add(selectedParticipant);
+
+        String expType = type.getValue();
+        Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+                expCurrency, expPart, expType);
+        ev.getExpenses().add(expense);
+        return true;
+    }
+
+
+
+    /**
+     * show corresponding tags for expense
+     */
+    public void populateTypeBox() {
+        if (type.getItems().isEmpty()) {
+            type.getItems().add("food");
+            type.getItems().add("entrance fees");
+            type.getItems().add("travel");
+        }
+    }
+
+    /**
+     * populate the split people list
+     * @param event
+     */
+    public void populateSplitPeople(Event event) {
+        expenseParticipants.getChildren().clear();
+        selectedParticipants.clear();
+
+        for (Participant participant : event.getParticipants()) {
+            CheckBox checkBox = new CheckBox(participant.getName());
+            checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    selectedParticipants.add(participant);
+                } else {
+                    selectedParticipants.remove(participant);
+                }
+            });
+            expenseParticipants.getChildren().add(checkBox);
+        }
+    }
+
+    private void disablePartialSplitCheckboxes(boolean disable) {
+        for (Node node : expenseParticipants.getChildren()) {
+            if (node instanceof CheckBox) {
+                CheckBox checkBox = (CheckBox) node;
+                checkBox.setDisable(disable);
+            }
+        }
+    }
+
+    /**
+     * Reset all the fields of an expense after adding it.
+     *
+     */
+    private void resetExpenseFields() {
+        purpose.clear();
+        amount.clear();
+        currency.getSelectionModel().clearSelection();
+        date.setValue(LocalDate.now());
+        expenseAuthor.getSelectionModel().clearSelection();
+        equalSplit.setSelected(false);
+        partialSplit.setSelected(false);
+        selectedParticipants.clear();
+        type.getSelectionModel().clearSelection();
+    }
+}

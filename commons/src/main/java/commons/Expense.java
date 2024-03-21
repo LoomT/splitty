@@ -213,4 +213,14 @@ public class Expense {
         return Objects.hash(expenseID, expenseAuthor, purpose,
                 amount, currency, date, expenseParticipants, type);
     }
+
+    /**
+     * return form for displaying the expenses
+     * @return human readable form
+     */
+    public String toString() {
+        String rez = String.valueOf(getDate());
+        rez += "  " + expenseAuthor.getName() + " paid " + amount + "€ for" + purpose;
+        return rez;
+    }
 }

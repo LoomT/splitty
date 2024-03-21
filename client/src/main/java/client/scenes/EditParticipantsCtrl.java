@@ -118,9 +118,9 @@ public class EditParticipantsCtrl {
 
         if (index < 0) return;
         if (index == 0) {
-            // create a new participant
             Participant newP = new Participant(name, email);
             server.createParticipant(event.getId(), newP);
+            resetFields();
         } else {
             Participant currP = event.getParticipants().get(index - 1);
             currP.setName(name);
