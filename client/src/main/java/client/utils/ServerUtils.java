@@ -16,16 +16,8 @@
 package client.utils;
 
 import com.google.inject.Inject;
-
-
-import commons.Participant;
-
-import jakarta.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientConfig;
-
 import commons.Event;
-
+import commons.Participant;
 import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -71,6 +63,19 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(event, APPLICATION_JSON), Event.class);
+    }
+
+    /**
+     * Sends a delete request for event
+     *
+     * @param id event id
+     * @return status code
+     */
+    public int deleteEvent(String id) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("api/events/" + id)
+                .request(APPLICATION_JSON)
+                .delete().getStatus();
     }
 
     /**

@@ -95,7 +95,7 @@ public class EventController {
      * @return status 204 if deleted successfully or 404 if the event does not exist
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Event> deleteById(@PathVariable("id") String id) {
+    public ResponseEntity<Event> deleteById(@PathVariable String id) {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
