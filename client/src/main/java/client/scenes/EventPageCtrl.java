@@ -128,8 +128,7 @@ public class EventPageCtrl {
             }
             participantText.setText(p.toString());
             participantChoiceBox.getItems().addAll(
-                    e.getParticipants().stream().map(Participant::getName).toList()
-            );
+                    e.getParticipants().stream().map(Participant::getName).toList());
             participantChoiceBox.setValue(e.getParticipants().get(0).getName());
             selectedParticipantId = 0;
             String name = e.getParticipants().get(selectedParticipantId).getName();
