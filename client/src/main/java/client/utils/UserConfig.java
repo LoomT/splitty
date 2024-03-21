@@ -2,7 +2,10 @@ package client.utils;
 
 import com.google.inject.Inject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -56,6 +59,25 @@ public class UserConfig {
         configProperties.setProperty("lang", lang);
         try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed language to " + lang);
+        }
+    }
+
+    /**
+     * @return directory the event was saved to the previous time
+     */
+    public File getInitialExportDirectory() {
+        return new File(configProperties.getProperty("initialExportDirectory",  null));
+    }
+
+    /**
+     * @param directory file directory to save the path of
+     */
+    public void setInitialExportDirectory(File directory) {
+        configProperties.setProperty("initialExportDirectory", directory.getAbsolutePath());
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed export dir to " + directory.getAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("Failed to save config when updating export directory");
         }
     }
 
