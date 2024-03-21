@@ -20,6 +20,7 @@ import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Participant;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
@@ -137,6 +138,20 @@ public class MainCtrl {
         websocket.disconnect();
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
+        for (Participant p :
+                eventToShow.getParticipants()) {
+            System.out.println(p.getParticipantId() + " " + p.getName());
+
+
+        }
+        primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * this method is used to switch back to the event
+     * page from the participant/expense editors
+     */
+    public void goBackToEventPage() {
         primaryStage.setScene(eventPage);
     }
 
