@@ -41,9 +41,15 @@ public class EditParticipantsCtrl {
      * @param server       serverutils instance
      * @param mainCtrl     main control instance
      * @param languageConf the language config instance
+     * @param websocket    the websocket instance
      */
     @Inject
-    public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf, Websocket websocket) {
+    public EditParticipantsCtrl(
+            ServerUtils server,
+            MainCtrl mainCtrl,
+            LanguageConf languageConf,
+            Websocket websocket
+    ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
@@ -101,7 +107,7 @@ public class EditParticipantsCtrl {
         websocket.resetAction(WebsocketActions.ADD_PARTICIPANT);
         websocket.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
 
-        websocket.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part)->{
+        websocket.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -113,7 +119,7 @@ public class EditParticipantsCtrl {
             }
             if (index == -1) {
                 throw new RuntimeException("The updated participant's ID ("
-                        + p.getParticipantId()+
+                        + p.getParticipantId() +
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);
@@ -137,7 +143,7 @@ public class EditParticipantsCtrl {
             }
             if (index == -1) {
                 throw new RuntimeException("The deleted participant's ID ("
-                        + partId+
+                        + partId +
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);

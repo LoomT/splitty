@@ -46,7 +46,7 @@ public class EventPageCtrl {
     private MainCtrl mainCtrl;
     private LanguageConf languageConf;
     private Event event;
-    private String previousEventId = "";
+
 
 
     /**
@@ -129,8 +129,6 @@ public class EventPageCtrl {
      * Registers all the change listeners on WS if they're not registered already
      */
     private void registerParticipantChangeListener() {
-        //if (previousEventId.equals(event.getId())) return;
-        //previousEventId = event.getId();
         websocket.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
         websocket.resetAction(WebsocketActions.ADD_PARTICIPANT);
         websocket.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
