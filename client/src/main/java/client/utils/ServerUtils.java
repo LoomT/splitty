@@ -66,6 +66,19 @@ public class ServerUtils {
     }
 
     /**
+     * Sends a delete request for event
+     *
+     * @param id event id
+     * @return status code
+     */
+    public int deleteEvent(String id) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("api/events/" + id)
+                .request(APPLICATION_JSON)
+                .delete().getStatus();
+    }
+
+    /**
      * @param eventId     tbe event in which the participant should be created
      * @param participant the participant to be created
      */

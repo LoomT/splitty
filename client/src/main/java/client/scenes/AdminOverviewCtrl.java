@@ -34,8 +34,8 @@ public class AdminOverviewCtrl {
     /**
      * adminOverview screen controller constructor
      *
-     * @param server   utils
-     * @param mainCtrl main scene controller
+     * @param server     utils
+     * @param mainCtrl   main scene controller
      * @param userConfig the user configuration
      */
     @Inject
@@ -50,7 +50,6 @@ public class AdminOverviewCtrl {
 
     /**
      * This method is called when the fxml is loaded
-     *
      */
     @FXML
     private void initialize() {
@@ -65,7 +64,6 @@ public class AdminOverviewCtrl {
 
     /**
      * Method to handle the refresh button click
-     *
      */
     @FXML
     private void refreshButtonClicked() {
@@ -80,8 +78,6 @@ public class AdminOverviewCtrl {
     private void backButtonClicked() {
         mainCtrl.showAdminLogin();
     }
-
-
 
     /**
      * Method to get all the events into the list
@@ -98,7 +94,15 @@ public class AdminOverviewCtrl {
                 new EventListItemAdmin(
                     allEvents.get(i).getTitle(),
                     allEvents.get(i).getId(),
-                    () -> eventList.getChildren().remove(list.get(finalI)),
+                    () -> {
+                        int status = server.deleteEvent(allEvents.get(finalI).getId());
+                        if(status != 204) {
+                            System.out.println("Server did not delete the event " + status);
+                            // TODO maybe trow an error message or smth
+                        }
+                        allEvents.remove(finalI);
+                        eventList.getChildren().remove(list.get(finalI));
+                    },
                     () -> eventExportHandler(allEvents.get(finalI)),
                     () -> {
                         // TODO display the event
@@ -119,7 +123,7 @@ public class AdminOverviewCtrl {
         FileChooser.ExtensionFilter extensionFilter =
                 new FileChooser.ExtensionFilter("JSON files", "*.json");
         fileChooser.getExtensionFilters().add(extensionFilter);
-        if(initialDirectory != null && initialDirectory.exists())
+        if (initialDirectory != null && initialDirectory.exists())
             fileChooser.setInitialDirectory(initialDirectory);
         else initialDirectory = null;
         return fileChooser;
@@ -135,7 +139,7 @@ public class AdminOverviewCtrl {
         FileChooser fileChooser = initFileChooser();
 
         File file = mainCtrl.showSaveFileDialog(fileChooser);
-        if(file == null) {
+        if (file == null) {
             System.out.println("No file selected");
             return;
         }
