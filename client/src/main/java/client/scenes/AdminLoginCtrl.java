@@ -11,13 +11,6 @@ public class AdminLoginCtrl {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
-
-    @FXML
-    private Label usernameLabel;
-
-    @FXML
-    private TextField usernameTextField;
-
     @FXML
     private Label passwordLabel;
 
@@ -40,19 +33,31 @@ public class AdminLoginCtrl {
         this.mainCtrl = mainCtrl;
     }
 
+
+
+    /**
+     * Method to handle the back button click
+     *
+     */
     @FXML
-    private void initialize() {
-        setupListeners();
+    private void backButtonClicked() {
+        mainCtrl.showStartScreen();
     }
 
-    private void setupListeners() {
-        loginButton.setOnAction(event -> login());
-    }
 
-    private void login() {
+    /**
+     * Method to handle the login button click
+     *
+     */
+    @FXML
+    private void loginButtonClicked() {
         String password = passwordTextField.getText();
-
-
+        if (server.verifyPassword(password)) {
+            mainCtrl.showAdminOverview(password);
+        } else {
+            passwordLabel.setText("Incorrect password");
+        }
     }
+
 }
 

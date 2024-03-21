@@ -1,10 +1,14 @@
 package server.api;
 
 import commons.Event;
+import commons.WebsocketActions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
 
@@ -13,16 +17,21 @@ import java.util.random.RandomGenerator;
 public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
+    private final SimpMessagingTemplate simp;
 
     /**
      * Constructor with repository and random number generator injections
      *
      * @param repo Event repository
      * @param random A random number generator
+     * @param simp websocket object used to send updates to everyone
      */
-    public EventController(EventRepository repo, RandomGenerator random) {
+    @Autowired
+    public EventController(EventRepository repo, RandomGenerator random,
+                           SimpMessagingTemplate simp) {
         this.repo = repo;
         this.random = random;
+        this.simp = simp;
     }
 
     /**
@@ -90,7 +99,10 @@ public class EventController {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
-                return ResponseEntity.status(204).build();
+                simp.convertAndSend("/event/" + id, "delete",
+                        Map.of("action", WebsocketActions.DELETE_EVENT,
+                                "type", String.class.getTypeName()));
+                return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
@@ -115,11 +127,16 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
-                return ResponseEntity.ok(repo.save(event));
+                repo.save(event);
+                simp.convertAndSend("/event/" + id, title,
+                        Map.of("action", WebsocketActions.TITLE_CHANGE,
+                                "type", String.class.getTypeName()));
+                return ResponseEntity.noContent().build();
             }
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
+
 }

@@ -15,27 +15,25 @@
  */
 package server.api;
 
+import commons.Expense;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import server.database.ExpenseRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
 
-
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-
-
-import commons.Expense;
-import server.database.ExpenseRepository;
-
-
+@SuppressWarnings("NullableProblems")
 public class TestExpenseRepository implements ExpenseRepository {
     private final List<Expense> expenses = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
+    private final TestRandom random = new TestRandom();
 
     /**
      * @return called methods
@@ -51,6 +49,12 @@ public class TestExpenseRepository implements ExpenseRepository {
         calledMethods.add(name);
     }
 
+    /**
+     * @return expense list
+     */
+    public List<Expense> getExpenses() {
+        return expenses;
+    }
     /**
      * flush
      */
@@ -127,6 +131,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public Expense getReferenceById(Long id) {
+        call("getReferenceById");
         return null;
     }
 
@@ -158,7 +163,9 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public <S extends Expense> List<S> saveAll(Iterable<S> entities) {
-        return null;
+        List<S> saved = new ArrayList<>();
+        entities.forEach(e -> saved.add(save(e)));
+        return saved;
     }
 
     /**
@@ -189,8 +196,33 @@ public class TestExpenseRepository implements ExpenseRepository {
     @Override
     public <S extends Expense> S save(S entity) {
         call("save");
+        // check if there is already an expense with the same id and overwrite it if yes
+        for(Expense e : expenses) {
+            if(e.getExpenseID() == entity.getExpenseID()) {
+                replaceFields(e, entity);
+                return (S) e;
+            }
+        }
+        // if it's a new expense, generate an id and save
+        entity.setExpenseID(random.nextLong());
         expenses.add(entity);
         return entity;
+    }
+
+    /**
+     * Replaces the old expense while keeping the same object address
+     *
+     * @param oldExp old expense
+     * @param newExp new expense
+     */
+    private void replaceFields(Expense oldExp, Expense newExp) {
+        oldExp.setAmount(newExp.getAmount());
+        oldExp.setCurrency(newExp.getCurrency());
+        oldExp.setExpenseAuthor(newExp.getExpenseAuthor());
+        oldExp.setPurpose(newExp.getPurpose());
+        oldExp.setType(newExp.getType());
+        oldExp.getExpenseParticipants().clear();
+        oldExp.getExpenseParticipants().addAll(newExp.getExpenseParticipants());
     }
 
     /**
@@ -199,6 +231,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public Optional<Expense> findById(Long id) {
+        call("findById");
         return expenses.stream().filter(e -> e.getExpenseID() == id).findAny();
     }
 
@@ -257,7 +290,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public void deleteAll() {
-
+        expenses.clear();
     }
 
     /**

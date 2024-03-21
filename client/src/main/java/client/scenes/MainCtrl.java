@@ -20,8 +20,11 @@ import client.utils.UserConfig;
 import commons.Event;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+
+import java.io.File;
 
 public class MainCtrl {
 
@@ -33,21 +36,27 @@ public class MainCtrl {
     private LanguageConf languageConf;
 
     private AdminLoginCtrl adminLoginCtrl;
+    private EditParticipantsCtrl editParticipantsCtrl;
+    private Scene editParticipants;
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
     private UserConfig userConfig;
 
+    private Scene adminOverview;
+    private AdminOverviewCtrl adminOverviewCtrl;
+
     /**
      * Initializes the UI
      *
-     * @param primaryStage stage
-     * @param languageConf the language config
-     * @param userConfig the user configuration
-     * @param startScreen controller and scene
-     * @param eventPage controller and scene for eventpage
-     *
-     * @param adminLogin admin login controller and scene
+     * @param primaryStage         stage
+     * @param languageConf         the language config
+     * @param userConfig           the user configuration
+     * @param startScreen          controller and scene
+     * @param eventPage            controller and scene for event page
+     * @param adminLogin           admin login controller and scene
+     * @param editParticipantsPage controller and scene for editParticipants
+     * @param adminOverview        admin overview controller and scene
      */
     public void initialize(
             Stage primaryStage,
@@ -55,7 +64,9 @@ public class MainCtrl {
             UserConfig userConfig,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
-            Pair<AdminLoginCtrl, Parent> adminLogin
+            Pair<AdminLoginCtrl, Parent> adminLogin,
+            Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
+            Pair<AdminOverviewCtrl, Parent> adminOverview
     ) {
 
         this.primaryStage = primaryStage;
@@ -71,6 +82,13 @@ public class MainCtrl {
 
         this.eventPageCtrl = eventPage.getKey();
         this.eventPage = new Scene(eventPage.getValue());
+
+
+        this.editParticipantsCtrl = editParticipantsPage.getKey();
+        this.editParticipants = new Scene(editParticipantsPage.getValue());
+
+        this.adminOverviewCtrl = adminOverview.getKey();
+        this.adminOverview = new Scene(adminOverview.getValue());
 
         //showOverview();
         showStartScreen();
@@ -93,18 +111,51 @@ public class MainCtrl {
      * Display admin login
      */
     public void showAdminLogin() {
-        primaryStage.setTitle("Admin Login");
+        primaryStage.setTitle(languageConf.get("AdminLogin.title"));
         primaryStage.setScene(adminLogin);
     }
 
     /**
      * shows the event page
+     *
      * @param eventToShow the event to display
      */
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * shows the participant editor page
+     *
+     * @param eventToShow the event to show the participant editor for
+     */
+    public void showEditParticipantsPage(Event eventToShow) {
+        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
+        primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
+        primaryStage.setScene(editParticipants);
+    }
+
+    /**
+     * shows the admin overview
+     * @param password admin password
+     */
+    public void showAdminOverview(String password) {
+        adminOverviewCtrl.setPassword(password);
+        adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
+        primaryStage.setTitle("Admin Overview");
+        primaryStage.setScene(adminOverview);
+    }
+
+    /**
+     * Opens the system file chooser to save something
+     *
+     * @param fileChooser file chooser
+     * @return opened file
+     */
+    public File showSaveFileDialog(FileChooser fileChooser) {
+        return fileChooser.showSaveDialog(primaryStage);
     }
 
 

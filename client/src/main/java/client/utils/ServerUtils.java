@@ -15,20 +15,27 @@
  */
 package client.utils;
 
-import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-
-import java.util.List;
-
-import commons.Event;
-
 import com.google.inject.Inject;
 
+
+import commons.Participant;
+
+import jakarta.ws.rs.core.Response;
+
 import org.glassfish.jersey.client.ClientConfig;
+
+import commons.Event;
 
 import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.client.ClientConfig;
+
+import java.util.List;
+
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class ServerUtils {
 
@@ -39,7 +46,7 @@ public class ServerUtils {
      */
     @Inject
     public ServerUtils(UserConfig userConfig) {
-        server = userConfig.getUrl();
+        server = "http:" + userConfig.getUrl();
     }
 
     /**
@@ -67,13 +74,49 @@ public class ServerUtils {
     }
 
     /**
-     * Sends an API call to server for quotes
+     * @param eventId     tbe event in which the participant should be created
+     * @param participant the participant to be created
+     */
+    public void createParticipant(String eventId, Participant participant) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("api/events/" + eventId + "/participants")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
+    }
+
+    /**
+     * @param eventId     the event in which the participant should be updated
+     * @param participant the participant to be updated
+     */
+    public void updateParticipant(String eventId, Participant participant) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventId + "/participants/" + participant.getParticipantId())
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
+    }
+
+    /**
+     * @param eventId       the event in which the participant should be deleted
+     * @param participantId the participant to be deleted
+     */
+    public void deleteParticipant(String eventId, String participantId) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventId + "/participants/" + participantId)
+                .request(APPLICATION_JSON)
+                .delete();
+    }
+
+    /**
+     * S ends an API call to server for quotes
      *
      * @return all quotes
      */
     public List<Quote> getQuotes() {
         return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("api/quotes") //
+                .target(server)
+                .path("api/quotes") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Quote>>() {
@@ -92,5 +135,46 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    }
+
+
+
+
+    /**
+     * Verify the input password
+     * @param inputPassword the password to verify
+     * @return boolean
+     */
+
+    public boolean verifyPassword(String inputPassword) {
+        Response response = ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/verify") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(inputPassword, APPLICATION_JSON));
+
+
+        boolean isValid = response.getStatus() == Response.Status.OK.getStatusCode();
+
+        response.close();
+
+        return isValid;
+    }
+
+
+    /**
+     * Sends an API call to server for events
+     * @param inputPassword the password to verify
+     *
+     * @return all quotes
+     */
+    public List<Event> getEvents(String inputPassword) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/events") //
+                .request(APPLICATION_JSON) //
+                .header("Authorization", inputPassword)
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Event>>() {
+                });
     }
 }

@@ -6,14 +6,11 @@ import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import com.google.inject.Inject;
 import commons.Event;
-
-
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +134,8 @@ public class StartScreenCtrl {
             Event joinedEvent = server.getEvent(code.getText());
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
-            System.out.println("Something went wrong while joining an event");
+            throw e;
+            //System.out.println("Something went wrong while joining an event");
         }
 
 
