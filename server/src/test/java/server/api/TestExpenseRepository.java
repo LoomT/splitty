@@ -218,13 +218,11 @@ public class TestExpenseRepository implements ExpenseRepository {
         // check if the participants in expense are in the event
         Set<Long> participantIds = event.getParticipants().stream()
                 .map(Participant::getId).collect(Collectors.toSet());
-        for(Expense expense : event.getExpenses()) {
-            if(!participantIds.contains(expense.getExpenseAuthor().getId()))
+        if(!participantIds.contains(entity.getExpenseAuthor().getId()))
+            return null;
+        for(Participant expenseParticipant : entity.getExpenseParticipants()) {
+            if(!participantIds.contains(expenseParticipant.getId()))
                 return null;
-            for(Participant expenseParticipant : expense.getExpenseParticipants()) {
-                if(!participantIds.contains(expenseParticipant.getId()))
-                    return null;
-            }
         }
 
         // check if there is already an expense with the same id and overwrite it if yes

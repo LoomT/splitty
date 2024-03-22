@@ -23,10 +23,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
-import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +39,9 @@ public class TestParticipantRepository implements ParticipantRepository {
     private final RandomGenerator random = new TestRandom();
     private TestEventRepository eventRepo = null;
 
+    /**
+     * @param repo event repo
+     */
     public void setEventRepo(TestEventRepository repo) {
         eventRepo = repo;
     }

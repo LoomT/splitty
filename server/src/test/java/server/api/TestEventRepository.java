@@ -72,6 +72,9 @@ public class TestEventRepository implements EventRepository {
         return calledMethods;
     }
 
+    /**
+     * @return events in repo
+     */
     public List<Event> getEvents() {
         return events;
     }
