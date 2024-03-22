@@ -90,8 +90,13 @@ public class Websocket {
         functions.get(action).add(consumer);
     }
 
+
     /**
      * Registers all the change listeners on WS if they're not registered already
+     * @param event the event in which we listen on the participant changes
+     * @param updatePartCallback this is called when a participant in the event is updated
+     * @param addPartCallback this is called when a participant in the event is created
+     * @param deletePartCallback this is called when a participant in the event is deleted
      */
     public void registerParticipantChangeListener(
             Event event,

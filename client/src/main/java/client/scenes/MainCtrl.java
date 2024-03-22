@@ -150,6 +150,7 @@ public class MainCtrl {
     /**
      * this method is used to switch back to the event
      * page from the participant/expense editors
+     * @param event the event to show
      */
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
