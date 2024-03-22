@@ -41,7 +41,7 @@ public class Event {
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
     private List<Participant> participants;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "event_id")

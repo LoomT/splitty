@@ -96,7 +96,7 @@ public class ServerUtils {
     public void updateParticipant(String eventId, Participant participant) {
         ClientBuilder.newClient(new ClientConfig())
                 .target(server)
-                .path("api/events/" + eventId + "/participants/" + participant.getParticipantId())
+                .path("api/events/" + eventId + "/participants/" + participant.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
     }
