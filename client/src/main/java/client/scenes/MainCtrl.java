@@ -17,7 +17,10 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
+import client.utils.Websocket;
+import com.google.inject.Inject;
 import commons.Event;
+import commons.Participant;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
@@ -45,6 +48,16 @@ public class MainCtrl {
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
+    private Websocket websocket;
+
+    /**
+     * @param websocket the websocket instance
+     */
+    @Inject
+    public MainCtrl(Websocket websocket) {
+        this.websocket = websocket;
+
+    }
 
     /**
      * Initializes the UI
@@ -101,6 +114,7 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
+        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
@@ -122,7 +136,22 @@ public class MainCtrl {
      */
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
+        websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
+        for (Participant p :
+                eventToShow.getParticipants()) {
+            System.out.println(p.getParticipantId() + " " + p.getName());
+
+
+        }
+        primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * this method is used to switch back to the event
+     * page from the participant/expense editors
+     */
+    public void goBackToEventPage() {
         primaryStage.setScene(eventPage);
     }
 
