@@ -15,13 +15,11 @@ class ParticipantTest {
     Participant participant1;
     Participant participant2;
     Expense expense;
-    BankAccount bankAccount;
     @BeforeEach
     public void testSetup(){
-        participant1 = new Participant("participant1", "p1@gmail.com");
+        participant1 = new Participant("participant1", "p1@gmail.com", "Bob",  "1234");
         participant2 = new Participant("participant2", "p2@gmail.com");
         List<Participant> expenseParticipants = new ArrayList<>();
-        bankAccount = new BankAccount("test","1234");
         expenseParticipants.add(participant1);
         expenseParticipants.add(participant2);
         expense = new Expense(participant1, "test", 32,
@@ -34,7 +32,7 @@ class ParticipantTest {
      */
     @Test
     void getNameTest() {
-        assertEquals(participant1.getName(), "participant1");
+        assertEquals("participant1", participant1.getName());
     }
 
     /**
@@ -43,48 +41,40 @@ class ParticipantTest {
     @Test
     void setNameTest() {
         participant1.setName("participant");
-        assertEquals(participant1.getName(), "participant");
+        assertEquals("participant", participant1.getName());
     }
 
     @Test
     void getEmailAddress() {
-        assertEquals(participant1.getEmailAddress(), "p1@gmail.com");
+        assertEquals("p1@gmail.com", participant1.getEmailAddress());
     }
 
     @Test
     void setEmailAddress() {
         participant1.setEmailAddress("test@gmail.com");
-        assertEquals(participant1.getEmailAddress(), "test@gmail.com");
+        assertEquals("test@gmail.com", participant1.getEmailAddress());
     }
 
     @Test
-    void getBankAccountSet() {
-        assertEquals(participant1.getBankAccountSet(), new HashSet<>());
+    void getBeneficiary() {
+        assertEquals("Bob", participant1.getBeneficiary());
     }
 
     @Test
-    void setBankAccountSet() {
-        assertEquals(participant1.getBankAccountSet(), new HashSet<>());
-        Set<BankAccount> test = new HashSet<>();
-        test.add(bankAccount);
-        participant1.setBankAccountSet(test);
-        assertEquals(participant1.getBankAccountSet(), test);
+    void getAccountNumber() {
+        assertEquals("1234", participant1.getAccountNumber());
     }
 
     @Test
-    void addBankAccountTrue() {
-        assertTrue(participant1.addBankAccount(bankAccount));
+    void setBeneficiary() {
+        participant1.setBeneficiary("Not Bob");
+        assertEquals("Not Bob", participant1.getBeneficiary());
     }
 
     @Test
-    void addBankAccountFalse() {
-        assertTrue(participant1.addBankAccount(bankAccount));
-        assertFalse(participant1.addBankAccount(bankAccount));
-    }
-
-    @Test
-    void addBankAccountNull() {
-        assertFalse(participant1.addBankAccount(null));
+    void setAccountNumber() {
+        participant1.setAccountNumber("Not Bob");
+        assertEquals("Not Bob", participant1.getAccountNumber());
     }
 
     /**
