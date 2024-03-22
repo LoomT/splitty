@@ -151,7 +151,8 @@ public class MainCtrl {
      * this method is used to switch back to the event
      * page from the participant/expense editors
      */
-    public void goBackToEventPage() {
+    public void goBackToEventPage(Event event) {
+        eventPageCtrl.displayEvent(event);
         primaryStage.setScene(eventPage);
     }
 

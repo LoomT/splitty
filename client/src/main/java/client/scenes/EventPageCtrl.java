@@ -116,8 +116,12 @@ public class EventPageCtrl {
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
         });
 
-        //if (!previousEventId.equals(event.getId())) websocket.connect(e.getId());
-        registerParticipantChangeListener();
+        websocket.registerParticipantChangeListener(
+                event,
+                this::displayEvent,
+                this::displayEvent,
+                this::displayEvent
+        );
 
     }
 
@@ -125,57 +129,6 @@ public class EventPageCtrl {
 
     }
 
-    /**
-     * Registers all the change listeners on WS if they're not registered already
-     */
-    private void registerParticipantChangeListener() {
-        websocket.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
-        websocket.resetAction(WebsocketActions.ADD_PARTICIPANT);
-        websocket.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
-
-        websocket.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part)->{
-            Participant p = (Participant) part;
-            int index = -1;
-            for (int i = 0; i < event.getParticipants().size(); i++) {
-                Participant curr = event.getParticipants().get(i);
-                if (curr.getParticipantId() == p.getParticipantId()) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The updated participant's ID ("
-                        + p.getParticipantId()+
-                        ") does not match with any ID's of the already existing participants");
-            }
-            event.getParticipants().remove(index);
-            event.getParticipants().add(index, p);
-            displayEvent(event);
-        });
-        websocket.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
-            Participant p = (Participant) part;
-            event.getParticipants().add(p);
-            displayEvent(event);
-        });
-        websocket.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
-            long partId = (long) part;
-            int index = -1;
-            for (int i = 0; i < event.getParticipants().size(); i++) {
-                Participant curr = event.getParticipants().get(i);
-                if (curr.getParticipantId() == partId) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The deleted participant's ID ("
-                        + partId+
-                        ") does not match with any ID's of the already existing participants");
-            }
-            event.getParticipants().remove(index);
-            displayEvent(event);
-        });
-    }
 
     /**
      * Sets the labels' styles for the case in which no participants exist
