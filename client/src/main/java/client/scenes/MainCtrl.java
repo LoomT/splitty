@@ -219,11 +219,6 @@ public class MainCtrl {
     }
 
     /**
-     * Display overview
-     */
-
-
-    /**
      * AdminLoginCtrl getter
      *
      * @return admin login controller
