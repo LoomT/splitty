@@ -115,7 +115,6 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
