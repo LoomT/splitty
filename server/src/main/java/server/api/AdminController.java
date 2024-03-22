@@ -1,8 +1,6 @@
 package server.api;
 
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import server.AdminService;
 import server.database.EventRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
-import java.util.Optional;
 
 @RestController
 public class AdminController {
@@ -72,33 +68,33 @@ public class AdminController {
         try {
             if(repo.existsById(event.getId()))
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            List<Participant> participants = event.getParticipants();
-            for(Expense expense : event.getExpenses()) {
-                Optional<Participant> newExpenseAuthor = participants.stream()
-                        .filter(p -> p.getParticipantId()
-                                == expense.getExpenseAuthor().getParticipantId())
-                        .findAny();
-                if(newExpenseAuthor.isEmpty())
-                    throw new MissingResourceException(
-                            "Missing participant from participant list",
-                            "Participant",
-                            Long.toString(expense.getExpenseAuthor().getParticipantId()));
-                expense.setExpenseAuthor(newExpenseAuthor.get());
-
-                List<Participant> newParticipants = new ArrayList<>();
-                for(Participant old : expense.getExpenseParticipants()) {
-                    Optional<Participant> newParticipant = participants.stream()
-                            .filter(p -> p.getParticipantId() == old.getParticipantId())
-                            .findAny();
-                    if(newParticipant.isEmpty())
-                        throw new MissingResourceException(
-                                "Missing participant from participant list",
-                                "Participant", Long.toString(old.getParticipantId()));
-                    newParticipants.add(newParticipant.get());
-                }
-                expense.setExpenseParticipants(newParticipants);
-            }
-            Event saved = repo.save(event);
+//            List<Participant> participants = event.getParticipants();
+//            for(Expense expense : event.getExpenses()) {
+//                Optional<Participant> newExpenseAuthor = participants.stream()
+//                        .filter(p -> p.getParticipantId()
+//                                == expense.getExpenseAuthor().getParticipantId())
+//                        .findAny();
+//                if(newExpenseAuthor.isEmpty())
+//                    throw new MissingResourceException(
+//                            "Missing participant from participant list",
+//                            "Participant",
+//                            Long.toString(expense.getExpenseAuthor().getParticipantId()));
+//                expense.setExpenseAuthor(newExpenseAuthor.get());
+//
+//                List<Participant> newParticipants = new ArrayList<>();
+//                for(Participant old : expense.getExpenseParticipants()) {
+//                    Optional<Participant> newParticipant = participants.stream()
+//                            .filter(p -> p.getParticipantId() == old.getParticipantId())
+//                            .findAny();
+//                    if(newParticipant.isEmpty())
+//                        throw new MissingResourceException(
+//                                "Missing participant from participant list",
+//                                "Participant", Long.toString(old.getParticipantId()));
+//                    newParticipants.add(newParticipant.get());
+//                }
+//                expense.setExpenseParticipants(newParticipants);
+//            }
+            Event saved = repo.saveAndFlush(event);
             return ResponseEntity.ok(saved);
 
         } catch (MissingResourceException e) {
