@@ -4,6 +4,7 @@ package commons;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -183,6 +184,10 @@ public class Expense {
         this.expenseID = expenseID;
     }
 
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
 
     /**
      * equals method
@@ -216,11 +221,23 @@ public class Expense {
 
     /**
      * return form for displaying the expenses
-     * @return human readable form
+     * @return human-readable form
      */
     public String toString() {
-        String rez = String.valueOf(getDate());
-        rez += "  " + expenseAuthor.getName() + " paid " + amount + "€ for" + purpose;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date); // Assuming 'date' is your Date object
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        String rez = dayOfMonth + ".";
+        int month = calendar.get(Calendar.MONTH) + 1;
+        rez += month + ".     ";
+        String cur = "";
+        switch(currency) {
+            case "USD" -> cur = "$";
+            case "EUR" -> cur = "€";
+            case "GBP" -> cur = "£";
+            case "JPY" -> cur = "¥";
+        }
+        rez += "  " + expenseAuthor.getName() + " paid " + amount + cur + " for " + purpose;
         return rez;
     }
 }

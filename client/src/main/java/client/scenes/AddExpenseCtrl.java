@@ -12,7 +12,10 @@ import javafx.scene.text.TextFlow;
 import commons.Expense;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AddExpenseCtrl {
@@ -155,6 +158,11 @@ public class AddExpenseCtrl {
      */
     public boolean handleAddButton(Event ev) {
         LocalDate expDate = date.getValue();
+        LocalDateTime localDateTime = expDate.atStartOfDay();
+
+        // Step 3: Convert to Date
+        Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+
         String expPurpose = purpose.getText();
         String selectedParticipantName = expenseAuthor.getValue();
         Participant selectedParticipant = ev.getParticipants().stream()
@@ -173,6 +181,7 @@ public class AddExpenseCtrl {
         String expType = type.getValue();
         Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
                 expCurrency, expPart, expType);
+        expense.setDate(date);
         ev.getExpenses().add(expense);
         return true;
     }

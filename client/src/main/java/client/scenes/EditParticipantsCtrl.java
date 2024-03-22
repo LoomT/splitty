@@ -60,17 +60,14 @@ public class EditParticipantsCtrl {
         chooseParticipant.getItems().clear();
 
         chooseParticipant.getItems().add(languageConf.get("EditP.newParticipant"));
-        chooseParticipant
-            .getItems()
-            .addAll(
+        chooseParticipant.getItems().addAll(
                 e.getParticipants()
-                    .stream()
-                    .map(Participant::getName)
-                    .toList()
-            );
+                        .stream()
+                        .map(Participant::getName)
+                        .toList()
+        );
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
-
 
         chooseParticipant.setOnAction((event1) -> {
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
@@ -82,11 +79,34 @@ public class EditParticipantsCtrl {
                 Participant p = event.getParticipants().get(index - 1);
                 nameField.setText(p.getName());
                 emailField.setText(p.getEmailAddress());
-
             }
         });
-
     }
+
+    // Handler for the save button
+    @FXML
+    private void saveButtonClicked() {
+        int index = chooseParticipant.getSelectionModel().getSelectedIndex();
+        String name = nameField.getText();
+        String email = emailField.getText();
+
+        if (index < 0) return;
+        if (index == 0) {
+            Participant newP = new Participant(name, email);
+            event.getParticipants().add(newP); // Add new participant to the event
+            server.createParticipant(event.getId(), newP);
+            resetFields();
+        } else {
+            Participant currP = event.getParticipants().get(index - 1);
+            currP.setName(name);
+            currP.setEmailAddress(email);
+            server.updateParticipant(event.getId(), currP);
+        }
+
+        // After adding or editing a participant, display the EventPage with the updated event data
+        mainCtrl.showEventPage(event);
+    }
+
 
     private void resetFields() {
         saveButton.setText(languageConf.get("EditP.createParticipant"));
@@ -105,28 +125,30 @@ public class EditParticipantsCtrl {
         mainCtrl.showEventPage(event);
     }
 
-    /**
-     * Handler for the save button
-     */
-    @FXML
-    private void saveButtonClicked() {
-        int index = chooseParticipant.getSelectionModel().getSelectedIndex();
-        System.out.println("Creating/saving participant " + index);
+//    /**
+//     * Handler for the save button
+//     */
+//    @FXML
+//    private void saveButtonClicked() {
+//        int index = chooseParticipant.getSelectionModel().getSelectedIndex();
+//        System.out.println("Creating/saving participant " + index);
+//
+//        String name = nameField.getText();
+//        String email = emailField.getText();
+//
+//        if (index < 0) return;
+//        if (index == 0) {
+//            Participant newP = new Participant(name, email);
+//            server.createParticipant(event.getId(), newP);
+//            resetFields();
+//        } else {
+//            Participant currP = event.getParticipants().get(index - 1);
+//            currP.setName(name);
+//            currP.setEmailAddress(email);
+//            server.updateParticipant(event.getId(), currP);
+//        }
+//
+//    }
 
-        String name = nameField.getText();
-        String email = emailField.getText();
 
-        if (index < 0) return;
-        if (index == 0) {
-            Participant newP = new Participant(name, email);
-            server.createParticipant(event.getId(), newP);
-            resetFields();
-        } else {
-            Participant currP = event.getParticipants().get(index - 1);
-            currP.setName(name);
-            currP.setEmailAddress(email);
-            server.updateParticipant(event.getId(), currP);
-        }
-
-    }
 }
