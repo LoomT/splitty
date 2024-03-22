@@ -103,8 +103,14 @@ public class EditParticipantsCtrl {
             }
         });
 
-    }
+        websocket.registerParticipantChangeListener(
+                event,
+                this::displayEditParticipantsPage,
+                this::displayEditParticipantsPage,
+                this::displayEditParticipantsPage
+        );
 
+    }
 
     private void resetFields() {
         saveButton.setText(languageConf.get("EditP.createParticipant"));
@@ -120,7 +126,7 @@ public class EditParticipantsCtrl {
      */
     @FXML
     private void backButtonClicked() {
-        mainCtrl.goBackToEventPage();
+        mainCtrl.goBackToEventPage(event);
     }
 
     /**
