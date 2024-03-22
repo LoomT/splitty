@@ -114,6 +114,7 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
+        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
@@ -135,7 +136,6 @@ public class MainCtrl {
      */
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
-        websocket.disconnect();
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         for (Participant p :
