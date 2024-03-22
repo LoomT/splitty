@@ -52,11 +52,17 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
+     * @param repo expense repo to save participants
+     */
+    public TestEventRepository(TestExpenseRepository repo){
+        expenseRepo = repo;
+    }
+    /**
      * @param partRepo participant repo to save participants
      * @param expRepo expense repo
      */
     public TestEventRepository(TestParticipantRepository partRepo, TestExpenseRepository expRepo) {
-        this(partRepo);
+        this.partRepo = partRepo;
         this.expenseRepo = expRepo;
     }
     /**
@@ -266,8 +272,8 @@ public class TestEventRepository implements EventRepository {
         if(expenseRepo != null) {
             expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
                     .stream()
-                    .mapToLong(Expense::getExpenseID)
-                    .noneMatch(id -> id == e.getExpenseID()));
+                    .mapToLong(Expense::getId)
+                    .noneMatch(id -> id == e.getId()));
             expenseRepo.saveAll(entity.getExpenses());
         }
         return entity;
