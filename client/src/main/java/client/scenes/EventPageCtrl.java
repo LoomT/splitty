@@ -136,7 +136,7 @@ public class EventPageCtrl {
             createExpensesFrom(e, name);
             createExpensesIncluding(e, name);
         });
-         websocket.registerParticipantChangeListener(
+        websocket.registerParticipantChangeListener(
                 event,
                 this::displayEvent,
                 this::displayEvent,
