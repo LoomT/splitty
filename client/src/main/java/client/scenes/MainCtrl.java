@@ -141,7 +141,7 @@ public class MainCtrl {
         eventPageCtrl.displayEvent(eventToShow);
         for (Participant p :
                 eventToShow.getParticipants()) {
-            System.out.println(p.getParticipantId() + " " + p.getName());
+            System.out.println(p.getId() + " " + p.getName());
 
 
         }
