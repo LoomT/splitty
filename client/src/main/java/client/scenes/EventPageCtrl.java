@@ -14,7 +14,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,36 +104,27 @@ public class EventPageCtrl {
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
-            participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
-            allTab.setStyle("-fx-opacity:0");
-            allTab.setDisable(true);
-            fromTab.setStyle("-fx-opacity:0");
-            fromTab.setDisable(true);
-            includingTab.setStyle("-fx-opacity:0");
-            includingTab.setDisable(true);
-            //addExpenseButton.setDisable(true);
+            noParticipantsExist();
         } else {
-            allTab.setStyle("-fx-opacity:1");
-            allTab.setDisable(false);
-            fromTab.setStyle("-fx-opacity:1");
-            fromTab.setDisable(false);
-            includingTab.setStyle("-fx-opacity:1");
-            includingTab.setDisable(false);
-            addExpenseButton.setDisable(false);
+            participantsExist();
+
             StringBuilder p = new StringBuilder();
             for (int i = 0; i < e.getParticipants().size(); i++) {
                 p.append(e.getParticipants().get(i).getName());
                 if (i != e.getParticipants().size() - 1) p.append(", ");
             }
             participantText.setText(p.toString());
+
             participantChoiceBox.getItems().addAll(
-                    e.getParticipants().stream().map(Participant::getName).toList());
+                    e.getParticipants().stream().map(Participant::getName).toList()
+            );
             participantChoiceBox.setValue(e.getParticipants().get(0).getName());
             selectedParticipantId = 0;
             String name = e.getParticipants().get(selectedParticipantId).getName();
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
         }
+
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
             if (selectedParticipantId < 0) return;
@@ -146,8 +136,44 @@ public class EventPageCtrl {
             createExpensesFrom(e, name);
             createExpensesIncluding(e, name);
         });
-        websocket.connect(e.getId());
-        registerExpenseChangeListener();
+         websocket.registerParticipantChangeListener(
+                event,
+                this::displayEvent,
+                this::displayEvent,
+                this::displayEvent
+        );
+    }
+
+    private void handleWS() {
+
+    }
+
+
+    /**
+     * Sets the labels' styles for the case in which no participants exist
+     */
+    private void noParticipantsExist() {
+        participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
+        allTab.setStyle("-fx-opacity:0");
+        allTab.setDisable(true);
+        fromTab.setStyle("-fx-opacity:0");
+        fromTab.setDisable(true);
+        includingTab.setStyle("-fx-opacity:0");
+        includingTab.setDisable(true);
+        addExpenseButton.setDisable(true);
+    }
+
+    /**
+     * Sets the labels' styles for the case in which participants do exist
+     */
+    private void participantsExist() {
+        allTab.setStyle("-fx-opacity:1");
+        allTab.setDisable(false);
+        fromTab.setStyle("-fx-opacity:1");
+        fromTab.setDisable(false);
+        includingTab.setStyle("-fx-opacity:1");
+        includingTab.setDisable(false);
+        addExpenseButton.setDisable(false);
     }
 
     /**
@@ -218,7 +244,6 @@ public class EventPageCtrl {
 
     }
 
-
     /**
      * Changes the title of the event
      *
@@ -234,7 +259,7 @@ public class EventPageCtrl {
      */
     @FXML
     private void backButtonClicked() {
-        websocket.disconnect();
+        //websocket.disconnect();
         mainCtrl.showStartScreen();
     }
 
@@ -270,8 +295,10 @@ public class EventPageCtrl {
         }
     }
 
+
     @FXML
     private void sendInvitesClicked() {
+
     }
 
     @FXML
@@ -410,7 +437,5 @@ public class EventPageCtrl {
         System.out.println(participantChoiceBox.getValue());
         return participantChoiceBox.getValue();
     }
-
-
 
 }

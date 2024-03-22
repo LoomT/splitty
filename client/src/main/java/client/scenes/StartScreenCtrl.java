@@ -4,6 +4,7 @@ import client.components.EventListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
@@ -36,6 +37,7 @@ public class StartScreenCtrl {
 
 
     private UserConfig userConfig;
+    private Websocket websocket;
 
     /**
      * start screen controller constructor
@@ -44,19 +46,22 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
+     * @param websocket the ws instance
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrl mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig
+            UserConfig userConfig,
+            Websocket websocket
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
+        this.websocket = websocket;
 
     }
 
@@ -114,6 +119,7 @@ public class StartScreenCtrl {
      * Creates and joins the event with provided title
      */
     public void create() {
+        websocket.resetAllActions();
         if (title.getText().isEmpty()) return;
         try {
             Event createdEvent = server.createEvent(new Event(title.getText()));
@@ -129,6 +135,7 @@ public class StartScreenCtrl {
      * Tries to join the inputted event
      */
     public void join() {
+        websocket.resetAllActions();
         if (code.getText().isEmpty()) return;
         try {
             Event joinedEvent = server.getEvent(code.getText());

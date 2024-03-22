@@ -17,7 +17,10 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
+import client.utils.Websocket;
+import com.google.inject.Inject;
 import commons.Event;
+import commons.Participant;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
@@ -47,6 +50,16 @@ public class MainCtrl {
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
+    private Websocket websocket;
+
+    /**
+     * @param websocket the websocket instance
+     */
+    @Inject
+    public MainCtrl(Websocket websocket) {
+        this.websocket = websocket;
+
+    }
 
     /**
      * Initializes the UI
@@ -59,7 +72,7 @@ public class MainCtrl {
      * @param adminLogin           admin login controller and scene
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
-     *@param addExpensePage controller and scene for addExpense
+     * @param addExpensePage controller and scene for addExpense
      */
     public void initialize(
             Stage primaryStage,
@@ -108,6 +121,7 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
+        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
@@ -129,9 +143,25 @@ public class MainCtrl {
      */
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
+        websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-
         eventPageCtrl.displayExpenses(eventToShow);
+        for (Participant p :
+                eventToShow.getParticipants()) {
+            System.out.println(p.getParticipantId() + " " + p.getName());
+
+
+        }
+        primaryStage.setScene(eventPage);
+    }
+
+    /**
+     * this method is used to switch back to the event
+     * page from the participant/expense editors
+     * @param event the event to show
+     */
+    public void goBackToEventPage(Event event) {
+        eventPageCtrl.displayEvent(event);
         primaryStage.setScene(eventPage);
     }
 
@@ -176,7 +206,6 @@ public class MainCtrl {
         primaryStage.setTitle("Add/Edit Expense");
         primaryStage.setScene(addExpense);
     }
-
 
     /**
      * Getter for startScreenCtrl
