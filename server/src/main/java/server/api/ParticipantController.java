@@ -48,10 +48,8 @@ public class ParticipantController {
             Optional<Participant> optionalParticipant =
                     repo.findById(new EventWeakKey(eventID, partID));
 
-            if(optionalParticipant.isEmpty()) return ResponseEntity.notFound().build();
-            Participant participant = optionalParticipant.get();
-
-            return ResponseEntity.ok(participant);
+            return optionalParticipant.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
         }catch (Exception e){
             return ResponseEntity.internalServerError().build();
         }
