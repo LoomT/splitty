@@ -44,7 +44,7 @@ public class Event {
     @JoinColumn(name = "event_id", updatable = false, insertable = false)
     private List<Participant> participants;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
     private List<Expense> expenses;
     @Temporal(TemporalType.TIMESTAMP)
     private final Date creationDate;
