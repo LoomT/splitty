@@ -113,56 +113,6 @@ public class EditParticipantsCtrl {
 
     }
 
-    private void registerParticipantChangeListener() {
-        websocket.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
-        websocket.resetAction(WebsocketActions.ADD_PARTICIPANT);
-        websocket.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
-
-        websocket.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part)->{
-            Participant p = (Participant) part;
-            int index = -1;
-            for (int i = 0; i < event.getParticipants().size(); i++) {
-                Participant curr = event.getParticipants().get(i);
-                if (curr.getParticipantId() == p.getParticipantId()) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The updated participant's ID ("
-                        + p.getParticipantId()+
-                        ") does not match with any ID's of the already existing participants");
-            }
-            event.getParticipants().remove(index);
-            event.getParticipants().add(index, p);
-            displayEditParticipantsPage(event);
-        });
-        websocket.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
-            Participant p = (Participant) part;
-            event.getParticipants().add(p);
-            displayEditParticipantsPage(event);
-        });
-        websocket.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
-            long partId = (long) part;
-            int index = -1;
-            for (int i = 0; i < event.getParticipants().size(); i++) {
-                Participant curr = event.getParticipants().get(i);
-                if (curr.getParticipantId() == partId) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The deleted participant's ID ("
-                        + partId+
-                        ") does not match with any ID's of the already existing participants");
-            }
-            event.getParticipants().remove(index);
-            displayEditParticipantsPage(event);
-        });
-    }
-
-
     private void resetFields() {
         saveButton.setText(languageConf.get("EditP.createParticipant"));
         nameField.setText("");
