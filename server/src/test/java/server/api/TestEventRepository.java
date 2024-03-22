@@ -265,16 +265,20 @@ public class TestEventRepository implements EventRepository {
             // Deletes participants that are no longer in the event entity
             partRepo.getParticipants().removeIf(p -> entity.getParticipants()
                     .stream()
-                    .map(Participant::getId)
-                    .noneMatch(id -> id == p.getId()));
-            partRepo.saveAll(entity.getParticipants());
+                    .noneMatch(pp -> pp.getEventID().equals(entity.getId())
+                            && pp.getId() == p.getId()));
+            List<Participant> participants = entity.getParticipants();
+            entity.setParticipants(new ArrayList<>());
+            partRepo.saveAll(participants);
         }
         if(expenseRepo != null) {
             expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
                     .stream()
-                    .mapToLong(Expense::getId)
-                    .noneMatch(id -> id == e.getId()));
-            expenseRepo.saveAll(entity.getExpenses());
+                    .noneMatch(ee -> ee.getEventID().equals(entity.getId())
+                            && ee.getId() == e.getId()));
+            List<Expense> expenses = entity.getExpenses();
+            entity.setExpenses(new ArrayList<>());
+            expenseRepo.saveAll(expenses);
         }
         return entity;
     }
