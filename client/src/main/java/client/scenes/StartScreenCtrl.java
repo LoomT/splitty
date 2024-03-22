@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.components.EventListItem;
+import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -8,7 +9,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
@@ -29,13 +30,13 @@ public class StartScreenCtrl {
     private TextField code;
 
     @FXML
-    private ChoiceBox<String> languageChoiceBox;
+    private ComboBox<String> languageChoiceBox;
 
     @FXML
     private VBox eventList;
 
 
-    private UserConfig userConfig;
+    private final UserConfig userConfig;
 
     /**
      * start screen controller constructor
@@ -67,6 +68,8 @@ public class StartScreenCtrl {
     private void initialize() {
         languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+        languageChoiceBox.setButtonCell(new FlagListCell());
+        languageChoiceBox.setCellFactory(param -> new FlagListCell());
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
