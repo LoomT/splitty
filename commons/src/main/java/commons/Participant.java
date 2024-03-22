@@ -1,5 +1,7 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,12 +19,16 @@ import java.util.Set;
  *  bankAccountSet: The registered Bank Accounts for the participant. (can be empty)
  *  getter setter equals hashcode toString methods
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "participantId", scope = Participant.class)
 @Entity
 public class Participant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long participantId;
+//    @Id
+//    private String eventId;
     @Column(nullable = false)
     private String name;
     @Nullable
