@@ -184,6 +184,10 @@ public class Expense {
         this.expenseID = expenseID;
     }
 
+    /**
+     * setter for date
+     * @param date
+     */
     public void setDate(Date date) {
         this.date = date;
     }
