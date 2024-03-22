@@ -15,7 +15,6 @@ import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class AdminOverviewCtrl {
@@ -67,7 +66,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void refreshButtonClicked() {
-        loadAllEvents();
+        reloadAllEvents(server.getEvents(password));
     }
 
 
@@ -79,35 +78,36 @@ public class AdminOverviewCtrl {
         mainCtrl.showAdminLogin();
     }
 
+    public void loadAllEvents() {
+        reloadAllEvents(server.getEvents(password));
+    }
+
     /**
      * Method to get all the events into the list
      */
-    public void loadAllEvents() {
-        List<Event> allEvents = server.getEvents(password);
-        List<EventListItemAdmin> list = new ArrayList<>();
-
+    public void reloadAllEvents(List<Event> allEvents) {
         eventList.getChildren().clear();
 
-        for (int i = 0; i < allEvents.size(); i++) {
-            int finalI = i;
-            list.add(
+        for (Event event : allEvents) {
+            final EventListItemAdmin item =
                 new EventListItemAdmin(
-                    allEvents.get(i).getTitle(),
-                    allEvents.get(i).getId(),
+                        event.getTitle(),
+                        event.getId(),
                     () -> {
-                        int status = server.deleteEvent(allEvents.get(finalI).getId());
+                        int status = server.deleteEvent(event.getId());
                         if(status != 204) {
                             System.out.println("Server did not delete the event " + status);
                             // TODO maybe trow an error message or smth
+                        } else {
+                            allEvents.remove(event);
+                            reloadAllEvents(allEvents);
                         }
-                        allEvents.remove(finalI);
-                        eventList.getChildren().remove(list.get(finalI));
                     },
-                    () -> eventExportHandler(allEvents.get(finalI)),
+                    () -> eventExportHandler(event),
                     () -> {
                         // TODO display the event
-                    }));
-            eventList.getChildren().add(list.get(i));
+                    });
+            eventList.getChildren().add(item);
         }
 
     }
@@ -187,6 +187,7 @@ public class AdminOverviewCtrl {
             try {
                 Event event = reader.readValue(file);
                 Response response = server.importEvent(password, event);
+                System.out.println(response.getStatus()); // for troubleshooting
                 switch (response.getStatus()) {
                     case 400 -> {
                         System.out.println("Missing participants from the participant list");
