@@ -5,6 +5,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
+import javafx.application.Platform;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.converter.CompositeMessageConverter;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -65,6 +66,7 @@ public class Websocket {
      * Disconnect the websocket from the server
      */
     public void disconnect() {
+        if (stompSession == null) return;
         stompSession.disconnect();
     }
 
@@ -86,6 +88,68 @@ public class Websocket {
      */
     public void on(WebsocketActions action, Consumer<Object> consumer) {
         functions.get(action).add(consumer);
+    }
+
+
+    /**
+     * Registers all the change listeners on WS if they're not registered already
+     * @param event the event in which we listen on the participant changes
+     * @param updatePartCallback this is called when a participant in the event is updated
+     * @param addPartCallback this is called when a participant in the event is created
+     * @param deletePartCallback this is called when a participant in the event is deleted
+     */
+    public void registerParticipantChangeListener(
+            Event event,
+            Consumer<Event> updatePartCallback,
+            Consumer<Event> addPartCallback,
+            Consumer<Event> deletePartCallback
+    ) {
+        this.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
+        this.resetAction(WebsocketActions.ADD_PARTICIPANT);
+        this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
+
+        this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part)->{
+            Participant p = (Participant) part;
+            int index = -1;
+            for (int i = 0; i < event.getParticipants().size(); i++) {
+                Participant curr = event.getParticipants().get(i);
+                if (curr.getParticipantId() == p.getParticipantId()) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The updated participant's ID ("
+                        + p.getParticipantId()+
+                        ") does not match with any ID's of the already existing participants");
+            }
+            event.getParticipants().remove(index);
+            event.getParticipants().add(index, p);
+            updatePartCallback.accept(event);
+        });
+        this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
+            Participant p = (Participant) part;
+            event.getParticipants().add(p);
+            addPartCallback.accept(event);
+        });
+        this.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
+            long partId = (long) part;
+            int index = -1;
+            for (int i = 0; i < event.getParticipants().size(); i++) {
+                Participant curr = event.getParticipants().get(i);
+                if (curr.getParticipantId() == partId) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The deleted participant's ID ("
+                        + partId+
+                        ") does not match with any ID's of the already existing participants");
+            }
+            event.getParticipants().remove(index);
+            deletePartCallback.accept(event);
+        });
     }
 
     /**
@@ -142,7 +206,17 @@ public class Websocket {
             try {
                 WebsocketActions action = WebsocketActions
                         .valueOf(headers.get("action").getFirst());
-                functions.get(action).forEach(consumer -> consumer.accept(payload));
+                functions.get(action).forEach(consumer -> {
+                    // This is necessary to run the Javafx updates on the same
+                    // thread as the app is run on, and not the WS thread
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            consumer.accept(payload);
+                        }
+                    });
+                });
+
             } catch (IllegalArgumentException e) {
                 System.out.println("Server sent an unknown action");
             }
