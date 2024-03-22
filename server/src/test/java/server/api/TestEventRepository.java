@@ -66,6 +66,9 @@ public class TestEventRepository implements EventRepository {
         return calledMethods;
     }
 
+    public List<Event> getEvents() {
+        return events;
+    }
     /**
      * @param name name of call
      */
@@ -195,7 +198,7 @@ public class TestEventRepository implements EventRepository {
      */
     @Override
     public Event getReferenceById(String id) {
-        return null;
+        return find(id).get();
     }
 
     /**
@@ -256,8 +259,8 @@ public class TestEventRepository implements EventRepository {
             // Deletes participants that are no longer in the event entity
             partRepo.getParticipants().removeIf(p -> entity.getParticipants()
                     .stream()
-                    .map(Participant::getParticipantId)
-                    .noneMatch(id -> id == p.getParticipantId()));
+                    .map(Participant::getId)
+                    .noneMatch(id -> id == p.getId()));
             partRepo.saveAll(entity.getParticipants());
         }
         if(expenseRepo != null) {
