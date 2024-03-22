@@ -186,7 +186,7 @@ public class Expense {
 
     /**
      * setter for date
-     * @param date
+     * @param date the updated value of the date
      */
     public void setDate(Date date) {
         this.date = date;
