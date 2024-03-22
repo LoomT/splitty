@@ -105,14 +105,7 @@ public class AddExpenseCtrl {
 
 
         add.setOnAction(x -> {
-            boolean addedExpense = handleAddButton(event);
-            if (addedExpense) {
-                mainCtrl.showEventPage(event);
-            } else {
-            }
-            mainCtrl.showEventPage(event);
-
-            resetExpenseFields();
+            handleAddButton(event);
         });
 
         abort.setOnAction(x -> mainCtrl.showEventPage(event));
@@ -152,39 +145,53 @@ public class AddExpenseCtrl {
 
 
     /**
-     * Behavior for add button.
+     * behaviour for add button
      * @param ev
-     * @return true if added succesfully, false otherwise
      */
-    public boolean handleAddButton(Event ev) {
-        LocalDate expDate = date.getValue();
-        LocalDateTime localDateTime = expDate.atStartOfDay();
+    public void handleAddButton(Event ev) {
+        if (expenseAuthor.getValue() == null ||
+                purpose.getText().isEmpty() ||
+                amount.getText().isEmpty() ||
+                currency.getValue() == null ||
+                (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
+                date.getValue() == null ||
+                type.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Incomplete Fields");
+            alert.setHeaderText(null);
+            alert.setContentText("Please fill in all fields before adding the expense.");
+            alert.showAndWait();
+        } else {
+            LocalDate expDate = date.getValue();
+            LocalDateTime localDateTime = expDate.atStartOfDay();
 
-        // Step 3: Convert to Date
-        Date date = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+            Date expenseDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-        String expPurpose = purpose.getText();
-        String selectedParticipantName = expenseAuthor.getValue();
-        Participant selectedParticipant = ev.getParticipants().stream()
-                .filter(participant -> participant.getName().equals(selectedParticipantName))
-                .findFirst().orElse(null);
-        if (selectedParticipant == null) {
-            return false;
+            String expPurpose = purpose.getText();
+            String selectedParticipantName = expenseAuthor.getValue();
+            Participant selectedParticipant = ev.getParticipants().stream()
+                    .filter(participant -> participant.getName().equals(selectedParticipantName))
+                    .findFirst().orElse(null);
+            if (selectedParticipant != null) {
+                double expAmount = Double.parseDouble(amount.getText());
+                String expCurrency = currency.getValue();
+                List<Participant> expPart = new ArrayList<>();
+                expPart.add(selectedParticipant);
+
+                String expType = type.getValue();
+                Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+                        expCurrency, expPart, expType);
+                expense.setDate(expenseDate);
+                ev.getExpenses().add(expense);
+
+                resetExpenseFields();
+
+                mainCtrl.showEventPage(ev);
+            }
         }
-
-        double expAmount = Double.parseDouble(amount.getText());
-        String expCurrency = currency.getValue();
-        List<Participant> expPart = new ArrayList<>();
-
-        expPart.add(selectedParticipant);
-
-        String expType = type.getValue();
-        Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
-                expCurrency, expPart, expType);
-        expense.setDate(date);
-        ev.getExpenses().add(expense);
-        return true;
     }
+
+
 
 
 
