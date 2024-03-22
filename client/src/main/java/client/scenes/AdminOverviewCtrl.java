@@ -78,12 +78,16 @@ public class AdminOverviewCtrl {
         mainCtrl.showAdminLogin();
     }
 
+    /**
+     * Reload the events with events from the server
+     */
     public void loadAllEvents() {
         reloadAllEvents(server.getEvents(password));
     }
 
     /**
      * Method to get all the events into the list
+     * @param allEvents events to load into the list
      */
     public void reloadAllEvents(List<Event> allEvents) {
         eventList.getChildren().clear();
