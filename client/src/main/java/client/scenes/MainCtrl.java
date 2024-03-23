@@ -191,11 +191,13 @@ public class MainCtrl {
 
     /**
      * Show error popup for general usage
-     * @param token token of the error
+     * @param stringToken String token to be used as a variable in the error text
+     * @param intToken int token to be used as a variable in the error text
+     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
      * Check ErrorPopupCtrl for more detailed documentation
      */
-    public void showErrorPopup(ErrorPopupCtrl.ErrorCode code, String token, int limit){
-        errorPopupCtrl.generatePopup(code, token, limit);
+    public void showErrorPopup(ErrorPopupCtrl.ErrorCode code, String stringToken, int intToken){
+        errorPopupCtrl.generatePopup(code, stringToken, intToken);
         Stage stage = new Stage();
         stage.setScene(errorPopup);
         stage.setResizable(false);

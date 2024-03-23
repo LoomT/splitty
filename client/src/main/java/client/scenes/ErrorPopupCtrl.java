@@ -17,24 +17,28 @@ import java.util.Properties;
  * Controller for the error popup.
  * A default error popup is initialized first and then the fields are changed
  * according to the situation.
- * Variables:
+ * Fields:
  *      mainCtrl: Main controller
  *      LanguageConf: Language configuration
  *      errorHeader: Header of the error
  *      errorDescription: Description of the error
  *      errorImage: Image of the error
- *      errorButton: A button within the error. Currently unused
+ *      errorButton: A button within the error. Currently unused as a placeholder
  * Methods:
- *      generatePopup(String type, String token)
- *          type: Type of error. Used to locate the header and description in the language.conf
- *          This must be compatible with the language.conf format of: ErrorPopup.<type>
- *          token: Field of the error caused. Example: For creating an event token is an Event.
- *          This needs a better name
- *      generatePopup(String type, String token, int limit)
- *          This must be compatible with the language.conf format of: ErrorPopup.<type>
- *          token: Field of the error caused. Example: For creating an event token is an Event.
- *          This needs a better name
- *          limit: word limit for the field.
+ *      generatePopup (ErrorCode code, String stringToken, int intToken)
+ *      Variables:
+ *          ErrorCode code: code of the error. Used to specify the error.
+ *          Can be extended using ErrorCode enum
+ *          stringToken, intToken: tokens that can be used within errors as variables.
+ *      The generatePopup changes the header and the description of the
+ *      ErrorPopup.fxml found in scenes
+ *      according to the properties found in the languageConfig and
+ *      the code of the error.
+ * <p>
+ *      errorPicker(ErrorCode code, Properties prop, String stringToken, int intToken)
+ *      Variables:
+ *      ErrorCode code, stringToken, intToken: same as the generatePopup
+ *      Properties prop: properties file that has the current language config of the client
  */
 public class ErrorPopupCtrl {
 
@@ -59,8 +63,8 @@ public class ErrorPopupCtrl {
 
     /**
      * Constructor for the ErrorPopupCtrl
-     * @param mainCtrl Main controller
-     * @param languageConf language.conf file
+     * @param mainCtrl Main controller of the client
+     * @param languageConf language.conf file of the client
      */
     @Inject
     public ErrorPopupCtrl(MainCtrl mainCtrl, LanguageConf languageConf) {
@@ -69,9 +73,10 @@ public class ErrorPopupCtrl {
     }
 
     /**
-     *
+     * Generates a popup using the code and the tokens.
      * @param token String token to be used
      * @param limit word limit of the input
+     * @param code code of the error as found in the ErrorCode enum
      */
     public void generatePopup(ErrorCode code, String token, int limit){
 
@@ -90,26 +95,28 @@ public class ErrorPopupCtrl {
     }
 
     /**
-     *
-     * @param code code of the error
-     * @param prop appropriate language config
-     * @param token String token to be used
-     * @param limit word limit of the input
+     * Picks the correct header and description for the error depending on the code given.
+     * If the code cannot be found, gives an unknown error header and description.
+     * @param code code of the error as found in the ErrorCodes Enum
+     * @param prop language config file the client is currently at
+     * @param stringToken String token to be used in the error text as a variable
+     * @param intToken an integer token to be used as a variable in the error text
      */
-    private void errorPicker(ErrorCode code, Properties prop, String token, int limit){
+    private void errorPicker(ErrorCode code, Properties prop, String stringToken, int intToken){
         String header;
         String description;
         switch(code){
             case EmptyStringError -> {
-                header = String.format(prop.getProperty("ErrorPopup.emptyFieldErrorHeader"), token);
-                description = String.format(
-                        prop.getProperty("ErrorPopup.emptyFieldErrorDescription"), token);
+                header = String.format(prop.getProperty(
+                        "ErrorPopup.emptyFieldErrorHeader"), stringToken);
+                description = String.format(prop.getProperty(
+                        "ErrorPopup.emptyFieldErrorDescription"), stringToken);
             }
             case WordLimitError -> {
-                header = String.format(prop.getProperty("ErrorPopup.wordLimitErrorHeader"), token);
-                //System.out.println(prop.getProperty("ErrorPopup.wordLimitErrorDescription"));
-                description = String.format(
-                        prop.getProperty("ErrorPopup.wordLimitErrorDescription"), token, limit);
+                header = String.format(prop.getProperty(
+                        "ErrorPopup.wordLimitErrorHeader"), stringToken);
+                description = String.format(prop.getProperty(
+                        "ErrorPopup.wordLimitErrorDescription"), stringToken, intToken);
             }
 
             case InvalidErrorCode -> {
@@ -125,6 +132,9 @@ public class ErrorPopupCtrl {
         this.errorDescription.setText(description);
     }
 
+    /**
+     * ErrorCode enum should be used to classify error codes.
+     */
     public enum ErrorCode{
         WordLimitError,
         EmptyStringError,
