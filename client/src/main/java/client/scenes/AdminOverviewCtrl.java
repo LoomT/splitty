@@ -8,8 +8,10 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.fxml.FXML;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import org.checkerframework.framework.qual.FromByteCode;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -26,6 +28,9 @@ public class AdminOverviewCtrl {
     @FXML
     private VBox eventList;
     private String password;
+
+    @FXML
+    private ChoiceBox<String> orderByChoiceBox;
 
 
     /**
