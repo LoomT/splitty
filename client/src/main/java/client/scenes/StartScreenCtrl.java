@@ -159,7 +159,7 @@ public class StartScreenCtrl {
         }
         else if(title.getText().length() > 100){
             System.out.println("Word Limit Error");
-            mainCtrl.showErrorPopup(WordLimitError, "an event name" ,100);
+            mainCtrl.showErrorPopup(WordLimitError, "An event name" ,100);
             return;
         }
         try {

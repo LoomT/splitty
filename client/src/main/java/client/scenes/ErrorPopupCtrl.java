@@ -113,12 +113,12 @@ public class ErrorPopupCtrl {
             }
 
             case InvalidErrorCode -> {
-                header = prop.getProperty("ErrorPopup.invalidJoinCodeHeader");
-                description = prop.getProperty("ErrorPopup.invalidJoinCodeDescription");
+                header = prop.getProperty("ErrorPopup.invalidJoinCodeErrorHeader");
+                description = prop.getProperty("ErrorPopup.invalidJoinCodeErrorDescription");
             }
             default -> {
-                header = prop.getProperty("ErrorPopup.invalidErrorHeader");
-                description = prop.getProperty("ErrorPopup.invalidErrorDescription");
+                header = prop.getProperty("ErrorPopup.unknownErrorHeader");
+                description = prop.getProperty("ErrorPopup.unknownErrorDescription");
             }
         }
         this.errorHeader.setText(header);
