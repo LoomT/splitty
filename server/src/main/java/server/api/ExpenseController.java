@@ -1,15 +1,13 @@
 package server.api;
 
-import commons.Event;
+import commons.EventWeakKey;
 import commons.Expense;
 import commons.WebsocketActions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
-import server.database.EventRepository;
 import server.database.ExpenseRepository;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,20 +15,17 @@ import java.util.Optional;
 @RequestMapping("/api/events/{eventID}/expenses")
 public class ExpenseController {
     private final ExpenseRepository repoExpense;
-    private final EventRepository repoEvent;
     private final SimpMessagingTemplate simp;
 
     /**
      * constructor for expense controller
      *
      * @param repoExpense repo of the Expenses
-     * @param repoEvent repo of the Events
      * @param simp websocket object to send messages to event subscribers
      */
-    public ExpenseController(ExpenseRepository repoExpense, EventRepository repoEvent,
+    public ExpenseController(ExpenseRepository repoExpense,
                              SimpMessagingTemplate simp) {
         this.repoExpense = repoExpense;
-        this.repoEvent = repoEvent;
         this.simp = simp;
     }
 
@@ -45,17 +40,10 @@ public class ExpenseController {
     public ResponseEntity<Expense> getById(@PathVariable long id,
                                            @PathVariable String eventID) {
         try {
-            Optional<Event> optionalEvent = repoEvent.findById(eventID);
-            Optional<Expense> optionalExpense = repoExpense.findById(id);
-            if(optionalEvent.isEmpty() || optionalExpense.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            Event event = optionalEvent.get();
-            Expense expense = optionalExpense.get();
-            if(!event.hasExpense(expense)) {
-                return ResponseEntity.status(401).build();
-            }
-            return ResponseEntity.ok(expense); //status code 200(OK) if found
+            Optional<Expense> optionalExpense = repoExpense.findById(new EventWeakKey(eventID, id));
+            //status code 200(OK) if found
+            return optionalExpense.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
@@ -72,19 +60,12 @@ public class ExpenseController {
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense,
                                               @PathVariable String eventID) {
         try {
-            if (checkForBadExpenseFields(expense) || expense.getExpenseID() != 0) {
+            if (checkForBadExpenseFields(expense)) {
                 return ResponseEntity.badRequest().build();
             }
-            Optional<Event> optionalEvent = repoEvent.findById(eventID);
-            if (optionalEvent.isEmpty())
-                return ResponseEntity.notFound().build();
-            Event event = optionalEvent.get();
-            if(!new HashSet<>(event.getParticipants()).containsAll(expense.getExpenseParticipants())
-                    || !event.hasParticipant(expense.getExpenseAuthor()))
-                return ResponseEntity.badRequest().build();
+
+            expense.setEventID(eventID);
             Expense saved = repoExpense.save(expense);
-            optionalEvent.get().addExpense(saved);
-            repoEvent.save(optionalEvent.get());
             simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_EXPENSE,
                             "type", Expense.class.getTypeName()));
@@ -107,19 +88,11 @@ public class ExpenseController {
     public ResponseEntity<Expense> deleteById(@PathVariable long id,
                                               @PathVariable String eventID) {
         try {
-            Optional<Event> optionalEvent = repoEvent.findById(eventID);
-            Optional<Expense> optionalExpense = repoExpense.findById(id);
-            if(optionalEvent.isEmpty() || optionalExpense.isEmpty()) {
+            Optional<Expense> optionalExpense = repoExpense.findById(new EventWeakKey(eventID, id));
+            if(optionalExpense.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            Event event = optionalEvent.get();
-            Expense expense = optionalExpense.get();
-            if(!event.hasExpense(expense)) {
-                return ResponseEntity.status(401).build();
-            }
-
-            event.deleteExpense(expense);
-            repoEvent.save(event);
+            repoExpense.delete(optionalExpense.get());
             simp.convertAndSend("/event/" + eventID, id,
                     Map.of("action", WebsocketActions.REMOVE_EXPENSE,
                             "type", Long.class.getTypeName()));
@@ -143,25 +116,15 @@ public class ExpenseController {
                                                  @RequestBody Expense updatedExpense,
                                                  @PathVariable String eventID) {
         try {
-            if(checkForBadExpenseFields(updatedExpense) || updatedExpense.getExpenseID() != id)
+            if(checkForBadExpenseFields(updatedExpense)
+                    || updatedExpense.getId() != id
+                    || !updatedExpense.getEventID().equals(eventID))
                 return ResponseEntity.badRequest().build();
-            Optional<Event> optionalEvent = repoEvent.findById(eventID);
-            Optional<Expense> optionalExpense = repoExpense.findById(id);
-            if(optionalEvent.isEmpty() || optionalExpense.isEmpty()) {
+
+            if(!repoExpense.existsById(new EventWeakKey(eventID, id)))
                 return ResponseEntity.notFound().build();
-            }
-            Event event = optionalEvent.get();
-            Expense expense = optionalExpense.get();
-            if(!event.hasExpense(expense)) {
-                return ResponseEntity.status(401).build();
-            }
-            if(!new HashSet<>(event.getParticipants())
-                    .containsAll(updatedExpense.getExpenseParticipants()) ||
-                    !event.hasParticipant(updatedExpense.getExpenseAuthor()))
-                return ResponseEntity.badRequest().build();
-            event.deleteExpense(expense);
-            event.addExpense(updatedExpense);
-            repoEvent.save(event);
+
+            repoExpense.save(updatedExpense);
             simp.convertAndSend("/event/" + eventID, updatedExpense,
                     Map.of("action", WebsocketActions.UPDATE_EXPENSE,
                             "type", Expense.class.getTypeName()));

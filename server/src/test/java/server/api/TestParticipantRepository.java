@@ -15,6 +15,8 @@
  */
 package server.api;
 
+import commons.Event;
+import commons.EventWeakKey;
 import commons.Participant;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
@@ -35,7 +37,14 @@ public class TestParticipantRepository implements ParticipantRepository {
     private final List<Participant> participants = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
     private final RandomGenerator random = new TestRandom();
+    private TestEventRepository eventRepo = null;
 
+    /**
+     * @param repo event repo
+     */
+    public void setEventRepo(TestEventRepository repo) {
+        eventRepo = repo;
+    }
     /**
      * @return called methods
      */
@@ -80,7 +89,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return list
      */
     @Override
-    public List<Participant> findAllById(Iterable<Long> ids) {
+    public List<Participant> findAllById(Iterable<EventWeakKey> ids) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -141,7 +150,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @param ids to delete by
      */
     @Override
-    public void deleteAllByIdInBatch(Iterable<Long> ids) {
+    public void deleteAllByIdInBatch(Iterable<EventWeakKey> ids) {
         // TODO Auto-generated method stub
 
     }
@@ -160,7 +169,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return quote
      */
     @Override
-    public Participant getOne(Long id) {
+    public Participant getOne(EventWeakKey id) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -170,7 +179,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return participant
      */
     @Override
-    public Participant getById(Long id) {
+    public Participant getById(EventWeakKey id) {
         call("getById");
         if(find(id).isPresent()) {
             return find(id).get();
@@ -182,7 +191,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return quote
      */
     @Override
-    public Participant getReferenceById(Long id) {
+    public Participant getReferenceById(EventWeakKey id) {
         call("getReferenceById");
         if(find(id).isEmpty()) return null;
         return find(id).get();
@@ -192,8 +201,10 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @param id id
      * @return quote
      */
-    private Optional<Participant> find(Long id) {
-        return participants.stream().filter(q -> q.getParticipantId() == id).findFirst();
+    private Optional<Participant> find(EventWeakKey id) {
+        return participants.stream()
+                .filter(q -> q.getId() == id.getId() && q.getEventID().equals(id.getEventID()))
+                .findFirst();
     }
 
     /**
@@ -239,27 +250,26 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public <S extends Participant> S save(S entity) {
         call("save");
-        for(Participant e : participants){
-            if(e.getParticipantId() == entity.getParticipantId()){
-                replaceFields(e, entity);
-                return (S) e;
+        if(entity.getEventID() == null) return null;
+        Optional<Event> optionalEvent = eventRepo.getEvents()
+                .stream().filter(e -> e.getId().equals(entity.getEventID())).findAny();
+        if(optionalEvent.isEmpty()) return null;
+        for(int i = 0; i < participants.size(); i++) {
+            Participant p = participants.get(i);
+            if (p.getId() == entity.getId()
+                    && p.getEventID().equals(entity.getEventID())) {
+                participants.remove(i);
+                participants.add(i, entity);
+                optionalEvent.get().getParticipants().remove(p);
+                optionalEvent.get().addParticipant(entity);
+                return entity;
             }
         }
-        entity.setParticipantId(random.nextLong());
+        entity.setId(random.nextLong());
         participants.add(entity);
-        return entity;
-    }
+        optionalEvent.get().addParticipant(entity);
 
-    /**
-     * Replaces the old participant while keeping the same object address
-     *
-     * @param oldPart old participant
-     * @param newPart new participant
-     */
-    private void replaceFields(Participant oldPart, Participant newPart) {
-        oldPart.setName(newPart.getName());
-        oldPart.setEmailAddress(newPart.getEmailAddress());
-        oldPart.setBankAccountSet(newPart.getBankAccountSet());
+        return entity;
     }
 
     /**
@@ -267,10 +277,12 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return quote
      */
     @Override
-    public Optional<Participant> findById(Long id) {
+    public Optional<Participant> findById(EventWeakKey id) {
         // TODO Auto-generated method stub
         call("findById");
-        return participants.stream().filter(e -> e.getParticipantId() == id).findAny();
+        return participants.stream()
+                .filter(e -> e.getId() == id.getId() && e.getEventID().equals(id.getEventID()))
+                .findAny();
     }
 
     /**
@@ -278,7 +290,7 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @return true if present
      */
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(EventWeakKey id) {
         call("existsById");
         return find(id).isPresent();
     }
@@ -295,9 +307,12 @@ public class TestParticipantRepository implements ParticipantRepository {
      * @param id to delete by
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(EventWeakKey id) {
         calledMethods.add("deleteById");
-        participants.removeIf(p -> p.getParticipantId() == id);
+        if(!participants.removeIf(p -> p.getId() == id.getId()
+                && p.getEventID().equals(id.getEventID()))) return;
+        eventRepo.getEvents().stream().filter(e -> e.getId().equals(id.getEventID()))
+                .findAny().get().getParticipants().removeIf(p -> p.getId() == id.getId());
     }
 
     /**
@@ -306,15 +321,16 @@ public class TestParticipantRepository implements ParticipantRepository {
     @Override
     public void delete(Participant entity) {
         calledMethods.add("delete");
-        participants.remove(entity);
-
+        if(!participants.remove(entity)) return;
+        eventRepo.getEvents().stream().filter(e -> e.getId().equals(entity.getEventID()))
+                .findAny().get().getParticipants().remove(entity);
     }
 
     /**
      * @param ids to delete by
      */
     @Override
-    public void deleteAllById(Iterable<? extends Long> ids) {
+    public void deleteAllById(Iterable<? extends EventWeakKey> ids) {
         // TODO Auto-generated method stub
 
     }

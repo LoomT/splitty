@@ -113,14 +113,14 @@ public class Websocket {
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
                 Participant curr = event.getParticipants().get(i);
-                if (curr.getParticipantId() == p.getParticipantId()) {
+                if (curr.getId() == p.getId()) {
                     index = i;
                     break;
                 }
             }
             if (index == -1) {
                 throw new RuntimeException("The updated participant's ID ("
-                        + p.getParticipantId()+
+                        + p.getId()+
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);
@@ -137,7 +137,7 @@ public class Websocket {
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
                 Participant curr = event.getParticipants().get(i);
-                if (curr.getParticipantId() == partId) {
+                if (curr.getId() == partId) {
                     index = i;
                     break;
                 }
