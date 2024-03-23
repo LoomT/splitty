@@ -183,14 +183,14 @@ public class Websocket {
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
                 Expense curr = event.getExpenses().get(i);
-                if (curr.getExpenseID() == expense.getExpenseID()) {
+                if (curr.getId() == expense.getId()) {
                     index = i;
                     break;
                 }
             }
             if (index == -1) {
                 throw new RuntimeException("The updated expense's ID ("
-                        + expense.getExpenseID()+
+                        + expense.getId()+
                         ") does not match with any ID's of the already existing expenses");
             }
             event.getExpenses().remove(index);
@@ -202,7 +202,7 @@ public class Websocket {
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
                 Expense curr = event.getExpenses().get(i);
-                if (curr.getExpenseID() == expId) {
+                if (curr.getId() == expId) {
                     index = i;
                     break;
                 }
