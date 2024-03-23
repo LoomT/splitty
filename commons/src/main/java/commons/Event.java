@@ -41,8 +41,10 @@ public class Event {
     private String title;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id")
     private List<Participant> participants;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id")
     private List<Expense> expenses;
     @Temporal(TemporalType.TIMESTAMP)
     private final Date creationDate;

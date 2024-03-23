@@ -84,8 +84,19 @@ public class ParticipantController {
             }
             Event event = optionalEvent.get();
             event.addParticipant(participant);
-            eventRepo.save(event);
-            simp.convertAndSend("/event/" + eventID, participant,
+            Event saved = eventRepo.save(event);
+            // find the participant with the highest id
+            Participant highest = null;
+            long highestID = -1;
+            for (Participant p : saved.getParticipants()) {
+                if (p.getParticipantId() > highestID) {
+                    highestID = p.getParticipantId();
+                    highest = p;
+                }
+            }
+            if (highest == null) throw new RuntimeException("Participant never got saved");
+
+            simp.convertAndSend("/event/" + eventID, highest,
                     Map.of("action", WebsocketActions.ADD_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
