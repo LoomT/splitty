@@ -9,8 +9,11 @@ public class FlagListCell extends javafx.scene.control.ListCell<String> {
     private final ImageView imageView = new ImageView();
 
     @Inject
-    LanguageConf languageConf;
+    private LanguageConf languageConf;
 
+    /**
+     * @param languageConf to add the current language configuration to the class
+     */
     public FlagListCell(LanguageConf languageConf){
         this.languageConf = languageConf;
     }
@@ -28,9 +31,6 @@ public class FlagListCell extends javafx.scene.control.ListCell<String> {
         if (empty || language == null) {
             setGraphic(null);
         } else {
-//            Image flagImage = new Image(ResourceBundle.getBundle
-//                            ("languages", Locale.of("flags"))
-//                            .getString("flag_" + language));
             Image flagImage = new Image(languageConf.get("flag", language));
             imageView.setImage(flagImage);
             imageView.setFitHeight(20);
