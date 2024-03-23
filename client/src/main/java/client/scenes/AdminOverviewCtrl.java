@@ -12,10 +12,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import org.checkerframework.framework.qual.FromByteCode;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class AdminOverviewCtrl {
@@ -34,17 +34,23 @@ public class AdminOverviewCtrl {
     private ChoiceBox<String> orderByChoiceBox;
 
     private LanguageConf languageConf;
-
+    private List<Event> allEvents;
 
     /**
      * adminOverview screen controller constructor
      *
-     * @param server     utils
-     * @param mainCtrl   main scene controller
-     * @param userConfig the user configuration
+     * @param server       utils
+     * @param mainCtrl     main scene controller
+     * @param userConfig   the user configuration
+     * @param languageConf the languageconf instance
      */
     @Inject
-    public AdminOverviewCtrl(ServerUtils server, MainCtrl mainCtrl, UserConfig userConfig, LanguageConf languageConf) {
+    public AdminOverviewCtrl(
+            ServerUtils server,
+            MainCtrl mainCtrl,
+            UserConfig userConfig,
+            LanguageConf languageConf
+    ) {
 
         this.server = server;
         this.mainCtrl = mainCtrl;
@@ -59,7 +65,55 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void initialize() {
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.creationDate"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.numOfParticipants"));
+        orderByChoiceBox.setValue(languageConf.get("AdminOverview.creationDate"));
+        orderByChoiceBox.setOnAction((e1) -> {
+            orderAndDisplayEvents();
+        });
+
+    }
+
+    private void orderAndDisplayEvents() {
+        List<EventListItemAdmin> list = new ArrayList<>();
+
+        switch (orderByChoiceBox.getSelectionModel().getSelectedIndex()) {
+            case 0: // Order by creation date
+                allEvents.sort(((o1, o2) -> -o1.getCreationDate().compareTo(o2.getCreationDate())));
+                break;
+            case 1: // Order by event name
+                allEvents.sort(Comparator.comparing(o -> o.getTitle().toLowerCase()));
+                break;
+            case 2: // order by num of participants
+                allEvents.sort(Comparator.comparingInt(o -> -o.getParticipants().size()));
+                break;
+        }
+
+
+        eventList.getChildren().clear();
+
+        for (int i = 0; i < allEvents.size(); i++) {
+            int finalI = i;
+            list.add(
+                    new EventListItemAdmin(
+                            allEvents.get(i).getTitle(),
+                            allEvents.get(i).getId(),
+                            () -> {
+                                int status = server.deleteEvent(allEvents.get(finalI).getId());
+                                if (status != 204) {
+                                    System.out.println("Server did not delete the event " + status);
+                                    // TODO maybe trow an error message or smth
+                                }
+                                allEvents.remove(finalI);
+                                eventList.getChildren().remove(list.get(finalI));
+                            },
+                            () -> eventExportHandler(allEvents.get(finalI)),
+                            () -> {
+                                // TODO display the event
+                            }));
+            eventList.getChildren().add(list.get(i));
+        }
     }
 
     /**
@@ -90,32 +144,8 @@ public class AdminOverviewCtrl {
      * Method to get all the events into the list
      */
     public void loadAllEvents() {
-        List<Event> allEvents = server.getEvents(password);
-        List<EventListItemAdmin> list = new ArrayList<>();
-
-        eventList.getChildren().clear();
-
-        for (int i = 0; i < allEvents.size(); i++) {
-            int finalI = i;
-            list.add(
-                new EventListItemAdmin(
-                    allEvents.get(i).getTitle(),
-                    allEvents.get(i).getId(),
-                    () -> {
-                        int status = server.deleteEvent(allEvents.get(finalI).getId());
-                        if(status != 204) {
-                            System.out.println("Server did not delete the event " + status);
-                            // TODO maybe trow an error message or smth
-                        }
-                        allEvents.remove(finalI);
-                        eventList.getChildren().remove(list.get(finalI));
-                    },
-                    () -> eventExportHandler(allEvents.get(finalI)),
-                    () -> {
-                        // TODO display the event
-                    }));
-            eventList.getChildren().add(list.get(i));
-        }
+        allEvents = server.getEvents(password);
+        orderAndDisplayEvents();
     }
 
     /**

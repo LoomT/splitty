@@ -176,7 +176,7 @@ public class MainCtrl {
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
-        primaryStage.setTitle("Admin Overview");
+        primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
     }
 
