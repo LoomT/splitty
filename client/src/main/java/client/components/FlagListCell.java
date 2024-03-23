@@ -1,13 +1,19 @@
 package client.components;
 
+import client.utils.LanguageConf;
+import jakarta.inject.Inject;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 public class FlagListCell extends javafx.scene.control.ListCell<String> {
     private final ImageView imageView = new ImageView();
+
+    @Inject
+    LanguageConf languageConf;
+
+    public FlagListCell(LanguageConf languageConf){
+        this.languageConf = languageConf;
+    }
 
     /**
      *
@@ -22,9 +28,10 @@ public class FlagListCell extends javafx.scene.control.ListCell<String> {
         if (empty || language == null) {
             setGraphic(null);
         } else {
-            Image flagImage = new Image(ResourceBundle.getBundle
-                            ("languages", Locale.of("flags"))
-                            .getString("flag_" + language));
+//            Image flagImage = new Image(ResourceBundle.getBundle
+//                            ("languages", Locale.of("flags"))
+//                            .getString("flag_" + language));
+            Image flagImage = new Image(languageConf.get("flag", language));
             imageView.setImage(flagImage);
             imageView.setFitHeight(20);
             imageView.setPreserveRatio(true);

@@ -68,8 +68,8 @@ public class StartScreenCtrl {
     private void initialize() {
         languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
-        languageChoiceBox.setButtonCell(new FlagListCell());
-        languageChoiceBox.setCellFactory(param -> new FlagListCell());
+        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
+        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
