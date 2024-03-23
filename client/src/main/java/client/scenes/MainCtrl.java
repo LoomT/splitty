@@ -191,12 +191,11 @@ public class MainCtrl {
 
     /**
      * Show error popup for general usage
-     * @param type type of error
-     * @param place place of error
+     * @param token token of the error
      * Check ErrorPopupCtrl for more detailed documentation
      */
-    public void showErrorPopup(String type, String place){
-        errorPopupCtrl.generatePopup(type, place);
+    public void showErrorPopup(ErrorPopupCtrl.ErrorCode code, String token, int limit){
+        errorPopupCtrl.generatePopup(code, token, limit);
         Stage stage = new Stage();
         stage.setScene(errorPopup);
         stage.setResizable(false);
@@ -204,24 +203,6 @@ public class MainCtrl {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
     }
-
-    /**
-     * Show error popup for general usage
-     * @param type type of error
-     * @param place place of error
-     * @param limit
-     * Check ErrorPopupCtrl for more detailed documentation
-     */
-    public void showWordLimitErrorPopup(String type, String place, int limit){
-        errorPopupCtrl.generatePopup(type, place, limit);
-        Stage stage = new Stage();
-        stage.setScene(errorPopup);
-        stage.setResizable(false);
-        stage.setTitle("Error");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
-    }
-
 
     /**
      * Opens the system file chooser to save something

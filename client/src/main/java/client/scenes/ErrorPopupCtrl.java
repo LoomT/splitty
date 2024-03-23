@@ -70,10 +70,11 @@ public class ErrorPopupCtrl {
 
     /**
      *
-     * @param type
-     * @param token
+     * @param token String token to be used
+     * @param limit word limit of the input
      */
-    public void generatePopup(String type, String token){
+    public void generatePopup(ErrorCode code, String token, int limit){
+
         String languageURL = Objects.requireNonNull(getClass().getResource
                 ("/languages_" + languageConf.getCurrentLocaleString() + ".properties")).getPath();
         try(FileInputStream fis = new FileInputStream(languageURL)){
@@ -81,11 +82,7 @@ public class ErrorPopupCtrl {
                     getClass().getResource("/client/scenes/icons8-error-96.png"))));
             Properties prop = new Properties();
             prop.load(fis);
-
-            this.errorHeader.setText(String.format(
-                    prop.getProperty("ErrorPopup." + type + "Header"), token));
-            this.errorDescription.setText(String.format(
-                    prop.getProperty("ErrorPopup." + type + "Description"), token));
+            errorPicker(code, prop, token, limit);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -94,26 +91,45 @@ public class ErrorPopupCtrl {
 
     /**
      *
-     * @param type
-     * @param token
-     * @param limit
+     * @param code code of the error
+     * @param prop appropriate language config
+     * @param token String token to be used
+     * @param limit word limit of the input
      */
-    public void generatePopup(String type, String token, int limit){ //get a better name
-        String languageURL = Objects.requireNonNull(getClass().getResource
-                ("/languages_" + languageConf.getCurrentLocaleString() + ".properties")).getPath();
-        try(FileInputStream fis = new FileInputStream(languageURL)){
-            this.errorImage.setImage(new Image(String.valueOf(
-                    getClass().getResource("/client/scenes/icons8-error-96.png"))));
-            Properties prop = new Properties();
-            prop.load(fis);
+    private void errorPicker(ErrorCode code, Properties prop, String token, int limit){
+        String header;
+        String description;
+        switch(code){
+            case EmptyStringError -> {
+                header = String.format(prop.getProperty("ErrorPopup.emptyFieldErrorHeader"), token);
+                description = String.format(
+                        prop.getProperty("ErrorPopup.emptyFieldErrorDescription"), token);
+            }
+            case WordLimitError -> {
+                header = String.format(prop.getProperty("ErrorPopup.wordLimitErrorHeader"), token);
+                //System.out.println(prop.getProperty("ErrorPopup.wordLimitErrorDescription"));
+                description = String.format(
+                        prop.getProperty("ErrorPopup.wordLimitErrorDescription"), token, limit);
+            }
 
-            this.errorHeader.setText(prop.getProperty("ErrorPopup." + type + "Header"));
-            this.errorDescription.setText(String.format(
-                    prop.getProperty("ErrorPopup." + type + "Description"), token, limit));
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            case InvalidErrorCode -> {
+                header = prop.getProperty("ErrorPopup.invalidJoinCodeHeader");
+                description = prop.getProperty("ErrorPopup.invalidJoinCodeDescription");
+            }
+            default -> {
+                header = prop.getProperty("ErrorPopup.invalidErrorHeader");
+                description = prop.getProperty("ErrorPopup.invalidErrorDescription");
+            }
         }
+        this.errorHeader.setText(header);
+        this.errorDescription.setText(description);
+    }
+
+    public enum ErrorCode{
+        WordLimitError,
+        EmptyStringError,
+        InvalidErrorCode
+
     }
 
 

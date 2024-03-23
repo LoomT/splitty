@@ -19,6 +19,8 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import static client.scenes.ErrorPopupCtrl.ErrorCode.*;
+
 
 public class StartScreenCtrl {
 
@@ -152,12 +154,12 @@ public class StartScreenCtrl {
         websocket.resetAllActions();
         if (title.getText().isEmpty()){
             System.out.println("Empty Title Error");
-            mainCtrl.showErrorPopup("emptyFieldError", "an Event");
+            mainCtrl.showErrorPopup(EmptyStringError, "for an event name", 0);
             return;
         }
         else if(title.getText().length() > 100){
             System.out.println("Word Limit Error");
-            mainCtrl.showWordLimitErrorPopup("wordLimitError", "Event Titles" ,100);
+            mainCtrl.showErrorPopup(WordLimitError, "an event name" ,100);
             return;
         }
         try {
@@ -177,13 +179,18 @@ public class StartScreenCtrl {
         websocket.resetAllActions();
         if (code.getText().isEmpty()){
             System.out.println("Empty Field Error");
-            mainCtrl.showErrorPopup("emptyFieldError", "an Event Code");
+            mainCtrl.showErrorPopup(EmptyStringError,"join code for an event", 0);
             //wordLimitError(code, joinError, 6);
             return;
         }
         if(code.getText().length() > 6){
             System.out.println("Word Limit Error");
-            mainCtrl.showWordLimitErrorPopup("wordLimitError", "Event Codes", 6);
+            mainCtrl.showErrorPopup(WordLimitError,"A join code", 6);
+            return;
+        }
+        if(code.getText().length() != 6){
+            System.out.println("Join Code Error");
+            mainCtrl.showErrorPopup(InvalidErrorCode,"A join code", 0);
             return;
         }
         try {
