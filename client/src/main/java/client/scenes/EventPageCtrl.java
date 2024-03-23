@@ -47,6 +47,8 @@ public class EventPageCtrl {
     private LanguageConf languageConf;
     private Event event;
 
+
+
     /**
      * @param server       server utils injection
      * @param mainCtrl     mainCtrl injection
@@ -71,6 +73,7 @@ public class EventPageCtrl {
         });
 
 
+
     }
 
     /**
@@ -84,22 +87,10 @@ public class EventPageCtrl {
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
-            participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
-            allTab.setStyle("-fx-opacity:0");
-            allTab.setDisable(true);
-            fromTab.setStyle("-fx-opacity:0");
-            fromTab.setDisable(true);
-            includingTab.setStyle("-fx-opacity:0");
-            includingTab.setDisable(true);
-            addExpenseButton.setDisable(true);
+            noParticipantsExist();
         } else {
-            allTab.setStyle("-fx-opacity:1");
-            allTab.setDisable(false);
-            fromTab.setStyle("-fx-opacity:1");
-            fromTab.setDisable(false);
-            includingTab.setStyle("-fx-opacity:1");
-            includingTab.setDisable(false);
-            addExpenseButton.setDisable(false);
+            participantsExist();
+
             StringBuilder p = new StringBuilder();
             for (int i = 0; i < e.getParticipants().size(); i++) {
                 p.append(e.getParticipants().get(i).getName());
@@ -124,7 +115,46 @@ public class EventPageCtrl {
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
         });
-        websocket.connect(e.getId());
+
+        websocket.registerParticipantChangeListener(
+                event,
+                this::displayEvent,
+                this::displayEvent,
+                this::displayEvent
+        );
+
+    }
+
+    private void handleWS() {
+
+    }
+
+
+    /**
+     * Sets the labels' styles for the case in which no participants exist
+     */
+    private void noParticipantsExist() {
+        participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
+        allTab.setStyle("-fx-opacity:0");
+        allTab.setDisable(true);
+        fromTab.setStyle("-fx-opacity:0");
+        fromTab.setDisable(true);
+        includingTab.setStyle("-fx-opacity:0");
+        includingTab.setDisable(true);
+        addExpenseButton.setDisable(true);
+    }
+
+    /**
+     * Sets the labels' styles for the case in which participants do exist
+     */
+    private void participantsExist() {
+        allTab.setStyle("-fx-opacity:1");
+        allTab.setDisable(false);
+        fromTab.setStyle("-fx-opacity:1");
+        fromTab.setDisable(false);
+        includingTab.setStyle("-fx-opacity:1");
+        includingTab.setDisable(false);
+        addExpenseButton.setDisable(false);
     }
 
     /**
@@ -139,7 +169,7 @@ public class EventPageCtrl {
 
     @FXML
     private void backButtonClicked() {
-        websocket.disconnect();
+        //websocket.disconnect();
         mainCtrl.showStartScreen();
     }
 

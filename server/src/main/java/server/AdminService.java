@@ -1,11 +1,26 @@
 package server;
 
-import java.security.SecureRandom;
-import java.util.Base64;
+import org.springframework.stereotype.Component;
 
+import java.util.Base64;
+import java.util.random.RandomGenerator;
+
+@Component
 public class AdminService {
 
-    private static final String adminPassword = generateAdminPassword();
+    private final String adminPassword;
+
+    private final RandomGenerator random;
+
+
+    /**
+     * Constructor for AdminService
+     * @param random RandomGenerator
+     */
+    public AdminService(RandomGenerator random) {
+        this.random = random;
+        adminPassword = generateAdminPassword();
+    }
 
 
     /**
@@ -14,11 +29,12 @@ public class AdminService {
      * @return the generated password
      */
 
-    static String generateAdminPassword() {
-        SecureRandom random = new SecureRandom();
+    String generateAdminPassword() {
         byte[] bytes = new byte[24];
         random.nextBytes(bytes);
-        return Base64.getEncoder().encodeToString(bytes);
+        String password = Base64.getEncoder().encodeToString(bytes);
+        System.out.println("Admin password: " + password);
+        return password;
     }
 
     /**
@@ -27,8 +43,8 @@ public class AdminService {
      * @return the admin password
      */
 
-    public static String getAdminPassword() {
-        return adminPassword;
+    public String getAdminPassword() {
+        return this.adminPassword;
     }
 
     /**
@@ -37,12 +53,9 @@ public class AdminService {
      * @param inputPassword password read in AdminLoginCtrl
      * @return boolean value
      */
-    public static boolean verifyPassword(String inputPassword) {
+    public boolean verifyPassword(String inputPassword) {
         String adminServiceAttribute = getAdminPassword();
 
         return adminServiceAttribute.equals(inputPassword);
     }
-
-
-
 }
