@@ -86,7 +86,7 @@ public class StartScreenCtrl {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
         reloadEventCodes();
-        wordLimitError(code, joinError, 6);
+        wordLimitError(code, joinError, 5);
         wordLimitError(title, createEventError,100);
 
     }
@@ -152,14 +152,17 @@ public class StartScreenCtrl {
      */
     public void create() {
         websocket.resetAllActions();
+        String token;
         if (title.getText().isEmpty()){
             System.out.println("Empty Title Error");
-            mainCtrl.showErrorPopup(EmptyStringError, "for an event name", 0);
+            token = "StartScreen.emptyEventToken";
+            mainCtrl.showErrorPopup(EmptyStringError, token, 0);
             return;
         }
         else if(title.getText().length() > 100){
             System.out.println("Word Limit Error");
-            mainCtrl.showErrorPopup(WordLimitError, "An event name" ,100);
+            token = "StartScreen.eventWordLimitToken";
+            mainCtrl.showErrorPopup(WordLimitError, token ,100);
             return;
         }
         try {
@@ -177,20 +180,23 @@ public class StartScreenCtrl {
      */
     public void join() {
         websocket.resetAllActions();
+        String token;
         if (code.getText().isEmpty()){
+            token = "StartScreen.joinEmptyToken";
             System.out.println("Empty Field Error");
-            mainCtrl.showErrorPopup(EmptyStringError,"join code for an event", 0);
-            //wordLimitError(code, joinError, 6);
+            mainCtrl.showErrorPopup(EmptyStringError, token, 0);
             return;
         }
-        if(code.getText().length() > 6){
+        if(code.getText().length() > 5){
+            token = "StartScreen.joinWordLimitToken";
             System.out.println("Word Limit Error");
-            mainCtrl.showErrorPopup(WordLimitError,"A join code", 6);
+            mainCtrl.showErrorPopup(WordLimitError, token, 5);
             return;
         }
-        if(code.getText().length() != 6){
+        if(code.getText().length() != 5){
+            token = "StartScreen.joinInvalidToken";
             System.out.println("Join Code Error");
-            mainCtrl.showErrorPopup(InvalidErrorCode,"A join code", 0);
+            mainCtrl.showErrorPopup(InvalidErrorCode, token, 5);
             return;
         }
         try {
@@ -198,7 +204,6 @@ public class StartScreenCtrl {
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
             throw e;
-            //System.out.println("Something went wrong while joining an event");
         }
 
 
