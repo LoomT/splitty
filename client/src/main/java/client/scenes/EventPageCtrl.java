@@ -142,6 +142,12 @@ public class EventPageCtrl {
                 this::displayEvent,
                 this::displayEvent
         );
+        websocket.registerExpenseChangeListener(
+                event,
+                this::displayExpenses,
+                this::displayExpenses,
+                this::displayExpenses
+        );
     }
 
     private void handleWS() {
@@ -188,61 +194,6 @@ public class EventPageCtrl {
 //        createExpensesIncluding(e, selectedName);
     }
 
-    /**
-     * Registers all the change listeners on WS if they're not registered already
-     *
-     */
-
-    private void registerExpenseChangeListener() {
-        if (previousEventId.equals(event.getId())) return;
-        previousEventId = event.getId();
-        websocket.resetAction(WebsocketActions.ADD_EXPENSE);
-        websocket.resetAction(WebsocketActions.UPDATE_EXPENSE);
-        websocket.resetAction(WebsocketActions.REMOVE_EXPENSE);
-        websocket.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
-            Expense expense = (Expense) exp;
-            event.getExpenses().add(expense);
-            displayEvent(event);
-        });
-        websocket.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
-            Expense expense = (Expense) exp;
-            int index = -1;
-            for (int i = 0; i < event.getExpenses().size(); i++) {
-                Expense curr = event.getExpenses().get(i);
-                if (curr.getExpenseID() == expense.getExpenseID()) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The updated expense's ID ("
-                        + expense.getExpenseID()+
-                        ") does not match with any ID's of the already existing expenses");
-            }
-            event.getExpenses().remove(index);
-            event.getExpenses().add(index, expense);
-            displayEvent(event);
-        });
-        websocket.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
-            long expId = (long) exp;
-            int index = -1;
-            for (int i = 0; i < event.getExpenses().size(); i++) {
-                Expense curr = event.getExpenses().get(i);
-                if (curr.getExpenseID() == expId) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The deleted expense's ID ("
-                        + expId+
-                        ") does not match with any ID's of the already existing expenses");
-            }
-            event.getExpenses().remove(index);
-            displayEvent(event);
-        });
-
-    }
 
     /**
      * Changes the title of the event

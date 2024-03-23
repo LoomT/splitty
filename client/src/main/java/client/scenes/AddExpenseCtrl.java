@@ -3,6 +3,7 @@ package client.scenes;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
+import client.utils.Websocket;
 import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
@@ -60,15 +61,27 @@ public class AddExpenseCtrl {
     private Expense expense;
     private List<Participant> selectedParticipants = new ArrayList<>();
 
+    private Websocket websocket;
+
+
     /**
      * @param server   serverutils instance
      * @param mainCtrl main control instance
+     * @param languageConf the language config instance
+     * @param websocket the websocket instance
 
      */
     @Inject
-    public AddExpenseCtrl(ServerUtils server, MainCtrl mainCtrl) {
+    public AddExpenseCtrl(
+            ServerUtils server,
+            MainCtrl mainCtrl,
+            LanguageConf languageConf,
+            Websocket websocket
+    ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.languageConf = languageConf;
+        this.websocket = websocket;
     }
 
     /**
@@ -109,6 +122,13 @@ public class AddExpenseCtrl {
         });
 
         abort.setOnAction(x -> mainCtrl.showEventPage(event));
+
+        websocket.registerExpenseChangeListener(
+                event,
+                this::displayAddExpensePage,
+                this::displayAddExpensePage,
+                this::displayAddExpensePage
+        );
 
     }
 
