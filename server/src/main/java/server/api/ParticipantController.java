@@ -1,9 +1,6 @@
 package server.api;
 
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -48,16 +45,11 @@ public class ParticipantController {
     public ResponseEntity<Participant> getById(@PathVariable long partID,
                                                @PathVariable String eventID){
         try{
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            Optional<Participant> optionalParticipant = repo.findById(partID);
-            if(optionalEvent.isEmpty() || optionalParticipant.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            Participant participant = optionalParticipant.get();
-            if(!optionalEvent.get().hasParticipant(participant)){
-                return ResponseEntity.status(401).build();
-            }
-            return ResponseEntity.ok(participant);
+            Optional<Participant> optionalParticipant =
+                    repo.findById(new EventWeakKey(eventID, partID));
+
+            return optionalParticipant.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
         }catch (Exception e){
             return ResponseEntity.internalServerError().build();
         }
@@ -76,27 +68,14 @@ public class ParticipantController {
     public ResponseEntity<Participant> add(@RequestBody Participant participant,
                                            @PathVariable String eventID) {
         try {
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
+            if(!eventRepo.existsById(eventID)) return ResponseEntity.notFound().build();
             if (participant == null || participant.getName() == null ||
                     participant.getName().isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            Event event = optionalEvent.get();
-            event.addParticipant(participant);
-            Event saved = eventRepo.save(event);
-            // find the participant with the highest id
-            Participant highest = null;
-            long highestID = -1;
-            for (Participant p : saved.getParticipants()) {
-                if (p.getParticipantId() > highestID) {
-                    highestID = p.getParticipantId();
-                    highest = p;
-                }
-            }
-            if (highest == null) throw new RuntimeException("Participant never got saved");
-
-            simp.convertAndSend("/event/" + eventID, highest,
+            participant.setEventID(eventID);
+            Participant saved = repo.save(participant);
+            simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
@@ -122,19 +101,13 @@ public class ParticipantController {
         try {
             if (participant == null || participant.getName() == null
                     || participant.getName().isEmpty()
-                    || participant.getParticipantId() != partID) {
+                    || participant.getId() != partID
+                    || !eventID.equals(participant.getEventID())) {
                 return ResponseEntity.badRequest().build();
             }
 
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            Optional<Participant> optionalParticipant = repo.findById(partID);
-            if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
+            if(!repo.existsById(new EventWeakKey(eventID, partID)))
                 return ResponseEntity.notFound().build();
-            Event event = optionalEvent.get();
-            Participant oldParticipant = optionalParticipant.get();
-
-            if (!event.hasParticipant(oldParticipant))
-                return ResponseEntity.status(401).build();
 
             repo.save(participant);
             simp.convertAndSend("/event/" + eventID, participant,
@@ -159,15 +132,12 @@ public class ParticipantController {
     public ResponseEntity<Event> deleteById(@PathVariable long partID,
                                             @PathVariable String eventID) {
         try {
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            Optional<Participant> optionalParticipant = repo.findById(partID);
-            if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
-                return ResponseEntity.notFound().build();
-            Event event = optionalEvent.get();
-            Participant participant = optionalParticipant.get();
+            Optional<Participant> optionalParticipant =
+                    repo.findById(new EventWeakKey(eventID, partID));
+            if(optionalParticipant.isEmpty()) return ResponseEntity.notFound().build();
 
-            if (!event.hasParticipant(participant))
-                return ResponseEntity.status(401).build();
+            Participant participant = optionalParticipant.get();
+            Event event = eventRepo.getReferenceById(eventID);
 
             List<Expense> expenses = event.getExpenses();
             expenses.removeIf(expense -> expense.getExpenseAuthor().equals(participant));
@@ -175,8 +145,7 @@ public class ParticipantController {
                 e.getExpenseParticipants().remove(participant);
             }
 
-            event.deleteParticipant(participant);
-            eventRepo.save(event);
+            repo.delete(participant);
             simp.convertAndSend("/event/" + eventID, partID,
                     Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
                             "type", Long.class.getTypeName()));
