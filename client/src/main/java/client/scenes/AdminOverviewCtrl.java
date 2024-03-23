@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.components.EventListItemAdmin;
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +33,8 @@ public class AdminOverviewCtrl {
     @FXML
     private ChoiceBox<String> orderByChoiceBox;
 
+    private LanguageConf languageConf;
+
 
     /**
      * adminOverview screen controller constructor
@@ -41,12 +44,13 @@ public class AdminOverviewCtrl {
      * @param userConfig the user configuration
      */
     @Inject
-    public AdminOverviewCtrl(ServerUtils server, MainCtrl mainCtrl, UserConfig userConfig) {
+    public AdminOverviewCtrl(ServerUtils server, MainCtrl mainCtrl, UserConfig userConfig, LanguageConf languageConf) {
 
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.userConfig = userConfig;
         this.initialDirectory = userConfig.getInitialExportDirectory();
+        this.languageConf = languageConf;
     }
 
 
@@ -55,6 +59,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void initialize() {
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
     }
 
     /**
