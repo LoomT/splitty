@@ -93,6 +93,11 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
+        var errorPopup = FXML.load(
+                ErrorPopupCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "ErrorPopup.fxml"
+        );
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
 
         mainCtrl.initialize(
@@ -103,7 +108,8 @@ public class Main extends Application {
                 eventPage,
                 adminLogin,
                 editParticipants,
-                adminOverview
+                adminOverview,
+                errorPopup
         );
 
     }

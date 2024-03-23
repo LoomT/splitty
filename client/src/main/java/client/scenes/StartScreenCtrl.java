@@ -12,6 +12,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.beans.binding.Bindings;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,11 @@ public class StartScreenCtrl {
     @FXML
     private VBox eventList;
 
+    @FXML
+    private Text joinError;
+
+    @FXML
+    private Text createEventError;
 
     private UserConfig userConfig;
     private Websocket websocket;
@@ -76,6 +84,8 @@ public class StartScreenCtrl {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
         reloadEventCodes();
+        wordLimitError(code, joinError, 6);
+        wordLimitError(title, createEventError,100);
 
     }
 
@@ -114,13 +124,42 @@ public class StartScreenCtrl {
         reloadEventCodes();
     }
 
+    /**
+     *
+     * @param textField
+     * @param errorMessage
+     * @param limit
+     */
+    public void wordLimitError(TextField textField, Text errorMessage, int limit){
+        String message = errorMessage.getText();
+        errorMessage.setFill(Color.RED);
+        errorMessage.setVisible(false);
+        textField.textProperty().addListener((observableValue, number, t1)->{
+            errorMessage.setVisible(true);
+            errorMessage.textProperty().bind(Bindings.concat(
+                    message, String.format(" %d/%d", textField.getText().length(), limit)));
+
+            errorMessage.setVisible(textField.getLength() > limit);
+        });
+    }
+
+
 
     /**
      * Creates and joins the event with provided title
      */
     public void create() {
         websocket.resetAllActions();
-        if (title.getText().isEmpty()) return;
+        if (title.getText().isEmpty()){
+            System.out.println("Empty Title Error");
+            mainCtrl.showErrorPopup("emptyFieldError", "an Event");
+            return;
+        }
+        else if(title.getText().length() > 100){
+            System.out.println("Word Limit Error");
+            mainCtrl.showWordLimitErrorPopup("wordLimitError", "Event Titles" ,100);
+            return;
+        }
         try {
             Event createdEvent = server.createEvent(new Event(title.getText()));
             mainCtrl.showEventPage(createdEvent);
@@ -136,7 +175,17 @@ public class StartScreenCtrl {
      */
     public void join() {
         websocket.resetAllActions();
-        if (code.getText().isEmpty()) return;
+        if (code.getText().isEmpty()){
+            System.out.println("Empty Field Error");
+            mainCtrl.showErrorPopup("emptyFieldError", "an Event Code");
+            //wordLimitError(code, joinError, 6);
+            return;
+        }
+        if(code.getText().length() > 6){
+            System.out.println("Word Limit Error");
+            mainCtrl.showWordLimitErrorPopup("wordLimitError", "Event Codes", 6);
+            return;
+        }
         try {
             Event joinedEvent = server.getEvent(code.getText());
             mainCtrl.showEventPage(joinedEvent);
