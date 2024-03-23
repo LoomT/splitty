@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
@@ -32,17 +33,26 @@ public class EditParticipantsCtrl {
     private ServerUtils server;
     private MainCtrl mainCtrl;
     private LanguageConf languageConf;
+    private Websocket websocket;
 
     /**
      * @param server       serverutils instance
      * @param mainCtrl     main control instance
      * @param languageConf the language config instance
+     * @param websocket    the websocket instance
      */
     @Inject
-    public EditParticipantsCtrl(ServerUtils server, MainCtrl mainCtrl, LanguageConf languageConf) {
+    public EditParticipantsCtrl(
+            ServerUtils server,
+            MainCtrl mainCtrl,
+            LanguageConf languageConf,
+            Websocket websocket
+    ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
+        this.websocket = websocket;
+
 
     }
 
@@ -71,6 +81,13 @@ public class EditParticipantsCtrl {
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
 
+        for (Participant p :
+                e.getParticipants()) {
+            System.out.println(p.getParticipantId() + " " + p.getName());
+
+
+        }
+
 
         chooseParticipant.setOnAction((event1) -> {
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
@@ -85,6 +102,13 @@ public class EditParticipantsCtrl {
 
             }
         });
+
+        websocket.registerParticipantChangeListener(
+                event,
+                this::displayEditParticipantsPage,
+                this::displayEditParticipantsPage,
+                this::displayEditParticipantsPage
+        );
 
     }
 
@@ -102,7 +126,7 @@ public class EditParticipantsCtrl {
      */
     @FXML
     private void backButtonClicked() {
-        mainCtrl.showEventPage(event);
+        mainCtrl.goBackToEventPage(event);
     }
 
     /**
@@ -120,6 +144,7 @@ public class EditParticipantsCtrl {
         if (index == 0) {
             // create a new participant
             Participant newP = new Participant(name, email);
+
             server.createParticipant(event.getId(), newP);
         } else {
             Participant currP = event.getParticipants().get(index - 1);
