@@ -9,7 +9,6 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -254,6 +253,11 @@ public class EventPageCtrl {
         mainCtrl.showAddExpensePage(event);
     }
 
+    /**
+     * create the specific displayed expenses for a listview
+     * @param expenses
+     * @param lv
+     */
     public void createExpenses(List<Expense> expenses, ListView<String> lv) {
         ObservableList<String> items = lv.getItems();
         for (Expense expense : expenses) {

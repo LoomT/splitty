@@ -216,12 +216,14 @@ public class AddExpenseCtrl {
                 LocalDate expDate = date.getValue();
                 LocalDateTime localDateTime = expDate.atStartOfDay();
 
-                Date expenseDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+                Date expenseDate = Date.from(localDateTime.
+                        atZone(ZoneId.systemDefault()).toInstant());
 
                 String expPurpose = purpose.getText();
                 String selectedParticipantName = expenseAuthor.getValue();
                 Participant selectedParticipant = ev.getParticipants().stream()
-                        .filter(participant -> participant.getName().equals(selectedParticipantName))
+                        .filter(participant -> participant.getName().
+                                equals(selectedParticipantName))
                         .findFirst().orElse(null);
                 if (selectedParticipant != null) {
                     String expCurrency = currency.getValue();
