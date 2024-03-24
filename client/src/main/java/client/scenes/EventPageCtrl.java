@@ -9,6 +9,7 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -259,13 +260,13 @@ public class EventPageCtrl {
      * @param lv
      */
     public void createExpenses(List<Expense> expenses, ListView<String> lv) {
-        ObservableList<String> items = lv.getItems();
+        ObservableList<String> items = FXCollections.observableArrayList();
+
         for (Expense expense : expenses) {
             String expenseString = expense.toString();
-            if (!items.contains(expenseString)) {
-                items.add(expenseString);
-            }
+            items.add(expenseString);
         }
+
         lv.setItems(items);
     }
 

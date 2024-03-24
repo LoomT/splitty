@@ -262,22 +262,10 @@ public class Expense {
         };
 
         String formattedAmount = currencyFormatter.format(amount);
-        System.out.println(formattedAmount);
-        int size = formattedAmount.length();
-        String currencySymbol = null, amountValue = null;
-
-        if (currency.equals("EUR")) {
-            currencySymbol = formattedAmount.substring(0,0);
-            amountValue = formattedAmount.substring(0, size);
-        } else {
-            currencySymbol = formattedAmount.substring(0,1);
-            amountValue = formattedAmount.substring(1, size);
-        }
-
 
         String rez = dayOfMonth + "." + month + "." + year + "     " +
                 expenseAuthor.getName() + " paid " +
-                amountValue + " " + currencySymbol + " for " + purpose;
+                formattedAmount + " for " + purpose;
 
         return rez;
     }
