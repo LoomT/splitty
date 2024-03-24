@@ -2,13 +2,13 @@ package commons;
 
 
 import jakarta.persistence.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
+@IdClass(EventWeakKey.class)
 public class Expense {
     /*
     Properties:
@@ -23,33 +23,33 @@ public class Expense {
     String type for the type of the current created expense
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long expenseID;
-    @NotNull
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+    @Id
+    @Column(name = "event_id", length = 5, nullable = false)
+    private String eventID;
     @ManyToOne
     private Participant expenseAuthor;
-    @NotNull
+    @Column(nullable = false)
     private String purpose;
+    @Column(nullable = false)
     private double amount;
-    @Column(length = 3)
-    @NotNull
+    @Column(length = 3, nullable = false)
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
-    @NotNull
     private Date date;
     @ManyToMany
     private List<Participant> expenseParticipants;
-    @NotNull
     private String type;
 
     /**
      * constructor for Expense class
-     * @param expenseAuthor
-     * @param purpose
-     * @param amount
-     * @param currency
-     * @param expenseParticipants
-     * @param type
+     * @param expenseAuthor of expense
+     * @param purpose of expense
+     * @param amount of money
+     * @param currency currency, 3 letters
+     * @param expenseParticipants participants that split the expense
+     * @param type type of expense TODO change to a list of labels when implementing labels
      */
     public Expense(Participant expenseAuthor, String purpose, double amount,
                    String currency, List<Participant> expenseParticipants, String type) {
@@ -74,8 +74,22 @@ public class Expense {
      * getter for expenseID
      * @return the expenseID
      */
-    public long getExpenseID() {
-        return expenseID;
+    public long getId() {
+        return id;
+    }
+
+    /**
+     * @return event id
+     */
+    public String getEventID() {
+        return eventID;
+    }
+
+    /**
+     * @param eventID event id
+     */
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
     }
 
     /**
@@ -124,6 +138,13 @@ public class Expense {
      */
     public List<Participant> getExpenseParticipants() {
         return expenseParticipants;
+    }
+
+    /**
+     * @param newParticipants expense participant list to set
+     */
+    public void setExpenseParticipants(List<Participant> newParticipants) {
+        expenseParticipants = newParticipants;
     }
 
     /**
@@ -177,25 +198,25 @@ public class Expense {
 
     /**
      * setter for the ID of the expense
-     * @param expenseID
+     * @param id
      */
-    public void setExpenseID(long expenseID) {
-        this.expenseID = expenseID;
+    public void setId(long id) {
+        this.id = id;
     }
 
 
     /**
-     * equals method
-     * @param o
-     * @return true if equals, false otherwise
+     * @param o object to compare against
+     * @return true iff equal
      */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Expense expense = (Expense) o;
-        return expenseID == expense.expenseID
-                && Double.compare(expense.amount, amount) == 0
+        return id == expense.id
+                && Double.compare(amount, expense.amount) == 0
+                && Objects.equals(eventID, expense.eventID)
                 && Objects.equals(expenseAuthor, expense.expenseAuthor)
                 && Objects.equals(purpose, expense.purpose)
                 && Objects.equals(currency, expense.currency)
@@ -205,12 +226,11 @@ public class Expense {
     }
 
     /**
-     * hashCode method
-     * @return an hashCode for a specific object
+     * @return hash code
      */
     @Override
     public int hashCode() {
-        return Objects.hash(expenseID, expenseAuthor, purpose,
+        return Objects.hash(id, eventID, expenseAuthor, purpose,
                 amount, currency, date, expenseParticipants, type);
     }
 }

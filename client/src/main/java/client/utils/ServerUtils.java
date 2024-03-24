@@ -96,7 +96,7 @@ public class ServerUtils {
     public void updateParticipant(String eventId, Participant participant) {
         ClientBuilder.newClient(new ClientConfig())
                 .target(server)
-                .path("api/events/" + eventId + "/participants/" + participant.getParticipantId())
+                .path("api/events/" + eventId + "/participants/" + participant.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(participant, APPLICATION_JSON), Participant.class);
     }
@@ -181,5 +181,22 @@ public class ServerUtils {
                 .accept(APPLICATION_JSON) //
                 .get(new GenericType<List<Event>>() {
                 });
+    }
+
+    /**
+     * Sends an API call to add the event
+     * The ids of expenses and participants gets reassigned so use the returned event!
+     *
+     * @param password admin password
+     * @param event event to import
+     * @return imported event
+     */
+    public Response importEvent(String password, Event event) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server).path("admin/events")
+                .request(APPLICATION_JSON)
+                .header("Authorization", password)
+                .accept(APPLICATION_JSON)
+                .post(Entity.entity(event, APPLICATION_JSON));
     }
 }
