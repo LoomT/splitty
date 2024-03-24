@@ -212,13 +212,10 @@ public class AddExpenseCtrl {
             String amountText = amount.getText();
             try {
                 double expAmount = Double.parseDouble(amountText);
-
                 LocalDate expDate = date.getValue();
                 LocalDateTime localDateTime = expDate.atStartOfDay();
-
                 Date expenseDate = Date.from(localDateTime.
                         atZone(ZoneId.systemDefault()).toInstant());
-
                 String expPurpose = purpose.getText();
                 String selectedParticipantName = expenseAuthor.getValue();
                 Participant selectedParticipant = ev.getParticipants().stream()
@@ -227,7 +224,6 @@ public class AddExpenseCtrl {
                         .findFirst().orElse(null);
                 if (selectedParticipant != null) {
                     String expCurrency = currency.getValue();
-                    //List<Participant> expPart = new ArrayList<>();
                     expPart.add(selectedParticipant);
 
                     String expType = type.getValue();
@@ -235,9 +231,7 @@ public class AddExpenseCtrl {
                             expCurrency, expPart, expType);
                     expense.setDate(expenseDate);
                     ev.getExpenses().add(expense);
-
                     resetExpenseFields();
-
                     mainCtrl.showEventPage(ev);
                 }
             } catch (NumberFormatException e) {

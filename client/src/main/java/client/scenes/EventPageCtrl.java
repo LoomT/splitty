@@ -107,14 +107,12 @@ public class EventPageCtrl {
             noParticipantsExist();
         } else {
             participantsExist();
-
             StringBuilder p = new StringBuilder();
             for (int i = 0; i < e.getParticipants().size(); i++) {
                 p.append(e.getParticipants().get(i).getName());
                 if (i != e.getParticipants().size() - 1) p.append(", ");
             }
             participantText.setText(p.toString());
-
             participantChoiceBox.getItems().addAll(
                     e.getParticipants().stream().map(Participant::getName).toList()
             );
@@ -124,7 +122,6 @@ public class EventPageCtrl {
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
         }
-
         participantChoiceBox.setOnAction(event -> {
             selectedParticipantId = participantChoiceBox.getSelectionModel().getSelectedIndex();
             if (selectedParticipantId < 0) return;
@@ -133,14 +130,10 @@ public class EventPageCtrl {
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
             fromListView.getItems().clear();
             includingListView.getItems().clear();
-//            createExpensesFrom(e, name);
-//            createExpensesIncluding(e, name);
-
             fromExpenses = getExpensesFrom(e, name);
             includingExpenses = getExpensesIncluding(e, name);
             createExpenses(fromExpenses, fromListView);
             createExpenses(includingExpenses, includingListView);
-
         });
         websocket.registerParticipantChangeListener(
                 event,
@@ -155,7 +148,6 @@ public class EventPageCtrl {
                 this::displayExpenses
         );
     }
-
     private void handleWS() {
 
     }
@@ -224,7 +216,7 @@ public class EventPageCtrl {
      */
     @FXML
     public void tabSelectionChanged(Event e, String selectedParticipantName) {
-        allExpenses = getAllExpenses(event);
+        allExpenses = getAllExpenses(e);
         fromExpenses = getExpensesFrom(e, selectedParticipantName);
         includingExpenses = getExpensesIncluding(e, selectedParticipantName);
         createExpenses(allExpenses, allListView);
