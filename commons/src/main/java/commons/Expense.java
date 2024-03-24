@@ -38,7 +38,7 @@ public class Expense {
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Participant> expenseParticipants;
     private String type;
 
