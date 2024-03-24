@@ -147,7 +147,7 @@ public class MainCtrl {
         eventPageCtrl.displayEvent(eventToShow);
         for (Participant p :
                 eventToShow.getParticipants()) {
-            System.out.println(p.getParticipantId() + " " + p.getName());
+            System.out.println(p.getId() + " " + p.getName());
 
 
         }
@@ -196,15 +196,6 @@ public class MainCtrl {
         return fileChooser.showSaveDialog(primaryStage);
     }
 
-    /**
-     * shows the add/edit expense page
-     * @param eventToShow the event to show the participant editor for
-     */
-    public void showAddExpensePage(Event eventToShow) {
-        addExpenseCtrl.displayAddExpensePage(eventToShow);
-        primaryStage.setTitle("Add/Edit Expense");
-        primaryStage.setScene(addExpense);
-    }
 
     /**
      * Opens the system file chooser to open multiple files
@@ -214,6 +205,16 @@ public class MainCtrl {
      */
     public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
         return fileChooser.showOpenMultipleDialog(primaryStage);
+    }
+
+    /**
+     * shows the add/edit expense page
+     * @param eventToShow the event to show the participant editor for
+     */
+    public void showAddExpensePage(Event eventToShow) {
+        addExpenseCtrl.displayAddExpensePage(eventToShow);
+        primaryStage.setTitle("Add/Edit Expense");
+        primaryStage.setScene(addExpense);
     }
 
 
