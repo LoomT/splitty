@@ -208,7 +208,7 @@ public class EventPageCtrl {
      */
     @FXML
     private void backButtonClicked() {
-        //websocket.disconnect();
+        websocket.disconnect();
         mainCtrl.showStartScreen();
     }
 

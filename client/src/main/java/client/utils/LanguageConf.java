@@ -42,6 +42,15 @@ public class LanguageConf {
     }
 
     /**
+     * @param key the key of the property in the language properties file
+     * @param lang language code to find the key value for
+     * @return String value of requested property
+     */
+    public String get(String key, String lang){
+        return ResourceBundle.getBundle("languages", Locale.of(lang)).getString(key);
+    }
+
+    /**
      * @return the current locale in string format
      */
     public String getCurrentLocaleString() {

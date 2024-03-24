@@ -1,11 +1,11 @@
 package commons;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 
 /**
@@ -17,18 +17,25 @@ import java.util.Set;
  *  bankAccountSet: The registered Bank Accounts for the participant. (can be empty)
  *  getter setter equals hashcode toString methods
  */
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id", scope = Participant.class)
 @Entity
+@IdClass(EventWeakKey.class)
 public class Participant {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long participantId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+    @Id
+    @Column(name = "event_id", length = 5, nullable = false)
+    private String eventID;
     @Column(nullable = false)
     private String name;
     @Nullable
     private String emailAddress;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BankAccount> bankAccountSet;
+    private String beneficiary;
+
+    private String accountNumber;
 
     /**
      * constructor
@@ -40,8 +47,6 @@ public class Participant {
      */
     public Participant(String name) {
         this.name = name;
-        emailAddress = null;
-        bankAccountSet = new HashSet<>();
     }
 
     /**
@@ -57,11 +62,14 @@ public class Participant {
      * constructor with expenses
      * @param name name of the participant
      * @param email email of the participant. Can be Null
-     * @param bankAccountSet bankAccount number of the participant
+     * @param beneficiary bank account beneficiary name
+     * @param accountNumber bank account number
      */
-    public Participant(String name, @Nullable String email, Set<BankAccount> bankAccountSet ) {
+    public Participant(String name, @Nullable String email,
+                       String beneficiary, String accountNumber ) {
         this(name, email);
-        this.bankAccountSet = bankAccountSet;
+        this.beneficiary = beneficiary;
+        this.accountNumber = accountNumber;
     }
 
     /**
@@ -84,16 +92,16 @@ public class Participant {
      * get participant
      * @return participant
      */
-    public long getParticipantId() {
-        return participantId;
+    public long getId() {
+        return id;
     }
 
     /**
      *
-     * @param participantId participantID to replace the old one
+     * @param id participantID to replace the old one
      */
-    public void setParticipantId(long participantId) {
-        this.participantId = participantId;
+    public void setId(long id) {
+        this.id = id;
     }
 
     /**
@@ -113,69 +121,89 @@ public class Participant {
     }
 
     /**
-     * getter for bankAccountSet
-     * @return bankAccountSet
+     * @return event id
      */
-    public Set<BankAccount> getBankAccountSet() {
-        return bankAccountSet;
+    public String getEventID() {
+        return eventID;
     }
 
     /**
-     * setter for bankAccountSet
-     * @param bankAccountSet to replace the old one
-     */
-    public void setBankAccountSet(Set<BankAccount> bankAccountSet) {
-        this.bankAccountSet = bankAccountSet;
-    }
-
-    /**
-     * Add bankAccount to bankAccountSet
-     * @param bankAccount bankAccount to be added
-     * @return false if bankAccount is null or already in set, true otherwise
-     */
-    public boolean addBankAccount(BankAccount bankAccount){
-        if(bankAccount == null) return false;
-        return bankAccountSet.add(bankAccount);
-    }
-
-    /**
+     * Should not be used in the client
      *
-     * @param o object to be compared to
-     * @return true iff all the parameters are the same, false otherwise
+     * @param eventID event id
+     */
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
+
+    /**
+     * @return bank account beneficiary name
+     */
+    public String getBeneficiary() {
+        return beneficiary;
+    }
+
+    /**
+     * @param beneficiary bank account beneficiary name
+     */
+    public void setBeneficiary(String beneficiary) {
+        this.beneficiary = beneficiary;
+    }
+
+    /**
+     * @return bank account number
+     */
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    /**
+     * @param accountNumber bank account number
+     */
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    /**
+     * @param o object to compare against
+     * @return true iff equal
      */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Participant that = (Participant) o;
-
-        if (participantId != that.participantId || !name.equals(that.name)) return false;
-        if (!Objects.equals(emailAddress, that.emailAddress)) return false;
-        return bankAccountSet.equals(that.bankAccountSet);
+        return id == that.id && Objects.equals(eventID, that.eventID)
+                && Objects.equals(name, that.name)
+                && Objects.equals(emailAddress, that.emailAddress)
+                && Objects.equals(beneficiary, that.beneficiary)
+                && Objects.equals(accountNumber, that.accountNumber);
     }
 
     /**
-     * hashCode generator for class Participant
-     * @return a unique hashcode for the object
+     * @return hash code
      */
     @Override
     public int hashCode() {
-        return Objects.hash(participantId, name, emailAddress, bankAccountSet);
+        return Objects.hash(id, eventID, name, emailAddress, beneficiary, accountNumber);
     }
 
     /**
      * toString method for Participant class
+     *
      * @return human-readable string
      */
     @Override
     public String toString() {
         String result = "Participant{" +
-                "participantId=" + participantId +
+                "participantId=" + id +
                 ", name='" + name + '\'';
         if(emailAddress != null)
             result += ", emailAddress='" + emailAddress + '\'';
-        result += ", bankAccountSet=" + bankAccountSet + '}';
+        if(beneficiary != null && accountNumber != null)
+            result += ", beneficiary='" + beneficiary
+                    + "', account number='" + accountNumber + '\'';
+        result += "}";
         return result;
     }
 }

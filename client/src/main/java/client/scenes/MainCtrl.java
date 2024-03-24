@@ -28,6 +28,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.File;
+import java.util.List;
 
 public class MainCtrl {
 
@@ -121,7 +122,6 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
@@ -145,7 +145,12 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        eventPageCtrl.displayExpenses(eventToShow);
+        for (Participant p :
+                eventToShow.getParticipants()) {
+            System.out.println(p.getParticipantId() + " " + p.getName());
+
+
+        }
         primaryStage.setScene(eventPage);
     }
 
@@ -202,6 +207,17 @@ public class MainCtrl {
     }
 
     /**
+     * Opens the system file chooser to open multiple files
+     *
+     * @param fileChooser file chooser
+     * @return selected files
+     */
+    public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
+        return fileChooser.showOpenMultipleDialog(primaryStage);
+    }
+
+
+    /**
      * Getter for startScreenCtrl
      *
      * @return startScreenCtrl
@@ -219,11 +235,6 @@ public class MainCtrl {
     public void setStartScreenCtrl(StartScreenCtrl startScreenCtrl) {
         this.startScreenCtrl = startScreenCtrl;
     }
-
-    /**
-     * Display overview
-     */
-
 
     /**
      * AdminLoginCtrl getter

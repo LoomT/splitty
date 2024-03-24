@@ -83,7 +83,7 @@ public class EditParticipantsCtrl {
 
         for (Participant p :
                 e.getParticipants()) {
-            System.out.println(p.getParticipantId() + " " + p.getName());
+            System.out.println(p.getId() + " " + p.getName());
 
 
         }

@@ -15,7 +15,10 @@
  */
 package server.api;
 
+import commons.Event;
+import commons.EventWeakKey;
 import commons.Expense;
+import commons.Participant;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +29,9 @@ import server.database.ExpenseRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 @SuppressWarnings("NullableProblems")
@@ -34,6 +39,14 @@ public class TestExpenseRepository implements ExpenseRepository {
     private final List<Expense> expenses = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
     private final TestRandom random = new TestRandom();
+    private TestEventRepository eventRepo;
+
+    /**
+     * @param eventRepo the test event repository
+     */
+    public void setEventRepo(TestEventRepository eventRepo) {
+        this.eventRepo = eventRepo;
+    }
 
     /**
      * @return called methods
@@ -95,7 +108,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @param ids to delete by
      */
     @Override
-    public void deleteAllByIdInBatch(Iterable<Long> ids) {
+    public void deleteAllByIdInBatch(Iterable<EventWeakKey> ids) {
 
     }
 
@@ -112,7 +125,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @return Expense
      */
     @Override
-    public Expense getOne(Long id) {
+    public Expense getOne(EventWeakKey id) {
         return null;
     }
 
@@ -121,7 +134,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @return Expense
      */
     @Override
-    public Expense getById(Long id) {
+    public Expense getById(EventWeakKey id) {
         return null;
     }
 
@@ -130,9 +143,9 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @return Expense
      */
     @Override
-    public Expense getReferenceById(Long id) {
+    public Expense getReferenceById(EventWeakKey id) {
         call("getReferenceById");
-        return null;
+        return find(id).orElse(null);
     }
 
     /**
@@ -182,7 +195,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @return list
      */
     @Override
-    public List<Expense> findAllById(Iterable<Long> ids) {
+    public List<Expense> findAllById(Iterable<EventWeakKey> ids) {
         return null;
     }
 
@@ -196,16 +209,39 @@ public class TestExpenseRepository implements ExpenseRepository {
     @Override
     public <S extends Expense> S save(S entity) {
         call("save");
+        if(entity.getEventID() == null) return null;
+        Optional<Event> optionalEvent = eventRepo.getEvents()
+                .stream().filter(e -> e.getId().equals(entity.getEventID())).findAny();
+        if(optionalEvent.isEmpty()) return null;
+        Event event = optionalEvent.get();
+
+        // check if the participants in expense are in the event
+        Set<Long> participantIds = event.getParticipants().stream()
+                .map(Participant::getId).collect(Collectors.toSet());
+        if(!participantIds.contains(entity.getExpenseAuthor().getId()))
+            return null;
+        for(Participant expenseParticipant : entity.getExpenseParticipants()) {
+            if(!participantIds.contains(expenseParticipant.getId()))
+                return null;
+        }
+
         // check if there is already an expense with the same id and overwrite it if yes
-        for(Expense e : expenses) {
-            if(e.getExpenseID() == entity.getExpenseID()) {
-                replaceFields(e, entity);
-                return (S) e;
+        for(int i = 0; i < expenses.size(); i++) {
+            Expense e = expenses.get(i);
+            if (e.getId() == entity.getId()
+                    && e.getEventID().equals(entity.getEventID())) {
+                expenses.remove(i);
+                expenses.add(i, entity);
+                optionalEvent.get().getExpenses().remove(e);
+                optionalEvent.get().addExpense(entity);
+                return entity;
             }
         }
         // if it's a new expense, generate an id and save
-        entity.setExpenseID(random.nextLong());
+        entity.setId(random.nextLong());
         expenses.add(entity);
+        event.addExpense(entity);
+
         return entity;
     }
 
@@ -226,13 +262,22 @@ public class TestExpenseRepository implements ExpenseRepository {
     }
 
     /**
+     * @param id composite expense key
+     * @return expense or null if not found
+     */
+    public Optional<Expense> find(EventWeakKey id) {
+        return expenses.stream().filter(e -> e.getId() == id.getId()
+                && e.getEventID().equals(id.getEventID())).findAny();
+    }
+
+    /**
      * @param id id
      * @return Expense
      */
     @Override
-    public Optional<Expense> findById(Long id) {
+    public Optional<Expense> findById(EventWeakKey id) {
         call("findById");
-        return expenses.stream().filter(e -> e.getExpenseID() == id).findAny();
+        return find(id);
     }
 
     /**
@@ -240,7 +285,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @return true if present
      */
     @Override
-    public boolean existsById(Long id) {
+    public boolean existsById(EventWeakKey id) {
         call("existsById");
         return findById(id).isPresent();
     }
@@ -257,8 +302,12 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @param id to delete by
      */
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(EventWeakKey id) {
         call("deleteById");
+        if(!expenses.removeIf(e -> e.getId() == id.getId()
+                && e.getEventID().equals(id.getEventID()))) return;
+        eventRepo.getEvents().stream().filter(e -> e.getId().equals(id.getEventID()))
+                .findAny().get().getExpenses().removeIf(e -> e.getId() == id.getId());
     }
 
     /**
@@ -266,14 +315,17 @@ public class TestExpenseRepository implements ExpenseRepository {
      */
     @Override
     public void delete(Expense entity) {
-
+        call("delete");
+        if(!expenses.remove(entity)) return;
+        eventRepo.getEvents().stream().filter(e -> e.getId().equals(entity.getEventID()))
+                .findAny().get().getExpenses().remove(entity);
     }
 
     /**
      * @param ids to delete by
      */
     @Override
-    public void deleteAllById(Iterable<? extends Long> ids) {
+    public void deleteAllById(Iterable<? extends EventWeakKey> ids) {
 
     }
 
