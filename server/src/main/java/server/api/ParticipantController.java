@@ -17,6 +17,7 @@ public class ParticipantController {
     private final ParticipantRepository repo;
     private final EventRepository eventRepo;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * Constructor with repository and random number generator injections
@@ -27,10 +28,11 @@ public class ParticipantController {
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,
-                                 SimpMessagingTemplate simp) {
+                                 SimpMessagingTemplate simp, AdminController adminController) {
         this.repo = repo;
         this.eventRepo = eventRepo;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -75,6 +77,7 @@ public class ParticipantController {
             }
             participant.setEventID(eventID);
             Participant saved = repo.save(participant);
+            adminController.update();
             simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
@@ -110,6 +113,7 @@ public class ParticipantController {
                 return ResponseEntity.notFound().build();
 
             repo.save(participant);
+            adminController.update();
             simp.convertAndSend("/event/" + eventID, participant,
                     Map.of("action", WebsocketActions.UPDATE_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
@@ -146,6 +150,7 @@ public class ParticipantController {
             }
 
             repo.delete(participant);
+            adminController.update();
             simp.convertAndSend("/event/" + eventID, partID,
                     Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
                             "type", Long.class.getTypeName()));

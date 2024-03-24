@@ -18,6 +18,7 @@ public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * Constructor with repository and random number generator injections
@@ -28,10 +29,11 @@ public class EventController {
      */
     @Autowired
     public EventController(EventRepository repo, RandomGenerator random,
-                           SimpMessagingTemplate simp) {
+                           SimpMessagingTemplate simp, AdminController adminController) {
         this.repo = repo;
         this.random = random;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -128,6 +130,7 @@ public class EventController {
                 Event event = found.get();
                 event.setTitle(title);
                 repo.save(event);
+                adminController.update();
                 simp.convertAndSend("/event/" + id, title,
                         Map.of("action", WebsocketActions.TITLE_CHANGE,
                                 "type", String.class.getTypeName()));
