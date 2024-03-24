@@ -242,7 +242,7 @@ public class Expense {
     }
 
     /**
-     * return form for displaying the expenses
+     * return form for displaying the expenses in the event page
      * @return human-readable form
      */
     @Override
