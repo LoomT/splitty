@@ -145,6 +145,7 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
+        eventPageCtrl.displayExpenses(eventToShow);
         for (Participant p :
                 eventToShow.getParticipants()) {
             System.out.println(p.getId() + " " + p.getName());

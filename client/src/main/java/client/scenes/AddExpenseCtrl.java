@@ -209,34 +209,45 @@ public class AddExpenseCtrl {
             alert.setContentText("Please fill in all fields before adding the expense.");
             alert.showAndWait();
         } else {
-            LocalDate expDate = date.getValue();
-            LocalDateTime localDateTime = expDate.atStartOfDay();
+            String amountText = amount.getText();
+            try {
+                double expAmount = Double.parseDouble(amountText);
 
-            Date expenseDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+                LocalDate expDate = date.getValue();
+                LocalDateTime localDateTime = expDate.atStartOfDay();
 
-            String expPurpose = purpose.getText();
-            String selectedParticipantName = expenseAuthor.getValue();
-            Participant selectedParticipant = ev.getParticipants().stream()
-                    .filter(participant -> participant.getName().equals(selectedParticipantName))
-                    .findFirst().orElse(null);
-            if (selectedParticipant != null) {
-                double expAmount = Double.parseDouble(amount.getText());
-                String expCurrency = currency.getValue();
-                //List<Participant> expPart = new ArrayList<>();
-                expPart.add(selectedParticipant);
+                Date expenseDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
 
-                String expType = type.getValue();
-                Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
-                        expCurrency, expPart, expType);
-                expense.setDate(expenseDate);
-                ev.getExpenses().add(expense);
+                String expPurpose = purpose.getText();
+                String selectedParticipantName = expenseAuthor.getValue();
+                Participant selectedParticipant = ev.getParticipants().stream()
+                        .filter(participant -> participant.getName().equals(selectedParticipantName))
+                        .findFirst().orElse(null);
+                if (selectedParticipant != null) {
+                    String expCurrency = currency.getValue();
+                    //List<Participant> expPart = new ArrayList<>();
+                    expPart.add(selectedParticipant);
 
-                resetExpenseFields();
+                    String expType = type.getValue();
+                    Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+                            expCurrency, expPart, expType);
+                    expense.setDate(expenseDate);
+                    ev.getExpenses().add(expense);
 
-                mainCtrl.showEventPage(ev);
+                    resetExpenseFields();
+
+                    mainCtrl.showEventPage(ev);
+                }
+            } catch (NumberFormatException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Invalid Amount");
+                alert.setHeaderText(null);
+                alert.setContentText("Please enter a valid number for the amount.");
+                alert.showAndWait();
             }
         }
     }
+
 
 
 

@@ -133,8 +133,14 @@ public class EventPageCtrl {
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
             fromListView.getItems().clear();
             includingListView.getItems().clear();
-            createExpensesFrom(e, name);
-            createExpensesIncluding(e, name);
+//            createExpensesFrom(e, name);
+//            createExpensesIncluding(e, name);
+
+            fromExpenses = getExpensesFrom(e, name);
+            includingExpenses = getExpensesIncluding(e, name);
+            createExpenses(fromExpenses, fromListView);
+            createExpenses(includingExpenses, includingListView);
+
         });
         websocket.registerParticipantChangeListener(
                 event,
@@ -218,29 +224,15 @@ public class EventPageCtrl {
      */
     @FXML
     public void tabSelectionChanged(Event e, String selectedParticipantName) {
-
-        try {
-            Tab selectedTab = expenseList.getSelectionModel().getSelectedItem();
-
-            if (selectedTab != null) {
-
-                if (selectedTab == allTab) {
-                    createAllExpenses(e);
-                    createExpensesFrom(e, selectedParticipantName);
-                    createExpensesIncluding(e, selectedParticipantName);
-                } else if (selectedTab == fromTab) {
-                    //fromListView.getItems().clear();
-                    createExpensesFrom(e, selectedParticipantName);
-                } else if (selectedTab == includingTab) {
-                    //includingListView.getItems().clear();
-                    createExpensesIncluding(e, selectedParticipantName);
-                }
-
-
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        allExpenses = getAllExpenses(event);
+        fromExpenses = getExpensesFrom(e, selectedParticipantName);
+        includingExpenses = getExpensesIncluding(e, selectedParticipantName);
+        createExpenses(allExpenses, allListView);
+        createExpenses(fromExpenses, fromListView);
+        createExpenses(includingExpenses, includingListView);
+//        createAllExpenses(e);
+//        createExpensesFrom(e, selectedParticipantName);
+//        createExpensesIncluding(e, selectedParticipantName);
     }
 
 
@@ -262,77 +254,15 @@ public class EventPageCtrl {
         mainCtrl.showAddExpensePage(event);
     }
 
-    /**
-     * expenses for all tab
-     * @param event
-     */
-    public void createAllExpenses(Event event) {
-        String name = extractSelectedName();
-
-        allExpenses = getAllExpenses(event);
-
-        ObservableList<String> items = FXCollections.observableArrayList();
-
-        for (Expense expense : allExpenses) {
-            String expenseString = expense.toString();
-            items.add(expenseString);
-
-            if (expense.getExpenseAuthor().getName().equals(name)) {
-                if (!fromListView.getItems().contains(expenseString)) {
-                    fromListView.getItems().add(expenseString);
-                }
-            }
-        }
-        allListView.setItems(items);
-    }
-
-    /**
-     * expenses for from tab
-     * @param event
-     * @param personName
-     */
-    public void  createExpensesFrom(Event event, String personName) {
-        fromExpenses = getExpensesFrom(event, personName);
-
-        ObservableList<String> items = FXCollections.observableArrayList();
-
-        for (Expense expense : fromExpenses) {
-            String expenseString = expense.toString();
-            items.add(expenseString);
-            if (!allListView.getItems().contains(expenseString)) {
-                allListView.getItems().add(expenseString);
-            }
-            if (!includingListView.getItems().contains(expenseString)) {
-                includingListView.getItems().add(expenseString);
-            }
-        }
-        fromListView.setItems(items);
-    }
-
-    /**
-     * expenses for including tab
-     * @param event
-     * @param personName
-     */
-    /**
-     * Expenses for including tab
-     * @param event the event
-     * @param personName the name of the person
-     */
-    public void createExpensesIncluding(Event event, String personName) {
-        ObservableList<String> items = includingListView.getItems();
-
-        includingExpenses = getExpensesIncluding(event, personName);
-
-        for (Expense expense : includingExpenses) {
+    public void createExpenses(List<Expense> expenses, ListView<String> lv) {
+        ObservableList<String> items = lv.getItems();
+        for (Expense expense : expenses) {
             String expenseString = expense.toString();
             if (!items.contains(expenseString)) {
                 items.add(expenseString);
             }
-            if (!allListView.getItems().contains(expenseString)) {
-                allListView.getItems().add(expenseString);
-            }
         }
+        lv.setItems(items);
     }
 
 

@@ -3,10 +3,8 @@ package commons;
 
 import jakarta.persistence.*;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.text.NumberFormat;
+import java.util.*;
 
 @Entity
 @IdClass(EventWeakKey.class)
@@ -247,21 +245,42 @@ public class Expense {
      * return form for displaying the expenses
      * @return human-readable form
      */
+    @Override
     public String toString() {
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date); // Assuming 'date' is your Date object
+        calendar.setTime(date);
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        String rez = dayOfMonth + ".";
         int month = calendar.get(Calendar.MONTH) + 1;
-        rez += month + ".     ";
-        String cur = "";
-        switch(currency) {
-            case "USD" -> cur = "$";
-            case "EUR" -> cur = "€";
-            case "GBP" -> cur = "£";
-            case "JPY" -> cur = "¥";
+        int year = calendar.get(Calendar.YEAR);
+
+        NumberFormat currencyFormatter = switch (currency) {
+            case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
+            case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
+            case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
+            case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
+            default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
+        };
+
+        String formattedAmount = currencyFormatter.format(amount);
+        System.out.println(formattedAmount);
+        int size = formattedAmount.length();
+        String currencySymbol = null, amountValue = null;
+
+        if (currency.equals("EUR")) {
+            currencySymbol = formattedAmount.substring(0,0);
+            amountValue = formattedAmount.substring(0, size);
+        } else {
+            currencySymbol = formattedAmount.substring(0,1);
+            amountValue = formattedAmount.substring(1, size);
         }
-        rez += "  " + expenseAuthor.getName() + " paid " + amount + cur + " for " + purpose;
+
+
+        String rez = dayOfMonth + "." + month + "." + year + "     " +
+                expenseAuthor.getName() + " paid " +
+                amountValue + " " + currencySymbol + " for " + purpose;
+
         return rez;
     }
+
+
 }
