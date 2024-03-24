@@ -135,6 +135,10 @@ public class EventPageCtrl {
             createExpenses(fromExpenses, fromListView);
             createExpenses(includingExpenses, includingListView);
         });
+        handleWS();
+        displayExpenses(event);
+    }
+    private void handleWS() {
         websocket.registerParticipantChangeListener(
                 event,
                 this::displayEvent,
@@ -147,9 +151,6 @@ public class EventPageCtrl {
                 this::displayExpenses,
                 this::displayExpenses
         );
-    }
-    private void handleWS() {
-
     }
 
 

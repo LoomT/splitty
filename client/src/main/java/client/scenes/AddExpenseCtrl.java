@@ -104,15 +104,11 @@ public class AddExpenseCtrl {
 
         equalSplit.setOnAction(e -> {
             if (equalSplit.isSelected()) {
-                //expPart = new ArrayList<>();
                 splitAll = true;
                 partialSplit.setSelected(false);
                 disablePartialSplitCheckboxes(true);
 
-                expPart.addAll(event.getParticipants()
-                                .stream()
-                                .toList()
-                );
+                expPart.addAll(event.getParticipants());
             }
         });
         partialSplit.setOnAction(this::handlePartialSplit);
@@ -123,14 +119,8 @@ public class AddExpenseCtrl {
             handleAddButton(event);
         });
 
-        abort.setOnAction(x -> mainCtrl.showEventPage(event));
+        abort.setOnAction(x -> mainCtrl.goBackToEventPage(event));
 
-        websocket.registerExpenseChangeListener(
-                event,
-                this::displayAddExpensePage,
-                this::displayAddExpensePage,
-                this::displayAddExpensePage
-        );
 
     }
 
@@ -232,7 +222,7 @@ public class AddExpenseCtrl {
                     expense.setDate(expenseDate);
                     ev.getExpenses().add(expense);
                     resetExpenseFields();
-                    mainCtrl.showEventPage(ev);
+                    mainCtrl.goBackToEventPage(ev);
                 }
             } catch (NumberFormatException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
