@@ -11,9 +11,6 @@ import org.springframework.web.context.request.async.DeferredResult;
 import server.AdminService;
 import server.database.EventRepository;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
@@ -34,7 +31,6 @@ public class AdminController {
     public AdminController(EventRepository repo, AdminService admS) {
         this.repo = repo;
         this.admS = admS;
-        test();
     }
 
     /**
@@ -135,61 +131,36 @@ public class AdminController {
         }
     }
 
-    private boolean newChange = false;
+    private Date lastChange = new Date();
     @GetMapping("admin/events/poll")
     public DeferredResult<ResponseEntity<List<Event>>>
     longPoll(@RequestHeader("Authorization") String inputPassword, @RequestParam Long timeOut) {
         DeferredResult<ResponseEntity<List<Event>>> output = new DeferredResult<>(timeOut,
                 ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
         if(!admS.verifyPassword(inputPassword)) {
-            System.out.println("sending unauthorized");
             output.setResult(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
             return output;
         }
 
         output.onError((Throwable t) -> {output.setErrorResult(ResponseEntity.internalServerError().build());});
-        output.onCompletion(() -> System.out.println("completed"));
+        Date startTime = new Date();
         ForkJoinPool.commonPool().submit(() -> {
             try {
-                Thread.sleep(100);
-//                long timeLeft = timeOut;
-//                while(!newChange) {
-//                    if(output.isSetOrExpired()) {
-//                        System.out.println("terminated helper thread");
-//                        return;
-//                    }
-//                    Thread.sleep(100);
-//                    timeLeft -= 100;
-//                }
+                while(startTime.after(lastChange)) {
+                    if(output.isSetOrExpired()) {
+                        return;
+                    }
+                    Thread.sleep(100);
+                }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println("setting result");
-            newChange = false;
             List<Event> events = repo.findAll();
             output.setResult(ResponseEntity.ok(events));
         });
-        System.out.println("thread freed");
         return output;
     }
-
     public void update() {
-        newChange = true;
-        System.out.println("updated");
-    }
-
-    public void test() {
-        Thread.startVirtualThread(() -> {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-            while(true) {
-                String a = null;
-                try {
-                    a = reader.readLine();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if(a.equals("ok")) update();
-            }
-        });
+        lastChange = new Date();
     }
 }
