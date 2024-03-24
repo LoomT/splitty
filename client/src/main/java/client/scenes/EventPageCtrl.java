@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class EventPageCtrl {
@@ -189,9 +190,6 @@ public class EventPageCtrl {
     public void displayExpenses(Event e) {
         String selectedName = extractSelectedName();
         tabSelectionChanged(e, selectedName);
-
-//        createExpensesFrom(e, selectedName);
-//        createExpensesIncluding(e, selectedName);
     }
 
 
@@ -232,10 +230,10 @@ public class EventPageCtrl {
                     createExpensesFrom(e, selectedParticipantName);
                     createExpensesIncluding(e, selectedParticipantName);
                 } else if (selectedTab == fromTab) {
-                    fromListView.getItems().clear();
+                    //fromListView.getItems().clear();
                     createExpensesFrom(e, selectedParticipantName);
                 } else if (selectedTab == includingTab) {
-                    includingListView.getItems().clear();
+                    //includingListView.getItems().clear();
                     createExpensesIncluding(e, selectedParticipantName);
                 }
 
@@ -294,7 +292,7 @@ public class EventPageCtrl {
      * @param event
      * @param personName
      */
-    public void createExpensesFrom(Event event, String personName) {
+    public void  createExpensesFrom(Event event, String personName) {
         fromExpenses = getExpensesFrom(event, personName);
 
         ObservableList<String> items = FXCollections.observableArrayList();
@@ -302,11 +300,14 @@ public class EventPageCtrl {
         for (Expense expense : fromExpenses) {
             String expenseString = expense.toString();
             items.add(expenseString);
+            if (!allListView.getItems().contains(expenseString)) {
+                allListView.getItems().add(expenseString);
+            }
+            if (!includingListView.getItems().contains(expenseString)) {
+                includingListView.getItems().add(expenseString);
+            }
         }
         fromListView.setItems(items);
-        if (!allListView.getItems().contains(String.valueOf(items.getLast()))) {
-            allListView.getItems().add(String.valueOf(items.getLast()));
-        }
     }
 
     /**
@@ -314,24 +315,28 @@ public class EventPageCtrl {
      * @param event
      * @param personName
      */
+    /**
+     * Expenses for including tab
+     * @param event the event
+     * @param personName the name of the person
+     */
     public void createExpensesIncluding(Event event, String personName) {
-        includingExpenses = getExpensesIncluding(event, personName);
+        ObservableList<String> items = includingListView.getItems();
 
-        ObservableList<String> items = FXCollections.observableArrayList();
+        includingExpenses = getExpensesIncluding(event, personName);
 
         for (Expense expense : includingExpenses) {
             String expenseString = expense.toString();
-            items.add(expenseString);
-        }
-        includingListView.setItems(items);
-        if (!allListView.getItems().contains(String.valueOf(items.getLast()))) {
-            allListView.getItems().add(String.valueOf(items.getLast()));
-        }
-
-        if (!fromListView.getItems().contains(String.valueOf(items.getLast()))) {
-            fromListView.getItems().add(String.valueOf(items.getLast()));
+            if (!items.contains(expenseString)) {
+                items.add(expenseString);
+            }
+            if (!allListView.getItems().contains(expenseString)) {
+                allListView.getItems().add(expenseString);
+            }
         }
     }
+
+
 
     /**
      * return all expenses

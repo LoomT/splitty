@@ -92,8 +92,9 @@
                 </HBox>
                 <HBox prefHeight="27.0" prefWidth="298.0">
                     <children>
-                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="Only Some People">
-                            <font>
+                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="Only Some People" onAction="#handlePartialSplit">
+
+                        <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
                         </CheckBox>

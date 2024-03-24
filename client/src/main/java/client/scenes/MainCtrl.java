@@ -146,12 +146,6 @@ public class MainCtrl {
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         eventPageCtrl.displayExpenses(eventToShow);
-        for (Participant p :
-                eventToShow.getParticipants()) {
-            System.out.println(p.getParticipantId() + " " + p.getName());
-
-
-        }
         primaryStage.setScene(eventPage);
     }
 
