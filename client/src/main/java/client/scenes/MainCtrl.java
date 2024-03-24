@@ -195,41 +195,4 @@ public class MainCtrl {
     public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
         return fileChooser.showOpenMultipleDialog(primaryStage);
     }
-
-    /**
-     * Getter for startScreenCtrl
-     *
-     * @return startScreenCtrl
-     */
-    public StartScreenCtrl getStartScreenCtrl() {
-        return startScreenCtrl;
-    }
-
-
-    /**
-     * setter for startScreenCtrl
-     *
-     * @param startScreenCtrl start screen controller
-     */
-    public void setStartScreenCtrl(StartScreenCtrl startScreenCtrl) {
-        this.startScreenCtrl = startScreenCtrl;
-    }
-
-    /**
-     * AdminLoginCtrl getter
-     *
-     * @return admin login controller
-     */
-    public AdminLoginCtrl getAdminLoginCtrl() {
-        return adminLoginCtrl;
-    }
-
-    /**
-     * setter for adminLoginCtrl
-     *
-     * @param adminLoginCtrl admin login controller
-     */
-    public void setAdminLoginCtrl(AdminLoginCtrl adminLoginCtrl) {
-        this.adminLoginCtrl = adminLoginCtrl;
-    }
 }

@@ -154,7 +154,7 @@ public class AdminController {
         }
 
         output.onError((Throwable t) ->
-        {output.setErrorResult(ResponseEntity.internalServerError().build());});
+                output.setErrorResult(ResponseEntity.internalServerError().build()));
         Date startTime = new Date();
         ForkJoinPool.commonPool().submit(() -> {
             try {

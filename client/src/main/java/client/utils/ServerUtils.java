@@ -18,7 +18,6 @@ package client.utils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import commons.Quote;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -114,43 +113,10 @@ public class ServerUtils {
     }
 
     /**
-     * S ends an API call to server for quotes
-     *
-     * @return all quotes
-     */
-    public List<Quote> getQuotes() {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server)
-                .path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Quote>>() {
-                });
-    }
-
-    /**
-     * Send an API call to server to add a quote
-     *
-     * @param quote Quote to add
-     * @return Added quote
-     */
-    public Quote addQuote(Quote quote) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("api/quotes") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
-    }
-
-
-
-
-    /**
      * Verify the input password
      * @param inputPassword the password to verify
      * @return boolean
      */
-
     public boolean verifyPassword(String inputPassword) {
         Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/verify") //
@@ -179,7 +145,7 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .header("Authorization", inputPassword)
                 .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Event>>() {
+                .get(new GenericType<>() {
                 });
     }
 
