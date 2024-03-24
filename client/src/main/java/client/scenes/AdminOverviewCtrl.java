@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.components.EventListItemAdmin;
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,11 +11,17 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.core.Response;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+
 import java.util.List;
 
 public class AdminOverviewCtrl {
@@ -29,21 +36,36 @@ public class AdminOverviewCtrl {
     private VBox eventList;
     private String password;
 
+    @FXML
+    private ChoiceBox<String> orderByChoiceBox;
+
+    @FXML
+    private CheckBox reverseOrderCheckBox;
+
+    private LanguageConf languageConf;
+    private List<Event> allEvents;
 
     /**
      * adminOverview screen controller constructor
      *
-     * @param server     utils
-     * @param mainCtrl   main scene controller
-     * @param userConfig the user configuration
+     * @param server       utils
+     * @param mainCtrl     main scene controller
+     * @param userConfig   the user configuration
+     * @param languageConf the languageconf instance
      */
     @Inject
-    public AdminOverviewCtrl(ServerUtils server, MainCtrl mainCtrl, UserConfig userConfig) {
+    public AdminOverviewCtrl(
+            ServerUtils server,
+            MainCtrl mainCtrl,
+            UserConfig userConfig,
+            LanguageConf languageConf
+    ) {
 
         this.server = server;
         this.mainCtrl = mainCtrl;
         this.userConfig = userConfig;
         this.initialDirectory = userConfig.getInitialExportDirectory();
+        this.languageConf = languageConf;
     }
 
 
@@ -52,6 +74,61 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void initialize() {
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.creationDate"));
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.numOfParticipants"));
+        orderByChoiceBox.setValue(languageConf.get("AdminOverview.creationDate"));
+        orderByChoiceBox.setOnAction((e1) -> {
+            orderAndDisplayEvents();
+        });
+
+        reverseOrderCheckBox.setOnAction((e1)-> {
+            orderAndDisplayEvents();
+        });
+
+    }
+
+    private void orderAndDisplayEvents() {
+        List<EventListItemAdmin> list = new ArrayList<>();
+
+        switch (orderByChoiceBox.getSelectionModel().getSelectedIndex()) {
+            case 0: // Order by creation date
+                allEvents.sort(((o1, o2) -> -o1.getCreationDate().compareTo(o2.getCreationDate())));
+                break;
+            case 1: // Order by event name
+                allEvents.sort(Comparator.comparing(o -> o.getTitle().toLowerCase()));
+                break;
+            case 2: // order by num of participants
+                allEvents.sort(Comparator.comparingInt(o -> -o.getParticipants().size()));
+                break;
+        }
+
+        if (reverseOrderCheckBox.isSelected()) allEvents = allEvents.reversed();
+
+
+        eventList.getChildren().clear();
+
+        for (Event event : allEvents) {
+            final EventListItemAdmin item =
+                    new EventListItemAdmin(
+                            event.getTitle(),
+                            event.getId(),
+                            () -> {
+                                int status = server.deleteEvent(event.getId());
+                                if(status != 204) {
+                                    System.out.println("Server did not delete the event " + status);
+                                    // TODO maybe trow an error message or smth
+                                } else {
+                                    allEvents.remove(event);
+                                    loadAllEvents();
+                                }
+                            },
+                            () -> eventExportHandler(event),
+                            () -> mainCtrl.showEventPage(event)
+                            );
+            eventList.getChildren().add(item);
+
+        }
     }
 
     /**
@@ -66,7 +143,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void refreshButtonClicked() {
-        reloadAllEvents(server.getEvents(password));
+        loadAllEvents();
     }
 
 
@@ -82,39 +159,11 @@ public class AdminOverviewCtrl {
      * Reload the events with events from the server
      */
     public void loadAllEvents() {
-        reloadAllEvents(server.getEvents(password));
-    }
-
-    /**
-     * Method to get all the events into the list
-     * @param allEvents events to load into the list
-     */
-    public void reloadAllEvents(List<Event> allEvents) {
-        eventList.getChildren().clear();
-
-        for (Event event : allEvents) {
-            final EventListItemAdmin item =
-                new EventListItemAdmin(
-                        event.getTitle(),
-                        event.getId(),
-                    () -> {
-                        int status = server.deleteEvent(event.getId());
-                        if(status != 204) {
-                            System.out.println("Server did not delete the event " + status);
-                            // TODO maybe trow an error message or smth
-                        } else {
-                            allEvents.remove(event);
-                            reloadAllEvents(allEvents);
-                        }
-                    },
-                    () -> eventExportHandler(event),
-                    () -> {
-                        // TODO display the event
-                    });
-            eventList.getChildren().add(item);
-        }
+        allEvents = server.getEvents(password);
+        orderAndDisplayEvents();
 
     }
+
 
     /**
      * Initializes the file chooser with json extension filter

@@ -20,7 +20,7 @@ import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Participant;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
@@ -115,6 +115,7 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
+        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
@@ -138,12 +139,7 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        for (Participant p :
-                eventToShow.getParticipants()) {
-            System.out.println(p.getId() + " " + p.getName());
-
-
-        }
+        startScreen.setCursor(Cursor.DEFAULT);
         primaryStage.setScene(eventPage);
     }
 
@@ -175,7 +171,7 @@ public class MainCtrl {
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
-        primaryStage.setTitle("Admin Overview");
+        primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
     }
 

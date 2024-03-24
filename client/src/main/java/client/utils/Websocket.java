@@ -68,6 +68,7 @@ public class Websocket {
     public void disconnect() {
         if (stompSession == null || !stompSession.isConnected()) return;
         stompSession.disconnect();
+
     }
 
     /**
