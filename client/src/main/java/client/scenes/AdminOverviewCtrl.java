@@ -82,6 +82,10 @@ public class AdminOverviewCtrl {
             orderAndDisplayEvents();
         });
 
+        reverseOrderCheckBox.setOnAction((e1)-> {
+            orderAndDisplayEvents();
+        });
+
     }
 
     private void orderAndDisplayEvents() {
@@ -98,6 +102,8 @@ public class AdminOverviewCtrl {
                 allEvents.sort(Comparator.comparingInt(o -> -o.getParticipants().size()));
                 break;
         }
+
+        if (reverseOrderCheckBox.isSelected()) allEvents = allEvents.reversed();
 
 
         eventList.getChildren().clear();
@@ -118,9 +124,8 @@ public class AdminOverviewCtrl {
                                 }
                             },
                             () -> eventExportHandler(event),
-                            () -> {
-                                // TODO display the event
-                            });
+                            () -> mainCtrl.showEventPage(event)
+                            );
             eventList.getChildren().add(item);
 
         }

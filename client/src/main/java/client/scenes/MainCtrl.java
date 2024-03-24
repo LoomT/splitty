@@ -20,7 +20,6 @@ import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Participant;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
@@ -139,12 +138,6 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        for (Participant p :
-                eventToShow.getParticipants()) {
-            System.out.println(p.getId() + " " + p.getName());
-
-
-        }
         primaryStage.setScene(eventPage);
     }
 

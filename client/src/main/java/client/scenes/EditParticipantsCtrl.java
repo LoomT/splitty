@@ -81,14 +81,6 @@ public class EditParticipantsCtrl {
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
 
-        for (Participant p :
-                e.getParticipants()) {
-            System.out.println(p.getId() + " " + p.getName());
-
-
-        }
-
-
         chooseParticipant.setOnAction((event1) -> {
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
             if (index < 0) return;
