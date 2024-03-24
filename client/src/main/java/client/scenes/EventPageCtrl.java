@@ -16,7 +16,6 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 
 public class EventPageCtrl {

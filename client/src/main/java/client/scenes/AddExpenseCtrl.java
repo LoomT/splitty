@@ -112,7 +112,7 @@ public class AddExpenseCtrl {
                 expPart.addAll(event.getParticipants()
                                 .stream()
                                 .toList()
-                        );
+                );
             }
         });
         partialSplit.setOnAction(this::handlePartialSplit);
@@ -134,6 +134,10 @@ public class AddExpenseCtrl {
 
     }
 
+    /**
+     * handle partial splitting
+     * @param event
+     */
     @FXML
     public void handlePartialSplit(ActionEvent event) {
         equalSplit.setSelected(false);
