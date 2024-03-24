@@ -25,6 +25,7 @@ public class ParticipantController {
      * @param repo Participant repository
      * @param eventRepo Event repository
      * @param simp websocket object used to send updates to everyone
+     * @param adminController admin controller for sending updates
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,

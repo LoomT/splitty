@@ -20,7 +20,7 @@ public class AdminController {
 
     private final EventRepository repo;
     private final AdminService admS;
-
+    private Date lastChange = new Date();
 
     /**
      * Constructor with repository injection
@@ -100,6 +100,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * @param event event to check
+     * @return 200 if event is valid, 400 if not
+     * and 406 if there already exists an event with the same id
+     */
     private HttpStatus checkEventValidity(Event event) {
         if(repo.existsById(event.getId()))
             return HttpStatus.CONFLICT;
@@ -132,10 +137,15 @@ public class AdminController {
         }
     }
 
-    private Date lastChange = new Date();
+    /**
+     * @param inputPassword admin password
+     * @param timeOut millisecond after which send a time-out response
+     * @return 200 if there is a change, 408 if time-outed
+     */
     @GetMapping("/admin/events/poll")
     public DeferredResult<ResponseEntity<String>>
-    longPoll(@RequestHeader("Authorization") String inputPassword, @RequestHeader("TimeOut") Long timeOut) {
+        longPoll(@RequestHeader("Authorization") String inputPassword,
+                 @RequestHeader("TimeOut") Long timeOut) {
         DeferredResult<ResponseEntity<String>> output = new DeferredResult<>(timeOut,
                 ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
         if(!admS.verifyPassword(inputPassword)) {
@@ -143,7 +153,8 @@ public class AdminController {
             return output;
         }
 
-        output.onError((Throwable t) -> {output.setErrorResult(ResponseEntity.internalServerError().build());});
+        output.onError((Throwable t) ->
+        {output.setErrorResult(ResponseEntity.internalServerError().build());});
         Date startTime = new Date();
         ForkJoinPool.commonPool().submit(() -> {
             try {
@@ -160,6 +171,10 @@ public class AdminController {
         });
         return output;
     }
+
+    /**
+     * Register new event update
+     */
     public void update() {
         lastChange = new Date();
     }

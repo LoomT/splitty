@@ -49,7 +49,7 @@ public class MainCtrl {
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
-    private Websocket websocket;
+    private final Websocket websocket;
 
     /**
      * @param websocket the websocket instance
@@ -232,20 +232,4 @@ public class MainCtrl {
     public void setAdminLoginCtrl(AdminLoginCtrl adminLoginCtrl) {
         this.adminLoginCtrl = adminLoginCtrl;
     }
-
-
-//    public void showOverview() {
-//        primaryStage.setTitle("Quotes: Overview");
-//        primaryStage.setScene(overview);
-//        overviewCtrl.refresh();
-//    }
-//
-//    /**
-//     * display adding quote scene
-//     */
-//    public void showAdd() {
-//        primaryStage.setTitle("Quotes: Adding Quote");
-//        primaryStage.setScene(add);
-//        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-//    }
 }

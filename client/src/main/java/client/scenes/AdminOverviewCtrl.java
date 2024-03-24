@@ -41,7 +41,7 @@ public class AdminOverviewCtrl {
     @FXML
     private CheckBox reverseOrderCheckBox;
 
-    private LanguageConf languageConf;
+    private final LanguageConf languageConf;
     private List<Event> allEvents;
 
     private Thread poller;
@@ -79,14 +79,9 @@ public class AdminOverviewCtrl {
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.numOfParticipants"));
         orderByChoiceBox.setValue(languageConf.get("AdminOverview.creationDate"));
-        orderByChoiceBox.setOnAction((e1) -> {
-            orderAndDisplayEvents();
-        });
+        orderByChoiceBox.setOnAction((e1) -> orderAndDisplayEvents());
 
-        reverseOrderCheckBox.setOnAction((e1)-> {
-            orderAndDisplayEvents();
-        });
-
+        reverseOrderCheckBox.setOnAction((e1) -> orderAndDisplayEvents());
     }
 
     private void orderAndDisplayEvents() {

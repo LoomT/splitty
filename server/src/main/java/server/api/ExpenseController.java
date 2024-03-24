@@ -23,6 +23,7 @@ public class ExpenseController {
      *
      * @param repoExpense repo of the Expenses
      * @param simp websocket object to send messages to event subscribers
+     * @param adminController admin controller for sending updates
      */
     public ExpenseController(ExpenseRepository repoExpense,
                              SimpMessagingTemplate simp, AdminController adminController) {
