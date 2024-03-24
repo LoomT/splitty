@@ -92,6 +92,7 @@ public class AdminController {
             }
             saved.getExpenses().addAll(expenses);
             saved = repo.save(saved);
+            update();
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
@@ -120,7 +121,7 @@ public class AdminController {
      * @return all events
      * @param inputPassword the password to verify
      */
-    @GetMapping ("admin/events")
+    @GetMapping ("/admin/events")
     public ResponseEntity<List<Event>> getAll(@RequestHeader("Authorization")
                                                   String inputPassword) {
         boolean isValid = admS.verifyPassword(inputPassword);
@@ -132,10 +133,10 @@ public class AdminController {
     }
 
     private Date lastChange = new Date();
-    @GetMapping("admin/events/poll")
-    public DeferredResult<ResponseEntity<List<Event>>>
-    longPoll(@RequestHeader("Authorization") String inputPassword, @RequestParam Long timeOut) {
-        DeferredResult<ResponseEntity<List<Event>>> output = new DeferredResult<>(timeOut,
+    @GetMapping("/admin/events/poll")
+    public DeferredResult<ResponseEntity<String>>
+    longPoll(@RequestHeader("Authorization") String inputPassword, @RequestHeader("TimeOut") Long timeOut) {
+        DeferredResult<ResponseEntity<String>> output = new DeferredResult<>(timeOut,
                 ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
         if(!admS.verifyPassword(inputPassword)) {
             output.setResult(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
@@ -155,8 +156,7 @@ public class AdminController {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            List<Event> events = repo.findAll();
-            output.setResult(ResponseEntity.ok(events));
+            output.setResult(ResponseEntity.noContent().build());
         });
         return output;
     }

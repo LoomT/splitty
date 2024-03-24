@@ -84,6 +84,7 @@ public class EventController {
             } while (repo.existsById(id));
             event.setId(id);
             Event saved = repo.save(event);
+            adminController.update();
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -101,6 +102,7 @@ public class EventController {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
+                adminController.update();
                 simp.convertAndSend("/event/" + id, "delete",
                         Map.of("action", WebsocketActions.DELETE_EVENT,
                                 "type", String.class.getTypeName()));
