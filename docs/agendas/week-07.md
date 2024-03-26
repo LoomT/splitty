@@ -14,10 +14,11 @@
 ---------------------------------------------------------------
 - ### Main Agenda (36 min)
   - **Progress Update** (14 min)
-    - Everyone briefly explains the part they worked on and the progress they made (6 min)
+    - Everyone briefly explains the part they worked on and the progress they made (5 min)
     - Did we get everything done that we wanted to get done? (3 min)
-    - What could be improved this week to make sure we reach our goals? (3 min)
+    - What could be improved this week to make sure we reach our goals? (1 min)
     - Did we use the feedback they gave us last week? (2 min)
+    - New addition: Discuss feedback regarding the project testing (3 min)
   
   - **Continuation** (17 min) (Key takeaway: keep the momentum going)
     - What has to be done this week? (8 min, keep everyone involved)
