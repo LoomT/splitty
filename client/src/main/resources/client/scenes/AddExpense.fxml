@@ -84,20 +84,20 @@
                 </Text>
                 <HBox prefHeight="28.0" prefWidth="144.0">
                     <children>
-                        <RadioButton fx:id="equalSplit" mnemonicParsing="false" text=" Equally Between Everybody">
+                        <CheckBox fx:id="equalSplit" mnemonicParsing="false" text=" Equally Between Everybody">
                             <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
-                        </RadioButton>
+                        </CheckBox>
                     </children>
                 </HBox>
                 <HBox prefHeight="27.0" prefWidth="298.0">
                     <children>
-                        <RadioButton fx:id="partialSplit" mnemonicParsing="false" text="Only Some People">
+                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="Only Some People">
                             <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
-                        </RadioButton>
+                        </CheckBox>
                     </children>
                 </HBox>
             </children>

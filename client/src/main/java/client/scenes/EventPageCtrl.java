@@ -248,6 +248,22 @@ public class EventPageCtrl {
     }
 
     /**
+     * create expense that will be displayed in the list view
+     * @param expenses
+     * @param lv
+     */
+    public void createExpenses(List<Expense> expenses, ListView<String> lv) {
+        ObservableList<String> items = FXCollections.observableArrayList();
+
+        for (Expense expense : expenses) {
+            String expenseString = expense.toString();
+            items.add(expenseString);
+        }
+
+        lv.setItems(items);
+    }
+
+    /**
      * create the specific displayed expenses for a listview
      * @param expenses
      * @param lv
@@ -267,8 +283,8 @@ public class EventPageCtrl {
                 }
             }
             items.add(expenseString);
-            List<Participant> participants = getUniqueParticipants(expense);
-
+            List<Participant> participants = expense.getExpenseParticipants();
+            System.out.println(participants);
             StringBuilder participantsList = new StringBuilder("");
             while(index > 0) {
                 participantsList.append("  ");
@@ -291,21 +307,6 @@ public class EventPageCtrl {
         }
 
         lv.setItems(items);
-    }
-
-    /**
-     * get the unique participants
-     * @param expense
-     * @return the unique participants
-     */
-    private List<Participant> getUniqueParticipants(Expense expense) {
-        List<Participant> participants = new ArrayList<>();
-        for (Participant p : expense.getExpenseParticipants()) {
-            if (!participants.contains(p)) {
-                participants.add(p);
-            }
-        }
-        return participants;
     }
 
     /**
