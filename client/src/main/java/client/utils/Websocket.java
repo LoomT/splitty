@@ -153,6 +153,72 @@ public class Websocket {
         });
     }
 
+
+    /**
+     * Registers all the change listeners on WS if they're not registered already
+     * @param event the event in which we listen on the participant changes
+     * @param updateExpCallback this is called when a participant in the event is updated
+     * @param addExpCallback this is called when a participant in the event is created
+     * @param deleteExpCallback this is called when a participant in the event is deleted
+     *
+     */
+
+    public void registerExpenseChangeListener(
+            Event event,
+            Consumer<Event> updateExpCallback,
+            Consumer<Event> addExpCallback,
+            Consumer<Event> deleteExpCallback
+
+    ) {
+        this.resetAction(WebsocketActions.UPDATE_EXPENSE);
+        this.resetAction(WebsocketActions.ADD_EXPENSE);
+        this.resetAction(WebsocketActions.REMOVE_EXPENSE);
+
+        this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
+            Expense expense = (Expense) exp;
+            event.getExpenses().add(expense);
+            addExpCallback.accept(event);
+        });
+        this.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
+            Expense expense = (Expense) exp;
+            int index = -1;
+            for (int i = 0; i < event.getExpenses().size(); i++) {
+                Expense curr = event.getExpenses().get(i);
+                if (curr.getId() == expense.getId()) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The updated expense's ID ("
+                        + expense.getId()+
+                        ") does not match with any ID's of the already existing expenses");
+            }
+            event.getExpenses().remove(index);
+            event.getExpenses().add(index, expense);
+            updateExpCallback.accept(event);
+        });
+        this.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
+            long expId = (long) exp;
+            int index = -1;
+            for (int i = 0; i < event.getExpenses().size(); i++) {
+                Expense curr = event.getExpenses().get(i);
+                if (curr.getId() == expId) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The deleted expense's ID ("
+                        + expId+
+                        ") does not match with any ID's of the already existing expenses");
+            }
+            event.getExpenses().remove(index);
+            deleteExpCallback.accept(event);
+        });
+
+    }
+
     /**
      * Removes all listeners set for a particular action
      *
@@ -231,5 +297,3 @@ public class Websocket {
         }
     }
 }
-
-

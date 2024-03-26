@@ -3,9 +3,8 @@ package commons;
 
 import jakarta.persistence.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.text.NumberFormat;
+import java.util.*;
 
 @Entity
 @IdClass(EventWeakKey.class)
@@ -204,6 +203,14 @@ public class Expense {
         this.id = id;
     }
 
+    /**
+     * setter for date
+     * @param date the updated value of the date
+     */
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
 
     /**
      * @param o object to compare against
@@ -233,4 +240,35 @@ public class Expense {
         return Objects.hash(id, eventID, expenseAuthor, purpose,
                 amount, currency, date, expenseParticipants, type);
     }
+
+    /**
+     * return form for displaying the expenses in the event page
+     * @return human-readable form
+     */
+    @Override
+    public String toString() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+
+        NumberFormat currencyFormatter = switch (currency) {
+            case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
+            case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
+            case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
+            case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
+            default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
+        };
+
+        String formattedAmount = currencyFormatter.format(amount);
+
+        String rez = dayOfMonth + "." + month + "." + year + "     " +
+                expenseAuthor.getName() + " paid " +
+                formattedAmount + " for " + purpose;
+
+        return rez;
+    }
+
+
 }
