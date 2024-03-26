@@ -5,16 +5,19 @@ import commons.Event;
 import commons.Participant;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TestServerUtils implements ServerUtils {
 
     private final List<Event> events;
     private int counter;
+    private Date lastChange;
 
     public TestServerUtils() {
         events = new ArrayList<>();
         counter = 1;
+        lastChange = new Date();
     }
 
     /**
@@ -42,6 +45,7 @@ public class TestServerUtils implements ServerUtils {
         Event clone = event.clone();
         clone.setId(Integer.toString(counter++));
         events.add(clone);
+        lastChange = new Date();
         return clone;
     }
 
@@ -56,6 +60,7 @@ public class TestServerUtils implements ServerUtils {
         for (int i = 0; i < events.size(); i++) {
             if(events.get(i).getId().equals(id)) {
                 events.remove(i);
+                lastChange = new Date();
                 return 204;
             }
         }
@@ -74,6 +79,7 @@ public class TestServerUtils implements ServerUtils {
         Participant clone = participant.clone();
         clone.setId(counter++);
         event.addParticipant(clone);
+        lastChange = new Date();
         return 204;
     }
 
@@ -90,6 +96,7 @@ public class TestServerUtils implements ServerUtils {
         if(old == null) return 404;
         event.getParticipants().remove(old);
         event.addParticipant(participant);
+        lastChange = new Date();
         return 204;
     }
 
@@ -105,6 +112,7 @@ public class TestServerUtils implements ServerUtils {
                 .filter(p -> p.getId() == participantId).findAny().orElse(null);
         if(old == null) return 404;
         event.getParticipants().remove(old);
+        lastChange = new Date();
         return 204;
     }
 
@@ -136,6 +144,22 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * @param inputPassword the admin password
+     * @return 204 if there is a change in the database, 408 if time-outed
+     */
+    @Override
+    public int pollEvents(String inputPassword) {
+        if(!verifyPassword(inputPassword)) return 401;
+        Date now = new Date();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return now.before(lastChange) ? 204 : 408;
+    }
+
+    /**
      * Sends an API call to add the event
      * The ids of expenses and participants gets reassigned so use the returned event!
      *
@@ -147,6 +171,7 @@ public class TestServerUtils implements ServerUtils {
     public int importEvent(String password, Event event) {
         if(!verifyPassword(password)) return 401;
         events.add(event.clone());
+        lastChange = new Date();
         return 204;
     }
 }

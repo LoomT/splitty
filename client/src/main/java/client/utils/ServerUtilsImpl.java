@@ -29,7 +29,7 @@ import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
-public class ServerUtilsImpl implements ServerUtils{
+public class ServerUtilsImpl implements ServerUtils {
 
     private final String server;
 

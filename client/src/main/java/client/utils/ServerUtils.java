@@ -61,6 +61,12 @@ public interface ServerUtils {
     List<Event> getEvents(String inputPassword);
 
     /**
+     * @param inputPassword the admin password
+     * @return 204 if there is a change in the database, 408 if time-outed
+     */
+    int pollEvents(String inputPassword);
+
+    /**
      * Sends an API call to add the event
      * The ids of expenses and participants gets reassigned so use the returned event!
      *
