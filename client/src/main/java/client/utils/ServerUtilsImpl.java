@@ -18,6 +18,7 @@ package client.utils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -42,14 +43,18 @@ public class ServerUtilsImpl implements ServerUtils{
 
     /**
      * @param id the id of the event to get
-     * @return the found event
+     * @return the found event, null if not found
      */
     public Event getEvent(String id) {
-        return ClientBuilder.newClient(new ClientConfig())
-                .target(server).path("api/events/" + id)
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .get(Event.class);
+        try{
+            return ClientBuilder.newClient(new ClientConfig())
+                    .target(server).path("api/events/" + id)
+                    .request(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON)
+                    .get(Event.class);
+        } catch (NotFoundException e) {
+            return null;
+        }
     }
 
     /**

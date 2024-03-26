@@ -142,6 +142,12 @@ public class StartScreenCtrl {
         if (code.getText().isEmpty()) return;
         try {
             Event joinedEvent = server.getEvent(code.getText());
+            if(joinedEvent == null) {
+                System.out.println("Event not found");
+                // Show visually that event was not found
+                // a full error pop up might be too annoying in this case
+                return;
+            }
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
             throw e;

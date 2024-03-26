@@ -10,7 +10,7 @@ public interface ServerUtils {
 
     /**
      * @param id the id of the event to get
-     * @return the found event
+     * @return the found event, null if not found
      */
     Event getEvent(String id);
 
