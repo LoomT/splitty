@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
-import jakarta.ws.rs.core.Response;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -18,10 +17,8 @@ import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-
 import java.util.ArrayList;
 import java.util.Comparator;
-
 import java.util.List;
 
 public class AdminOverviewCtrl {
@@ -239,9 +236,8 @@ public class AdminOverviewCtrl {
         for(File file : files) {
             try {
                 Event event = reader.readValue(file);
-                Response response = server.importEvent(password, event);
-                System.out.println(response.getStatus()); // for troubleshooting
-                switch (response.getStatus()) {
+                int status = server.importEvent(password, event);
+                switch (status) {
                     case 400 -> {
                         System.out.println("Missing participants from the participant list");
                         // TODO display an error message that the JSON file is incorrect

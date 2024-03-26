@@ -115,7 +115,7 @@ public class ServerUtilsImpl implements ServerUtils{
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      */
-    public int deleteParticipant(String eventId, String participantId) {
+    public int deleteParticipant(String eventId, long participantId) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventId + "/participants/" + participantId)
@@ -164,12 +164,14 @@ public class ServerUtilsImpl implements ServerUtils{
      * @param event event to import
      * @return imported event
      */
-    public Response importEvent(String password, Event event) {
-        return ClientBuilder.newClient(new ClientConfig())
+    public int importEvent(String password, Event event) {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("admin/events")
                 .request(APPLICATION_JSON)
                 .header("Authorization", password)
                 .accept(APPLICATION_JSON)
-                .post(Entity.entity(event, APPLICATION_JSON));
+                .post(Entity.entity(event, APPLICATION_JSON))) {
+            return response.getStatus();
+        }
     }
 }

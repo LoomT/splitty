@@ -2,7 +2,6 @@ package client.utils;
 
 import commons.Event;
 import commons.Participant;
-import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -44,7 +43,7 @@ public interface ServerUtils {
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      */
-    int deleteParticipant(String eventId, String participantId);
+    int deleteParticipant(String eventId, long participantId);
 
     /**
      * Verify the input password
@@ -69,5 +68,5 @@ public interface ServerUtils {
      * @param event event to import
      * @return imported event
      */
-    Response importEvent(String password, Event event);
+    int importEvent(String password, Event event);
 }
