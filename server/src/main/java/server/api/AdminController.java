@@ -20,7 +20,7 @@ public class AdminController {
 
     private final EventRepository repo;
     private final AdminService admS;
-    private Date lastChange = new Date();
+    private Date lastChange;
 
     /**
      * Constructor with repository injection
@@ -31,6 +31,7 @@ public class AdminController {
     public AdminController(EventRepository repo, AdminService admS) {
         this.repo = repo;
         this.admS = admS;
+        lastChange = new Date();
     }
 
     /**
@@ -140,7 +141,7 @@ public class AdminController {
     /**
      * @param inputPassword admin password
      * @param timeOut millisecond after which send a time-out response
-     * @return 200 if there is a change, 408 if time-outed
+     * @return 204 if there is a change, 408 if time-outed
      */
     @GetMapping("/admin/events/poll")
     public DeferredResult<ResponseEntity<String>>
@@ -162,7 +163,7 @@ public class AdminController {
                     if(output.isSetOrExpired()) {
                         return;
                     }
-                    Thread.sleep(100);
+                    Thread.sleep(200);
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

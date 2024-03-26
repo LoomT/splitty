@@ -153,14 +153,16 @@ public class ServerUtils {
      * @param inputPassword admin password
      * @return HTTP response - 204 if there is an update and 408 if not
      */
-    public Response pollEvents(String inputPassword) {
-        return ClientBuilder.newClient(new ClientConfig()) //
+    public int pollEvents(String inputPassword) {
+        try(Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/events/poll") //
                 .request(APPLICATION_JSON) //
                 .header("Authorization", inputPassword)
                 .header("TimeOut", 5000L)
                 .accept(APPLICATION_JSON) //
-                .get();
+                .get()) {
+            return response.getStatus();
+        }
     }
 
     /**

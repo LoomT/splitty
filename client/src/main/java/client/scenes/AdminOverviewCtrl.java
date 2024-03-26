@@ -263,11 +263,9 @@ public class AdminOverviewCtrl {
     public void initPoller() {
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
-                try (Response response = server.pollEvents(password)) {
-                    System.out.println(response.toString());
-                    if(response.getStatus() != 204) continue;
-                    Platform.runLater(this::loadAllEvents);
-                }
+                int status = server.pollEvents(password);
+                if(status != 204) continue;
+                Platform.runLater(this::loadAllEvents);
             }});
         poller.start();
     }
