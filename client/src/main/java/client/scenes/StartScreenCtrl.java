@@ -97,7 +97,7 @@ public class StartScreenCtrl {
 
             list.add(
                     new EventListItem(
-                            "Test",
+                            server.getEvent(recentEventCodes.get(i)).getTitle(),
                             recentEventCodes.get(i),
                             () -> {
                                 eventList.getChildren().remove(list.get(finalI));
