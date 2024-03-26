@@ -131,7 +131,6 @@ public class AddExpenseCtrl {
     public void handlePartialSplit(ActionEvent event) {
         equalSplit.setSelected(false);
         disablePartialSplitCheckboxes(false);
-        //expPart = new ArrayList<>();
         CheckBox checkBox = (CheckBox) event.getSource();
         if (checkBox.isSelected()) {
             expPart.clear();
@@ -255,7 +254,6 @@ public class AddExpenseCtrl {
      * @param event
      */
     public void populateSplitPeople(Event event) {
-        //expPart.clear();
         expenseParticipants.getChildren().clear();
         selectedParticipants.clear();
 

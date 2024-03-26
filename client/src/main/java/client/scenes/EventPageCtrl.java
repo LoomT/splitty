@@ -258,7 +258,6 @@ public class EventPageCtrl {
 
         for (Expense expense : expenses) {
             String expenseString = expense.toString();
-            System.out.println(expenseString);
             char[] temp = expenseString.toCharArray();
             int index = 0;
             for (int i = 0; i < temp.length; i++) {
@@ -267,7 +266,6 @@ public class EventPageCtrl {
                     break;
                 }
             }
-            System.out.println(index);
             items.add(expenseString);
 
             List<Participant> participants = expense.getExpenseParticipants();
@@ -350,7 +348,6 @@ public class EventPageCtrl {
      * @return the name
      */
     public String extractSelectedName() {
-        System.out.println(participantChoiceBox.getValue());
         return participantChoiceBox.getValue();
     }
 
