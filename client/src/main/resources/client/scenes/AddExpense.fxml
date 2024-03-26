@@ -14,6 +14,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.text.TextFlow?>
 
+<?import javafx.scene.control.RadioButton?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="501.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddExpenseCtrl">
     <children>
         <Pane layoutX="3.0" layoutY="8.0" prefHeight="56.0" prefWidth="600.0" style="-fx-background-color: #ddd;">
@@ -83,21 +84,20 @@
                 </Text>
                 <HBox prefHeight="28.0" prefWidth="144.0">
                     <children>
-                        <CheckBox fx:id="equalSplit" mnemonicParsing="false" text=" Equally Between Everybody">
+                        <RadioButton fx:id="equalSplit" mnemonicParsing="false" text=" Equally Between Everybody">
                             <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
-                        </CheckBox>
+                        </RadioButton>
                     </children>
                 </HBox>
                 <HBox prefHeight="27.0" prefWidth="298.0">
                     <children>
-                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="Only Some People" onAction="#handlePartialSplit">
-
-                        <font>
+                        <RadioButton fx:id="partialSplit" mnemonicParsing="false" text="Only Some People">
+                            <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
-                        </CheckBox>
+                        </RadioButton>
                     </children>
                 </HBox>
             </children>

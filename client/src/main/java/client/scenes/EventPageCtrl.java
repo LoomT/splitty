@@ -267,13 +267,7 @@ public class EventPageCtrl {
                 }
             }
             items.add(expenseString);
-
-            List<Participant> participants = new ArrayList<>();
-            for (Participant p : expense.getExpenseParticipants()) {
-                if (!participants.contains(p)) {
-                    participants.add(p);
-                }
-            }
+            List<Participant> participants = getUniqueParticipants(expense);
 
             StringBuilder participantsList = new StringBuilder("");
             while(index > 0) {
@@ -299,7 +293,20 @@ public class EventPageCtrl {
         lv.setItems(items);
     }
 
-
+    /**
+     * get the unique participants
+     * @param expense
+     * @return the unique participants
+     */
+    private List<Participant> getUniqueParticipants(Expense expense) {
+        List<Participant> participants = new ArrayList<>();
+        for (Participant p : expense.getExpenseParticipants()) {
+            if (!participants.contains(p)) {
+                participants.add(p);
+            }
+        }
+        return participants;
+    }
 
     /**
      * return all expenses

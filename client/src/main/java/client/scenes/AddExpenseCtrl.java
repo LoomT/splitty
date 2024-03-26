@@ -39,10 +39,10 @@ public class AddExpenseCtrl {
     private DatePicker date;
 
     @FXML
-    private CheckBox equalSplit;
+    private RadioButton equalSplit;
 
     @FXML
-    private CheckBox partialSplit;
+    private RadioButton partialSplit;
 
     @FXML
     private TextFlow expenseParticipants;
@@ -118,7 +118,9 @@ public class AddExpenseCtrl {
             handleAddButton(event);
         });
 
-        abort.setOnAction(x -> mainCtrl.goBackToEventPage(event));
+        abort.setOnAction(x -> {
+            handleAbortButton(event);
+        });
 
 
     }
@@ -153,16 +155,15 @@ public class AddExpenseCtrl {
      * Fill the choices for the author of the expense.
      */
     public void populateAuthorChoiceBox(Event event) {
-        if (expenseAuthor.getItems().size() == 0) {
-            expenseAuthor
-                .getItems()
-                .addAll(
-                    event.getParticipants()
-                            .stream()
-                            .map(Participant::getName)
-                            .toList()
-                );
-        }
+        expenseAuthor.getItems().clear();
+        expenseAuthor
+            .getItems()
+            .addAll(
+                event.getParticipants()
+                        .stream()
+                        .map(Participant::getName)
+                        .toList()
+            );
 
     }
 
@@ -233,10 +234,14 @@ public class AddExpenseCtrl {
         }
     }
 
-
-
-
-
+    /**
+     * handle the behaviour for the abort button
+     * @param ev
+     */
+    public void handleAbortButton(Event ev) {
+        resetExpenseFields();
+        mainCtrl.goBackToEventPage(ev);
+    }
 
     /**
      * show corresponding tags for expense
