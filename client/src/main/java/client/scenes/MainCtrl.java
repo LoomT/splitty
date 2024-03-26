@@ -43,6 +43,9 @@ public class MainCtrl {
     private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
 
+    private AddExpenseCtrl addExpenseCtrl;
+    private Scene addExpense;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
     private UserConfig userConfig;
@@ -71,6 +74,7 @@ public class MainCtrl {
      * @param adminLogin           admin login controller and scene
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
+     * @param addExpensePage controller and scene for addExpense
      */
     public void initialize(
             Stage primaryStage,
@@ -80,7 +84,8 @@ public class MainCtrl {
             Pair<EventPageCtrl, Parent> eventPage,
             Pair<AdminLoginCtrl, Parent> adminLogin,
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
-            Pair<AdminOverviewCtrl, Parent> adminOverview
+            Pair<AdminOverviewCtrl, Parent> adminOverview,
+            Pair<AddExpenseCtrl, Parent> addExpensePage
     ) {
 
         this.primaryStage = primaryStage;
@@ -100,6 +105,9 @@ public class MainCtrl {
 
         this.editParticipantsCtrl = editParticipantsPage.getKey();
         this.editParticipants = new Scene(editParticipantsPage.getValue());
+
+        this.addExpenseCtrl = addExpensePage.getKey();
+        this.addExpense = new Scene(addExpensePage.getValue());
 
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
@@ -170,7 +178,6 @@ public class MainCtrl {
      */
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
-        adminOverviewCtrl.initPoller();
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
@@ -194,5 +201,15 @@ public class MainCtrl {
      */
     public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
         return fileChooser.showOpenMultipleDialog(primaryStage);
+    }
+
+    /**
+     * shows the add/edit expense page
+     * @param eventToShow the event to show the participant editor for
+     */
+    public void showAddExpensePage(Event eventToShow) {
+        addExpenseCtrl.displayAddExpensePage(eventToShow);
+        primaryStage.setTitle("Add/Edit Expense");
+        primaryStage.setScene(addExpense);
     }
 }

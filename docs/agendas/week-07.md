@@ -19,11 +19,18 @@
     - What could be improved this week to make sure we reach our goals? (3 min)
     - Did we use the feedback they gave us last week? (2 min)
   
-  - **Continuation** (22 min) (Key takeaway: keep the momentum going)
-    - What has to be done this week? (11 min, keep everyone involved)
+  - **Continuation** (17 min) (Key takeaway: keep the momentum going)
+    - What has to be done this week? (8 min, keep everyone involved)
     - Creation and closure of issues (Keep them detailed) (5 min)
-    - Switching roles: Who will work on what?  (4 min)
+    - Switching roles: Who will work on what?  (2 min)
     - Assigning the issues to the team members (2 min)
+  - **Product Pitch** (5min) (Draft for a presentation has to be created)
+    - What features to include in the presentation? (2 min)
+    - Who will work on the presentation? (2 min)
+    - What tools will we use? (1 min)
+  
+  **Note:** Draft has to be uploaded to Brightspace by Thursday 
+    
     
 ---------------------------------------------------------------
 - ##### Closing the meeting (5 min)

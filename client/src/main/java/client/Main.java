@@ -64,7 +64,8 @@ public class Main extends Application {
      *
      * @param primaryStage the primary stage
      */
-    public void loadLanguageResourcesAndStart(Stage primaryStage) {
+    public void loadLanguageResourcesAndStart(Stage primaryStage)
+    {
         // Load all the FXML here:
         var start = FXML.load(
                 StartScreenCtrl.class,
@@ -93,8 +94,14 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
 
+        var addExpense = FXML.load(
+                AddExpenseCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "AddExpense.fxml"
+        );
+
+        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(
                 primaryStage,
                 languageConf,
@@ -103,7 +110,8 @@ public class Main extends Application {
                 eventPage,
                 adminLogin,
                 editParticipants,
-                adminOverview
+                adminOverview,
+                addExpense
         );
 
     }
