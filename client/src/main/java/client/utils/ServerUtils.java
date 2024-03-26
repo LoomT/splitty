@@ -30,25 +30,34 @@ public interface ServerUtils {
     /**
      * @param eventId     tbe event in which the participant should be created
      * @param participant the participant to be created
+     * @return 204 for success,
+     * 400 if the participant is badly formatted,
+     * 404 if event is not found
      */
     int createParticipant(String eventId, Participant participant);
 
     /**
      * @param eventId     the event in which the participant should be updated
      * @param participant the participant to be updated
+     * @return 204 for success,
+     * 400 if the participant is badly formatted,
+     * 404 if event is not found
      */
     int updateParticipant(String eventId, Participant participant);
 
     /**
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
+     * @return 204 for success,
+     * 400 if the participant is badly formatted,
+     * 404 if event is not found
      */
     int deleteParticipant(String eventId, long participantId);
 
     /**
      * Verify the input password
      * @param inputPassword the password to verify
-     * @return boolean
+     * @return true iff password is correct
      */
     boolean verifyPassword(String inputPassword);
 

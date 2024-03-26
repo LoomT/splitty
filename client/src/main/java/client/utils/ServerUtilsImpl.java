@@ -87,6 +87,9 @@ public class ServerUtilsImpl implements ServerUtils {
     /**
      * @param eventId     tbe event in which the participant should be created
      * @param participant the participant to be created
+     * @return 204 for success,
+     * 400 if the participant is badly formatted,
+     * 404 if event is not found
      */
     public int createParticipant(String eventId, Participant participant) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
@@ -100,6 +103,9 @@ public class ServerUtilsImpl implements ServerUtils {
     /**
      * @param eventId     the event in which the participant should be updated
      * @param participant the participant to be updated
+     * @return 204 for success,
+     * 400 if the participant is badly formatted,
+     * 404 if event is not found
      */
     public int updateParticipant(String eventId, Participant participant) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
@@ -114,6 +120,9 @@ public class ServerUtilsImpl implements ServerUtils {
     /**
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
+     * @return 204 for success,
+     * 400 if the participant is badly formatted,
+     * 404 if event is not found
      */
     public int deleteParticipant(String eventId, long participantId) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
@@ -128,7 +137,7 @@ public class ServerUtilsImpl implements ServerUtils {
     /**
      * Verify the input password
      * @param inputPassword the password to verify
-     * @return boolean
+     * @return true iff password is correct
      */
     public boolean verifyPassword(String inputPassword) {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
@@ -136,7 +145,7 @@ public class ServerUtilsImpl implements ServerUtils {
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(inputPassword, APPLICATION_JSON))) {
-        return response.getStatus() == Response.Status.OK.getStatusCode();
+            return response.getStatus() == Response.Status.OK.getStatusCode();
         }
     }
 
@@ -157,6 +166,15 @@ public class ServerUtilsImpl implements ServerUtils {
     }
 
     /**
+     * @param inputPassword the admin password
+     * @return 204 if there is a change in the database, 408 if time-outed
+     */
+    @Override
+    public int pollEvents(String inputPassword) {
+        return 0;
+    }
+
+    /**
      * Sends an API call to add the event
      * The ids of expenses and participants gets reassigned so use the returned event!
      *
@@ -164,6 +182,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param event event to import
      * @return imported event
      */
+    @Override
     public int importEvent(String password, Event event) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("admin/events")

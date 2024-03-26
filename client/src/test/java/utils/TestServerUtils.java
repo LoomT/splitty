@@ -120,7 +120,7 @@ public class TestServerUtils implements ServerUtils {
      * Verify the input password
      *
      * @param inputPassword the password to verify
-     * @return boolean
+     * @return true iff password is "password"
      */
     @Override
     public boolean verifyPassword(String inputPassword) {
