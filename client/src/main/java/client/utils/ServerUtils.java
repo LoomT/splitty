@@ -220,6 +220,7 @@ public class ServerUtils {
     /**
      * @param eventID ID of the event to which the expense belongs
      * @param expense the expense to be created
+     * @return status code
      */
     public int createExpense(String eventID, Expense expense) {
         return ClientBuilder.newClient(new ClientConfig())
@@ -234,6 +235,7 @@ public class ServerUtils {
      * @param id id of the expense to update
      * @param eventID ID of the event containing the expense
      * @param expense the updated expense object
+     * @return status code
      */
     public int updateExpense(long id, String eventID, Expense expense) {
         return ClientBuilder.newClient(new ClientConfig())
@@ -247,6 +249,7 @@ public class ServerUtils {
     /**
      * @param id id of the expense to delete
      * @param eventID ID of the event containing the expense
+     * @return status code
      */
     public int deleteExpense(long id, String eventID) {
         return ClientBuilder.newClient(new ClientConfig())
