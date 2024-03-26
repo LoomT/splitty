@@ -221,14 +221,13 @@ public class ServerUtils {
      * @param eventID ID of the event to which the expense belongs
      * @param expense the expense to be created
      */
-    public void createExpense(String eventID, Expense expense) {
-        ClientBuilder.newClient(new ClientConfig())
+    public int createExpense(String eventID, Expense expense) {
+        return ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/expenses")
                 .request(APPLICATION_JSON)
-                .post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
-
-
+                .post(Entity.entity(expense, APPLICATION_JSON))
+                .getStatus();
     }
 
     /**
@@ -236,23 +235,25 @@ public class ServerUtils {
      * @param eventID ID of the event containing the expense
      * @param expense the updated expense object
      */
-    public void updateExpense(long id, String eventID, Expense expense) {
-        ClientBuilder.newClient(new ClientConfig())
+    public int updateExpense(long id, String eventID, Expense expense) {
+        return ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/expenses/" + id)
                 .request(APPLICATION_JSON)
-                .put(Entity.entity(expense, APPLICATION_JSON), Expense.class);
+                .put(Entity.entity(expense, APPLICATION_JSON))
+                .getStatus();
     }
 
     /**
      * @param id id of the expense to delete
      * @param eventID ID of the event containing the expense
      */
-    public void deleteExpense(long id, String eventID) {
-        ClientBuilder.newClient(new ClientConfig())
+    public int deleteExpense(long id, String eventID) {
+        return ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/expenses/" + id)
                 .request(APPLICATION_JSON)
-                .delete();
+                .delete()
+                .getStatus();
     }
 }
