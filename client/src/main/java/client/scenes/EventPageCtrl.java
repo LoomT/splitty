@@ -268,7 +268,12 @@ public class EventPageCtrl {
             }
             items.add(expenseString);
 
-            List<Participant> participants = expense.getExpenseParticipants();
+            List<Participant> participants = new ArrayList<>();
+            for (Participant p : expense.getExpenseParticipants()) {
+                if (!participants.contains(p)) {
+                    participants.add(p);
+                }
+            }
 
             StringBuilder participantsList = new StringBuilder("");
             while(index > 0) {
