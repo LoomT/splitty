@@ -338,6 +338,7 @@ public class Expense implements Cloneable {
             for (Participant p : this.expenseParticipants) {
                 clone.expenseParticipants.add(p.clone());
             }
+            clone.date = (Date) this.date.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

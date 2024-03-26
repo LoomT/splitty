@@ -3,10 +3,8 @@ package commons;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 // Index the title for faster sorting by title for admin,
@@ -47,7 +45,7 @@ public class Event implements Cloneable {
     @JoinColumn(name = "event_id", updatable = false, insertable = false)
     private List<Expense> expenses;
     @Temporal(TemporalType.TIMESTAMP)
-    private final Date creationDate;
+    private Date creationDate;
 
     /**
      * No-Argument Constructor
@@ -327,22 +325,24 @@ public class Event implements Cloneable {
     public Event clone() {
         try {
             Event clone = (Event) super.clone();
-//            clone.participants = new ArrayList<>(this.participants.size());
-//            for (Participant p : this.participants) {
-//                clone.participants.add(p.clone());
-//            }
-//            clone.expenses = new ArrayList<>(this.expenses.size());
-//            for (Expense e : this.expenses) {
-//                clone.expenses.add(e.clone());
-//            }
-//            for(Expense e : clone.expenses) {
-//                e.setExpenseAuthor(clone.participants.stream()
-//                        .filter(p -> p.getId() == e.getExpenseAuthor().getId())
-//                        .findAny().orElseThrow());
-//                Set<Long> ids = clone.participants.stream().map(Participant::getId).collect(Collectors.toSet());
-//                e.setExpenseParticipants(new ArrayList<>(clone.participants.stream()
-//                        .filter(p -> ids.contains(p.getId())).toList()));
-//            }
+            clone.participants = new ArrayList<>(this.participants.size());
+            for (Participant p : this.participants) {
+                clone.participants.add(p.clone());
+            }
+            clone.expenses = new ArrayList<>(this.expenses.size());
+            for (Expense e : this.expenses) {
+                clone.expenses.add(e.clone());
+            }
+            for(Expense e : clone.expenses) {
+                e.setExpenseAuthor(clone.participants.stream()
+                        .filter(p -> p.getId() == e.getExpenseAuthor().getId())
+                        .findAny().orElseThrow());
+                Set<Long> ids = clone.participants.stream()
+                        .map(Participant::getId).collect(Collectors.toSet());
+                e.setExpenseParticipants(new ArrayList<>(clone.participants.stream()
+                        .filter(p -> ids.contains(p.getId())).toList()));
+            }
+            clone.creationDate = (Date) this.creationDate.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

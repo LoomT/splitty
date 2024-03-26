@@ -4,17 +4,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class ParticipantTest {
 
     Participant participant1;
     Participant participant2;
     Expense expense;
+    Participant clone;
     @BeforeEach
     public void testSetup(){
         participant1 = new Participant("participant1", "p1@gmail.com", "Bob",  "1234");
@@ -24,6 +24,7 @@ class ParticipantTest {
         expenseParticipants.add(participant2);
         expense = new Expense(participant1, "test", 32,
                 "EUR", expenseParticipants, "type");
+        clone = participant1.clone();
     }
 
 
@@ -112,5 +113,30 @@ class ParticipantTest {
     @Test
     void testHashCodeOverflow() {
         assertEquals(participant1.hashCode(), participant1.hashCode());
+    }
+
+    @Test
+    void cloneName() {
+        assertEquals(participant1.getName(), clone.getName());
+    }
+
+    @Test
+    void cloneID() {
+        assertEquals(participant1.getId(), clone.getId());
+    }
+
+    @Test
+    void cloneEmail() {
+        assertEquals(participant1.getEmailAddress(), clone.getEmailAddress());
+    }
+
+    @Test
+    void cloneBeneficiaryName() {
+        assertEquals(participant1.getBeneficiary(), clone.getBeneficiary());
+    }
+
+    @Test
+    void cloneAccountNumber() {
+        assertEquals(participant1.getAccountNumber(), clone.getAccountNumber());
     }
 }
