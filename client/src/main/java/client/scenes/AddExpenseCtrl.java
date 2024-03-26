@@ -100,8 +100,7 @@ public class AddExpenseCtrl {
         splitAll = false;
 
         populateSplitPeople(event);
-
-
+        disablePartialSplitCheckboxes(true);
         equalSplit.setOnAction(e -> {
             if (equalSplit.isSelected()) {
                 splitAll = true;
@@ -135,6 +134,7 @@ public class AddExpenseCtrl {
         //expPart = new ArrayList<>();
         CheckBox checkBox = (CheckBox) event.getSource();
         if (checkBox.isSelected()) {
+            expPart.clear();
             for (Node node : expenseParticipants.getChildren()) {
                 if (node instanceof CheckBox) {
                     CheckBox participantCheckBox = (CheckBox) node;
@@ -214,13 +214,13 @@ public class AddExpenseCtrl {
                         .findFirst().orElse(null);
                 if (selectedParticipant != null) {
                     String expCurrency = currency.getValue();
-                    expPart.add(selectedParticipant);
+                    //expPart.add(selectedParticipant);
 
                     String expType = type.getValue();
                     Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
                             expCurrency, expPart, expType);
                     expense.setDate(expenseDate);
-                    ev.getExpenses().add(expense);
+                    server.createExpense(ev.getId(), expense);
                     resetExpenseFields();
                     mainCtrl.goBackToEventPage(ev);
                 }

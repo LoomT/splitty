@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import commons.Quote;
+import commons.Expense;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -84,10 +85,12 @@ public class ServerUtils {
      */
     public void createParticipant(String eventId, Participant participant) {
         ClientBuilder.newClient(new ClientConfig())
-                .target(server).path("api/events/" + eventId + "/participants")
+                .target(server).
+                path("api/events/" + eventId + "/participants")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
     }
+
 
     /**
      * @param eventId     the event in which the participant should be updated
@@ -198,5 +201,58 @@ public class ServerUtils {
                 .header("Authorization", password)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(event, APPLICATION_JSON));
+    }
+
+    /**
+     * @param id id of the expense to retrieve
+     * @param eventID ID of the event containing the expense
+     * @return the retrieved expense
+     */
+    public Expense getExpense(long id, String eventID) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses/" + id)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(Expense.class);
+    }
+
+    /**
+     * @param eventID ID of the event to which the expense belongs
+     * @param expense the expense to be created
+     */
+    public void createExpense(String eventID, Expense expense) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(expense, APPLICATION_JSON), Expense.class);
+
+
+    }
+
+    /**
+     * @param id id of the expense to update
+     * @param eventID ID of the event containing the expense
+     * @param expense the updated expense object
+     */
+    public void updateExpense(long id, String eventID, Expense expense) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses/" + id)
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(expense, APPLICATION_JSON), Expense.class);
+    }
+
+    /**
+     * @param id id of the expense to delete
+     * @param eventID ID of the event containing the expense
+     */
+    public void deleteExpense(long id, String eventID) {
+        ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses/" + id)
+                .request(APPLICATION_JSON)
+                .delete();
     }
 }

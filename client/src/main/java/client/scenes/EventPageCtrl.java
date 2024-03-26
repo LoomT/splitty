@@ -132,8 +132,8 @@ public class EventPageCtrl {
             includingListView.getItems().clear();
             fromExpenses = getExpensesFrom(e, name);
             includingExpenses = getExpensesIncluding(e, name);
-            createExpenses(fromExpenses, fromListView);
-            createExpenses(includingExpenses, includingListView);
+            createExpenses(fromExpenses, fromListView, e);
+            createExpenses(includingExpenses, includingListView, e);
         });
         handleWS();
         displayExpenses(event);
@@ -220,9 +220,9 @@ public class EventPageCtrl {
         allExpenses = getAllExpenses(e);
         fromExpenses = getExpensesFrom(e, selectedParticipantName);
         includingExpenses = getExpensesIncluding(e, selectedParticipantName);
-        createExpenses(allExpenses, allListView);
-        createExpenses(fromExpenses, fromListView);
-        createExpenses(includingExpenses, includingListView);
+        createExpenses(allExpenses, allListView, e);
+        createExpenses(fromExpenses, fromListView, e);
+        createExpenses(includingExpenses, includingListView, e);
 //        createAllExpenses(e);
 //        createExpensesFrom(e, selectedParticipantName);
 //        createExpensesIncluding(e, selectedParticipantName);
@@ -251,13 +251,46 @@ public class EventPageCtrl {
      * create the specific displayed expenses for a listview
      * @param expenses
      * @param lv
+     * @param ev
      */
-    public void createExpenses(List<Expense> expenses, ListView<String> lv) {
+    public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         ObservableList<String> items = FXCollections.observableArrayList();
 
         for (Expense expense : expenses) {
             String expenseString = expense.toString();
+            System.out.println(expenseString);
+            char[] temp = expenseString.toCharArray();
+            int index = 0;
+            for (int i = 0; i < temp.length; i++) {
+                if (Character.isLowerCase(temp[i])) {
+                    index = i;
+                    break;
+                }
+            }
+            System.out.println(index);
             items.add(expenseString);
+
+            List<Participant> participants = expense.getExpenseParticipants();
+
+            StringBuilder participantsList = new StringBuilder("");
+            while(index > 0) {
+                participantsList.append("  ");
+                index--;
+            }
+            participantsList.append("(");
+            int count = participants.size();
+            if (count == ev.getParticipants().size()) {
+                participantsList.append("all");
+            } else {
+                for (int i = 0; i < count; i++) {
+                    participantsList.append(participants.get(i).getName());
+                    if (i < count - 1) {
+                        participantsList.append(",");
+                    }
+                }
+            }
+            participantsList.append(")");
+            items.add(String.valueOf(participantsList));
         }
 
         lv.setItems(items);
