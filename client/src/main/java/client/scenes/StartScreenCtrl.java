@@ -88,13 +88,16 @@ public class StartScreenCtrl {
     private void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
+
         eventList.getChildren().clear();
 
 
         for (int i = 0; i < recentEventCodes.size(); i++) {
             int finalI = i;
+
             list.add(
                     new EventListItem(
+                            "Test",
                             recentEventCodes.get(i),
                             () -> {
                                 eventList.getChildren().remove(list.get(finalI));
