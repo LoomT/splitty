@@ -20,7 +20,6 @@ import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Participant;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -53,7 +52,7 @@ public class MainCtrl {
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
-    private Websocket websocket;
+    private final Websocket websocket;
 
     /**
      * @param websocket the websocket instance
@@ -148,14 +147,7 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        eventPageCtrl.displayExpenses(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
-        for (Participant p :
-                eventToShow.getParticipants()) {
-            System.out.println(p.getId() + " " + p.getName());
-
-
-        }
         primaryStage.setScene(eventPage);
     }
 
@@ -186,6 +178,7 @@ public class MainCtrl {
      */
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
+        adminOverviewCtrl.initPoller();
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
@@ -200,7 +193,6 @@ public class MainCtrl {
     public File showSaveFileDialog(FileChooser fileChooser) {
         return fileChooser.showSaveDialog(primaryStage);
     }
-
 
     /**
      * Opens the system file chooser to open multiple files
@@ -221,58 +213,4 @@ public class MainCtrl {
         primaryStage.setTitle("Add/Edit Expense");
         primaryStage.setScene(addExpense);
     }
-
-
-    /**
-     * Getter for startScreenCtrl
-     *
-     * @return startScreenCtrl
-     */
-    public StartScreenCtrl getStartScreenCtrl() {
-        return startScreenCtrl;
-    }
-
-
-    /**
-     * setter for startScreenCtrl
-     *
-     * @param startScreenCtrl start screen controller
-     */
-    public void setStartScreenCtrl(StartScreenCtrl startScreenCtrl) {
-        this.startScreenCtrl = startScreenCtrl;
-    }
-
-    /**
-     * AdminLoginCtrl getter
-     *
-     * @return admin login controller
-     */
-    public AdminLoginCtrl getAdminLoginCtrl() {
-        return adminLoginCtrl;
-    }
-
-    /**
-     * setter for adminLoginCtrl
-     *
-     * @param adminLoginCtrl admin login controller
-     */
-    public void setAdminLoginCtrl(AdminLoginCtrl adminLoginCtrl) {
-        this.adminLoginCtrl = adminLoginCtrl;
-    }
-
-
-//    public void showOverview() {
-//        primaryStage.setTitle("Quotes: Overview");
-//        primaryStage.setScene(overview);
-//        overviewCtrl.refresh();
-//    }
-//
-//    /**
-//     * display adding quote scene
-//     */
-//    public void showAdd() {
-//        primaryStage.setTitle("Quotes: Adding Quote");
-//        primaryStage.setScene(add);
-//        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-//    }
 }

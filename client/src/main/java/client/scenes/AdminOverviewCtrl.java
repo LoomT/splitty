@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.core.Response;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -18,10 +19,8 @@ import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-
 import java.util.ArrayList;
 import java.util.Comparator;
-
 import java.util.List;
 
 public class AdminOverviewCtrl {
@@ -42,8 +41,10 @@ public class AdminOverviewCtrl {
     @FXML
     private CheckBox reverseOrderCheckBox;
 
-    private LanguageConf languageConf;
+    private final LanguageConf languageConf;
     private List<Event> allEvents;
+
+    private Thread poller;
 
     /**
      * adminOverview screen controller constructor
@@ -78,14 +79,9 @@ public class AdminOverviewCtrl {
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.numOfParticipants"));
         orderByChoiceBox.setValue(languageConf.get("AdminOverview.creationDate"));
-        orderByChoiceBox.setOnAction((e1) -> {
-            orderAndDisplayEvents();
-        });
+        orderByChoiceBox.setOnAction((e1) -> orderAndDisplayEvents());
 
-        reverseOrderCheckBox.setOnAction((e1)-> {
-            orderAndDisplayEvents();
-        });
-
+        reverseOrderCheckBox.setOnAction((e1) -> orderAndDisplayEvents());
     }
 
     private void orderAndDisplayEvents() {
@@ -124,7 +120,10 @@ public class AdminOverviewCtrl {
                                 }
                             },
                             () -> eventExportHandler(event),
-                            () -> mainCtrl.showEventPage(event)
+                            () -> {
+                                stopPoller();
+                                mainCtrl.showEventPage(event);
+                            }
                             );
             eventList.getChildren().add(item);
 
@@ -152,6 +151,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void backButtonClicked() {
+        stopPoller();
         mainCtrl.showAdminLogin();
     }
 
@@ -161,7 +161,6 @@ public class AdminOverviewCtrl {
     public void loadAllEvents() {
         allEvents = server.getEvents(password);
         orderAndDisplayEvents();
-
     }
 
 
@@ -256,5 +255,25 @@ public class AdminOverviewCtrl {
             }
         }
         loadAllEvents();
+    }
+
+    /**
+     * Initialize the long poller
+     */
+    public void initPoller() {
+        poller = new Thread(() -> {
+            while(!Thread.currentThread().isInterrupted()) {
+                int status = server.pollEvents(password);
+                if(status != 204) continue;
+                Platform.runLater(this::loadAllEvents);
+            }});
+        poller.start();
+    }
+
+    /**
+     * Stop the long poller
+     */
+    public void stopPoller() {
+        poller.interrupt();
     }
 }

@@ -16,17 +16,20 @@ import java.util.Optional;
 public class ExpenseController {
     private final ExpenseRepository repoExpense;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * constructor for expense controller
      *
      * @param repoExpense repo of the Expenses
      * @param simp websocket object to send messages to event subscribers
+     * @param adminController admin controller for sending updates
      */
     public ExpenseController(ExpenseRepository repoExpense,
-                             SimpMessagingTemplate simp) {
+                             SimpMessagingTemplate simp, AdminController adminController) {
         this.repoExpense = repoExpense;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -66,6 +69,7 @@ public class ExpenseController {
 
             expense.setEventID(eventID);
             Expense saved = repoExpense.save(expense);
+            adminController.update();
             simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_EXPENSE,
                             "type", Expense.class.getTypeName()));
@@ -93,6 +97,7 @@ public class ExpenseController {
                 return ResponseEntity.notFound().build();
             }
             repoExpense.delete(optionalExpense.get());
+            adminController.update();
             simp.convertAndSend("/event/" + eventID, id,
                     Map.of("action", WebsocketActions.REMOVE_EXPENSE,
                             "type", Long.class.getTypeName()));
@@ -125,6 +130,7 @@ public class ExpenseController {
                 return ResponseEntity.notFound().build();
 
             repoExpense.save(updatedExpense);
+            adminController.update();
             simp.convertAndSend("/event/" + eventID, updatedExpense,
                     Map.of("action", WebsocketActions.UPDATE_EXPENSE,
                             "type", Expense.class.getTypeName()));
