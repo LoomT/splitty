@@ -45,6 +45,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param id the id of the event to get
      * @return the found event, null if not found
      */
+    @Override
     public Event getEvent(String id) {
         try{
             return ClientBuilder.newClient(new ClientConfig())
@@ -61,6 +62,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param event the new event to be created
      * @return the created entry in the db
      */
+    @Override
     public Event createEvent(Event event) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("api/events") //
@@ -75,6 +77,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param id event id
      * @return status code
      */
+    @Override
     public int deleteEvent(String id) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("api/events/" + id)
@@ -91,6 +94,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * 400 if the participant is badly formatted,
      * 404 if event is not found
      */
+    @Override
     public int createParticipant(String eventId, Participant participant) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("api/events/" + eventId + "/participants")
@@ -107,6 +111,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * 400 if the participant is badly formatted,
      * 404 if event is not found
      */
+    @Override
     public int updateParticipant(String eventId, Participant participant) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
@@ -124,6 +129,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * 400 if the participant is badly formatted,
      * 404 if event is not found
      */
+    @Override
     public int deleteParticipant(String eventId, long participantId) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
@@ -139,6 +145,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param inputPassword the password to verify
      * @return true iff password is correct
      */
+    @Override
     public boolean verifyPassword(String inputPassword) {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/verify") //
@@ -156,6 +163,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param inputPassword the admin password
      * @return all events
      */
+    @Override
     public List<Event> getEvents(String inputPassword) {
         return ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/events") //
@@ -169,12 +177,13 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param inputPassword admin password
      * @return HTTP response - 204 if there is an update and 408 if not
      */
-    public int pollEvents(String inputPassword) {
+    @Override
+    public int pollEvents(String inputPassword, Long timeOut) {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/events/poll") //
                 .request(APPLICATION_JSON) //
                 .header("Authorization", inputPassword)
-                .header("TimeOut", 5000L)
+                .header("TimeOut", timeOut)
                 .accept(APPLICATION_JSON) //
                 .get()) {
             return response.getStatus();

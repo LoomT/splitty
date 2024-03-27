@@ -257,11 +257,12 @@ public class AdminOverviewCtrl {
 
     /**
      * Initialize the long poller
+     * @param timeOut time in ms until server sends a time-out signal
      */
-    public void initPoller() {
+    public void initPoller(Long timeOut) {
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
-                int status = server.pollEvents(password);
+                int status = server.pollEvents(password, timeOut);
                 if(status != 204) continue;
                 Platform.runLater(this::loadAllEvents);
             }});

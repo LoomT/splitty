@@ -71,9 +71,10 @@ public interface ServerUtils {
 
     /**
      * @param inputPassword the admin password
+     * @param timeOut time in ms until server sends a time-out signal
      * @return 204 if there is a change in the database, 408 if time-outed
      */
-    int pollEvents(String inputPassword);
+    int pollEvents(String inputPassword, Long timeOut);
 
     /**
      * Sends an API call to add the event

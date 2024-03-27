@@ -219,10 +219,11 @@ public class TestServerUtils implements ServerUtils {
 
     /**
      * @param inputPassword the admin password
+     * @param timeOut time in ms until server sends a time-out signal
      * @return 204 if there is a change in the database, 408 if time-outed
      */
     @Override
-    public int pollEvents(String inputPassword) {
+    public int pollEvents(String inputPassword, Long timeOut) {
         calls.add("pollEvents");
         if(!"password".equals(inputPassword)) {
             statuses.add(401);
@@ -230,7 +231,7 @@ public class TestServerUtils implements ServerUtils {
         }
         Date now = new Date();
         try {
-            Thread.sleep(5000);
+            Thread.sleep(timeOut);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
