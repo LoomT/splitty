@@ -5,6 +5,7 @@ import commons.Participant;
 import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.AdminService;
 
 import java.util.Objects;
 
@@ -22,7 +23,8 @@ class EventControllerTest {
         TestRandom random = new TestRandom();
         repo = new TestEventRepository();
         template = new TestSimpMessagingTemplate((message, timeout) -> false);
-        sut = new EventController(repo, random, template);
+        AdminController adminController = new AdminController(repo, new AdminService(random));
+        sut = new EventController(repo, random, template, adminController);
     }
     @Test
     public void databaseIsUsed() {
@@ -145,6 +147,6 @@ class EventControllerTest {
     @Test
     void randomId() {
         var added = sut.add(new Event("title"));
-        assertEquals("BCDEF", Objects.requireNonNull(added.getBody()).getId());
+        assertEquals("ZABCD", Objects.requireNonNull(added.getBody()).getId());
     }
 }
