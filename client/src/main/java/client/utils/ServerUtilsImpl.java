@@ -17,6 +17,7 @@ package client.utils;
 
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.ClientBuilder;
@@ -138,6 +139,52 @@ public class ServerUtilsImpl implements ServerUtils {
                 .delete()) {
             return response.getStatus();
         }
+    }
+
+    /**
+     * @param id      id of the expense to retrieve
+     * @param eventID ID of the event containing the expense
+     * @return the retrieved expense
+     */
+    @Override
+    public Expense getExpense(long id, String eventID) {
+        return null;
+    }
+
+    /**
+     * @param eventID ID of the event to which the expense belongs
+     * @param expense the expense to be created
+     * @return 204 for success,
+     * 400 if the expense is badly formatted,
+     * 404 if event is not found
+     */
+    @Override
+    public int createExpense(String eventID, Expense expense) {
+        return 0;
+    }
+
+    /**
+     * @param id      id of the expense to update
+     * @param eventID ID of the event containing the expense
+     * @param expense the updated expense object
+     * @return 204 for success,
+     * 400 if the expense is badly formatted,
+     * 404 if event or expense is not found
+     */
+    @Override
+    public int updateExpense(long id, String eventID, Expense expense) {
+        return 0;
+    }
+
+    /**
+     * @param id      id of the expense to delete
+     * @param eventID ID of the event containing the expense
+     * @return 204 for success,
+     * 404 if event or expense is not found
+     */
+    @Override
+    public int deleteExpense(long id, String eventID) {
+        return 0;
     }
 
     /**

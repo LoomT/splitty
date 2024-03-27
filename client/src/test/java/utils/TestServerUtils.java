@@ -2,6 +2,7 @@ package utils;
 
 import client.utils.ServerUtils;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 
 import java.util.ArrayList;
@@ -123,6 +124,7 @@ public class TestServerUtils implements ServerUtils {
         }
         Participant clone = participant.clone();
         clone.setId(counter++);
+        clone.setEventID(event.getId());
         event.addParticipant(clone);
         lastChange = new Date();
         statuses.add(204);
@@ -147,7 +149,8 @@ public class TestServerUtils implements ServerUtils {
             statuses.add(404);
             return 404;
         }
-        if(participant.getName() == null || participant.getName().isEmpty()) {
+        if(participant.getName() == null || participant.getName().isEmpty()
+                || !participant.getEventID().equals(eventId)) {
             statuses.add(400);
             return 400;
         }
@@ -178,6 +181,130 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getParticipants().remove(old);
         lastChange = new Date();
+        statuses.add(204);
+        return 204;
+    }
+
+    /**
+     * @param id id of the expense to retrieve
+     * @param eventID ID of the event containing the expense
+     * @return the retrieved expense, null if not found
+     */
+    @Override
+    public Expense getExpense(long id, String eventID) {
+        calls.add("getExpense");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return null;
+        }
+        Expense expense = event.getExpenses().stream()
+                .filter(e -> e.getId() == id).findAny().orElse(null);
+        if(expense == null) {
+            statuses.add(404);
+            return null;
+        }
+        statuses.add(200);
+        return expense.clone();
+    }
+
+    /**
+     * @param expense expense to check
+     * @param event event to which the expense will belong
+     * @return true iff any of the mandatory fields are missing
+     * or any participants in the expense are missing from the event
+     */
+    public boolean checkBadExpenseFields(Expense expense, Event event) {
+        if(expense == null) return true;
+        if(!event.getParticipants().contains(expense.getExpenseAuthor())) return true;
+        if(!event.getParticipants().containsAll(expense.getExpenseParticipants())) return true;
+        return expense.getCurrency() != null && expense.getCurrency().length() == 3
+                && expense.getPurpose() != null && !expense.getPurpose().isEmpty()
+                && expense.getDate() != null;
+    }
+
+    /**
+     * @param eventID ID of the event to which the expense belongs
+     * @param expense the expense to be created
+     * @return 204 for success,
+     * 400 if the expense is badly formatted,
+     * 404 if event is not found
+     */
+    @Override
+    public int createExpense(String eventID, Expense expense) {
+        calls.add("createExpense");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        }
+        if(checkBadExpenseFields(expense, event)) {
+            statuses.add(400);
+            return 400;
+        }
+        Expense clone = expense.clone();
+        clone.setId(counter++);
+        clone.setEventID(eventID);
+        event.addExpense(clone);
+        statuses.add(204);
+        return 204;
+    }
+
+    /**
+     * @param id      id of the expense to update
+     * @param eventID ID of the event containing the expense
+     * @param expense the updated expense object
+     * @return 204 for success,
+     * 400 if the expense is badly formatted,
+     * 404 if event or expense is not found
+     */
+    @Override
+    public int updateExpense(long id, String eventID, Expense expense) {
+        calls.add("updateExpense");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        }
+        Expense old = event.getExpenses().stream()
+                .filter(e -> e.getId() == id).findAny().orElse(null);
+        if(old == null) {
+            statuses.add(404);
+            return 404;
+        }
+        if(checkBadExpenseFields(expense, event) || expense.getId() != id
+                || !expense.getEventID().equals(eventID)) {
+            statuses.add(400);
+            return 400;
+        }
+        Expense clone = expense.clone();
+        event.getExpenses().remove(old);
+        event.getExpenses().add(clone);
+        statuses.add(204);
+        return 204;
+    }
+
+    /**
+     * @param id      id of the expense to delete
+     * @param eventID ID of the event containing the expense
+     * @return 204 for success,
+     * 404 if event or expense is not found
+     */
+    @Override
+    public int deleteExpense(long id, String eventID) {
+        calls.add("deleteExpense");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        }
+        Expense old = event.getExpenses().stream()
+                .filter(e -> e.getId() == id).findAny().orElse(null);
+        if(old == null) {
+            statuses.add(404);
+            return 404;
+        }
+        event.getExpenses().remove(old);
         statuses.add(204);
         return 204;
     }
@@ -233,14 +360,21 @@ public class TestServerUtils implements ServerUtils {
             statuses.add(401);
             return 401;
         }
-        Date now = new Date();
-        try {
-            Thread.sleep(timeOut);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        Date started = new Date();
+        long time = started.getTime();
+        while(new Date().getTime() - time < timeOut) {
+            try {
+                if(started.before(lastChange)) {
+                    statuses.add(204);
+                    return 204;
+                }
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        statuses.add(now.before(lastChange) ? 204 : 408);
-        return now.before(lastChange) ? 204 : 408;
+        statuses.add(408);
+        return 408;
     }
 
     /**

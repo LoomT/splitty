@@ -1,6 +1,7 @@
 package client.utils;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public interface ServerUtils {
      * @param participant the participant to be updated
      * @return 204 for success,
      * 400 if the participant is badly formatted,
-     * 404 if event is not found
+     * 404 if event or participant is not found
      */
     int updateParticipant(String eventId, Participant participant);
 
@@ -49,10 +50,47 @@ public interface ServerUtils {
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      * @return 204 for success,
-     * 400 if the participant is badly formatted,
-     * 404 if event is not found
+     * 404 if event or participant is not found
      */
     int deleteParticipant(String eventId, long participantId);
+
+    /**
+     * @param id id of the expense to retrieve
+     * @param eventID ID of the event containing the expense
+     * @return the retrieved expense
+     */
+
+    Expense getExpense(long id, String eventID);
+
+    /**
+     * @param eventID ID of the event to which the expense belongs
+     * @param expense the expense to be created
+     * @return 204 for success,
+     * 400 if the expense is badly formatted,
+     * 404 if event is not found
+     */
+
+    int createExpense(String eventID, Expense expense);
+
+    /**
+     * @param id id of the expense to update
+     * @param eventID ID of the event containing the expense
+     * @param expense the updated expense object
+     * @return 204 for success,
+     * 400 if the expense is badly formatted,
+     * 404 if event or expense is not found
+     */
+
+    int updateExpense(long id, String eventID, Expense expense);
+
+    /**
+     * @param id id of the expense to delete
+     * @param eventID ID of the event containing the expense
+     * @return 204 for success,
+     * 404 if event or expense is not found
+     */
+
+    int deleteExpense(long id, String eventID);
 
     /**
      * Verify the input password

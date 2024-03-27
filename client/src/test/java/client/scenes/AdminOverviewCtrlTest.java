@@ -37,10 +37,10 @@ public class AdminOverviewCtrlTest {
     @Test
     void initPollerResponse() throws InterruptedException {
         ctrl.setPassword("password");
-        ctrl.initPoller(500L);
+        ctrl.initPoller(1000L);
         Thread.sleep(100);
         server.createEvent(new Event("title"));
-        Thread.sleep(500);
+        Thread.sleep(100);
         assertTrue(server.getCalls().contains("pollEvents"));
         assertTrue(server.getStatuses().contains(204));
     }
@@ -59,11 +59,12 @@ public class AdminOverviewCtrlTest {
     @Test
     void stopPoller() throws InterruptedException {
         ctrl.setPassword("password");
-        ctrl.initPoller(500L);
-        Thread.sleep(600);
+        ctrl.initPoller(300L);
+        Thread.sleep(500);
         ctrl.stopPoller();
+        Thread.sleep(500);
         server.createEvent(new Event("title"));
-        Thread.sleep(600);
+        Thread.sleep(500);
         assertTrue(server.getCalls().contains("pollEvents"));
         assertFalse(server.getStatuses().contains(204));
     }
