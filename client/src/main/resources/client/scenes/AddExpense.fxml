@@ -18,7 +18,7 @@
     <children>
         <Pane layoutX="3.0" layoutY="8.0" prefHeight="56.0" prefWidth="600.0" style="-fx-background-color: #ddd;">
             <children>
-                <Text fill="#281111" layoutX="8.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add/Edit Expense">
+                <Text fill="#281111" layoutX="8.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.addeditexp">
                     <font>
                         <Font name="System Bold" size="33.0" />
                     </font>
@@ -29,7 +29,7 @@
             <children>
                 <HBox prefHeight="38.0" prefWidth="298.0">
                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Who paid?">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.whopaid">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
@@ -43,7 +43,7 @@
                 </HBox>
                 <HBox prefHeight="35.0" prefWidth="298.0">
                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="What for?">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.whatfor">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
@@ -57,7 +57,7 @@
                 </HBox>
                 <HBox prefHeight="36.0" prefWidth="298.0">
                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="How much?">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.howmuch">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
@@ -70,20 +70,20 @@
                         <ChoiceBox fx:id="currency" prefHeight="26.0" prefWidth="48.0" style="-fx-translate-x: 25;" />
                     </children>
                 </HBox>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="When?">
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.when">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Text>
                 <DatePicker fx:id="date" prefHeight="26.0" prefWidth="163.0" style="-fx-translate-x: 110; -fx-translate-y: -27;" />
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-translate-y: -15;" text="How to split?">
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-translate-y: -15;" text="%AddExp.howtosplit">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Text>
                 <HBox prefHeight="28.0" prefWidth="144.0">
                     <children>
-                        <CheckBox fx:id="equalSplit" mnemonicParsing="false" text=" Equally Between Everybody">
+                        <CheckBox fx:id="equalSplit" mnemonicParsing="false" text="%AddExp.equalsplit">
                             <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
@@ -92,9 +92,8 @@
                 </HBox>
                 <HBox prefHeight="27.0" prefWidth="298.0">
                     <children>
-                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="Only Some People" onAction="#handlePartialSplit">
-
-                        <font>
+                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="%AddExp.partialsplit">
+                            <font>
                                 <Font name="System Bold" size="15.0" />
                             </font>
                         </CheckBox>
@@ -110,7 +109,7 @@
         </TextFlow>
         <HBox layoutX="154.0" layoutY="417.0" prefHeight="36.0" prefWidth="298.0">
             <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Expense Type">
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.expensetype">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
@@ -120,12 +119,12 @@
         </HBox>
         <HBox layoutX="252.0" layoutY="453.0" prefHeight="28.0" prefWidth="200.0">
             <children>
-                <Button fx:id="abort" mnemonicParsing="false" style="-fx-translate-x: 40;" text="Abort">
+                <Button fx:id="abort" mnemonicParsing="false" style="-fx-translate-x: 40;" text="%AddExp.abort">
                     <font>
                         <Font size="15.0" />
                     </font>
                 </Button>
-                <Button fx:id="add" mnemonicParsing="false" style="-fx-translate-x: 50;" text="Add">
+                <Button fx:id="add" mnemonicParsing="false" style="-fx-translate-x: 50;" text="%AddExp.add">
                     <font>
                         <Font size="15.0" />
                     </font>
