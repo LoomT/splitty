@@ -28,6 +28,8 @@ public class EditParticipantsCtrl {
     private TextField bicField;
     @FXML
     private Button saveButton;
+    @FXML
+    private Button deletePartButton;
 
     private Event event;
     private ServerUtils server;
@@ -81,6 +83,7 @@ public class EditParticipantsCtrl {
 
         chooseParticipant.setValue(languageConf.get("EditP.newParticipant"));
 
+
         chooseParticipant.setOnAction((event1) -> {
             int index = chooseParticipant.getSelectionModel().getSelectedIndex();
             if (index < 0) return;
@@ -88,6 +91,7 @@ public class EditParticipantsCtrl {
                 resetFields();
             } else {
                 saveButton.setText(languageConf.get("EditP.save"));
+                deletePartButton.setDisable(false);
                 Participant p = event.getParticipants().get(index - 1);
                 nameField.setText(p.getName());
                 emailField.setText(p.getEmailAddress());
@@ -106,6 +110,7 @@ public class EditParticipantsCtrl {
 
     private void resetFields() {
         saveButton.setText(languageConf.get("EditP.createParticipant"));
+        deletePartButton.setDisable(true);
         nameField.setText("");
         emailField.setText("");
         ibanField.setText("");
@@ -119,6 +124,14 @@ public class EditParticipantsCtrl {
     @FXML
     private void backButtonClicked() {
         mainCtrl.goBackToEventPage(event);
+    }
+
+    @FXML
+    private void deletePartClicked() {
+        int index = chooseParticipant.getSelectionModel().getSelectedIndex();
+        Participant part = event.getParticipants().get(index -1);
+        String eventID = event.getId();
+        server.deleteParticipant(eventID, part.getId());
     }
 
     /**

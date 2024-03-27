@@ -105,7 +105,7 @@ public class ServerUtils {
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      */
-    public void deleteParticipant(String eventId, String participantId) {
+    public void deleteParticipant(String eventId, long participantId) {
         ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventId + "/participants/" + participantId)
