@@ -18,6 +18,8 @@ package client.utils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import commons.Quote;
+import commons.Expense;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
@@ -83,7 +85,8 @@ public class ServerUtils {
      */
     public void createParticipant(String eventId, Participant participant) {
         ClientBuilder.newClient(new ClientConfig())
-                .target(server).path("api/events/" + eventId + "/participants")
+                .target(server)
+                .path("api/events/" + eventId + "/participants")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
     }
@@ -113,10 +116,43 @@ public class ServerUtils {
     }
 
     /**
+     * S ends an API call to server for quotes
+     *
+     * @return all quotes
+     */
+    public List<Quote> getQuotes() {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server)
+                .path("api/quotes") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .get(new GenericType<List<Quote>>() {
+                });
+    }
+
+    /**
+     * Send an API call to server to add a quote
+     *
+     * @param quote Quote to add
+     * @return Added quote
+     */
+    public Quote addQuote(Quote quote) {
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("api/quotes") //
+                .request(APPLICATION_JSON) //
+                .accept(APPLICATION_JSON) //
+                .post(Entity.entity(quote, APPLICATION_JSON), Quote.class);
+    }
+
+
+
+
+    /**
      * Verify the input password
      * @param inputPassword the password to verify
      * @return boolean
      */
+
     public boolean verifyPassword(String inputPassword) {
         Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/verify") //
@@ -180,5 +216,62 @@ public class ServerUtils {
                 .header("Authorization", password)
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(event, APPLICATION_JSON));
+    }
+
+    /**
+     * @param id id of the expense to retrieve
+     * @param eventID ID of the event that contains the expense
+     * @return the retrieved expense
+     */
+    public Expense getExpense(long id, String eventID) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses/" + id)
+                .request(APPLICATION_JSON)
+                .accept(APPLICATION_JSON)
+                .get(Expense.class);
+    }
+
+    /**
+     * @param eventID ID of the event to which the expense belongs
+     * @param expense the expense to be created
+     * @return status code
+     */
+    public int createExpense(String eventID, Expense expense) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(expense, APPLICATION_JSON))
+                .getStatus();
+    }
+
+    /**
+     * @param id id of the expense to update
+     * @param eventID ID of the event containing the expense
+     * @param expense the updated expense object
+     * @return status code
+     */
+    public int updateExpense(long id, String eventID, Expense expense) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses/" + id)
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(expense, APPLICATION_JSON))
+                .getStatus();
+    }
+
+    /**
+     * @param id id of the expense to delete
+     * @param eventID ID of the event containing the expense
+     * @return status code
+     */
+    public int deleteExpense(long id, String eventID) {
+        return ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/expenses/" + id)
+                .request(APPLICATION_JSON)
+                .delete()
+                .getStatus();
     }
 }

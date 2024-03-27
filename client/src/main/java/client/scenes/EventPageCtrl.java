@@ -14,8 +14,12 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 
 public class EventPageCtrl {
@@ -63,9 +67,6 @@ public class EventPageCtrl {
     private List<Expense> allExpenses;
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
-    private String selectedName;
-
-    private String previousEventId = "";
 
     /**
      * @param server       server utils injection
@@ -132,8 +133,8 @@ public class EventPageCtrl {
             includingListView.getItems().clear();
             fromExpenses = getExpensesFrom(e, name);
             includingExpenses = getExpensesIncluding(e, name);
-            createExpenses(fromExpenses, fromListView);
-            createExpenses(includingExpenses, includingListView);
+            createExpenses(fromExpenses, fromListView, e);
+            createExpenses(includingExpenses, includingListView, e);
         });
         handleWS();
         displayExpenses(event);
@@ -220,12 +221,9 @@ public class EventPageCtrl {
         allExpenses = getAllExpenses(e);
         fromExpenses = getExpensesFrom(e, selectedParticipantName);
         includingExpenses = getExpensesIncluding(e, selectedParticipantName);
-        createExpenses(allExpenses, allListView);
-        createExpenses(fromExpenses, fromListView);
-        createExpenses(includingExpenses, includingListView);
-//        createAllExpenses(e);
-//        createExpensesFrom(e, selectedParticipantName);
-//        createExpensesIncluding(e, selectedParticipantName);
+        createExpenses(allExpenses, allListView, e);
+        createExpenses(fromExpenses, fromListView, e);
+        createExpenses(includingExpenses, includingListView, e);
     }
 
 
@@ -251,19 +249,76 @@ public class EventPageCtrl {
      * create the specific displayed expenses for a listview
      * @param expenses
      * @param lv
+     * @param ev
      */
-    public void createExpenses(List<Expense> expenses, ListView<String> lv) {
+    public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         ObservableList<String> items = FXCollections.observableArrayList();
 
         for (Expense expense : expenses) {
-            String expenseString = expense.toString();
+            String expenseString = toString(expense);
+            char[] temp = expenseString.toCharArray();
+            int index = 0;
+            for (int i = 0; i < temp.length; i++) {
+                if (Character.isLowerCase(temp[i])) {
+                    index = i;
+                    break;
+                }
+            }
             items.add(expenseString);
+            List<Participant> participants = expense.getExpenseParticipants();
+            System.out.println(participants);
+            StringBuilder participantsList = new StringBuilder("");
+            while(index > 0) {
+                participantsList.append("  ");
+                index--;
+            }
+            participantsList.append("(");
+            int count = participants.size();
+            if (count == ev.getParticipants().size()) {
+                participantsList.append("all");
+            } else {
+                for (int i = 0; i < count; i++) {
+                    participantsList.append(participants.get(i).getName());
+                    if (i < count - 1) {
+                        participantsList.append(",");
+                    }
+                }
+            }
+            participantsList.append(")");
+            items.add(String.valueOf(participantsList));
         }
 
         lv.setItems(items);
     }
 
+    /**
+     * return form for displaying the expenses in the event page
+     * @param exp the expense
+     * @return human-readable form
+     */
+    public String toString(Expense exp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(exp.getDate());
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
 
+        NumberFormat currencyFormatter = switch (exp.getCurrency()) {
+            case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
+            case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
+            case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
+            case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
+            default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
+        };
+
+        String formattedAmount = currencyFormatter.format(exp.getAmount());
+
+        String rez = dayOfMonth + "." + month + "." + year + "     " +
+                exp.getExpenseAuthor().getName() + " " + languageConf.get("AddExp.paid") +
+                " " + formattedAmount + " " + languageConf.get("AddExp.for") + " " +
+                exp.getPurpose();
+        return rez;
+    }
 
     /**
      * return all expenses
@@ -317,7 +372,6 @@ public class EventPageCtrl {
      * @return the name
      */
     public String extractSelectedName() {
-        System.out.println(participantChoiceBox.getValue());
         return participantChoiceBox.getValue();
     }
 
