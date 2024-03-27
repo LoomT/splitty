@@ -220,7 +220,7 @@ public class ServerUtils {
 
     /**
      * @param id id of the expense to retrieve
-     * @param eventID ID of the event containing the expense
+     * @param eventID ID of the event that contains the expense
      * @return the retrieved expense
      */
     public Expense getExpense(long id, String eventID) {
