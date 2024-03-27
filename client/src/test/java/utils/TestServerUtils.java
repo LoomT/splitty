@@ -162,6 +162,8 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * deleting participant also affects expenses
+     *
      * @param eventId       the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      */
@@ -178,6 +180,10 @@ public class TestServerUtils implements ServerUtils {
         if(old == null) {
             statuses.add(404);
             return 404;
+        }
+        event.getExpenses().removeIf(e -> e.getExpenseAuthor().equals(old));
+        for(Expense expense : event.getExpenses()) {
+            expense.getExpenseParticipants().removeIf(p -> p.equals(old));
         }
         event.getParticipants().remove(old);
         lastChange = new Date();
@@ -224,6 +230,20 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * Makes the participants of an expense share the same instances as the participants or an event
+     * so that updates to participants via updateParticipant propagate correctly
+     *
+     * @param expense expense for which participants to link
+     * @param participants participant list from event
+     */
+    public void linkExpenseParticipants(Expense expense, List<Participant> participants) {
+        expense.setExpenseAuthor(participants.stream()
+                .filter(p -> p.equals(expense.getExpenseAuthor())).findFirst().orElseThrow());
+        expense.setExpenseParticipants(participants.stream()
+                .filter(p -> expense.getExpenseParticipants().contains(p)).toList());
+    }
+
+    /**
      * @param eventID ID of the event to which the expense belongs
      * @param expense the expense to be created
      * @return 204 for success,
@@ -245,7 +265,9 @@ public class TestServerUtils implements ServerUtils {
         Expense clone = expense.clone();
         clone.setId(counter++);
         clone.setEventID(eventID);
+        linkExpenseParticipants(clone, event.getParticipants());
         event.addExpense(clone);
+        lastChange = new Date();
         statuses.add(204);
         return 204;
     }
@@ -279,7 +301,9 @@ public class TestServerUtils implements ServerUtils {
         }
         Expense clone = expense.clone();
         event.getExpenses().remove(old);
+        linkExpenseParticipants(clone, event.getParticipants());
         event.getExpenses().add(clone);
+        lastChange = new Date();
         statuses.add(204);
         return 204;
     }
@@ -305,6 +329,7 @@ public class TestServerUtils implements ServerUtils {
             return 404;
         }
         event.getExpenses().remove(old);
+        lastChange = new Date();
         statuses.add(204);
         return 204;
     }
