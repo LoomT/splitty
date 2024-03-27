@@ -94,19 +94,21 @@ public class StartScreenCtrl {
 
         for (int i = 0; i < recentEventCodes.size(); i++) {
             int finalI = i;
-
-            list.add(
-                    new EventListItem(
-                            server.getEvent(recentEventCodes.get(i)).getTitle(),
-                            recentEventCodes.get(i),
-                            () -> {
-                                eventList.getChildren().remove(list.get(finalI));
-                            },
-                            (String c) -> {
-                                code.setText(c);
-                            }));
-            eventList.getChildren().add(list.get(i));
-
+            try {
+                list.add(
+                        new EventListItem(
+                                server.getEvent(recentEventCodes.get(i)).getTitle(),
+                                recentEventCodes.get(i),
+                                () -> {
+                                    eventList.getChildren().remove(list.get(finalI));
+                                },
+                                (String c) -> {
+                                    code.setText(c);
+                                }));
+                eventList.getChildren().add(list.get(i));
+            } catch (Exception e) {
+                System.out.println("Please start the Server first");
+            }
         }
     }
 
