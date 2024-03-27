@@ -1,9 +1,7 @@
 package client.scenes;
 
-import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
-import client.utils.Websocket;
 import commons.Event;
 import commons.Participant;
 import javafx.event.ActionEvent;
@@ -57,32 +55,21 @@ public class AddExpenseCtrl {
 
     private ServerUtils server;
     private MainCtrl mainCtrl;
-    private LanguageConf languageConf;
-    private Expense expense;
-    private List<Participant> selectedParticipants = new ArrayList<>();
-    private List<Participant> expPart = new ArrayList<>();
-
-    private Websocket websocket;
-
+    private List<Participant> expPart;
 
     /**
      * @param server   server utils instance
      * @param mainCtrl main control instance
-     * @param languageConf the language config instance
-     * @param websocket the websocket instance
 
      */
     @Inject
     public AddExpenseCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
-            LanguageConf languageConf,
-            Websocket websocket
+            MainCtrl mainCtrl
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-        this.languageConf = languageConf;
-        this.websocket = websocket;
+        expPart = new ArrayList<>();
     }
 
     /**
@@ -198,12 +185,11 @@ public class AddExpenseCtrl {
                 (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
                 date.getValue() == null ||
                 type.getValue() == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Incomplete Fields");
-            alert.setHeaderText(null);
-            alert.setContentText("Please fill in all fields before adding the expense.");
-            alert.showAndWait();
+            alertAllFields();
         } else {
+            if (partialSplit.isSelected() && expPart.isEmpty()) {
+                alertSelectPart();
+            }
             String amountText = amount.getText();
             try {
                 double expAmount = Double.parseDouble(amountText);
@@ -240,6 +226,31 @@ public class AddExpenseCtrl {
     }
 
     /**
+     * alert to fill all fields
+     */
+    public void alertAllFields() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Incomplete Fields");
+        alert.setHeaderText(null);
+        alert.setContentText("Please fill in all fields before adding the expense.");
+        alert.showAndWait();
+    }
+
+    /**
+     * alert for selecting at least one participant
+     * when choosing the partial split option
+     */
+    public void alertSelectPart() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("No Participants Selected");
+        alert.setHeaderText(null);
+        alert.setContentText("Please select at least one " +
+                "participant for partial splitting.");
+        alert.showAndWait();
+        return;
+    }
+
+    /**
      * handle the behaviour for the abort button
      * @param ev the current event
      */
@@ -265,16 +276,14 @@ public class AddExpenseCtrl {
      */
     public void populateSplitPeople(Event event) {
         expenseParticipants.getChildren().clear();
-        selectedParticipants.clear();
+        expPart.clear();
 
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
             checkBox.setOnAction(e -> {
                 if (checkBox.isSelected()) {
                     expPart.add(participant);
-                    selectedParticipants.add(participant);
                 } else {
-                    selectedParticipants.remove(participant);
                     expPart.remove(participant);
                 }
                 //updateEqualSplitCheckbox();
@@ -304,7 +313,7 @@ public class AddExpenseCtrl {
         expenseAuthor.getSelectionModel().clearSelection();
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
-        selectedParticipants.clear();
+        expPart.clear();
         type.getSelectionModel().clearSelection();
     }
 }
