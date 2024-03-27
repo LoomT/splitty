@@ -78,6 +78,7 @@ public class AdminOverviewCtrl {
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.creationDate"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.numOfParticipants"));
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.lastActivity"));
         orderByChoiceBox.setValue(languageConf.get("AdminOverview.creationDate"));
         orderByChoiceBox.setOnAction((e1) -> orderAndDisplayEvents());
 
@@ -89,13 +90,16 @@ public class AdminOverviewCtrl {
 
         switch (orderByChoiceBox.getSelectionModel().getSelectedIndex()) {
             case 0: // Order by creation date
-                allEvents.sort(((o1, o2) -> -o1.getCreationDate().compareTo(o2.getCreationDate())));
+                allEvents.sort(Comparator.comparing(Event::getCreationDate).reversed());
                 break;
             case 1: // Order by event name
                 allEvents.sort(Comparator.comparing(o -> o.getTitle().toLowerCase()));
                 break;
             case 2: // order by num of participants
                 allEvents.sort(Comparator.comparingInt(o -> -o.getParticipants().size()));
+                break;
+            case 3: // order by last activity
+                allEvents.sort(Comparator.comparing(Event::getLastActivity).reversed());
                 break;
         }
 
