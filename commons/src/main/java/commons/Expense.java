@@ -37,7 +37,7 @@ public class Expense implements Cloneable {
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Participant> expenseParticipants;
     private String type;
 
