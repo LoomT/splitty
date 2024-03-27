@@ -16,6 +16,10 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final List<Integer> statuses;
 
+    /**
+     * constructor
+     * sets the counter for setting ids to 1 and the date to current time
+     */
     public TestServerUtils() {
         events = new ArrayList<>();
         counter = 1;
