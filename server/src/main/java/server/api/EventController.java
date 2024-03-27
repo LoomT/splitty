@@ -18,6 +18,7 @@ public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * Constructor with repository and random number generator injections
@@ -25,13 +26,15 @@ public class EventController {
      * @param repo Event repository
      * @param random A random number generator
      * @param simp websocket object used to send updates to everyone
+     * @param adminController admin controller for sending updates
      */
     @Autowired
     public EventController(EventRepository repo, RandomGenerator random,
-                           SimpMessagingTemplate simp) {
+                           SimpMessagingTemplate simp, AdminController adminController) {
         this.repo = repo;
         this.random = random;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -82,6 +85,7 @@ public class EventController {
             } while (repo.existsById(id));
             event.setId(id);
             Event saved = repo.save(event);
+            adminController.update();
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -99,6 +103,7 @@ public class EventController {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
+                adminController.update();
                 simp.convertAndSend("/event/" + id, "delete",
                         Map.of("action", WebsocketActions.DELETE_EVENT,
                                 "type", String.class.getTypeName()));
@@ -128,6 +133,7 @@ public class EventController {
                 Event event = found.get();
                 event.setTitle(title);
                 repo.save(event);
+                adminController.update();
                 simp.convertAndSend("/event/" + id, title,
                         Map.of("action", WebsocketActions.TITLE_CHANGE,
                                 "type", String.class.getTypeName()));

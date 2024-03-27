@@ -85,12 +85,11 @@ public class ServerUtils {
      */
     public void createParticipant(String eventId, Participant participant) {
         ClientBuilder.newClient(new ClientConfig())
-                .target(server).
-                path("api/events/" + eventId + "/participants")
+                .target(server)
+                .path("api/events/" + eventId + "/participants")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(participant, APPLICATION_JSON), Participant.class);
     }
-
 
     /**
      * @param eventId     the event in which the participant should be updated
@@ -182,8 +181,24 @@ public class ServerUtils {
                 .request(APPLICATION_JSON) //
                 .header("Authorization", inputPassword)
                 .accept(APPLICATION_JSON) //
-                .get(new GenericType<List<Event>>() {
+                .get(new GenericType<>() {
                 });
+    }
+
+    /**
+     * @param inputPassword admin password
+     * @return HTTP response - 204 if there is an update and 408 if not
+     */
+    public int pollEvents(String inputPassword) {
+        try(Response response = ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("admin/events/poll") //
+                .request(APPLICATION_JSON) //
+                .header("Authorization", inputPassword)
+                .header("TimeOut", 5000L)
+                .accept(APPLICATION_JSON) //
+                .get()) {
+            return response.getStatus();
+        }
     }
 
     /**
