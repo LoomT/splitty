@@ -53,7 +53,7 @@ public class Websocket {
      * @param eventID event id
      */
     public void connect(String eventID) {
-        if(stompSession.isConnected()) return;
+        if(stompSession != null && stompSession.isConnected()) return;
         try {
             stompSession = stompClient.connectAsync(url, sessionHandler).get();
         } catch (InterruptedException | ExecutionException e) {
