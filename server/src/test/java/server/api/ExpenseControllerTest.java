@@ -3,6 +3,7 @@ package server.api;
 import commons.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.AdminService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,9 @@ public class ExpenseControllerTest {
         eventRepo = new TestEventRepository(repoExpense);
         repoExpense.setEventRepo(eventRepo);
         template = new TestSimpMessagingTemplate((message, timeout) -> false);
-        expenseContr = new ExpenseController(repoExpense, template);
-        eventContr = new EventController(eventRepo, random, template);
+        AdminController adminController = new AdminController(eventRepo, new AdminService(random));
+        expenseContr = new ExpenseController(repoExpense, template, adminController);
+        eventContr = new EventController(eventRepo, random, template, adminController);
 
         // Creating sample participants
         p1 = new Participant("Mihai");

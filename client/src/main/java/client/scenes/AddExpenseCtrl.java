@@ -1,9 +1,7 @@
 package client.scenes;
 
-import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
-import client.utils.Websocket;
 import commons.Event;
 import commons.Participant;
 import javafx.event.ActionEvent;
@@ -21,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 
 public class AddExpenseCtrl {
-    private boolean splitAll;
 
     @FXML
     private ChoiceBox<String> expenseAuthor;
@@ -58,32 +55,21 @@ public class AddExpenseCtrl {
 
     private ServerUtils server;
     private MainCtrl mainCtrl;
-    private LanguageConf languageConf;
-    private Expense expense;
-    private List<Participant> selectedParticipants = new ArrayList<>();
-    private List<Participant> expPart = new ArrayList<>();
-
-    private Websocket websocket;
-
+    private List<Participant> expPart;
 
     /**
-     * @param server   serverutils instance
+     * @param server   server utils instance
      * @param mainCtrl main control instance
-     * @param languageConf the language config instance
-     * @param websocket the websocket instance
 
      */
     @Inject
     public AddExpenseCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
-            LanguageConf languageConf,
-            Websocket websocket
+            MainCtrl mainCtrl
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-        this.languageConf = languageConf;
-        this.websocket = websocket;
+        expPart = new ArrayList<>();
     }
 
     /**
@@ -91,24 +77,24 @@ public class AddExpenseCtrl {
      * @param event the event page to return to
      */
     public void displayAddExpensePage(Event event) {
+        equalSplit.setDisable(false);
         populateAuthorChoiceBox(event);
         populateTypeBox();
         purpose.clear();
         amount.clear();
         populateCurrencyChoiceBox();
         date.setValue(LocalDate.now());
-        splitAll = false;
-
+        expPart.clear();
         populateSplitPeople(event);
-
-
+        disablePartialSplitCheckboxes(true);
         equalSplit.setOnAction(e -> {
             if (equalSplit.isSelected()) {
-                splitAll = true;
+                expPart.clear();
                 partialSplit.setSelected(false);
                 disablePartialSplitCheckboxes(true);
-
                 expPart.addAll(event.getParticipants());
+            } else {
+                equalSplit.setSelected(true);
             }
         });
         partialSplit.setOnAction(this::handlePartialSplit);
@@ -119,33 +105,40 @@ public class AddExpenseCtrl {
             handleAddButton(event);
         });
 
-        abort.setOnAction(x -> mainCtrl.goBackToEventPage(event));
+        abort.setOnAction(x -> {
+            handleAbortButton(event);
+        });
 
 
     }
 
     /**
      * handle partial splitting
-     * @param event
+     * @param event current event
      */
     @FXML
     public void handlePartialSplit(ActionEvent event) {
-        equalSplit.setSelected(false);
-        disablePartialSplitCheckboxes(false);
-        //expPart = new ArrayList<>();
-        CheckBox checkBox = (CheckBox) event.getSource();
-        if (checkBox.isSelected()) {
-            for (Node node : expenseParticipants.getChildren()) {
-                if (node instanceof CheckBox) {
-                    CheckBox participantCheckBox = (CheckBox) node;
-                    if (participantCheckBox.isSelected()) {
-                        String participantName = participantCheckBox.getText();
-                        Participant selectedParticipant = new Participant(participantName);
-                        expPart.add(selectedParticipant);
+        if (partialSplit.isSelected()) {
+            equalSplit.setSelected(false);
+            disablePartialSplitCheckboxes(false);
+            CheckBox checkBox = (CheckBox) event.getSource();
+            if (checkBox.isSelected()) {
+                expPart.clear();
+                for (Node node : expenseParticipants.getChildren()) {
+                    if (node instanceof CheckBox participantCheckBox) {
+                        if (participantCheckBox.isSelected()) {
+                            String participantName = participantCheckBox.getText();
+                            Participant selectedParticipant = new Participant(participantName);
+                            expPart.add(selectedParticipant);
+                        }
                     }
                 }
+
             }
+        } else {
+            partialSplit.setSelected(true);
         }
+
     }
 
 
@@ -154,16 +147,15 @@ public class AddExpenseCtrl {
      * Fill the choices for the author of the expense.
      */
     public void populateAuthorChoiceBox(Event event) {
-        if (expenseAuthor.getItems().size() == 0) {
-            expenseAuthor
-                .getItems()
-                .addAll(
-                    event.getParticipants()
-                            .stream()
-                            .map(Participant::getName)
-                            .toList()
-                );
-        }
+        expenseAuthor.getItems().clear();
+        expenseAuthor
+            .getItems()
+            .addAll(
+                event.getParticipants()
+                        .stream()
+                        .map(Participant::getName)
+                        .toList()
+            );
 
     }
 
@@ -183,7 +175,7 @@ public class AddExpenseCtrl {
 
     /**
      * behaviour for add button
-     * @param ev
+     * @param ev current event
      */
     public void handleAddButton(Event ev) {
         if (expenseAuthor.getValue() == null ||
@@ -193,12 +185,11 @@ public class AddExpenseCtrl {
                 (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
                 date.getValue() == null ||
                 type.getValue() == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Incomplete Fields");
-            alert.setHeaderText(null);
-            alert.setContentText("Please fill in all fields before adding the expense.");
-            alert.showAndWait();
+            alertAllFields();
         } else {
+            if (partialSplit.isSelected() && expPart.isEmpty()) {
+                alertSelectPart();
+            }
             String amountText = amount.getText();
             try {
                 double expAmount = Double.parseDouble(amountText);
@@ -214,13 +205,13 @@ public class AddExpenseCtrl {
                         .findFirst().orElse(null);
                 if (selectedParticipant != null) {
                     String expCurrency = currency.getValue();
-                    expPart.add(selectedParticipant);
+                    //expPart.add(selectedParticipant);
 
                     String expType = type.getValue();
                     Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
                             expCurrency, expPart, expType);
                     expense.setDate(expenseDate);
-                    ev.getExpenses().add(expense);
+                    server.createExpense(ev.getId(), expense);
                     resetExpenseFields();
                     mainCtrl.goBackToEventPage(ev);
                 }
@@ -234,10 +225,39 @@ public class AddExpenseCtrl {
         }
     }
 
+    /**
+     * alert to fill all fields
+     */
+    public void alertAllFields() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Incomplete Fields");
+        alert.setHeaderText(null);
+        alert.setContentText("Please fill in all fields before adding the expense.");
+        alert.showAndWait();
+    }
 
+    /**
+     * alert for selecting at least one participant
+     * when choosing the partial split option
+     */
+    public void alertSelectPart() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("No Participants Selected");
+        alert.setHeaderText(null);
+        alert.setContentText("Please select at least one " +
+                "participant for partial splitting.");
+        alert.showAndWait();
+        return;
+    }
 
-
-
+    /**
+     * handle the behaviour for the abort button
+     * @param ev the current event
+     */
+    public void handleAbortButton(Event ev) {
+        resetExpenseFields();
+        mainCtrl.goBackToEventPage(ev);
+    }
 
     /**
      * show corresponding tags for expense
@@ -252,23 +272,21 @@ public class AddExpenseCtrl {
 
     /**
      * populate the split people list
-     * @param event
+     * @param event the current event
      */
     public void populateSplitPeople(Event event) {
-        //expPart.clear();
         expenseParticipants.getChildren().clear();
-        selectedParticipants.clear();
+        expPart.clear();
 
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
             checkBox.setOnAction(e -> {
                 if (checkBox.isSelected()) {
                     expPart.add(participant);
-                    selectedParticipants.add(participant);
                 } else {
-                    selectedParticipants.remove(participant);
                     expPart.remove(participant);
                 }
+                //updateEqualSplitCheckbox();
             });
             expenseParticipants.getChildren().add(checkBox);
         }
@@ -277,8 +295,7 @@ public class AddExpenseCtrl {
 
     private void disablePartialSplitCheckboxes(boolean disable) {
         for (Node node : expenseParticipants.getChildren()) {
-            if (node instanceof CheckBox) {
-                CheckBox checkBox = (CheckBox) node;
+            if (node instanceof CheckBox checkBox) {
                 checkBox.setDisable(disable);
             }
         }
@@ -296,7 +313,7 @@ public class AddExpenseCtrl {
         expenseAuthor.getSelectionModel().clearSelection();
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
-        selectedParticipants.clear();
+        expPart.clear();
         type.getSelectionModel().clearSelection();
     }
 }
