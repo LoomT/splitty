@@ -26,6 +26,7 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -104,7 +105,7 @@ public class ServerUtils {
     }
 
     /**
-     * @param eventId       the event in which the participant should be deleted
+     * @param eventId         the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      */
     public void deleteParticipant(String eventId, long participantId) {
@@ -145,10 +146,9 @@ public class ServerUtils {
     }
 
 
-
-
     /**
      * Verify the input password
+     *
      * @param inputPassword the password to verify
      * @return boolean
      */
@@ -171,8 +171,8 @@ public class ServerUtils {
 
     /**
      * Sends an API call to server for events
-     * @param inputPassword the password to verify
      *
+     * @param inputPassword the password to verify
      * @return all quotes
      */
     public List<Event> getEvents(String inputPassword) {
@@ -190,7 +190,7 @@ public class ServerUtils {
      * @return HTTP response - 204 if there is an update and 408 if not
      */
     public int pollEvents(String inputPassword) {
-        try(Response response = ClientBuilder.newClient(new ClientConfig()) //
+        try (Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/events/poll") //
                 .request(APPLICATION_JSON) //
                 .header("Authorization", inputPassword)
@@ -206,7 +206,7 @@ public class ServerUtils {
      * The ids of expenses and participants gets reassigned so use the returned event!
      *
      * @param password admin password
-     * @param event event to import
+     * @param event    event to import
      * @return imported event
      */
     public Response importEvent(String password, Event event) {
@@ -219,7 +219,7 @@ public class ServerUtils {
     }
 
     /**
-     * @param id id of the expense to retrieve
+     * @param id      id of the expense to retrieve
      * @param eventID ID of the event that contains the expense
      * @return the retrieved expense
      */
@@ -247,7 +247,7 @@ public class ServerUtils {
     }
 
     /**
-     * @param id id of the expense to update
+     * @param id      id of the expense to update
      * @param eventID ID of the event containing the expense
      * @param expense the updated expense object
      * @return status code
@@ -262,7 +262,7 @@ public class ServerUtils {
     }
 
     /**
-     * @param id id of the expense to delete
+     * @param id      id of the expense to delete
      * @param eventID ID of the event containing the expense
      * @return status code
      */
