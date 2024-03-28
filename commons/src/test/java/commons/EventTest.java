@@ -214,12 +214,21 @@ public class EventTest {
     }
 
     @Test
-    void cloneDate() {
+    void cloneCreationDate() {
         Event event = new Event("title");
         Event clone = event.clone();
         assertNotSame(event.getCreationDate(), clone.getCreationDate());
         assertEquals(event.getCreationDate(), clone.getCreationDate());
     }
+
+    @Test
+    void cloneLastActivity() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertNotSame(event.getLastActivity(), clone.getLastActivity());
+        assertEquals(event.getLastActivity(), clone.getLastActivity());
+    }
+
     @Test
     void cloneTitle() {
         Event event = new Event("title");
