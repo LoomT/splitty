@@ -153,7 +153,7 @@ public class AddExpenseCtrl {
             return;
         }
 
-        server.updateExpense(ev.getId(), ex);
+        server.updateExpense(ex.getId(), ev.getId(), ex);
         mainCtrl.goBackToEventPage(ev);
     }
 
