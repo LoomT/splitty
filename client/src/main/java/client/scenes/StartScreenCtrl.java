@@ -83,7 +83,8 @@ public class StartScreenCtrl {
     }
 
     /**
-     * This method fetches the event codes and updates the list
+     * Reloads the event codes from the user config and updates the event list
+     *
      */
     private void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
@@ -91,26 +92,35 @@ public class StartScreenCtrl {
 
         eventList.getChildren().clear();
 
-
-        for (int i = 0; i < recentEventCodes.size(); i++) {
-            int finalI = i;
+        for (String eventCode : recentEventCodes) {
             try {
-                list.add(
-                        new EventListItem(
-                                server.getEvent(recentEventCodes.get(i)).getTitle(),
-                                recentEventCodes.get(i),
-                                () -> {
-                                    eventList.getChildren().remove(list.get(finalI));
-                                },
-                                (String c) -> {
-                                    code.setText(c);
-                                }));
-                eventList.getChildren().add(list.get(i));
+                Event event = server.getEvent(eventCode);
+                if (event == null) {
+                    throw new IllegalArgumentException("Event does not exist for code: "
+                            + eventCode);
+                }
+                EventListItem eventListItem = new EventListItem(
+                        event.getTitle(),
+                        eventCode,
+                        () -> {
+                            eventList.getChildren().remove(
+                                    list.get(
+                                            recentEventCodes.indexOf(eventCode)
+                                    )
+                            );
+                        },
+                        (String c) -> {
+                            code.setText(c);
+                        }
+                );
+                list.add(eventListItem);
+                eventList.getChildren().add(eventListItem);
             } catch (Exception e) {
-                System.out.println("Please start the Server first");
+                System.out.println("Error: " + e.getMessage());
             }
         }
     }
+
 
     /**
      * Call this when you want to load/reload the start screen,
