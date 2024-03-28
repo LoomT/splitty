@@ -75,15 +75,18 @@
                   <Tab fx:id="allTab" text="%EventPage.all">
                      <content>
                         <ListView fx:id="allListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
+                     </content>
+                  </Tab>
                   <Tab fx:id="fromTab" text="From John">
                      <content>
                         <ListView fx:id="fromListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
+                     </content>
+                  </Tab>
                   <Tab fx:id="includingTab" text="Including John">
                      <content>
                         <ListView fx:id="includingListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
+                     </content>
+                  </Tab>
                </tabs>
             </TabPane>
          </children>

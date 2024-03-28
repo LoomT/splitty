@@ -13,6 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 import java.text.NumberFormat;
@@ -252,43 +253,81 @@ public class EventPageCtrl {
      * @param ev
      */
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
-        ObservableList<String> items = FXCollections.observableArrayList();
+        lv.setCellFactory(param -> new ListCell<>() {
+            private final Button editButton = new Button("\uD83D\uDD89");
+            private final HBox hbox = new HBox();
 
-        for (Expense expense : expenses) {
-            String expenseString = toString(expense);
-            char[] temp = expenseString.toCharArray();
-            int index = 0;
-            for (int i = 0; i < temp.length; i++) {
-                if (Character.isLowerCase(temp[i])) {
-                    index = i;
-                    break;
-                }
+            {
+                hbox.setSpacing(50);
+                hbox.getChildren().addAll(editButton);
+                editButton.setOnAction(event -> {
+                    int index = getIndex() / 2;
+                    Expense expense = expenses.get(index);
+                    mainCtrl.handleEditExpense(expense, ev);
+                });
             }
-            items.add(expenseString);
-            List<Participant> participants = expense.getExpenseParticipants();
-            System.out.println(participants);
-            StringBuilder participantsList = new StringBuilder("");
-            while(index > 0) {
-                participantsList.append("  ");
-                index--;
-            }
-            participantsList.append("(");
-            int count = participants.size();
-            if (count == ev.getParticipants().size()) {
-                participantsList.append("all");
-            } else {
-                for (int i = 0; i < count; i++) {
-                    participantsList.append(participants.get(i).getName());
-                    if (i < count - 1) {
-                        participantsList.append(",");
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    if (item.contains("(") && item.contains(")")) {
+                        setText(item);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        hbox.getChildren().clear();
+                        hbox.getChildren().addAll(new Text(item), editButton);
+                        setGraphic(hbox);
                     }
                 }
             }
-            participantsList.append(")");
-            items.add(String.valueOf(participantsList));
-        }
+        });
 
+        ObservableList<String> items = FXCollections.observableArrayList();
+        for (Expense expense : expenses) {
+            String expenseString = toString(expense);
+            int index = findFirstLowerCaseIndex(expenseString);
+            items.add(expenseString);
+            items.add(buildParticipantsList(expense.getExpenseParticipants(),
+                    index, ev.getParticipants()));
+        }
         lv.setItems(items);
+    }
+
+    private int findFirstLowerCaseIndex(String str) {
+        for (int i = 0; i < str.length(); i++) {
+            if (Character.isLowerCase(str.charAt(i))) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private String buildParticipantsList(List<Participant> participants,
+                                         int index, List<Participant> allParticipants) {
+        StringBuilder participantsList = new StringBuilder();
+        while (index > 0) {
+            participantsList.append("  ");
+            index--;
+        }
+        participantsList.append("(");
+        int count = participants.size();
+        if (count == allParticipants.size()) {
+            participantsList.append("all");
+        } else {
+            for (int i = 0; i < count; i++) {
+                participantsList.append(participants.get(i).getName());
+                if (i < count - 1) {
+                    participantsList.append(",");
+                }
+            }
+        }
+        participantsList.append(")");
+        return participantsList.toString();
     }
 
     /**
