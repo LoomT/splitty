@@ -278,6 +278,7 @@ public class Event implements Cloneable {
                 ", title='" + title + '\'' +
                 ", participants=" + participants +
                 ", expenses=" + expenses +
+                ", lastActivity=" + lastActivity +
                 ", creationDate=" + creationDate +
                 '}';
     }
