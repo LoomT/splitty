@@ -347,6 +347,13 @@ public class EventPageCtrl {
     }
 
     /**
+     *
+     */
+    public void eventTitleChanger(){
+
+    }
+
+    /**
      * return all expenses including a certain person
      * @param ev
      * @param name

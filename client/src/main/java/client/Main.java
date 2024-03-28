@@ -101,6 +101,12 @@ public class Main extends Application {
                 "client", "scenes", "AddExpense.fxml"
         );
 
+        var titleChanger = FXML.load(
+                TitleChangerCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "TitleChanger.fxml"
+        );
+
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(
                 primaryStage,
@@ -111,8 +117,8 @@ public class Main extends Application {
                 adminLogin,
                 editParticipants,
                 adminOverview,
-                addExpense
+                addExpense,
+                titleChanger
         );
-
     }
 }

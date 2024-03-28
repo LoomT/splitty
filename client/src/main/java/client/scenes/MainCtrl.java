@@ -85,7 +85,8 @@ public class MainCtrl {
             Pair<AdminLoginCtrl, Parent> adminLogin,
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
-            Pair<AddExpenseCtrl, Parent> addExpensePage
+            Pair<AddExpenseCtrl, Parent> addExpensePage,
+            Pair<TitleChangerCtrl, Parent> TitleChangerCtrl
     ) {
 
         this.primaryStage = primaryStage;
@@ -129,6 +130,8 @@ public class MainCtrl {
         primaryStage.setScene(startScreen);
 
     }
+
+    public void
 
     /**
      * Display admin login
