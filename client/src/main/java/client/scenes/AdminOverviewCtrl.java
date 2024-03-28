@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
-import jakarta.ws.rs.core.Response;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -242,9 +241,8 @@ public class AdminOverviewCtrl {
         for(File file : files) {
             try {
                 Event event = reader.readValue(file);
-                Response response = server.importEvent(password, event);
-                System.out.println(response.getStatus()); // for troubleshooting
-                switch (response.getStatus()) {
+                int status = server.importEvent(password, event);
+                switch (status) {
                     case 400 -> {
                         System.out.println("Missing participants from the participant list");
                         // TODO display an error message that the JSON file is incorrect
@@ -263,11 +261,12 @@ public class AdminOverviewCtrl {
 
     /**
      * Initialize the long poller
+     * @param timeOut time in ms until server sends a time-out signal
      */
-    public void initPoller() {
+    public void initPoller(Long timeOut) {
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
-                int status = server.pollEvents(password);
+                int status = server.pollEvents(password, timeOut);
                 if(status != 204) continue;
                 Platform.runLater(this::loadAllEvents);
             }});

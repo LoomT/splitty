@@ -66,7 +66,7 @@ public class UserConfig {
      * @return directory the event was saved to the previous time
      */
     public File getInitialExportDirectory() {
-        return new File(configProperties.getProperty("initialExportDirectory",  null));
+        return new File(configProperties.getProperty("initialExportDirectory",  ""));
     }
 
     /**

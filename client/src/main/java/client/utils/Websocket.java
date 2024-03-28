@@ -53,6 +53,7 @@ public class Websocket {
      * @param eventID event id
      */
     public void connect(String eventID) {
+        if(stompSession != null && stompSession.isConnected()) return;
         try {
             stompSession = stompClient.connectAsync(url, sessionHandler).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -68,7 +69,6 @@ public class Websocket {
     public void disconnect() {
         if (stompSession == null || !stompSession.isConnected()) return;
         stompSession.disconnect();
-
     }
 
     /**
