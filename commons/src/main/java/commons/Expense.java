@@ -3,11 +3,14 @@ package commons;
 
 import jakarta.persistence.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @IdClass(EventWeakKey.class)
-public class Expense {
+public class Expense implements Cloneable {
     /*
     Properties:
     Int expenseID so that one can reuse this type of expense
@@ -47,7 +50,7 @@ public class Expense {
      * @param amount of money
      * @param currency currency, 3 letters
      * @param expenseParticipants participants that split the expense
-     * @param type type of expense TODO change to a list of labels when implementing labels
+     * @param type type of expense
      */
     public Expense(Participant expenseAuthor, String purpose, double amount,
                    String currency, List<Participant> expenseParticipants, String type) {
@@ -156,7 +159,7 @@ public class Expense {
 
     /**
      * setter for participant
-     * @param expenseAuthor
+     * @param expenseAuthor participant that made the expense
      */
     public void setExpenseAuthor(Participant expenseAuthor) {
         this.expenseAuthor = expenseAuthor;
@@ -164,7 +167,7 @@ public class Expense {
 
     /**
      * setter for purpose
-     * @param purpose
+     * @param purpose purpose of the expense
      */
     public void setPurpose(String purpose) {
         this.purpose = purpose;
@@ -172,7 +175,7 @@ public class Expense {
 
     /**
      * setter for amount
-     * @param amount
+     * @param amount cost of the expense in specified currency
      */
     public void setAmount(double amount) {
         this.amount = amount;
@@ -180,7 +183,7 @@ public class Expense {
 
     /**
      * setter for currency
-     * @param currency
+     * @param currency currency of the cost
      */
     public void setCurrency(String currency) {
         this.currency = currency;
@@ -188,7 +191,7 @@ public class Expense {
 
     /**
      * setter for type
-     * @param type
+     * @param type type of expense
      */
     public void setType(String type) {
         this.type = type;
@@ -196,7 +199,7 @@ public class Expense {
 
     /**
      * setter for the ID of the expense
-     * @param id
+     * @param id id of expense
      */
     public void setId(long id) {
         this.id = id;
@@ -242,5 +245,27 @@ public class Expense {
 
 
 
-
+    /**
+     * Creates and returns a deep copy of this object x such that:
+     * <blockquote>
+     * <pre>
+     * x.clone() != x
+     * x.clone().equals(x)</pre></blockquote>
+     * and this holds for all non-primitive fields inside recursively
+     */
+    @Override
+    public Expense clone() {
+        try {
+            Expense clone = (Expense) super.clone();
+            clone.expenseAuthor = this.expenseAuthor.clone();
+            clone.expenseParticipants = new ArrayList<>();
+            for (Participant p : this.expenseParticipants) {
+                clone.expenseParticipants.add(p.clone());
+            }
+            clone.date = (Date) this.date.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

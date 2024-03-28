@@ -21,7 +21,7 @@ import java.util.Objects;
         property = "id", scope = Participant.class)
 @Entity
 @IdClass(EventWeakKey.class)
-public class Participant {
+public class Participant implements Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -205,6 +205,23 @@ public class Participant {
                     + "', account number='" + accountNumber + '\'';
         result += "}";
         return result;
+    }
+
+    /**
+     * Creates and returns a deep copy of this object x such that:
+     * <blockquote>
+     * <pre>
+     * x.clone() != x
+     * x.clone().equals(x)</pre></blockquote>
+     * and this holds for all non-primitive fields inside recursively
+     */
+    @Override
+    public Participant clone() {
+        try{
+            return (Participant) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
 

@@ -180,7 +180,7 @@ public class MainCtrl {
      */
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
-        adminOverviewCtrl.initPoller();
+        adminOverviewCtrl.initPoller(5000L); // 5 sec time out
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
