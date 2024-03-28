@@ -212,6 +212,7 @@ public class MainCtrl {
      */
     public void showAddExpensePage(Event eventToShow) {
         addExpenseCtrl.displayAddExpensePage(eventToShow, null);
+        addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle("Add Expense");
         primaryStage.setScene(addExpense);
     }
@@ -222,10 +223,12 @@ public class MainCtrl {
      * @param ev The event associated with the expense.
      */
     public void handleEditExpense(Expense exp, Event ev) {
+
         addExpenseCtrl.displayAddExpensePage(ev, exp);
         primaryStage.setTitle("Edit Expense");
         primaryStage.setScene(addExpense);
 
+        addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
         addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
         addExpenseCtrl.setPurpose(exp.getPurpose());
         addExpenseCtrl.setAmount(Double.toString(exp.getAmount()));
@@ -234,5 +237,6 @@ public class MainCtrl {
                 atZone(ZoneId.systemDefault()).toLocalDate());
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
+
     }
 }

@@ -107,9 +107,6 @@ public class AddExpenseCtrl {
         partialSplit.setOnAction(this::handlePartialSplit);
 
 
-        if (exp != null) {
-            add.setText("Save");
-        }
         add.setOnAction(x -> {
             if (exp == null) {
                 handleAddButton(event);
@@ -442,6 +439,14 @@ public class AddExpenseCtrl {
      */
     public void setType(String typeText) {
         type.setValue(typeText);
+    }
+
+    /**
+     * setter for button text
+     * @param s
+     */
+    public void setButton(String s) {
+        add.setText(s);
     }
 
 

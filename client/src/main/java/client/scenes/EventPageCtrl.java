@@ -12,8 +12,9 @@ import commons.WebsocketActions;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 import java.text.NumberFormat;
@@ -255,13 +256,15 @@ public class EventPageCtrl {
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         lv.setCellFactory(param -> new ListCell<>() {
             private final Button editButton = new Button("\uD83D\uDD89");
-            private final HBox hbox = new HBox();
+            private final StackPane stackPane = new StackPane();
 
             {
-                hbox.setSpacing(50);
-                hbox.getChildren().addAll(editButton);
+                stackPane.setAlignment(Pos.CENTER_LEFT);
+                StackPane.setAlignment(editButton, Pos.CENTER_RIGHT);
+                stackPane.getChildren().add(editButton);
                 editButton.setOnAction(event -> {
-                    int index = getIndex() / 2;
+                    int index = getIndex();
+                    System.out.println(index);
                     Expense expense = expenses.get(index);
                     mainCtrl.handleEditExpense(expense, ev);
                 });
@@ -279,9 +282,9 @@ public class EventPageCtrl {
                         setGraphic(null);
                     } else {
                         setText(null);
-                        hbox.getChildren().clear();
-                        hbox.getChildren().addAll(new Text(item), editButton);
-                        setGraphic(hbox);
+                        stackPane.getChildren().clear();
+                        stackPane.getChildren().addAll(new Text(item), editButton);
+                        setGraphic(stackPane);
                     }
                 }
             }
@@ -297,14 +300,7 @@ public class EventPageCtrl {
         lv.setItems(items);
     }
 
-    private int findFirstLowerCaseIndex(String str) {
-        for (int i = 0; i < str.length(); i++) {
-            if (Character.isLowerCase(str.charAt(i))) {
-                return i;
-            }
-        }
-        return 0;
-    }
+
 
     private String buildParticipantsList(List<Participant> participants,
                                          List<Participant> allParticipants) {
