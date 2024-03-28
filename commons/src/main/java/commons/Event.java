@@ -47,12 +47,16 @@ public class Event implements Cloneable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date lastActivity;
+
     /**
      * No-Argument Constructor
      * Required by JPA
      */
     public Event() {
         this.creationDate = new Date();
+        this.lastActivity = new Date();
     }
 
     /**
@@ -193,6 +197,20 @@ public class Event implements Cloneable {
      */
     public void addExpense(Expense expense){
         this.expenses.add(expense);
+    }
+
+    /**
+     * @return last activity date
+     */
+    public Date getLastActivity() {
+        return lastActivity;
+    }
+
+    /**
+     * @param lastActivity last activity date
+     */
+    public void setLastActivity(Date lastActivity) {
+        this.lastActivity = lastActivity;
     }
 
     /**
