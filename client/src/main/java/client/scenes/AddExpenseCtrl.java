@@ -140,7 +140,13 @@ public class AddExpenseCtrl {
 
         String expType = type.getValue();
 
-        ex.setExpenseAuthor(new Participant(expParticipant));
+        for (Participant p : ex.getExpenseParticipants()) {
+            if (p.getName() == expParticipant) {
+                ex.setExpenseAuthor(p);
+                break;
+            }
+        }
+        //ex.setExpenseAuthor(new Participant(expParticipant));
         ex.setPurpose(expPurpose);
         ex.setAmount(expAmount);
         ex.setCurrency(expCurrency);
