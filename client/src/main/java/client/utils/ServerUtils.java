@@ -247,15 +247,14 @@ public class ServerUtils {
     }
 
     /**
-     * @param id id of the expense to update
      * @param eventID ID of the event containing the expense
      * @param expense the updated expense object
      * @return status code
      */
-    public int updateExpense(long id, String eventID, Expense expense) {
+    public int updateExpense(String eventID, Expense expense) {
         return ClientBuilder.newClient(new ClientConfig())
                 .target(server)
-                .path("api/events/" + eventID + "/expenses/" + id)
+                .path("api/events/" + eventID + "/expenses/" + expense.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(expense, APPLICATION_JSON))
                 .getStatus();

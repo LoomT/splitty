@@ -290,10 +290,9 @@ public class EventPageCtrl {
         ObservableList<String> items = FXCollections.observableArrayList();
         for (Expense expense : expenses) {
             String expenseString = toString(expense);
-            int index = findFirstLowerCaseIndex(expenseString);
-            items.add(expenseString);
-            items.add(buildParticipantsList(expense.getExpenseParticipants(),
-                    index, ev.getParticipants()));
+            String temp = buildParticipantsList(expense.getExpenseParticipants(),
+                    ev.getParticipants());
+            items.add(expenseString + "\n" + "Included participants:   " + temp);
         }
         lv.setItems(items);
     }
@@ -308,13 +307,9 @@ public class EventPageCtrl {
     }
 
     private String buildParticipantsList(List<Participant> participants,
-                                         int index, List<Participant> allParticipants) {
+                                         List<Participant> allParticipants) {
         StringBuilder participantsList = new StringBuilder();
-        while (index > 0) {
-            participantsList.append("  ");
-            index--;
-        }
-        participantsList.append("(");
+
         int count = participants.size();
         if (count == allParticipants.size()) {
             participantsList.append("all");
@@ -326,7 +321,6 @@ public class EventPageCtrl {
                 }
             }
         }
-        participantsList.append(")");
         return participantsList.toString();
     }
 

@@ -107,6 +107,9 @@ public class AddExpenseCtrl {
         partialSplit.setOnAction(this::handlePartialSplit);
 
 
+        if (exp != null) {
+            add.setText("Save");
+        }
         add.setOnAction(x -> {
             if (exp == null) {
                 handleAddButton(event);
@@ -145,7 +148,12 @@ public class AddExpenseCtrl {
         ex.setExpenseParticipants(expParticipants);
         ex.setType(expType);
 
-        server.updateExpense(ex.getId(), ev.getId(), ex);
+        if (expParticipants.size() == 0) {
+            alertSelectPart();
+            return;
+        }
+
+        server.updateExpense(ev.getId(), ex);
         mainCtrl.goBackToEventPage(ev);
     }
 
