@@ -78,6 +78,7 @@ public class TestServerUtils implements ServerUtils {
         }
         Event clone = event.clone();
         clone.setId(Integer.toString(counter++));
+        clone.setLastActivity(new Date());
         events.add(clone);
         lastChange = new Date();
         statuses.add(200);
@@ -126,6 +127,7 @@ public class TestServerUtils implements ServerUtils {
         clone.setId(counter++);
         clone.setEventID(event.getId());
         event.addParticipant(clone);
+        event.setLastActivity(new Date());
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -156,6 +158,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getParticipants().remove(old);
         event.addParticipant(participant);
+        event.setLastActivity(new Date());
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -186,6 +189,7 @@ public class TestServerUtils implements ServerUtils {
             expense.getExpenseParticipants().removeIf(p -> p.equals(old));
         }
         event.getParticipants().remove(old);
+        event.setLastActivity(new Date());
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -267,6 +271,7 @@ public class TestServerUtils implements ServerUtils {
         clone.setEventID(eventID);
         linkExpenseParticipants(clone, event.getParticipants());
         event.addExpense(clone);
+        event.setLastActivity(new Date());
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -303,6 +308,7 @@ public class TestServerUtils implements ServerUtils {
         event.getExpenses().remove(old);
         linkExpenseParticipants(clone, event.getParticipants());
         event.getExpenses().add(clone);
+        event.setLastActivity(new Date());
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -329,6 +335,7 @@ public class TestServerUtils implements ServerUtils {
             return 404;
         }
         event.getExpenses().remove(old);
+        event.setLastActivity(new Date());
         lastChange = new Date();
         statuses.add(204);
         return 204;
