@@ -50,7 +50,7 @@ public class Expense implements Cloneable {
      * @param amount of money
      * @param currency currency, 3 letters
      * @param expenseParticipants participants that split the expense
-     * @param type type of expense TODO change to a list of labels when implementing labels
+     * @param type type of expense
      */
     public Expense(Participant expenseAuthor, String purpose, double amount,
                    String currency, List<Participant> expenseParticipants, String type) {
@@ -159,7 +159,7 @@ public class Expense implements Cloneable {
 
     /**
      * setter for participant
-     * @param expenseAuthor
+     * @param expenseAuthor participant that made the expense
      */
     public void setExpenseAuthor(Participant expenseAuthor) {
         this.expenseAuthor = expenseAuthor;
@@ -167,7 +167,7 @@ public class Expense implements Cloneable {
 
     /**
      * setter for purpose
-     * @param purpose
+     * @param purpose purpose of the expense
      */
     public void setPurpose(String purpose) {
         this.purpose = purpose;
@@ -175,7 +175,7 @@ public class Expense implements Cloneable {
 
     /**
      * setter for amount
-     * @param amount
+     * @param amount cost of the expense in specified currency
      */
     public void setAmount(double amount) {
         this.amount = amount;
@@ -183,7 +183,7 @@ public class Expense implements Cloneable {
 
     /**
      * setter for currency
-     * @param currency
+     * @param currency currency of the cost
      */
     public void setCurrency(String currency) {
         this.currency = currency;
@@ -191,7 +191,7 @@ public class Expense implements Cloneable {
 
     /**
      * setter for type
-     * @param type
+     * @param type type of expense
      */
     public void setType(String type) {
         this.type = type;
@@ -199,7 +199,7 @@ public class Expense implements Cloneable {
 
     /**
      * setter for the ID of the expense
-     * @param id
+     * @param id id of expense
      */
     public void setId(long id) {
         this.id = id;
