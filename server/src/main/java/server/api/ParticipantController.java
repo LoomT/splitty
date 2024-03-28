@@ -121,9 +121,12 @@ public class ParticipantController {
 
             repo.save(participant);
             adminController.update();
-            simp.convertAndSend("/event/" + eventID, participant,
+            simp.convertAndSend(
+                    "/event/" + eventID,
+                    participant,
                     Map.of("action", WebsocketActions.UPDATE_PARTICIPANT,
-                            "type", Participant.class.getTypeName()));
+                            "type", Participant.class.getTypeName())
+            );
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -140,8 +143,10 @@ public class ParticipantController {
      * 401 if participant is not part of the accessed event
      */
     @DeleteMapping("/{partID}")
-    public ResponseEntity<Event> deleteById(@PathVariable long partID,
-                                            @PathVariable String eventID) {
+    public ResponseEntity<Event> deleteById(
+        @PathVariable long partID,
+        @PathVariable String eventID
+    ) {
         try {
             Optional<Participant> optionalParticipant =
                     repo.findById(new EventWeakKey(eventID, partID));
@@ -149,41 +154,41 @@ public class ParticipantController {
 
             Participant participant = optionalParticipant.get();
             Event event = eventRepo.getReferenceById(eventID);
-            System.out.println(event);
-
-            //expenses.removeIf(expense -> expense.getExpenseAuthor().equals(participant));
             List<Expense> expensesToRemove = new ArrayList<>();
-            for (int i = 0; i < event.getExpenses().size();i++) {
+
+            for (int i = 0; i < event.getExpenses().size(); i++) {
                 Expense e = event.getExpenses().get(i);
                 if (e.getExpenseAuthor().getId() == partID) {
                     expensesToRemove.add(e);
-                    //expenseRepo.delete(e);
                     continue;
                 }
                 event.getExpenses().get(i).getExpenseParticipants().remove(participant);
-                simp.convertAndSend("/event/" + eventID, event.getExpenses().get(i),
+                simp.convertAndSend(
+                        "/event/" + eventID,
+                        event.getExpenses().get(i),
                         Map.of("action", WebsocketActions.UPDATE_EXPENSE,
-                                "type", Expense.class.getTypeName()));
-                //expenseRepo.save(event.getExpenses().get(i));
-
+                                "type", Expense.class.getTypeName())
+                );
             }
 
             for (Expense e : expensesToRemove) {
                 event.getExpenses().remove(e);
-                simp.convertAndSend("/event/" + eventID, e.getId(),
+                simp.convertAndSend(
+                        "/event/" + eventID,
+                        e.getId(),
                         Map.of("action", WebsocketActions.REMOVE_EXPENSE,
-                                "type", Long.class.getTypeName()));
+                                "type", Long.class.getTypeName())
+                );
             }
             event.getParticipants().remove(participant);
-            System.out.println(event);
             eventRepo.save(event);
-
-
-            //repo.delete(participant);
             adminController.update();
-            simp.convertAndSend("/event/" + eventID, partID,
+            simp.convertAndSend(
+                    "/event/" + eventID,
+                    partID,
                     Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
-                            "type", Long.class.getTypeName()));
+                            "type", Long.class.getTypeName())
+            );
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
