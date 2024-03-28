@@ -194,11 +194,11 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param id id
-     * @return Event
+     * @return Event or null if not found
      */
     @Override
     public Event getById(String id) {
-        return null;
+        return find(id).orElse(null);
     }
 
     /**

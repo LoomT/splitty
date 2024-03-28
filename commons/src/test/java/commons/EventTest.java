@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -198,5 +199,17 @@ public class EventTest {
         event.addExpense(expense2);
         event.deleteExpense(expense1);
         assertTrue(event.getExpenses().contains(expense2) && event.getExpenses().size() == 1);
+    }
+
+    @Test
+    void lastActivityConstructed() {
+        assertNotNull(event.getLastActivity());
+    }
+
+    @Test
+    void setActivity() {
+        Date date = new Date();
+        event.setLastActivity(date);
+        assertEquals(date, event.getLastActivity());
     }
 }
