@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
@@ -84,6 +85,7 @@ public class EventController {
                 id = generateId();
             } while (repo.existsById(id));
             event.setId(id);
+            event.setLastActivity(new Date());
             Event saved = repo.save(event);
             adminController.update();
             return ResponseEntity.ok(saved);
@@ -132,6 +134,7 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
+                event.setLastActivity(new Date());
                 repo.save(event);
                 adminController.update();
                 simp.convertAndSend("/event/" + id, title,
