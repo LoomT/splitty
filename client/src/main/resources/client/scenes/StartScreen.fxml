@@ -44,7 +44,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0" style="-fx-background: #eee;" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="250.0" style="-fx-background: #eee;" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
                     <content>
                         <VBox fx:id="eventList" scaleShape="false" />
                     </content>

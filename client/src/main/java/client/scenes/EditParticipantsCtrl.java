@@ -33,6 +33,8 @@ public class EditParticipantsCtrl {
     @FXML
     private Button saveButton;
     @FXML
+    private Button deletePartButton;
+    @FXML
     private Label participantEditWarning;
 
     private Event event;
@@ -76,7 +78,7 @@ public class EditParticipantsCtrl {
      */
     private void nameFieldChanged(ObservableValue<? extends String> observableValue,
                                   String oldString, String newString) {
-        if(!oldString.equals(newString)) nameField.setStyle("");
+        if (!oldString.equals(newString)) nameField.setStyle("");
     }
 
     /**
@@ -112,6 +114,7 @@ public class EditParticipantsCtrl {
             } else {
                 resetFields();
                 saveButton.setText(languageConf.get("EditP.save"));
+                deletePartButton.setVisible(true);
                 Participant p = event.getParticipants().get(index - 1);
                 nameField.setText(p.getName());
                 emailField.setText(p.getEmailAddress());
@@ -134,6 +137,7 @@ public class EditParticipantsCtrl {
      */
     private void resetFields() {
         saveButton.setText(languageConf.get("EditP.createParticipant"));
+        deletePartButton.setVisible(false);
         nameField.setText("");
         emailField.setText("");
         beneficiaryField.setText("");
@@ -149,6 +153,14 @@ public class EditParticipantsCtrl {
     @FXML
     private void backButtonClicked() {
         mainCtrl.goBackToEventPage(event);
+    }
+
+    @FXML
+    private void deletePartClicked() {
+        int index = chooseParticipant.getSelectionModel().getSelectedIndex();
+        Participant part = event.getParticipants().get(index -1);
+        String eventID = event.getId();
+        server.deleteParticipant(eventID, part.getId());
     }
 
     /**
