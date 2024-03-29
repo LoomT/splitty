@@ -244,7 +244,27 @@ public class Expense implements Cloneable {
     }
 
 
-
+    /**
+     * @return the string representation of this object
+     */
+    @Override
+    public String toString() {
+        StringBuilder participantIds = new StringBuilder();
+        for (Participant p : expenseParticipants) {
+            participantIds.append(p.getName()).append(", ");
+        }
+        return "Expense{" +
+                "id=" + id +
+                ", eventID='" + eventID + '\'' +
+                ", expenseAuthor=" + expenseAuthor.getId() +
+                ", purpose='" + purpose + '\'' +
+                ", amount=" + amount +
+                ", currency='" + currency + '\'' +
+                ", date=" + date +
+                ", expenseParticipants=" + participantIds +
+                ", type='" + type + '\'' +
+                '}';
+    }
     /**
      * Creates and returns a deep copy of this object x such that:
      * <blockquote>
