@@ -25,8 +25,10 @@ import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Properties;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -266,5 +268,14 @@ public class ServerUtilsImpl implements ServerUtils {
                 .post(Entity.entity(event, APPLICATION_JSON))) {
             return response.getStatus();
         }
+    }
+
+    /**
+     * Sends an API call to the mock currency converter
+     */
+    public List<Properties> getMockCC(){
+        return ClientBuilder.newClient(new ClientConfig()) //
+                .target(server).path("api/mockCurrencyConverter") //
+                .request().get(new GenericType<>(){});
     }
 }
