@@ -123,4 +123,6 @@ public interface ServerUtils {
      * @return imported event
      */
     int importEvent(String password, Event event);
+
+    int updateEvent(String eventId, Event event);
 }

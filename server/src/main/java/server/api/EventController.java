@@ -126,26 +126,34 @@ public class EventController {
      * @param title new title
      * @return the event entity with new title
      */
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Event> changeTitleById(@PathVariable String id,
-                                                 @RequestParam("newTitle") String title) {
+                                                 @RequestBody Event event) {
         try {
-            Optional<Event> found = repo.findById(id);
-            if(found.isPresent()) {
-                Event event = found.get();
-                event.setTitle(title);
-                event.setLastActivity(new Date());
-                repo.save(event);
-                adminController.update();
-                simp.convertAndSend("/event/" + id, title,
-                        Map.of("action", WebsocketActions.TITLE_CHANGE,
-                                "type", String.class.getTypeName()));
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.notFound().build();
+
+            Optional<Event> currEvent = repo.findById(id);
+
+            if(!id.equals(event.getId()))
+                return ResponseEntity.badRequest().build();
+
+            if(currEvent.isEmpty())
+                return ResponseEntity.notFound().build();
+
+            repo.save(event);
+            update(id);
+            simp.convertAndSend("/event/" + id, event.getTitle(),
+                    Map.of("action", WebsocketActions.TITLE_CHANGE,
+                            "type", String.class.getTypeName()));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    private void update(String eventID){
+        Event event = repo.getReferenceById(eventID);
+        event.setLastActivity(new Date());
+        repo.save(event);
+        adminController.update();
     }
 
 }

@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class TitleChangerCtrl {
     private final ServerUtils server;
@@ -22,6 +23,8 @@ public class TitleChangerCtrl {
 
     @FXML
     private Button cancelButton;
+
+    private EventPageCtrl eventPageCtrl;
 
     private UserConfig userConfig;
     private Websocket websocket;
@@ -51,12 +54,21 @@ public class TitleChangerCtrl {
         this.websocket = websocket;
 
     }
-
+    @FXML
     public void cancelTitle(){
-
+        nameTextField.textProperty().setValue("");
+        Stage stage = (Stage) saveButton.getScene().getWindow();
+        stage.close();
     }
 
+    @FXML
     public void saveTitle(){
+        if(eventPageCtrl == null) return;
+        eventPageCtrl.changeTitle(nameTextField.getText());
+        cancelTitle();
+    }
 
+    public void setEventPageCtrl(EventPageCtrl eventPage){
+        this.eventPageCtrl = eventPage;
     }
 }

@@ -1,6 +1,5 @@
 package client.scenes;
 
-
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -200,6 +199,7 @@ public class EventPageCtrl {
     public void changeTitle(String newTitle) {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
+        server.updateEvent(event.getId(), event);
     }
 
     /**
@@ -349,8 +349,9 @@ public class EventPageCtrl {
     /**
      *
      */
-    public void eventTitleChanger(){
-
+    public void changeTitle(){
+        mainCtrl.showChangeTitleScreen(this);
+        //String asdf = mainCtrl.showChangeTitleScreen();
     }
 
     /**

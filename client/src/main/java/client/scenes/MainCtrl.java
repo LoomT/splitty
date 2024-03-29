@@ -24,6 +24,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -48,6 +49,10 @@ public class MainCtrl {
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
+
+    private TitleChangerCtrl titleChangerCtrl;
+    private Scene titleChanger;
+
     private UserConfig userConfig;
 
     private Scene adminOverview;
@@ -86,7 +91,7 @@ public class MainCtrl {
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
             Pair<AddExpenseCtrl, Parent> addExpensePage,
-            Pair<TitleChangerCtrl, Parent> TitleChangerCtrl
+            Pair<TitleChangerCtrl, Parent> titleChangerPage
     ) {
 
         this.primaryStage = primaryStage;
@@ -113,6 +118,9 @@ public class MainCtrl {
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
 
+        this.titleChangerCtrl = titleChangerPage.getKey();
+        this.titleChanger = new Scene(titleChangerPage.getValue());
+
         //showOverview();
         showStartScreen();
         primaryStage.show();
@@ -131,7 +139,14 @@ public class MainCtrl {
 
     }
 
-    public void
+    public void showChangeTitleScreen(EventPageCtrl eventPageCtrl){
+        titleChangerCtrl.setEventPageCtrl(eventPageCtrl);
+        Stage stage = new Stage();
+        stage.setScene(titleChanger);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+    }
 
     /**
      * Display admin login
