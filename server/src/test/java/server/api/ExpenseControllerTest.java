@@ -3,8 +3,10 @@ package server.api;
 import commons.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.AdminService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,8 +33,9 @@ public class ExpenseControllerTest {
         eventRepo = new TestEventRepository(repoExpense);
         repoExpense.setEventRepo(eventRepo);
         template = new TestSimpMessagingTemplate((message, timeout) -> false);
-        expenseContr = new ExpenseController(repoExpense, template);
-        eventContr = new EventController(eventRepo, random, template);
+        AdminController adminController = new AdminController(eventRepo, new AdminService(random));
+        expenseContr = new ExpenseController(repoExpense, eventRepo, template, adminController);
+        eventContr = new EventController(eventRepo, random, template, adminController);
 
         // Creating sample participants
         p1 = new Participant("Mihai");
@@ -49,6 +52,7 @@ public class ExpenseControllerTest {
         var added = eventContr.add(event);
         event = added.getBody();
         expenseContr.addExpense(expense, event.getId());
+        event = eventRepo.getById(event.getId());
     }
 
     @Test
@@ -158,6 +162,44 @@ public class ExpenseControllerTest {
         assertEquals(updExp, template.getPayload());
     }
 
+    @Test
+    void activityUpdateAfterAddingExpense() {
+        Date before = event.getLastActivity();
+        expenseContr.addExpense(expense2, event.getId());
+        Event updated = eventRepo.getById(event.getId());
 
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
 
+    @Test
+    void activityUpdateAfterUpdatingExpense() {
+        Date before = event.getLastActivity();
+        Expense exp = event.getExpenses().getFirst();
+        exp.setPurpose("changed");
+        expenseContr.updateExpense(exp.getId(), exp, event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterDeletingExpense() {
+        Date before = event.getLastActivity();
+        expenseContr.deleteById(expense.getId(), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterGettingExpense() {
+        Date before = event.getLastActivity();
+        expenseContr.getById(expense.getId(), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertEquals(updated.getLastActivity(), before);
+    }
 }

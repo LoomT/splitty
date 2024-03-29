@@ -43,13 +43,16 @@ public class MainCtrl {
     private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
 
+    private AddExpenseCtrl addExpenseCtrl;
+    private Scene addExpense;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
     private UserConfig userConfig;
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
-    private Websocket websocket;
+    private final Websocket websocket;
 
     /**
      * @param websocket the websocket instance
@@ -71,6 +74,7 @@ public class MainCtrl {
      * @param adminLogin           admin login controller and scene
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
+     * @param addExpensePage controller and scene for addExpense
      */
     public void initialize(
             Stage primaryStage,
@@ -80,7 +84,8 @@ public class MainCtrl {
             Pair<EventPageCtrl, Parent> eventPage,
             Pair<AdminLoginCtrl, Parent> adminLogin,
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
-            Pair<AdminOverviewCtrl, Parent> adminOverview
+            Pair<AdminOverviewCtrl, Parent> adminOverview,
+            Pair<AddExpenseCtrl, Parent> addExpensePage
     ) {
 
         this.primaryStage = primaryStage;
@@ -100,6 +105,9 @@ public class MainCtrl {
 
         this.editParticipantsCtrl = editParticipantsPage.getKey();
         this.editParticipants = new Scene(editParticipantsPage.getValue());
+
+        this.addExpenseCtrl = addExpensePage.getKey();
+        this.addExpense = new Scene(addExpensePage.getValue());
 
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
@@ -170,6 +178,7 @@ public class MainCtrl {
      */
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
+        adminOverviewCtrl.initPoller(5000L); // 5 sec time out
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
@@ -196,55 +205,12 @@ public class MainCtrl {
     }
 
     /**
-     * Getter for startScreenCtrl
-     *
-     * @return startScreenCtrl
+     * shows the add/edit expense page
+     * @param eventToShow the event to show the participant editor for
      */
-    public StartScreenCtrl getStartScreenCtrl() {
-        return startScreenCtrl;
+    public void showAddExpensePage(Event eventToShow) {
+        addExpenseCtrl.displayAddExpensePage(eventToShow);
+        primaryStage.setTitle("Add/Edit Expense");
+        primaryStage.setScene(addExpense);
     }
-
-
-    /**
-     * setter for startScreenCtrl
-     *
-     * @param startScreenCtrl start screen controller
-     */
-    public void setStartScreenCtrl(StartScreenCtrl startScreenCtrl) {
-        this.startScreenCtrl = startScreenCtrl;
-    }
-
-    /**
-     * AdminLoginCtrl getter
-     *
-     * @return admin login controller
-     */
-    public AdminLoginCtrl getAdminLoginCtrl() {
-        return adminLoginCtrl;
-    }
-
-    /**
-     * setter for adminLoginCtrl
-     *
-     * @param adminLoginCtrl admin login controller
-     */
-    public void setAdminLoginCtrl(AdminLoginCtrl adminLoginCtrl) {
-        this.adminLoginCtrl = adminLoginCtrl;
-    }
-
-
-//    public void showOverview() {
-//        primaryStage.setTitle("Quotes: Overview");
-//        primaryStage.setScene(overview);
-//        overviewCtrl.refresh();
-//    }
-//
-//    /**
-//     * display adding quote scene
-//     */
-//    public void showAdd() {
-//        primaryStage.setTitle("Quotes: Adding Quote");
-//        primaryStage.setScene(add);
-//        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-//    }
 }

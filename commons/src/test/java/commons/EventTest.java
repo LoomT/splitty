@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -198,5 +199,63 @@ public class EventTest {
         event.addExpense(expense2);
         event.deleteExpense(expense1);
         assertTrue(event.getExpenses().contains(expense2) && event.getExpenses().size() == 1);
+    }
+
+    @Test
+    void lastActivityConstructed() {
+        assertNotNull(event.getLastActivity());
+    }
+
+    @Test
+    void setActivity() {
+        Date date = new Date();
+        event.setLastActivity(date);
+        assertEquals(date, event.getLastActivity());
+    }
+
+    @Test
+    void cloneCreationDate() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertNotSame(event.getCreationDate(), clone.getCreationDate());
+        assertEquals(event.getCreationDate(), clone.getCreationDate());
+    }
+
+    @Test
+    void cloneLastActivity() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertNotSame(event.getLastActivity(), clone.getLastActivity());
+        assertEquals(event.getLastActivity(), clone.getLastActivity());
+    }
+
+    @Test
+    void cloneTitle() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertEquals(event.getTitle(), clone.getTitle());
+    }
+
+    @Test
+    void cloneID() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertEquals(event.getId(), clone.getId());
+    }
+
+    @Test
+    void cloneParticipants() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertNotSame(event.getParticipants(), clone.getParticipants());
+        assertEquals(event.getParticipants(), clone.getParticipants());
+    }
+
+    @Test
+    void cloneExpenses() {
+        Event event = new Event("title");
+        Event clone = event.clone();
+        assertNotSame(event.getExpenses(), clone.getExpenses());
+        assertEquals(event.getExpenses(), clone.getExpenses());
     }
 }

@@ -6,6 +6,9 @@ import commons.Participant;
 import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.AdminService;
+
+import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpStatus.*;
@@ -28,9 +31,10 @@ public class ParticipantControllerTest {
 
         TestRandom random = new TestRandom();
         template = new TestSimpMessagingTemplate((message, timeout) -> false);
-        EventController eventContr = new EventController(eventRepo, random, template);
+        AdminController adminController = new AdminController(eventRepo, new AdminService(random));
+        EventController eventContr = new EventController(eventRepo, random, template, adminController);
         event = eventContr.add(event).getBody();
-        partContr = new ParticipantController(partRepo, eventRepo, template);
+        partContr = new ParticipantController(partRepo, eventRepo, template, adminController);
     }
 
     @Test
@@ -219,7 +223,7 @@ public class ParticipantControllerTest {
         partContr.add(participant, "id1");
         editedParticipant.setId(((Participant) template.getPayload()).getId());
         editedParticipant.setEventID("id2");
-        var saved = partContr.add(participant, "BCDEF");
+        var saved = partContr.add(participant, "ZABCD");
         var editByID404 = partContr.editParticipantById("id2", editedParticipant.getId(), editedParticipant);
         assertEquals(NO_CONTENT, saved.getStatusCode());
         assertEquals(NOT_FOUND, editByID404.getStatusCode());
@@ -235,7 +239,7 @@ public class ParticipantControllerTest {
         event1.addParticipant(participant);
         eventRepo.save(event1);
         eventRepo.save(event2);
-        var saved = partContr.add(participant, "BCDEF");
+        var saved = partContr.add(participant, "ZABCD");
         var editByID404 = partContr.deleteById( 2, "id2");
         assertEquals(NO_CONTENT, saved.getStatusCode());
         assertEquals(NOT_FOUND, editByID404.getStatusCode());
@@ -249,5 +253,54 @@ public class ParticipantControllerTest {
         partContr.deleteById(partID, event.getId());
         assertEquals(partID, template.getPayload());
         assertEquals(WebsocketActions.REMOVE_PARTICIPANT, template.getHeaders().get("action"));
+    }
+
+    @Test
+    void activityUpdateAfterAddingParticipant() {
+        Date before = event.getLastActivity();
+        partContr.add(new Participant("name"), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterUpdatingParticipant() {
+        partContr.add(new Participant("name"), event.getId());
+        event = eventRepo.getById(event.getId());
+        Date before = event.getLastActivity();
+        Participant participant = event.getParticipants().getFirst();
+        participant.setName("new name");
+        partContr.editParticipantById(event.getId(), participant.getId(), participant);
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterDeletingExpense() {
+        partContr.add(new Participant("name"), event.getId());
+        event = eventRepo.getById(event.getId());
+        Participant participant = event.getParticipants().getFirst();
+        Date before = event.getLastActivity();
+        partContr.deleteById(participant.getId(), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterGettingExpense() {
+        partContr.add(new Participant("name"), event.getId());
+        event = eventRepo.getById(event.getId());
+        Participant participant = event.getParticipants().getFirst();
+        Date before = event.getLastActivity();
+        partContr.getById(participant.getId(), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertEquals(updated.getLastActivity(), before);
     }
 }

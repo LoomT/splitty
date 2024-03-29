@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import commons.Event;
-import jakarta.ws.rs.core.Response;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
@@ -18,10 +18,8 @@ import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-
 import java.util.ArrayList;
 import java.util.Comparator;
-
 import java.util.List;
 
 public class AdminOverviewCtrl {
@@ -42,8 +40,10 @@ public class AdminOverviewCtrl {
     @FXML
     private CheckBox reverseOrderCheckBox;
 
-    private LanguageConf languageConf;
+    private final LanguageConf languageConf;
     private List<Event> allEvents;
+
+    private Thread poller;
 
     /**
      * adminOverview screen controller constructor
@@ -77,15 +77,11 @@ public class AdminOverviewCtrl {
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.creationDate"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.eventName"));
         orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.numOfParticipants"));
+        orderByChoiceBox.getItems().add(languageConf.get("AdminOverview.lastActivity"));
         orderByChoiceBox.setValue(languageConf.get("AdminOverview.creationDate"));
-        orderByChoiceBox.setOnAction((e1) -> {
-            orderAndDisplayEvents();
-        });
+        orderByChoiceBox.setOnAction((e1) -> orderAndDisplayEvents());
 
-        reverseOrderCheckBox.setOnAction((e1)-> {
-            orderAndDisplayEvents();
-        });
-
+        reverseOrderCheckBox.setOnAction((e1) -> orderAndDisplayEvents());
     }
 
     private void orderAndDisplayEvents() {
@@ -93,13 +89,16 @@ public class AdminOverviewCtrl {
 
         switch (orderByChoiceBox.getSelectionModel().getSelectedIndex()) {
             case 0: // Order by creation date
-                allEvents.sort(((o1, o2) -> -o1.getCreationDate().compareTo(o2.getCreationDate())));
+                allEvents.sort(Comparator.comparing(Event::getCreationDate).reversed());
                 break;
             case 1: // Order by event name
                 allEvents.sort(Comparator.comparing(o -> o.getTitle().toLowerCase()));
                 break;
             case 2: // order by num of participants
                 allEvents.sort(Comparator.comparingInt(o -> -o.getParticipants().size()));
+                break;
+            case 3: // order by last activity
+                allEvents.sort(Comparator.comparing(Event::getLastActivity).reversed());
                 break;
         }
 
@@ -124,7 +123,10 @@ public class AdminOverviewCtrl {
                                 }
                             },
                             () -> eventExportHandler(event),
-                            () -> mainCtrl.showEventPage(event)
+                            () -> {
+                                stopPoller();
+                                mainCtrl.showEventPage(event);
+                            }
                             );
             eventList.getChildren().add(item);
 
@@ -152,6 +154,7 @@ public class AdminOverviewCtrl {
      */
     @FXML
     private void backButtonClicked() {
+        stopPoller();
         mainCtrl.showAdminLogin();
     }
 
@@ -161,7 +164,6 @@ public class AdminOverviewCtrl {
     public void loadAllEvents() {
         allEvents = server.getEvents(password);
         orderAndDisplayEvents();
-
     }
 
 
@@ -239,9 +241,8 @@ public class AdminOverviewCtrl {
         for(File file : files) {
             try {
                 Event event = reader.readValue(file);
-                Response response = server.importEvent(password, event);
-                System.out.println(response.getStatus()); // for troubleshooting
-                switch (response.getStatus()) {
+                int status = server.importEvent(password, event);
+                switch (status) {
                     case 400 -> {
                         System.out.println("Missing participants from the participant list");
                         // TODO display an error message that the JSON file is incorrect
@@ -256,5 +257,26 @@ public class AdminOverviewCtrl {
             }
         }
         loadAllEvents();
+    }
+
+    /**
+     * Initialize the long poller
+     * @param timeOut time in ms until server sends a time-out signal
+     */
+    public void initPoller(Long timeOut) {
+        poller = new Thread(() -> {
+            while(!Thread.currentThread().isInterrupted()) {
+                int status = server.pollEvents(password, timeOut);
+                if(status != 204) continue;
+                Platform.runLater(this::loadAllEvents);
+            }});
+        poller.start();
+    }
+
+    /**
+     * Stop the long poller
+     */
+    public void stopPoller() {
+        poller.interrupt();
     }
 }

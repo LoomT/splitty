@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.ParticipantRepository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +18,7 @@ public class ParticipantController {
     private final ParticipantRepository repo;
     private final EventRepository eventRepo;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * Constructor with repository and random number generator injections
@@ -24,13 +26,15 @@ public class ParticipantController {
      * @param repo Participant repository
      * @param eventRepo Event repository
      * @param simp websocket object used to send updates to everyone
+     * @param adminController admin controller for sending updates
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,
-                                 SimpMessagingTemplate simp) {
+                                 SimpMessagingTemplate simp, AdminController adminController) {
         this.repo = repo;
         this.eventRepo = eventRepo;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -75,6 +79,7 @@ public class ParticipantController {
             }
             participant.setEventID(eventID);
             Participant saved = repo.save(participant);
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
@@ -110,6 +115,7 @@ public class ParticipantController {
                 return ResponseEntity.notFound().build();
 
             repo.save(participant);
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, participant,
                     Map.of("action", WebsocketActions.UPDATE_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
@@ -146,6 +152,7 @@ public class ParticipantController {
             }
 
             repo.delete(participant);
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, partID,
                     Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
                             "type", Long.class.getTypeName()));
@@ -153,5 +160,18 @@ public class ParticipantController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    /**
+     * Updates the last activity date of the specified event
+     * and updates the date for long poll in admin controller
+     *
+     * @param eventID event id
+     */
+    private void update(String eventID) {
+        Event event = eventRepo.getReferenceById(eventID);
+        event.setLastActivity(new Date());
+        eventRepo.save(event);
+        adminController.update();
     }
 }

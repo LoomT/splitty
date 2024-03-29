@@ -8,6 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.random.RandomGenerator;
@@ -18,6 +19,7 @@ public class EventController {
     private final EventRepository repo;
     private final RandomGenerator random;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * Constructor with repository and random number generator injections
@@ -25,13 +27,15 @@ public class EventController {
      * @param repo Event repository
      * @param random A random number generator
      * @param simp websocket object used to send updates to everyone
+     * @param adminController admin controller for sending updates
      */
     @Autowired
     public EventController(EventRepository repo, RandomGenerator random,
-                           SimpMessagingTemplate simp) {
+                           SimpMessagingTemplate simp, AdminController adminController) {
         this.repo = repo;
         this.random = random;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -81,7 +85,9 @@ public class EventController {
                 id = generateId();
             } while (repo.existsById(id));
             event.setId(id);
+            event.setLastActivity(new Date());
             Event saved = repo.save(event);
+            adminController.update();
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -99,6 +105,7 @@ public class EventController {
         try {
             if(repo.existsById(id)) {
                 repo.deleteById(id);
+                adminController.update();
                 simp.convertAndSend("/event/" + id, "delete",
                         Map.of("action", WebsocketActions.DELETE_EVENT,
                                 "type", String.class.getTypeName()));
@@ -127,7 +134,9 @@ public class EventController {
             if(found.isPresent()) {
                 Event event = found.get();
                 event.setTitle(title);
+                event.setLastActivity(new Date());
                 repo.save(event);
+                adminController.update();
                 simp.convertAndSend("/event/" + id, title,
                         Map.of("action", WebsocketActions.TITLE_CHANGE,
                                 "type", String.class.getTypeName()));

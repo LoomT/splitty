@@ -1,13 +1,16 @@
 package server.api;
 
+import commons.Event;
 import commons.EventWeakKey;
 import commons.Expense;
 import commons.WebsocketActions;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
+import server.database.EventRepository;
 import server.database.ExpenseRepository;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -15,18 +18,24 @@ import java.util.Optional;
 @RequestMapping("/api/events/{eventID}/expenses")
 public class ExpenseController {
     private final ExpenseRepository repoExpense;
+    private final EventRepository eventRepo;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * constructor for expense controller
      *
      * @param repoExpense repo of the Expenses
+     * @param eventRepo repo of events
      * @param simp websocket object to send messages to event subscribers
+     * @param adminController admin controller for sending updates
      */
-    public ExpenseController(ExpenseRepository repoExpense,
-                             SimpMessagingTemplate simp) {
+    public ExpenseController(ExpenseRepository repoExpense, EventRepository eventRepo,
+                             SimpMessagingTemplate simp, AdminController adminController) {
         this.repoExpense = repoExpense;
+        this.eventRepo = eventRepo;
         this.simp = simp;
+        this.adminController = adminController;
     }
 
     /**
@@ -60,12 +69,14 @@ public class ExpenseController {
     public ResponseEntity<Expense> addExpense(@RequestBody Expense expense,
                                               @PathVariable String eventID) {
         try {
+            if(!eventRepo.existsById(eventID)) return ResponseEntity.notFound().build();
             if (checkForBadExpenseFields(expense)) {
                 return ResponseEntity.badRequest().build();
             }
 
             expense.setEventID(eventID);
             Expense saved = repoExpense.save(expense);
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_EXPENSE,
                             "type", Expense.class.getTypeName()));
@@ -93,6 +104,7 @@ public class ExpenseController {
                 return ResponseEntity.notFound().build();
             }
             repoExpense.delete(optionalExpense.get());
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, id,
                     Map.of("action", WebsocketActions.REMOVE_EXPENSE,
                             "type", Long.class.getTypeName()));
@@ -125,6 +137,7 @@ public class ExpenseController {
                 return ResponseEntity.notFound().build();
 
             repoExpense.save(updatedExpense);
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, updatedExpense,
                     Map.of("action", WebsocketActions.UPDATE_EXPENSE,
                             "type", Expense.class.getTypeName()));
@@ -132,6 +145,19 @@ public class ExpenseController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    /**
+     * Updates the last activity date of the specified event
+     * and updates the date for long poll in admin controller
+     *
+     * @param eventID event id
+     */
+    private void update(String eventID) {
+        Event event = eventRepo.getReferenceById(eventID);
+        event.setLastActivity(new Date());
+        eventRepo.save(event);
+        adminController.update();
     }
 
     /**

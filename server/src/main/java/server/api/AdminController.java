@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.DeferredResult;
 import server.AdminService;
 import server.database.EventRepository;
 
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,7 +20,7 @@ public class AdminController {
 
     private final EventRepository repo;
     private final AdminService admS;
-
+    private Date lastChange;
 
     /**
      * Constructor with repository injection
@@ -29,6 +31,7 @@ public class AdminController {
     public AdminController(EventRepository repo, AdminService admS) {
         this.repo = repo;
         this.admS = admS;
+        lastChange = new Date();
     }
 
     /**
@@ -90,6 +93,7 @@ public class AdminController {
             }
             saved.getExpenses().addAll(expenses);
             saved = repo.save(saved);
+            update();
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
@@ -97,6 +101,11 @@ public class AdminController {
         }
     }
 
+    /**
+     * @param event event to check
+     * @return 200 if event is valid, 400 if not
+     * and 406 if there already exists an event with the same id
+     */
     private HttpStatus checkEventValidity(Event event) {
         if(repo.existsById(event.getId()))
             return HttpStatus.CONFLICT;
@@ -118,7 +127,7 @@ public class AdminController {
      * @return all events
      * @param inputPassword the password to verify
      */
-    @GetMapping ("admin/events")
+    @GetMapping ("/admin/events")
     public ResponseEntity<List<Event>> getAll(@RequestHeader("Authorization")
                                                   String inputPassword) {
         boolean isValid = admS.verifyPassword(inputPassword);
@@ -127,5 +136,47 @@ public class AdminController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
+    }
+
+    /**
+     * @param inputPassword admin password
+     * @param timeOut millisecond after which send a time-out response
+     * @return 204 if there is a change, 408 if time-outed
+     */
+    @GetMapping("/admin/events/poll")
+    public DeferredResult<ResponseEntity<String>>
+        longPoll(@RequestHeader("Authorization") String inputPassword,
+                 @RequestHeader("TimeOut") Long timeOut) {
+        DeferredResult<ResponseEntity<String>> output = new DeferredResult<>(timeOut,
+                ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).build());
+        if(!admS.verifyPassword(inputPassword)) {
+            output.setResult(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
+            return output;
+        }
+
+        output.onError((Throwable t) ->
+                output.setErrorResult(ResponseEntity.internalServerError().build()));
+        Date startTime = new Date();
+        ForkJoinPool.commonPool().submit(() -> {
+            try {
+                while(startTime.after(lastChange)) {
+                    if(output.isSetOrExpired()) {
+                        return;
+                    }
+                    Thread.sleep(200);
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            output.setResult(ResponseEntity.noContent().build());
+        });
+        return output;
+    }
+
+    /**
+     * Register new event update
+     */
+    public void update() {
+        lastChange = new Date();
     }
 }
