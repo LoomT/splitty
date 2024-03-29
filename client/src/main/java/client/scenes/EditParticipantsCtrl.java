@@ -180,7 +180,7 @@ public class EditParticipantsCtrl {
         if (index < 0) return;
         if(name.isEmpty()) {
             participantEditWarning.setVisible(true);
-            participantEditWarning.setText("Name is missing");
+            participantEditWarning.setText(languageConf.get("EditP.nameMissing"));
             nameField.setStyle("-fx-border-color: red;");
             return;
         }
@@ -214,7 +214,7 @@ public class EditParticipantsCtrl {
      */
     private void informNameExists() {
         participantEditWarning.setVisible(true);
-        participantEditWarning.setText("Name already exists");
+        participantEditWarning.setText(languageConf.get("EditP.nameExists"));
         nameField.setStyle("""
                         -fx-border-color: red;
                         -fx-text-inner-color: red""");
