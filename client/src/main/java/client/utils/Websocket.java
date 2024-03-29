@@ -126,6 +126,7 @@ public class Websocket {
             }
             event.getParticipants().remove(index);
             event.getParticipants().add(index, p);
+            event.getExpenses().forEach(e -> linkExpenseParticipants(e, event.getParticipants()));
             updatePartCallback.accept(event);
         });
         this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
@@ -161,9 +162,11 @@ public class Websocket {
      */
     public void linkExpenseParticipants(Expense expense, List<Participant> participants) {
         expense.setExpenseAuthor(participants.stream()
-                .filter(p -> p.equals(expense.getExpenseAuthor())).findFirst().orElseThrow());
+                .filter(p -> p.getId() == expense.getExpenseAuthor().getId())
+                .findFirst().orElseThrow());
+        List<Long> ids = expense.getExpenseParticipants().stream().map(Participant::getId).toList();
         expense.setExpenseParticipants(participants.stream()
-                .filter(p -> expense.getExpenseParticipants().contains(p)).toList());
+                .filter(p -> ids.contains(p.getId())).toList());
     }
 
     /**
