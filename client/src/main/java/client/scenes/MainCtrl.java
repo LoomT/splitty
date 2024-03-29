@@ -213,7 +213,7 @@ public class MainCtrl {
     public void showAddExpensePage(Event eventToShow) {
         addExpenseCtrl.displayAddExpensePage(eventToShow, null);
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
-        primaryStage.setTitle("Add Expense");
+        primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
     }
 
@@ -225,7 +225,7 @@ public class MainCtrl {
     public void handleEditExpense(Expense exp, Event ev) {
 
         addExpenseCtrl.displayAddExpensePage(ev, exp);
-        primaryStage.setTitle("Edit Expense");
+        primaryStage.setTitle(languageConf.get("AddExp.editexp"));
         primaryStage.setScene(addExpense);
 
         addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
