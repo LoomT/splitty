@@ -29,6 +29,7 @@ public class ParticipantController {
      * @param eventRepo       Event repository
      * @param simp            websocket object used to send updates to everyone
      * @param adminController admin controller for sending updates
+     * @param expenseRepo     the expense repo
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,

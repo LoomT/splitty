@@ -18,12 +18,14 @@ public class ParticipantControllerTest {
     private TestParticipantRepository partRepo;
     private ParticipantController partContr;
     private TestSimpMessagingTemplate template;
+    private TestExpenseRepository expenseRepo;
     @BeforeEach
     public void setup(){
         event = new Event("title");
 
         partRepo = new TestParticipantRepository();
         eventRepo = new TestEventRepository(partRepo);
+        expenseRepo = new TestExpenseRepository();
         partRepo.setEventRepo(eventRepo);
 
 
@@ -32,7 +34,7 @@ public class ParticipantControllerTest {
         AdminController adminController = new AdminController(eventRepo, new AdminService(random));
         EventController eventContr = new EventController(eventRepo, random, template, adminController);
         event = eventContr.add(event).getBody();
-        partContr = new ParticipantController(partRepo, eventRepo, template, adminController);
+        partContr = new ParticipantController(partRepo, eventRepo, template, adminController, expenseRepo);
     }
 
     @Test

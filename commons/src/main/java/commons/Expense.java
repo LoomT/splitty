@@ -241,8 +241,9 @@ public class Expense {
     }
 
 
-
-
+    /**
+     * @return the string representation of this object
+     */
     @Override
     public String toString() {
 

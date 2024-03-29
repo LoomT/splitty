@@ -26,7 +26,6 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
