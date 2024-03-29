@@ -124,5 +124,5 @@ public interface ServerUtils {
      */
     int importEvent(String password, Event event);
 
-    int updateEvent(String eventId, Event event);
+    int updateEvent(Event event, String eventName);
 }

@@ -199,7 +199,7 @@ public class EventPageCtrl {
     public void changeTitle(String newTitle) {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
-        server.updateEvent(event.getId(), event);
+        server.updateEvent(event, newTitle);
     }
 
     /**
