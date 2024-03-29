@@ -42,3 +42,38 @@
 
 Total time: 45 min + 5 min leeway
 
+### Progress Update
+
+  - Good progress was made for the application.
+  - Websockets have been implemented with long polling being mostly finished.
+  - Most of the standard features have been implemented.
+  - Some of us may not have reached the breakout criteria
+
+### Continuation
+
+  - Adding time estimation for merge requests were agreed upon.
+  - Removing participants from events was discussed as a feature to be implemented.
+  - Expanding the use of popups was discussed during the meeting to improve the UX.
+  - Using images instead of default buttons was discussed to improve the UI.
+  - Different themes and color palettes for the application were also discussed for implementation in the future.
+  - Dutch language not being fully implemented was discussed.
+  - Duplicate names for the participants and the possibility of using them as Primary Keys were discussed.
+
+### Testing Feedback^[Since the feedback came right before the meeting this was a late addition to the agenda.]
+
+  - Testing the frontend controllers was discussed to improve upon the testing feedback.
+  - Testing on input and process as well as the output was mentioned in the feedback and discussed.
+  - Agreement to create mock-ups of server utils, websockets etc. to test the controllers were made.
+ 
+### Product Pitch
+
+  - A draft for the product pitch needs to be handed in by Thursday.
+  - The contents and the tools to create the presentation were discussed.
+  - A meeting on 27/03/2024 at 12.00 (the following day) was agreed upon to further discuss the product pitch.
+ 
+## Action points
+
+  - Complete the implementation of basic features that are needed to pass the assignment.
+  - Expand on the testing through mock objects and more detailed tests.
+  - Improve upon the UI and UX through as discussed in the future.
+  - Create the product pitch draft until Thursday.

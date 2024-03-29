@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import server.AdminService;
 
+import java.util.Date;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -148,5 +149,31 @@ class EventControllerTest {
     void randomId() {
         var added = sut.add(new Event("title"));
         assertEquals("ZABCD", Objects.requireNonNull(added.getBody()).getId());
+    }
+
+    @Test
+    void activityDateAfterAddingEvent() {
+        Date before = new Date();
+        Event event = new Event("title");
+        Event added = sut.add(event).getBody();
+
+        assert added != null;
+        assertNotNull(added.getLastActivity());
+        assertTrue(added.getLastActivity().compareTo(before) >= 0);
+        assertTrue(added.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterChangingTitle() {
+        Event event = new Event("title");
+        Event added = sut.add(event).getBody();
+        assert added != null;
+        Date before = added.getLastActivity();
+        String id = added.getId();
+        sut.changeTitleById(id, "new title");
+        Event updated = sut.getById(id).getBody();
+        assert updated != null;
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
     }
 }

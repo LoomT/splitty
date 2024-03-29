@@ -22,6 +22,7 @@ public class ExpenseTest {
     List<Participant> expPart = new ArrayList<>();
     Date creationDate;
     long expenseId1, expenseId2;
+    Expense clone;
     @BeforeEach
     void setup() {
         p1 = new Participant();
@@ -41,7 +42,7 @@ public class ExpenseTest {
         final AtomicLong sequenceGenerator = new AtomicLong(System.currentTimeMillis());
         expenseId1 = sequenceGenerator.incrementAndGet();
         expenseId2 = sequenceGenerator.incrementAndGet();
-
+        clone = e1.clone();
     }
 
     @Test
@@ -147,5 +148,51 @@ public class ExpenseTest {
         assertNotEquals(e2.hashCode(), e3.hashCode());
     }
 
+    @Test
+    void cloneParticipants() {
+        assertNotSame(e1.getExpenseParticipants(), clone.getExpenseParticipants());
+        assertEquals(e1.getExpenseParticipants(), clone.getExpenseParticipants());
+    }
 
+    @Test
+    void cloneAuthor() {
+        assertNotSame(e1.getExpenseAuthor(), clone.getExpenseAuthor());
+        assertEquals(e1.getExpenseAuthor(), clone.getExpenseAuthor());
+    }
+
+    @Test
+    void clonePurpose() {
+        assertEquals(e1.getPurpose(), clone.getPurpose());
+    }
+
+    @Test
+    void cloneAmount() {
+        assertEquals(e1.getAmount(), clone.getAmount());
+    }
+
+    @Test
+    void cloneCurrency() {
+        assertEquals(e1.getCurrency(), clone.getCurrency());
+    }
+
+    @Test
+    void cloneID() {
+        assertEquals(e1.getId(), clone.getId());
+    }
+
+    @Test
+    void cloneEventID() {
+        assertEquals(e1.getEventID(), clone.getEventID());
+    }
+
+    @Test
+    void cloneDate() {
+        assertNotSame(e1.getDate(), clone.getDate());
+        assertEquals(e1.getDate(), clone.getDate());
+    }
+
+    @Test
+    void cloneType() {
+        assertEquals(e1.getType(), clone.getType());
+    }
 }

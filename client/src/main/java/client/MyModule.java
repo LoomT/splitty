@@ -34,10 +34,11 @@ public class MyModule implements Module {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
         binder.bind(UserConfig.class).in(Scopes.SINGLETON);
-        binder.bind(ServerUtils.class).in(Scopes.SINGLETON);
+        binder.bind(ServerUtils.class).to(ServerUtilsImpl.class).in(Scopes.SINGLETON);
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
         binder.bind(IOInterface.class).toInstance(new FileIO(UserConfig.class.getClassLoader()
                 .getResource("client/config.properties")));
         binder.bind(Websocket.class).in(Scopes.SINGLETON);
+
     }
 }
