@@ -98,7 +98,6 @@ public class EditTitleCtrl {
      */
     public void wordLimitError(TextField textField, Text errorMessage, int limit){
         String message = errorMessage.getText();
-        errorMessage.setFill(Color.RED);
         errorMessage.setVisible(false);
         textField.textProperty().addListener((observableValue, number, t1)->{
             errorMessage.setVisible(true);

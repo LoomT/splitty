@@ -38,11 +38,10 @@
                   </Text>
                </children>
             </GridPane>
-            <GridPane prefHeight="103.0" prefWidth="400.0" GridPane.rowIndex="1">
+            <GridPane alignment="CENTER" prefHeight="103.0" prefWidth="400.0" GridPane.rowIndex="1">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="123.42852783203125" minWidth="10.0" percentWidth="10.0" prefWidth="122.28570556640625" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="123.42852783203125" minWidth="10.0" percentWidth="40.0" prefWidth="122.28570556640625" />
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="102.85711669921875" minWidth="10.0" percentWidth="40.0" prefWidth="77.71429443359375" />
+                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="123.42852783203125" minWidth="10.0" percentWidth="80.0" prefWidth="122.28570556640625" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="100.0" minWidth="10.0" percentWidth="10.0" prefWidth="100.0" />
                </columnConstraints>
                <rowConstraints>
@@ -51,15 +50,23 @@
                   <RowConstraints minHeight="10.0" percentHeight="40.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%TitleChanger.newTitle" GridPane.columnIndex="1" />
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1">
                      <children>
-                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelTitle" prefHeight="25.0" prefWidth="70.0" text="Cancel" />
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveTitle" prefHeight="25.0" prefWidth="70.0" text="Save" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%TitleChanger.newTitle" />
+                        <TextField fx:id="nameTextField" prefWidth="163.0" />
                      </children>
                   </HBox>
-                  <TextField fx:id="nameTextField" GridPane.columnIndex="2" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: Red;" text="%TitleChanger.invalidTitle" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveTitle" prefHeight="25.0" prefWidth="70.0" text="Save" />
+                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelTitle" prefHeight="25.0" prefWidth="70.0" text="Cancel" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <children>
+                        <Text fx:id="titleError" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: Red;" text="%TitleChanger.invalidTitle" />
+                     </children>
+                  </HBox>
                </children>
             </GridPane>
          </children>
