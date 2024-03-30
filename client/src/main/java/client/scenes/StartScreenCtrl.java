@@ -10,8 +10,11 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
@@ -79,7 +82,6 @@ public class StartScreenCtrl {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
         reloadEventCodes();
-
     }
 
     /**
@@ -111,6 +113,7 @@ public class StartScreenCtrl {
                         },
                         (String c) -> {
                             code.setText(c);
+                            join();
                         }
                 );
                 list.add(eventListItem);
@@ -148,7 +151,6 @@ public class StartScreenCtrl {
         }
     }
 
-
     /**
      * Tries to join the inputted event
      */
@@ -170,6 +172,22 @@ public class StartScreenCtrl {
         }
 
 
+    }
+
+    public void checkEnter(Scene scene){
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == KeyCode.ENTER) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                System.out.println(ke.getTarget());
+                if(ke.getTarget().equals(title)){
+                    create();
+                }
+                else if(ke.getTarget().equals(code)){
+                    join();
+                }
+                ke.consume(); // <-- stops passing the event to next node
+            }
+        });
     }
 
 

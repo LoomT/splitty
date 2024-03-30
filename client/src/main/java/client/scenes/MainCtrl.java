@@ -129,6 +129,7 @@ public class MainCtrl {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
+        startScreenCtrl.checkEnter(startScreen);
 
     }
 
