@@ -154,6 +154,7 @@ public class EventController {
      * @param event
      * @return
      */
+    /*
     @PostMapping("/{id}")
     public ResponseEntity<Event> changeEvent(@PathVariable String id,
                                                  @RequestBody Event event) {
@@ -179,5 +180,7 @@ public class EventController {
             return ResponseEntity.internalServerError().build();
         }
     }
+     */
+
 
 }

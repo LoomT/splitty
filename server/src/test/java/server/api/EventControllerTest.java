@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
@@ -175,5 +176,20 @@ class EventControllerTest {
         assert updated != null;
         assertTrue(updated.getLastActivity().compareTo(before) >= 0);
         assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void changeEvent(){
+        Event event = new Event("title");
+        Event added = sut.add(event).getBody();
+        assert added != null;
+        event.addParticipant(new Participant());
+        event.addExpense(new Expense());
+        sut.changeEvent(event.getId(), event);
+    }
+
+    @Test
+    void changeEventWithIllegalEvent(){
+
     }
 }

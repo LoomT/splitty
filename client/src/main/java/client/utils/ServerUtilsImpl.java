@@ -270,7 +270,6 @@ public class ServerUtilsImpl implements ServerUtils {
 
     /**
      * @param event     the event in which the participant should be updated
-     * @param event the event to be updated
      * @return 204 for success,
      * 400 if the event is badly formatted,
      * 404 if event is not found
