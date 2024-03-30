@@ -26,7 +26,6 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
-import java.net.http.HttpClient;
 import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -277,7 +276,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * 404 if event is not found
      */
     @Override
-    public int updateEvent(Event event, String eventName) {
+    public int updateEventTitle(Event event) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + event.getId())

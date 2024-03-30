@@ -50,7 +50,7 @@ public class MainCtrl {
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-    private TitleChangerCtrl titleChangerCtrl;
+    private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
 
     private UserConfig userConfig;
@@ -91,7 +91,7 @@ public class MainCtrl {
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
             Pair<AddExpenseCtrl, Parent> addExpensePage,
-            Pair<TitleChangerCtrl, Parent> titleChangerPage
+            Pair<EditTitleCtrl, Parent> titleChangerPage
     ) {
 
         this.primaryStage = primaryStage;
@@ -118,7 +118,7 @@ public class MainCtrl {
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
 
-        this.titleChangerCtrl = titleChangerPage.getKey();
+        this.editTitleCtrl = titleChangerPage.getKey();
         this.titleChanger = new Scene(titleChangerPage.getValue());
 
         //showOverview();
@@ -140,7 +140,7 @@ public class MainCtrl {
     }
 
     public void showChangeTitleScreen(EventPageCtrl eventPageCtrl){
-        titleChangerCtrl.setEventPageCtrl(eventPageCtrl);
+        editTitleCtrl.setEventPageCtrl(eventPageCtrl);
         Stage stage = new Stage();
         stage.setScene(titleChanger);
         stage.setResizable(false);

@@ -8,9 +8,11 @@ import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.springframework.http.ResponseEntity;
 
-public class TitleChangerCtrl {
+public class EditTitleCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final LanguageConf languageConf;
@@ -23,6 +25,8 @@ public class TitleChangerCtrl {
 
     @FXML
     private Button cancelButton;
+    @FXML
+    private Text titleError;
 
     private EventPageCtrl eventPageCtrl;
 
@@ -39,7 +43,7 @@ public class TitleChangerCtrl {
      * @param websocket the ws instance
      */
     @Inject
-    public TitleChangerCtrl(
+    public EditTitleCtrl(
             ServerUtils server,
             MainCtrl mainCtrl,
             LanguageConf languageConf,
@@ -63,9 +67,17 @@ public class TitleChangerCtrl {
 
     @FXML
     public void saveTitle(){
-        if(eventPageCtrl == null) return;
-        eventPageCtrl.changeTitle(nameTextField.getText());
-        cancelTitle();
+        if(eventPageCtrl == null
+                || nameTextField.getText().isEmpty()
+                || nameTextField.getLength() > 100) return;
+
+        int result = eventPageCtrl.changeTitle(nameTextField.getText());
+        if(result >= 400)
+            System.out.println("An error has occurred");
+        else{
+            System.out.println("An error has occurred");
+            cancelTitle();
+        }
     }
 
     public void setEventPageCtrl(EventPageCtrl eventPage){

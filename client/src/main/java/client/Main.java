@@ -102,9 +102,9 @@ public class Main extends Application {
         );
 
         var titleChanger = FXML.load(
-                TitleChangerCtrl.class,
+                EditTitleCtrl.class,
                 languageConf.getLanguageResources(),
-                "client", "scenes", "TitleChanger.fxml"
+                "client", "scenes", "EditTitle.fxml"
         );
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);

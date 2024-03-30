@@ -158,20 +158,23 @@ public class EventController {
     public ResponseEntity<Event> changeEvent(@PathVariable String id,
                                                  @RequestBody Event event) {
         try {
-            if(!event.getId().equals(id))
+            if(!event.getId().equals(id)
+                    || id.length() != 5
+                    || event.getTitle() == null
+                    || event.getTitle().isEmpty())
                 return ResponseEntity.badRequest().build();
 
             Optional<Event> found = repo.findById(id);
-            if(found.isPresent()) {
-                event.setLastActivity(new Date());
-                repo.save(event);
-                adminController.update();
-                simp.convertAndSend("/event/" + id, event.getTitle(),
-                        Map.of("action", WebsocketActions.TITLE_CHANGE,
+            if(found.isEmpty())
+                return ResponseEntity.notFound().build();
+            event.setLastActivity(new Date());
+            repo.save(event);
+            adminController.update();
+            simp.convertAndSend("/event/" + id, event.getTitle(),
+                    Map.of("action", WebsocketActions.TITLE_CHANGE,
                                 "type", String.class.getTypeName()));
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.noContent().build();
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

@@ -200,10 +200,10 @@ public class EventPageCtrl {
      *
      * @param newTitle new title of the event
      */
-    public void changeTitle(String newTitle) {
+    public int changeTitle(String newTitle) {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
-        server.updateEvent(event, newTitle);
+        return server.updateEventTitle(event);
     }
 
     /**
@@ -355,7 +355,6 @@ public class EventPageCtrl {
      */
     public void changeTitle(){
         mainCtrl.showChangeTitleScreen(this);
-        //String asdf = mainCtrl.showChangeTitleScreen();
     }
 
     /**
