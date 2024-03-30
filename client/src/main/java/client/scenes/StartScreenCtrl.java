@@ -2,10 +2,7 @@ package client.scenes;
 
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
@@ -38,7 +35,7 @@ public class StartScreenCtrl {
 
 
     private UserConfig userConfig;
-    private Websocket websocket;
+    private WebsocketImpl websocket;
 
     /**
      * start screen controller constructor
@@ -55,7 +52,7 @@ public class StartScreenCtrl {
             MainCtrl mainCtrl,
             LanguageConf languageConf,
             UserConfig userConfig,
-            Websocket websocket
+            WebsocketImpl websocket
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
