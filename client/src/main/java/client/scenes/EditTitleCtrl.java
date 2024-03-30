@@ -5,9 +5,11 @@ import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +58,12 @@ public class EditTitleCtrl {
         this.languageConf = languageConf;
         this.userConfig = userConfig;
         this.websocket = websocket;
-
     }
+
+    public void initialize(){
+        wordLimitError(nameTextField, titleError, 100);
+    }
+
     @FXML
     public void cancelTitle(){
         nameTextField.textProperty().setValue("");
@@ -82,5 +88,24 @@ public class EditTitleCtrl {
 
     public void setEventPageCtrl(EventPageCtrl eventPage){
         this.eventPageCtrl = eventPage;
+    }
+
+    /**
+     *
+     * @param textField
+     * @param errorMessage
+     * @param limit
+     */
+    public void wordLimitError(TextField textField, Text errorMessage, int limit){
+        String message = errorMessage.getText();
+        errorMessage.setFill(Color.RED);
+        errorMessage.setVisible(false);
+        textField.textProperty().addListener((observableValue, number, t1)->{
+            errorMessage.setVisible(true);
+            errorMessage.textProperty().bind(Bindings.concat(
+                    message, String.format(" %d/%d", textField.getText().length(), limit)));
+
+            errorMessage.setVisible(textField.getLength() > limit);
+        });
     }
 }
