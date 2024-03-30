@@ -17,6 +17,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AddExpenseCtrl {
 
@@ -56,6 +57,7 @@ public class AddExpenseCtrl {
     private ServerUtils server;
     private MainCtrl mainCtrl;
     private List<Participant> expPart;
+    private boolean splitAll = false;
 
     /**
      * @param server   server utils instance
@@ -75,8 +77,11 @@ public class AddExpenseCtrl {
     /**
      * Method for displaying the page with a blank expense.
      * @param event the event page to return to
+     * @param exp the expense for which the page is displayed
      */
-    public void displayAddExpensePage(Event event) {
+    public void displayAddExpensePage(Event event, Expense exp) {
+        equalSplit.setSelected(false);
+        partialSplit.setSelected(false);
         equalSplit.setDisable(false);
         populateAuthorChoiceBox(event);
         populateTypeBox();
@@ -88,7 +93,9 @@ public class AddExpenseCtrl {
         populateSplitPeople(event);
         disablePartialSplitCheckboxes(true);
         equalSplit.setOnAction(e -> {
+            //splitAll = false;
             if (equalSplit.isSelected()) {
+                //splitAll = true;
                 expPart.clear();
                 partialSplit.setSelected(false);
                 disablePartialSplitCheckboxes(true);
@@ -100,16 +107,81 @@ public class AddExpenseCtrl {
         partialSplit.setOnAction(this::handlePartialSplit);
 
 
-
         add.setOnAction(x -> {
-            handleAddButton(event);
+            if (exp == null) {
+                handleAddButton(event);
+            } else {
+                editButton(event, exp);
+            }
         });
-
         abort.setOnAction(x -> {
             handleAbortButton(event);
         });
+    }
 
 
+    /**
+     * behaviour for the edit button
+     * @param ev
+     * @param ex
+     */
+    public void editButton(Event ev, Expense ex) {
+        String expParticipant = expenseAuthor.getValue();
+        String expPurpose = purpose.getText();
+        Double expAmount = Double.parseDouble(amount.getText());
+        String expCurrency = currency.getValue();
+        LocalDate temp = date.getValue();
+        LocalDateTime localDateTime = temp.atStartOfDay();
+        Date expDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+        List<Participant> expParticipants = getExpenseParticipants(ev);
+
+        String expType = type.getValue();
+
+        for (Participant p : ex.getExpenseParticipants()) {
+            if (p.getName() == expParticipant) {
+                ex.setExpenseAuthor(p);
+                break;
+            }
+        }
+        //ex.setExpenseAuthor(new Participant(expParticipant));
+        ex.setPurpose(expPurpose);
+        ex.setAmount(expAmount);
+        ex.setCurrency(expCurrency);
+        ex.setDate(expDate);
+        ex.setExpenseParticipants(expParticipants);
+        ex.setType(expType);
+
+        if (expParticipants.size() == 0) {
+            alertSelectPart();
+            return;
+        }
+
+        server.updateExpense(ex.getId(), ev.getId(), ex);
+        mainCtrl.goBackToEventPage(ev);
+    }
+
+    private List<Participant> getExpenseParticipants(Event ev) {
+        List<Participant> expParticipants = new ArrayList<>();
+        if (equalSplit.isSelected()) {
+            expParticipants.addAll(ev.getParticipants());
+        } else if (partialSplit.isSelected()) {
+            expParticipants.addAll(getSelectedParticipants(ev));
+        }
+        return expParticipants;
+    }
+
+    private List<Participant> getSelectedParticipants(Event ev) {
+        List<Participant> selectedParticipants = new ArrayList<>();
+        for (Node node : expenseParticipants.getChildren()) {
+            if (node instanceof CheckBox participantCheckBox && participantCheckBox.isSelected()) {
+                String participantName = participantCheckBox.getText();
+                ev.getParticipants().stream()
+                        .filter(p -> p.getName().equals(participantName))
+                        .findFirst()
+                        .ifPresent(selectedParticipants::add);
+            }
+        }
+        return selectedParticipants;
     }
 
     /**
@@ -121,25 +193,22 @@ public class AddExpenseCtrl {
         if (partialSplit.isSelected()) {
             equalSplit.setSelected(false);
             disablePartialSplitCheckboxes(false);
-            CheckBox checkBox = (CheckBox) event.getSource();
-            if (checkBox.isSelected()) {
-                expPart.clear();
-                for (Node node : expenseParticipants.getChildren()) {
-                    if (node instanceof CheckBox participantCheckBox) {
-                        if (participantCheckBox.isSelected()) {
-                            String participantName = participantCheckBox.getText();
-                            Participant selectedParticipant = new Participant(participantName);
-                            expPart.add(selectedParticipant);
-                        }
+            for (Node node : expenseParticipants.getChildren()) {
+                if (node instanceof CheckBox participantCheckBox) {
+                    if (participantCheckBox.isSelected()) {
+                        String participantName = participantCheckBox.getText();
+                        Participant selectedParticipant = new Participant(participantName);
+                        expPart.add(selectedParticipant);
                     }
                 }
-
             }
         } else {
             partialSplit.setSelected(true);
         }
-
     }
+
+
+
 
 
     /**
@@ -277,18 +346,25 @@ public class AddExpenseCtrl {
     public void populateSplitPeople(Event event) {
         expenseParticipants.getChildren().clear();
         expPart.clear();
-
+        int totalPart = event.getParticipants().size();
+        AtomicInteger selectedPart = new AtomicInteger();
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
             checkBox.setOnAction(e -> {
                 if (checkBox.isSelected()) {
                     expPart.add(participant);
+                    selectedPart.getAndIncrement();
                 } else {
                     expPart.remove(participant);
+                    selectedPart.getAndDecrement();
                 }
                 //updateEqualSplitCheckbox();
             });
             expenseParticipants.getChildren().add(checkBox);
+        }
+        if (totalPart == selectedPart.get()) {
+            equalSplit.setDisable(false);
+            equalSplit.setSelected(true);
         }
     }
 
@@ -315,5 +391,93 @@ public class AddExpenseCtrl {
         partialSplit.setSelected(false);
         expPart.clear();
         type.getSelectionModel().clearSelection();
+    }
+
+    /**
+     * setter for the expense author field
+     * @param author
+     */
+    public void setExpenseAuthor(String author) {
+        expenseAuthor.setValue(author);
+    }
+
+    /**
+     * setter for the purposeText field
+     * @param purposeText
+     */
+    public void setPurpose(String purposeText) {
+        purpose.setText(purposeText);
+    }
+
+    /**
+     * setter for the amountText field
+     * @param amountText
+     */
+    public void setAmount(String amountText) {
+        amount.setText(amountText);
+    }
+
+    /**
+     * setter for the currencyText field
+     * @param currencyText
+     */
+    public void setCurrency(String currencyText) {
+        currency.setValue(currencyText);
+    }
+
+    /**
+     * setter for the expenseDate field
+     * @param expenseDate
+     */
+    public void setDate(LocalDate expenseDate) {
+        date.setValue(expenseDate);
+    }
+
+    /**
+     * setter for the typeText field
+     * @param typeText
+     */
+    public void setType(String typeText) {
+        type.setValue(typeText);
+    }
+
+    /**
+     * setter for button text
+     * @param s
+     */
+    public void setButton(String s) {
+        add.setText(s);
+    }
+
+
+    /**
+     * Method to set the checkboxes regarding the way in which an expense is split.
+     * @param exp
+     * @param event
+     */
+    public void setSplitCheckboxes(Expense exp, Event event) {
+        List<Participant> temp = exp.getExpenseParticipants();
+        if (temp.size() == event.getParticipants().size()) {
+            equalSplit.setSelected(true);
+        } else {
+            partialSplit.setSelected(true);
+            for (Node node : expenseParticipants.getChildren()) {
+                if (node instanceof CheckBox checkBox) {
+                    checkBox.setDisable(false);
+                }
+            }
+            for (Node node : expenseParticipants.getChildren()) {
+                if (node instanceof CheckBox participantCheckBox) {
+                    String participantName = participantCheckBox.getText();
+                    List<String> names = new ArrayList<>();
+                    for (Participant p : exp.getExpenseParticipants()) {
+                        names.add(p.getName());
+                    }
+                    if (names.contains(participantName)) {
+                        participantCheckBox.setSelected(true);
+                    }
+                }
+            }
+        }
     }
 }

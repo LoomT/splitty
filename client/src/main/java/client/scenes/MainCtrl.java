@@ -20,6 +20,7 @@ import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,6 +29,7 @@ import javafx.stage.Stage;
 import javafx.util.Pair;
 
 import java.io.File;
+import java.time.ZoneId;
 import java.util.List;
 
 public class MainCtrl {
@@ -209,8 +211,32 @@ public class MainCtrl {
      * @param eventToShow the event to show the participant editor for
      */
     public void showAddExpensePage(Event eventToShow) {
-        addExpenseCtrl.displayAddExpensePage(eventToShow);
-        primaryStage.setTitle("Add/Edit Expense");
+        addExpenseCtrl.displayAddExpensePage(eventToShow, null);
+        addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
+        primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
+    }
+
+    /**
+     * Handle editing an expense.
+     * @param exp The expense to edit.
+     * @param ev The event associated with the expense.
+     */
+    public void handleEditExpense(Expense exp, Event ev) {
+
+        addExpenseCtrl.displayAddExpensePage(ev, exp);
+        primaryStage.setTitle(languageConf.get("AddExp.editexp"));
+        primaryStage.setScene(addExpense);
+
+        addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
+        addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
+        addExpenseCtrl.setPurpose(exp.getPurpose());
+        addExpenseCtrl.setAmount(Double.toString(exp.getAmount()));
+        addExpenseCtrl.setCurrency(exp.getCurrency());
+        addExpenseCtrl.setDate(exp.getDate().toInstant().
+                atZone(ZoneId.systemDefault()).toLocalDate());
+        addExpenseCtrl.setType(exp.getType());
+        addExpenseCtrl.setSplitCheckboxes(exp, ev);
+
     }
 }

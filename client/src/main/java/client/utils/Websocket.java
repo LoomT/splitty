@@ -126,6 +126,7 @@ public class Websocket {
             }
             event.getParticipants().remove(index);
             event.getParticipants().add(index, p);
+            event.getExpenses().forEach(e -> linkExpenseParticipants(e, event.getParticipants()));
             updatePartCallback.accept(event);
         });
         this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
@@ -153,6 +154,20 @@ public class Websocket {
         });
     }
 
+    /**
+     * Makes the participants of an expense share the same instances as the participants of an event
+     *
+     * @param expense expense for which participants to link
+     * @param participants participant list from event
+     */
+    public void linkExpenseParticipants(Expense expense, List<Participant> participants) {
+        expense.setExpenseAuthor(participants.stream()
+                .filter(p -> p.getId() == expense.getExpenseAuthor().getId())
+                .findFirst().orElseThrow());
+        List<Long> ids = expense.getExpenseParticipants().stream().map(Participant::getId).toList();
+        expense.setExpenseParticipants(participants.stream()
+                .filter(p -> ids.contains(p.getId())).toList());
+    }
 
     /**
      * Registers all the change listeners on WS if they're not registered already
@@ -168,7 +183,6 @@ public class Websocket {
             Consumer<Event> updateExpCallback,
             Consumer<Event> addExpCallback,
             Consumer<Event> deleteExpCallback
-
     ) {
         this.resetAction(WebsocketActions.UPDATE_EXPENSE);
         this.resetAction(WebsocketActions.ADD_EXPENSE);
@@ -176,47 +190,46 @@ public class Websocket {
 
         this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
+            linkExpenseParticipants(expense, event.getParticipants());
             event.getExpenses().add(expense);
             addExpCallback.accept(event);
         });
         this.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
-            Expense expense = (Expense) exp;
-            int index = -1;
-            for (int i = 0; i < event.getExpenses().size(); i++) {
-                Expense curr = event.getExpenses().get(i);
-                if (curr.getId() == expense.getId()) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
-                throw new RuntimeException("The updated expense's ID ("
-                        + expense.getId()+
-                        ") does not match with any ID's of the already existing expenses");
-            }
-            event.getExpenses().remove(index);
-            event.getExpenses().add(index, expense);
+            updateExpense(event, (Expense)exp);
             updateExpCallback.accept(event);
         });
         this.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
             long expId = (long) exp;
-            int index = -1;
-            for (int i = 0; i < event.getExpenses().size(); i++) {
-                Expense curr = event.getExpenses().get(i);
-                if (curr.getId() == expId) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index == -1) {
+            if(!event.getExpenses().removeIf(expense -> expense.getId() == expId))
                 throw new RuntimeException("The deleted expense's ID ("
-                        + expId+
-                        ") does not match with any ID's of the already existing expenses");
-            }
-            event.getExpenses().remove(index);
+                    + expId +
+                    ") does not match with any ID's of the already existing expenses");
             deleteExpCallback.accept(event);
         });
 
+    }
+
+    /**
+     * @param event event of which expense to update
+     * @param expense new expense
+     */
+    private void updateExpense(Event event, Expense expense) {
+        int index = -1;
+        for (int i = 0; i < event.getExpenses().size(); i++) {
+            Expense curr = event.getExpenses().get(i);
+            if (curr.getId() == expense.getId()) {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) {
+            throw new RuntimeException("The updated expense's ID ("
+                    + expense.getId()+
+                    ") does not match with any ID's of the already existing expenses");
+        }
+        event.getExpenses().remove(index);
+        linkExpenseParticipants(expense, event.getParticipants());
+        event.getExpenses().add(index, expense);
     }
 
     /**
@@ -276,12 +289,7 @@ public class Websocket {
                 functions.get(action).forEach(consumer -> {
                     // This is necessary to run the Javafx updates on the same
                     // thread as the app is run on, and not the WS thread
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            consumer.accept(payload);
-                        }
-                    });
+                    Platform.runLater(() -> consumer.accept(payload));
                 });
 
             } catch (IllegalArgumentException e) {
