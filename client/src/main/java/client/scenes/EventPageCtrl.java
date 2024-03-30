@@ -151,6 +151,10 @@ public class EventPageCtrl {
                 this::displayExpenses,
                 this::displayExpenses
         );
+        websocket.registerEventChangeListener(
+                event,
+                this::displayEvent
+        );
     }
 
 

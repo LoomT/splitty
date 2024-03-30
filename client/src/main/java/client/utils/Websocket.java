@@ -296,4 +296,24 @@ public class Websocket {
             super.handleException(session, command, headers, payload, exception);
         }
     }
+
+    /**
+     * Registers all the change listeners on WS if they're not registered already
+     * @param event the event in which we listen on the participant changes
+     * @param updatePartCallback this is called when a participant in the event is updated
+     * @param addPartCallback this is called when a participant in the event is created
+     * @param deletePartCallback this is called when a participant in the event is deleted
+     */
+    public void registerEventChangeListener(
+            Event currEvent,
+            Consumer<Event> updateEventCallback
+    ) {
+        this.resetAction(WebsocketActions.TITLE_CHANGE);
+
+        this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
+            String title = (String) e;
+            currEvent.setTitle(title);
+            updateEventCallback.accept(currEvent);
+        });
+    }
 }
