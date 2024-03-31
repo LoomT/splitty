@@ -448,4 +448,40 @@ public class TestServerUtils implements ServerUtils {
         statuses.add(204);
         return 204;
     }
+
+    /**
+     * Sends an API call to change an event
+     * Since adding/removing participants and expenses exist, this should be used to change titles
+     * @param event event to change
+     * @return updated event
+     */
+    @Override
+    public int updateEventTitle(Event event) {
+        calls.add("updateEventTitle");
+        if(event.getTitle() == null
+                || event.getId() == null
+                || event.getId().length() != 5
+                || event.getTitle().length() > 100
+                || event.getTitle().isEmpty()){
+            statuses.add(400);
+            return 400;
+        }
+        int eventIndex = -1;
+        for(int i = 0; i < events.size(); i++){
+            if(events.get(i).getId().equals(event.getId())){
+                eventIndex = i;
+                break;
+            }
+        }
+        if(eventIndex == -1){
+            statuses.add(404);
+            return 404;
+        }
+        events.add(eventIndex, event);
+        statuses.add(204);
+        return 204;
+
+    }
+
+
 }

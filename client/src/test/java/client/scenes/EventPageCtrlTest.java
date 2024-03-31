@@ -49,7 +49,7 @@ public class EventPageCtrlTest {
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new EventPageCtrl(mainCtrl, languageConf, websocket),
+                (type) -> new EventPageCtrl(mainCtrl, languageConf, websocket, server),
                 StandardCharsets.UTF_8);
         Scene scene = new Scene(eventPageLoader.load());
         ctrl = eventPageLoader.getController();

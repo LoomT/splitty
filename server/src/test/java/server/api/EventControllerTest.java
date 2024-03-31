@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
@@ -175,5 +176,42 @@ class EventControllerTest {
         assert updated != null;
         assertTrue(updated.getLastActivity().compareTo(before) >= 0);
         assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void changeEvent(){
+        Event event = new Event("title");
+        Event added = sut.add(event).getBody();
+        assert added != null;
+        event.addParticipant(new Participant());
+        event.addExpense(new Expense());
+        event.setTitle("new title");
+        sut.changeEvent(event.getId(), event);
+        assertEquals("/event/" + event.getId(), template.getDestination());
+        assertEquals(WebsocketActions.TITLE_CHANGE, template.getHeaders().get("action"));
+        assertEquals("new title", template.getPayload());
+    }
+
+    @Test
+    void changeEventWithIllegalEvent(){
+        Event event = new Event("title");
+        Event added = sut.add(event).getBody();
+        assert added != null;
+        event.setId("Illegal ID");
+        var actual = sut.changeEvent(event.getId(), event);
+        assertEquals(BAD_REQUEST, actual.getStatusCode());
+    }
+
+    @Test
+    void changeEventNotExist(){
+        Event event = new Event("title");
+        var actual = sut.changeEvent(event.getId(), event);
+        assertEquals(BAD_REQUEST, actual.getStatusCode());
+        Event added = sut.add(event).getBody();
+        assert added != null;
+        Event test = new Event("test");
+        test.setId("QQQQQ");
+        actual = sut.changeEvent("QQQQQ", test);
+        assertEquals(NOT_FOUND, actual.getStatusCode());
     }
 }
