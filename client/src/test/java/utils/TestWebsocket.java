@@ -2,6 +2,8 @@ package utils;
 
 import commons.Event;
 import client.utils.Websocket;
+import commons.Expense;
+import commons.Participant;
 import commons.WebsocketActions;
 
 import java.util.EnumMap;
@@ -57,16 +59,59 @@ public class TestWebsocket implements Websocket {
      * @param deletePartCallback this is called when a participant in the event is deleted
      */
 
-    @Override
     public void registerParticipantChangeListener(
             Event event,
             Consumer<Event> updatePartCallback,
             Consumer<Event> addPartCallback,
-            Consumer<Event> deletePartCallback)
-    {
-        this.on(WebsocketActions.UPDATE_PARTICIPANT, (obj) -> updatePartCallback.accept(event));
-        this.on(WebsocketActions.ADD_PARTICIPANT, (obj) -> addPartCallback.accept(event));
-        this.on(WebsocketActions.REMOVE_PARTICIPANT, (obj) -> deletePartCallback.accept(event));
+            Consumer<Event> deletePartCallback) {
+
+        this.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
+        this.resetAction(WebsocketActions.ADD_PARTICIPANT);
+        this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
+
+        this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
+            Participant p = (Participant) part;
+            int index = -1;
+            for (int i = 0; i < event.getParticipants().size(); i++) {
+                Participant curr = event.getParticipants().get(i);
+                if (curr.getId() == p.getId()) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The updated participant's ID ("
+                        + p.getId() +
+                        ") does not match with any ID's of the already existing participants");
+            }
+            event.getParticipants().remove(index);
+            event.getParticipants().add(index, p);
+            updatePartCallback.accept(event);
+        });
+
+        this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
+            Participant p = (Participant) part;
+            event.getParticipants().add(p);
+            addPartCallback.accept(event);
+        });
+        this.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
+            long partId = (long) part;
+            int index = -1;
+            for (int i = 0; i < event.getParticipants().size(); i++) {
+                Participant curr = event.getParticipants().get(i);
+                if (curr.getId() == partId) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The deleted participant's ID ("
+                        + partId +
+                        ") does not match with any ID's of the already existing participants");
+            }
+            event.getParticipants().remove(index);
+            deletePartCallback.accept(event);
+        });
     }
 
     /**
@@ -85,9 +130,53 @@ public class TestWebsocket implements Websocket {
             Consumer<Event> addExpCallback,
             Consumer<Event> deleteExpCallback)
     {
-        this.on(WebsocketActions.UPDATE_EXPENSE, (obj) -> updateExpCallback.accept(event));
-        this.on(WebsocketActions.ADD_EXPENSE, (obj) -> addExpCallback.accept(event));
-        this.on(WebsocketActions.REMOVE_EXPENSE, (obj) -> deleteExpCallback.accept(event));
+
+        this.resetAction(WebsocketActions.UPDATE_EXPENSE);
+        this.resetAction(WebsocketActions.ADD_EXPENSE);
+        this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
+
+        this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
+            Expense expense = (Expense) exp;
+            event.getExpenses().add(expense);
+            addExpCallback.accept(event);
+        });
+        this.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
+            Expense expense = (Expense) exp;
+            int index = -1;
+            for (int i = 0; i < event.getExpenses().size(); i++) {
+                Expense curr = event.getExpenses().get(i);
+                if (curr.getId() == expense.getId()) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The updated expense's ID ("
+                        + expense.getId() +
+                        ") does not match with any ID's of the already existing expenses");
+            }
+            event.getExpenses().remove(index);
+            event.getExpenses().add(index, expense);
+            updateExpCallback.accept(event);
+        });
+        this.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
+            long expId = (long) exp;
+            int index = -1;
+            for (int i = 0; i < event.getExpenses().size(); i++) {
+                Expense curr = event.getExpenses().get(i);
+                if (curr.getId() == expId) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index == -1) {
+                throw new RuntimeException("The deleted expense's ID ("
+                        + expId +
+                        ") does not match with any ID's of the already existing expenses");
+            }
+            event.getExpenses().remove(index);
+            deleteExpCallback.accept(event);
+        });
     }
 
     /**
