@@ -11,8 +11,8 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
-<?import javafx.scene.control.ComboBox?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StartScreenCtrl">
     <children>
         <Button layoutX="20.0" layoutY="10.0" mnemonicParsing="false" onAction="#showAdminLogin" text="%StartScreen.adminLoginBtn" />
@@ -23,11 +23,14 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="164.20001220703125" minWidth="10.0" prefWidth="86.60003662109375" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="30.0" minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="0.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="0.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" percentHeight="50.0" prefHeight="0.0" vgrow="SOMETIMES" />
+            <RowConstraints />
             </rowConstraints>
             <children>
                 <Label alignment="BOTTOM_LEFT" prefHeight="26.0" prefWidth="170.0" text="%StartScreen.createLabel" />
@@ -37,14 +40,14 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-                <Label alignment="BOTTOM_LEFT" prefHeight="26.0" prefWidth="170.0" text="%StartScreen.joinLabel" GridPane.rowIndex="2" />
-                <TextField fx:id="code" prefHeight="26.0" prefWidth="239.0" promptText="%StartScreen.inviteCode" GridPane.rowIndex="3" />
-                <Button mnemonicParsing="false" onAction="#join" prefHeight="26.0" text="%StartScreen.joinBtn" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                <Label alignment="BOTTOM_LEFT" prefHeight="26.0" prefWidth="170.0" text="%StartScreen.joinLabel" GridPane.rowIndex="3" />
+                <TextField fx:id="code" prefHeight="26.0" prefWidth="239.0" promptText="%StartScreen.inviteCode" GridPane.rowIndex="4" />
+                <Button mnemonicParsing="false" onAction="#join" prefHeight="26.0" text="%StartScreen.joinBtn" GridPane.columnIndex="1" GridPane.rowIndex="4">
                     <GridPane.margin>
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="250.0" style="-fx-background: #eee;" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS">
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="250.0" style="-fx-background: #eee;" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="6" GridPane.vgrow="ALWAYS">
                     <content>
                         <VBox fx:id="eventList" scaleShape="false" />
                     </content>
@@ -52,6 +55,8 @@
                         <Insets top="10.0" />
                     </GridPane.margin>
                 </ScrollPane>
+            <Text fx:id="createEventError" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: Red;" text="%StartScreen.wordLimitError" GridPane.rowIndex="2" />
+            <Text fx:id="joinError" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: Red;" text="%StartScreen.wordLimitError" GridPane.rowIndex="5" />
             </children>
         </GridPane>
     </children>

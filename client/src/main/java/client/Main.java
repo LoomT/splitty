@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.components.ErrorPopupCtrl;
 import client.scenes.*;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -90,6 +91,11 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
+        var errorPopup = FXML.load(
+                ErrorPopupCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "ErrorPopup.fxml"
+        );
         var addExpense = FXML.load(
                 AddExpenseCtrl.class,
                 languageConf.getLanguageResources(),
@@ -111,7 +117,8 @@ public class Main extends Application {
                 editParticipants,
                 adminOverview,
                 addExpense,
-                titleChanger
+                titleChanger,
+                errorPopup
         );
     }
 }
