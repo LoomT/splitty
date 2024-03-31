@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -27,6 +28,7 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import javafx.stage.Modality;
 
 import java.io.File;
 import java.time.ZoneId;
@@ -56,6 +58,10 @@ public class MainCtrl {
     private AdminOverviewCtrl adminOverviewCtrl;
     private final Websocket websocket;
 
+    private ErrorPopupCtrl errorPopupCtrl;
+    private Scene errorPopup;
+
+
     /**
      * @param websocket the websocket instance
      */
@@ -76,6 +82,7 @@ public class MainCtrl {
      * @param adminLogin           admin login controller and scene
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
+     * @param errorPopup controller and scene for errorPopup
      * @param addExpensePage controller and scene for addExpense
      */
     public void initialize(
@@ -87,7 +94,8 @@ public class MainCtrl {
             Pair<AdminLoginCtrl, Parent> adminLogin,
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
-            Pair<AddExpenseCtrl, Parent> addExpensePage
+            Pair<AddExpenseCtrl, Parent> addExpensePage,
+            Pair<ErrorPopupCtrl, Parent> errorPopup
     ) {
 
         this.primaryStage = primaryStage;
@@ -113,6 +121,9 @@ public class MainCtrl {
 
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
+
+        this.errorPopupCtrl = errorPopup.getKey();
+        this.errorPopup = new Scene(errorPopup.getValue());
 
         //showOverview();
         showStartScreen();
@@ -184,6 +195,23 @@ public class MainCtrl {
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
+    }
+
+    /**
+     * Show error popup for general usage
+     * @param stringToken String token to be used as a variable in the error text
+     * @param intToken int token to be used as a variable in the error text
+     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
+     * Check ErrorPopupCtrl for more detailed documentation
+     */
+    public void showErrorPopup(String code, String stringToken, int intToken){
+        errorPopupCtrl.generatePopup(code, stringToken, intToken);
+        Stage stage = new Stage();
+        stage.setScene(errorPopup);
+        stage.setResizable(false);
+        stage.setTitle("Error");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     /**
