@@ -61,6 +61,13 @@ public class EventPageCtrl {
     private final MainCtrl mainCtrl;
     private final LanguageConf languageConf;
     private Event event;
+
+    /**
+     * @return getter for the event
+     */
+    public Event getEvent() {
+        return event;
+    }
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
 
