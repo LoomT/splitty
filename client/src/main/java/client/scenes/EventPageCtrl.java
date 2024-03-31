@@ -69,6 +69,7 @@ public class EventPageCtrl {
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
      * @param websocket the websocket instance
+     * @param server server to be ysed
      */
     @Inject
     public EventPageCtrl(

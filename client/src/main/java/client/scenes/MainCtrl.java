@@ -102,7 +102,7 @@ public class MainCtrl {
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
             Pair<AddExpenseCtrl, Parent> addExpensePage,
-            Pair<ErrorPopupCtrl, Parent> errorPopup
+            Pair<ErrorPopupCtrl, Parent> errorPopup,
             Pair<EditTitleCtrl, Parent> editTitlePage
     ) {
 
