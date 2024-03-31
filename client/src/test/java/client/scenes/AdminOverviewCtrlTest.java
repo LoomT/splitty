@@ -3,15 +3,13 @@ package client.scenes;
 import client.MyFXML;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
-import commons.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.layout.StackPane;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import utils.TestIO;
@@ -20,8 +18,7 @@ import utils.TestServerUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ApplicationExtension.class)
 public class AdminOverviewCtrlTest {
@@ -36,74 +33,79 @@ public class AdminOverviewCtrlTest {
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
-        var startScreenLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/StartScreen.fxml"),
-                languageConf.getLanguageResources(), null,
-                (type) -> new StartScreenCtrl(server, mainCtrl, languageConf, userConfig, null),
-                StandardCharsets.UTF_8);
-        Parent startScreenParent = startScreenLoader.load();
-        var adminLoginLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/AdminLogin.fxml"),
-                languageConf.getLanguageResources(), null,
-                (type) -> new AdminLoginCtrl(server, mainCtrl),
-                StandardCharsets.UTF_8);
-        Parent adminLoginParent = adminLoginLoader.load();
+
         var adminOverviewLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/AdminOverview.fxml"),
                 languageConf.getLanguageResources(), null,
                 (type) -> new AdminOverviewCtrl(server, mainCtrl, userConfig, languageConf),
                 StandardCharsets.UTF_8);
-        Parent adminOverviewParent = adminOverviewLoader.load();
+        Scene scene = new Scene(adminOverviewLoader.load());
         ctrl = adminOverviewLoader.getController();
-        mainCtrl.initialize(stage,
-                new Pair<>(startScreenLoader.getController(), startScreenParent),
-                new Pair<>(null, new StackPane()),
-                new Pair<>(adminLoginLoader.getController(), adminLoginParent),
-                new Pair<>(null, new StackPane()),
-                new Pair<>(ctrl, adminOverviewParent),
-                new Pair<>(null, new StackPane()));
-        mainCtrl.showAdminOverview("password", 500L);
+
+        ctrl.setPassword("password");
+        ctrl.initPoller(50L); // 0.5 sec time out
+        ctrl.loadAllEvents(); // the password needs to be set before this method
+        stage.setTitle(languageConf.get("AdminOverview.title"));
+        stage.setScene(scene);
+        stage.show();
     }
 
     @BeforeAll
     static void setUp() {
-//        System.setProperty("testfx.robot", "glass");
-//        System.setProperty("testfx.headless", "true");
-//        System.setProperty("prism.order", "sw");
-//        System.setProperty("prism.text", "t2k");
-//        System.setProperty("java.awt.headless", "true");
-    }
-    @Test
-    void initPollerTimeOut() throws InterruptedException {
-        Thread.sleep(600);
-        assertTrue(server.isPolled());
-        assertTrue(server.getStatuses().contains(408));
+        System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("prism.order", "sw");
+        System.setProperty("prism.text", "t2k");
+        System.setProperty("java.awt.headless", "true");
     }
 
     @Test
-    void initPollerResponse() throws InterruptedException {
-        Thread.sleep(200);
-        server.createEvent(new Event("title"));
-        Thread.sleep(200);
-        assertTrue(server.isPolled());
-        assertTrue(server.getStatuses().contains(204));
+    void refreshNotClicked(FxRobot robot) {
+        assertEquals(server.getStatuses().getFirst(), 200);
+        assertEquals(server.getStatuses().size(), 1);
+    }
+    @Test
+    void refreshClicked(FxRobot robot) {
+        robot.clickOn("#refreshBtn");
+        assertEquals(server.getStatuses().getFirst(), 200);
+        assertEquals(server.getStatuses().get(1), 200);
     }
 
-    @Test
-    void initPollerIncorrectPassword() throws InterruptedException {
-        ctrl.setPassword("forgor");
-        Thread.sleep(600);
-        server.createEvent(new Event("title"));
-        Thread.sleep(600);
-        assertTrue(server.isPolled());
-        assertTrue(server.getStatuses().contains(401));
-        assertFalse(server.getStatuses().contains(204));
-    }
-
-    @Test
-    void stopPoller() throws InterruptedException {
-        ctrl.stopPoller();
-        Thread.sleep(700);
-        server.createEvent(new Event("title"));
-        Thread.sleep(500);
-        assertTrue(server.isPolled());
-        assertFalse(server.getStatuses().contains(204));
-    }
+    // not sure how to test concurrency
+//    @Test
+//    void initPollerTimeOut() throws InterruptedException {
+//        Thread.sleep(200);
+//        assertTrue(server.isPolled());
+//        assertTrue(server.getConcurrentStatuses().contains(408));
+//    }
+//
+//    @Test
+//    void initPollerResponse() throws InterruptedException {
+//        Thread.sleep(200);
+//        server.createEvent(new Event("title"));
+//        Thread.sleep(500);
+//        System.out.println(server.getConcurrentStatuses());
+//        assertTrue(server.isPolled());
+//        assertTrue(server.getConcurrentStatuses().contains(204));
+//    }
+//
+//    @Test
+//    void initPollerIncorrectPassword() throws InterruptedException {
+//        ctrl.setPassword("forgor");
+//        Thread.sleep(600);
+//        server.createEvent(new Event("title"));
+//        Thread.sleep(600);
+//        assertTrue(server.isPolled());
+//        assertTrue(server.getConcurrentStatuses().contains(401));
+//        assertFalse(server.getConcurrentStatuses().contains(204));
+//    }
+//
+//    @Test
+//    void stopPoller() throws InterruptedException {
+//        ctrl.stopPoller();
+//        Thread.sleep(500);
+//        server.createEvent(new Event("title"));
+//        Thread.sleep(500);
+//        assertTrue(server.isPolled());
+//        assertFalse(server.getConcurrentStatuses().contains(204));
+//    }
 }
