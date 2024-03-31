@@ -1,7 +1,6 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
-import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
@@ -11,7 +10,9 @@ import commons.WebsocketActions;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
 import java.text.NumberFormat;
@@ -44,8 +45,6 @@ public class EventPageCtrl {
     private Button addExpenseButton;
 
     @FXML
-    private TabPane expenseList;
-    @FXML
     private ListView<String> allListView;
 
     @FXML
@@ -57,40 +56,29 @@ public class EventPageCtrl {
 
     private int selectedParticipantId;
 
-    private Websocket websocket;
-
-    private ServerUtils server;
-    private MainCtrl mainCtrl;
-    private LanguageConf languageConf;
+    private final Websocket websocket;
+    private final MainCtrl mainCtrl;
+    private final LanguageConf languageConf;
     private Event event;
-    private List<Expense> allExpenses;
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
 
     /**
-     * @param server       server utils injection
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
      * @param websocket the websocket instance
      */
     @Inject
     public EventPageCtrl(
-        ServerUtils server,
         MainCtrl mainCtrl,
         LanguageConf languageConf,
         Websocket websocket
     ) {
-        this.server = server;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
 
         this.websocket = websocket;
-        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> {
-            event.setTitle(((String) newTitle));
-            eventTitle.setText(((String) newTitle));
-        });
-
-
+        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> changeTitle((String) newTitle));
     }
 
     /**
@@ -116,7 +104,7 @@ public class EventPageCtrl {
             participantChoiceBox.getItems().addAll(
                     e.getParticipants().stream().map(Participant::getName).toList()
             );
-            participantChoiceBox.setValue(e.getParticipants().get(0).getName());
+            participantChoiceBox.setValue(e.getParticipants().getFirst().getName());
             selectedParticipantId = 0;
             String name = e.getParticipants().get(selectedParticipantId).getName();
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
@@ -187,7 +175,7 @@ public class EventPageCtrl {
 
     /**
      * display the expenses
-     * @param e
+     * @param e event
      */
     public void displayExpenses(Event e) {
         String selectedName = extractSelectedName();
@@ -218,12 +206,12 @@ public class EventPageCtrl {
 
     /**
      * actions for when the tab selection is changed
-     * @param e
-     * @param selectedParticipantName
+     * @param e event
+     * @param selectedParticipantName selected participant name
      */
     @FXML
     public void tabSelectionChanged(Event e, String selectedParticipantName) {
-        allExpenses = getAllExpenses(e);
+        List<Expense> allExpenses = getAllExpenses(e);
         fromExpenses = getExpensesFrom(e, selectedParticipantName);
         includingExpenses = getExpensesIncluding(e, selectedParticipantName);
         createExpenses(allExpenses, allListView, e);
@@ -252,48 +240,70 @@ public class EventPageCtrl {
 
     /**
      * create the specific displayed expenses for a listview
-     * @param expenses
-     * @param lv
-     * @param ev
+     * @param expenses expenses from which to create the list view
+     * @param lv list view
+     * @param ev event
      */
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
-        ObservableList<String> items = FXCollections.observableArrayList();
+        lv.setCellFactory(param -> new ListCell<>() {
+            private final Button editButton = new Button("\uD83D\uDD89");
+            private final StackPane stackPane = new StackPane();
 
+            {
+                stackPane.setAlignment(Pos.CENTER_LEFT);
+                StackPane.setAlignment(editButton, Pos.CENTER_RIGHT);
+                stackPane.getChildren().add(editButton);
+                editButton.setOnAction(event -> {
+                    int index = getIndex();
+                    System.out.println(index);
+                    Expense expense = expenses.get(index);
+                    mainCtrl.handleEditExpense(expense, ev);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(null);
+                    stackPane.getChildren().clear();
+                    stackPane.getChildren().addAll(new Text(item), editButton);
+                    setGraphic(stackPane);
+                }
+            }
+        });
+
+        ObservableList<String> items = FXCollections.observableArrayList();
         for (Expense expense : expenses) {
             String expenseString = toString(expense);
-            char[] temp = expenseString.toCharArray();
-            int index = 0;
-            for (int i = 0; i < temp.length; i++) {
-                if (Character.isLowerCase(temp[i])) {
-                    index = i;
-                    break;
-                }
-            }
-            items.add(expenseString);
-            List<Participant> participants = expense.getExpenseParticipants();
-            System.out.println(participants);
-            StringBuilder participantsList = new StringBuilder("");
-            while(index > 0) {
-                participantsList.append("  ");
-                index--;
-            }
-            participantsList.append("(");
-            int count = participants.size();
-            if (count == ev.getParticipants().size()) {
-                participantsList.append("all");
-            } else {
-                for (int i = 0; i < count; i++) {
-                    participantsList.append(participants.get(i).getName());
-                    if (i < count - 1) {
-                        participantsList.append(",");
-                    }
-                }
-            }
-            participantsList.append(")");
-            items.add(String.valueOf(participantsList));
+            String temp = buildParticipantsList(expense.getExpenseParticipants(),
+                    ev.getParticipants());
+            items.add(expenseString + "\n" + "Included participants:   " + temp);
         }
-
         lv.setItems(items);
+    }
+
+
+
+    private String buildParticipantsList(List<Participant> participants,
+                                         List<Participant> allParticipants) {
+        StringBuilder participantsList = new StringBuilder();
+
+        int count = participants.size();
+        if (count == allParticipants.size()) {
+            participantsList.append("all");
+        } else {
+            for (int i = 0; i < count; i++) {
+                participantsList.append(participants.get(i).getName());
+                if (i < count - 1) {
+                    participantsList.append(", ");
+                }
+            }
+        }
+        return participantsList.toString();
     }
 
     /**
@@ -318,16 +328,15 @@ public class EventPageCtrl {
 
         String formattedAmount = currencyFormatter.format(exp.getAmount());
 
-        String rez = dayOfMonth + "." + month + "." + year + "     " +
+        return dayOfMonth + "." + month + "." + year + "     " +
                 exp.getExpenseAuthor().getName() + " " + languageConf.get("AddExp.paid") +
                 " " + formattedAmount + " " + languageConf.get("AddExp.for") + " " +
                 exp.getPurpose();
-        return rez;
     }
 
     /**
      * return all expenses
-     * @param ev
+     * @param ev event
      * @return all expenses
      */
     public List<Expense> getAllExpenses(Event ev) {
@@ -336,8 +345,8 @@ public class EventPageCtrl {
 
     /**
      * return all expenses from a certain person
-     * @param ev
-     * @param name
+     * @param ev event
+     * @param name name of participant
      * @return all expenses from a certain person
      */
     public List<Expense> getExpensesFrom(Event ev, String name) {
@@ -360,8 +369,8 @@ public class EventPageCtrl {
 
     /**
      * return all expenses including a certain person
-     * @param ev
-     * @param name
+     * @param ev event
+     * @param name name of participant
      * @return all expenses including a certain person
      */
     public List<Expense> getExpensesIncluding(Event ev, String name) {

@@ -47,12 +47,13 @@ public interface ServerUtils {
     int updateParticipant(String eventId, Participant participant);
 
     /**
-     * @param eventId       the event in which the participant should be deleted
+     * @param eventId         the event in which the participant should be deleted
      * @param participantId the participant to be deleted
      * @return 204 for success,
      * 404 if event or participant is not found
      */
     int deleteParticipant(String eventId, long participantId);
+
 
     /**
      * @param id id of the expense to retrieve
@@ -71,6 +72,7 @@ public interface ServerUtils {
      */
 
     int createExpense(String eventID, Expense expense);
+
 
     /**
      * @param id id of the expense to update
@@ -94,12 +96,14 @@ public interface ServerUtils {
 
     /**
      * Verify the input password
+     *
      * @param inputPassword the password to verify
      * @return true iff password is correct
      */
     boolean verifyPassword(String inputPassword);
 
     /**
+
      * Sends an API call to server to get all events
      *
      * @param inputPassword the admin password
@@ -112,6 +116,7 @@ public interface ServerUtils {
      * @param timeOut time in ms until server sends a time-out signal
      * @return 204 if there is a change in the database, 408 if time-outed
      */
+
     int pollEvents(String inputPassword, Long timeOut);
 
     /**
@@ -119,9 +124,10 @@ public interface ServerUtils {
      * The ids of expenses and participants gets reassigned so use the returned event!
      *
      * @param password admin password
-     * @param event event to import
+     * @param event    event to import
      * @return imported event
      */
+
     int importEvent(String password, Event event);
 
     /**
@@ -132,3 +138,4 @@ public interface ServerUtils {
      */
     int updateEventTitle(Event event);
 }
+
