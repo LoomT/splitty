@@ -13,19 +13,25 @@ public class EventListItem extends HBox {
     @FXML
     private Button button;
     @FXML
-    private Label label;
+    private Label eventCodeLabel;
+
+    @FXML
+    private Label eventTitleLabel;
 
     private String eventName;
+
+    private String id;
     private Runnable onRemoveCallback;
     private Consumer<String> onClickCallback;
 
 
     /**
      * @param eventName the name to display
+     * @param id the event id to display
      * @param onRemove the callback to be called when the remove button ic clicked
      * @param onClick the callback for when the eventcode is clicked
      */
-    public EventListItem(String eventName, Runnable onRemove, Consumer<String> onClick) {
+    public EventListItem(String eventName, String id, Runnable onRemove, Consumer<String> onClick) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass()
                         .getResource("/client/components/EventListItem.fxml")
@@ -40,10 +46,11 @@ public class EventListItem extends HBox {
         }
 
         this.eventName = eventName;
+        this.id = id;
         this.onRemoveCallback = onRemove;
         this.onClickCallback = onClick;
-        label.setText(eventName);
-    }
+        eventTitleLabel.setText(eventName);
+        eventCodeLabel.setText(id);    }
 
 
     /**
@@ -56,6 +63,6 @@ public class EventListItem extends HBox {
 
     @FXML
     private void eventCodeClicked() {
-        onClickCallback.accept(this.eventName);
+        onClickCallback.accept(this.id);
     }
 }

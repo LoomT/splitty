@@ -8,10 +8,12 @@
 
 <fx:root alignment="CENTER_LEFT" onMouseClicked="#eventCodeClicked" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="label" prefWidth="200.0" text="Label" HBox.hgrow="ALWAYS">
+      <Label fx:id="eventTitleLabel" prefHeight="17.0" prefWidth="150.0" text="Label" HBox.hgrow="ALWAYS">
          <HBox.margin>
             <Insets right="10.0" />
-         </HBox.margin></Label>
+         </HBox.margin>
+      </Label>
+      <Label fx:id="eventCodeLabel" prefHeight="17.0" prefWidth="77.0" text="Code" />
       <Button mnemonicParsing="false" onAction="#onXClick" text="X" />
    </children>
    <padding>

@@ -1,14 +1,16 @@
 package server.api;
 
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
+import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
+
+
+import java.util.ArrayList;
+import java.util.Date;
 
 import java.util.List;
 import java.util.Map;
@@ -20,20 +22,28 @@ public class ParticipantController {
     private final ParticipantRepository repo;
     private final EventRepository eventRepo;
     private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
+    private final ExpenseRepository expenseRepo;
 
     /**
      * Constructor with repository and random number generator injections
      *
-     * @param repo Participant repository
-     * @param eventRepo Event repository
-     * @param simp websocket object used to send updates to everyone
+     * @param repo            Participant repository
+     * @param eventRepo       Event repository
+     * @param simp            websocket object used to send updates to everyone
+     * @param adminController admin controller for sending updates
+     * @param expenseRepo     the expense repo
      */
     public ParticipantController(ParticipantRepository repo,
                                  EventRepository eventRepo,
-                                 SimpMessagingTemplate simp) {
+                                 SimpMessagingTemplate simp,
+                                 AdminController adminController,
+                                 ExpenseRepository expenseRepo) {
         this.repo = repo;
         this.eventRepo = eventRepo;
         this.simp = simp;
+        this.adminController = adminController;
+        this.expenseRepo = expenseRepo;
     }
 
     /**
@@ -44,21 +54,16 @@ public class ParticipantController {
      * @param partID  id of participant to search for
      * @return the requested participant entity or else a 404 'not found' response
      */
-    @GetMapping( "/{partID}")
+    @GetMapping("/{partID}")
     public ResponseEntity<Participant> getById(@PathVariable long partID,
-                                               @PathVariable String eventID){
-        try{
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            Optional<Participant> optionalParticipant = repo.findById(partID);
-            if(optionalEvent.isEmpty() || optionalParticipant.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            Participant participant = optionalParticipant.get();
-            if(!optionalEvent.get().hasParticipant(participant)){
-                return ResponseEntity.status(401).build();
-            }
-            return ResponseEntity.ok(participant);
-        }catch (Exception e){
+                                               @PathVariable String eventID) {
+        try {
+            Optional<Participant> optionalParticipant =
+                    repo.findById(new EventWeakKey(eventID, partID));
+
+            return optionalParticipant.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -69,34 +74,22 @@ public class ParticipantController {
      * Generates an ID for the participant, adds it to the database and sends it back to the client
      *
      * @param participant to be saved to the database
-     * @param eventID id to which the participant is to be added
+     * @param eventID     id to which the participant is to be added
      * @return the saved entity with an assigned ID
      */
-    @PostMapping({ "", "/" })
+    @PostMapping({"", "/"})
     public ResponseEntity<Participant> add(@RequestBody Participant participant,
                                            @PathVariable String eventID) {
         try {
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            if(optionalEvent.isEmpty()) return ResponseEntity.notFound().build();
+            if (!eventRepo.existsById(eventID)) return ResponseEntity.notFound().build();
             if (participant == null || participant.getName() == null ||
                     participant.getName().isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
-            Event event = optionalEvent.get();
-            event.addParticipant(participant);
-            Event saved = eventRepo.save(event);
-            // find the participant with the highest id
-            Participant highest = null;
-            long highestID = -1;
-            for (Participant p : saved.getParticipants()) {
-                if (p.getParticipantId() > highestID) {
-                    highestID = p.getParticipantId();
-                    highest = p;
-                }
-            }
-            if (highest == null) throw new RuntimeException("Participant never got saved");
-
-            simp.convertAndSend("/event/" + eventID, highest,
+            participant.setEventID(eventID);
+            Participant saved = repo.save(participant);
+            update(eventID);
+            simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_PARTICIPANT,
                             "type", Participant.class.getTypeName()));
             return ResponseEntity.noContent().build();
@@ -109,11 +102,11 @@ public class ParticipantController {
      * Change the name of a participant
      * /api/events/{eventID}/participants/{partID}?newName={name}&newEmail={email}
      *
-     * @param eventID id of the Event
-     * @param partID id of the participant
+     * @param eventID     id of the Event
+     * @param partID      id of the participant
      * @param participant new participant to replace the old one
      * @return the participant entity with new title.
-     *  or 401 if the participant is not accessible from the specified event
+     * or 401 if the participant is not accessible from the specified event
      */
     @PutMapping("/{partID}")
     public ResponseEntity<Participant> editParticipantById(@PathVariable String eventID,
@@ -122,24 +115,23 @@ public class ParticipantController {
         try {
             if (participant == null || participant.getName() == null
                     || participant.getName().isEmpty()
-                    || participant.getParticipantId() != partID) {
+                    || participant.getId() != partID
+                    || !eventID.equals(participant.getEventID())) {
                 return ResponseEntity.badRequest().build();
             }
 
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            Optional<Participant> optionalParticipant = repo.findById(partID);
-            if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
+            if (!repo.existsById(new EventWeakKey(eventID, partID)))
                 return ResponseEntity.notFound().build();
-            Event event = optionalEvent.get();
-            Participant oldParticipant = optionalParticipant.get();
-
-            if (!event.hasParticipant(oldParticipant))
-                return ResponseEntity.status(401).build();
 
             repo.save(participant);
-            simp.convertAndSend("/event/" + eventID, participant,
+
+            update(eventID);
+            simp.convertAndSend(
+                    "/event/" + eventID,
+                    participant,
                     Map.of("action", WebsocketActions.UPDATE_PARTICIPANT,
-                            "type", Participant.class.getTypeName()));
+                            "type", Participant.class.getTypeName())
+            );
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -149,40 +141,76 @@ public class ParticipantController {
     /**
      * removes a participant
      *
-     * @param partID id of participant to remove
+     * @param partID  id of participant to remove
      * @param eventID id of the Event in which the participant is located at
      * @return status 204 if deleted successfully,
      * 404 if the participant and/or event does not exist or
      * 401 if participant is not part of the accessed event
      */
     @DeleteMapping("/{partID}")
-    public ResponseEntity<Event> deleteById(@PathVariable long partID,
-                                            @PathVariable String eventID) {
+    public ResponseEntity<Event> deleteById(
+        @PathVariable long partID,
+        @PathVariable String eventID
+    ) {
         try {
-            Optional<Event> optionalEvent = eventRepo.findById(eventID);
-            Optional<Participant> optionalParticipant = repo.findById(partID);
-            if (optionalEvent.isEmpty() || optionalParticipant.isEmpty())
-                return ResponseEntity.notFound().build();
-            Event event = optionalEvent.get();
+            Optional<Participant> optionalParticipant =
+                    repo.findById(new EventWeakKey(eventID, partID));
+            if (optionalParticipant.isEmpty()) return ResponseEntity.notFound().build();
+
             Participant participant = optionalParticipant.get();
+            Event event = eventRepo.getReferenceById(eventID);
+            List<Expense> expensesToRemove = new ArrayList<>();
 
-            if (!event.hasParticipant(participant))
-                return ResponseEntity.status(401).build();
-
-            List<Expense> expenses = event.getExpenses();
-            expenses.removeIf(expense -> expense.getExpenseAuthor().equals(participant));
-            for (Expense e : expenses) {
-                e.getExpenseParticipants().remove(participant);
+            for (int i = 0; i < event.getExpenses().size(); i++) {
+                Expense e = event.getExpenses().get(i);
+                if (e.getExpenseAuthor().getId() == partID) {
+                    expensesToRemove.add(e);
+                    continue;
+                }
+                event.getExpenses().get(i).getExpenseParticipants().remove(participant);
+                simp.convertAndSend(
+                        "/event/" + eventID,
+                        event.getExpenses().get(i),
+                        Map.of("action", WebsocketActions.UPDATE_EXPENSE,
+                                "type", Expense.class.getTypeName())
+                );
             }
 
-            event.deleteParticipant(participant);
+
+            for (Expense e : expensesToRemove) {
+                event.getExpenses().remove(e);
+                simp.convertAndSend(
+                        "/event/" + eventID,
+                        e.getId(),
+                        Map.of("action", WebsocketActions.REMOVE_EXPENSE,
+                                "type", Long.class.getTypeName())
+                );
+            }
+            event.getParticipants().remove(participant);
             eventRepo.save(event);
-            simp.convertAndSend("/event/" + eventID, partID,
+            update(eventID);
+            simp.convertAndSend(
+                    "/event/" + eventID,
+                    partID,
                     Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
-                            "type", Long.class.getTypeName()));
+                            "type", Long.class.getTypeName())
+            );
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    /**
+     * Updates the last activity date of the specified event
+     * and updates the date for long poll in admin controller
+     *
+     * @param eventID event id
+     */
+    private void update(String eventID) {
+        Event event = eventRepo.getReferenceById(eventID);
+        event.setLastActivity(new Date());
+        eventRepo.save(event);
+        adminController.update();
     }
 }

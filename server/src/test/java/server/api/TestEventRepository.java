@@ -52,11 +52,17 @@ public class TestEventRepository implements EventRepository {
     }
 
     /**
+     * @param repo expense repo to save participants
+     */
+    public TestEventRepository(TestExpenseRepository repo){
+        expenseRepo = repo;
+    }
+    /**
      * @param partRepo participant repo to save participants
      * @param expRepo expense repo
      */
     public TestEventRepository(TestParticipantRepository partRepo, TestExpenseRepository expRepo) {
-        this(partRepo);
+        this.partRepo = partRepo;
         this.expenseRepo = expRepo;
     }
     /**
@@ -66,6 +72,12 @@ public class TestEventRepository implements EventRepository {
         return calledMethods;
     }
 
+    /**
+     * @return events in repo
+     */
+    public List<Event> getEvents() {
+        return events;
+    }
     /**
      * @param name name of call
      */
@@ -182,11 +194,11 @@ public class TestEventRepository implements EventRepository {
 
     /**
      * @param id id
-     * @return Event
+     * @return Event or null if not found
      */
     @Override
     public Event getById(String id) {
-        return null;
+        return find(id).orElse(null);
     }
 
     /**
@@ -195,7 +207,7 @@ public class TestEventRepository implements EventRepository {
      */
     @Override
     public Event getReferenceById(String id) {
-        return null;
+        return find(id).get();
     }
 
     /**
@@ -256,16 +268,20 @@ public class TestEventRepository implements EventRepository {
             // Deletes participants that are no longer in the event entity
             partRepo.getParticipants().removeIf(p -> entity.getParticipants()
                     .stream()
-                    .map(Participant::getParticipantId)
-                    .noneMatch(id -> id == p.getParticipantId()));
-            partRepo.saveAll(entity.getParticipants());
+                    .noneMatch(pp -> pp.getEventID().equals(entity.getId())
+                            && pp.getId() == p.getId()));
+            List<Participant> participants = entity.getParticipants();
+            entity.setParticipants(new ArrayList<>());
+            partRepo.saveAll(participants);
         }
         if(expenseRepo != null) {
             expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
                     .stream()
-                    .mapToLong(Expense::getExpenseID)
-                    .noneMatch(id -> id == e.getExpenseID()));
-            expenseRepo.saveAll(entity.getExpenses());
+                    .noneMatch(ee -> ee.getEventID().equals(entity.getId())
+                            && ee.getId() == e.getId()));
+            List<Expense> expenses = entity.getExpenses();
+            entity.setExpenses(new ArrayList<>());
+            expenseRepo.saveAll(expenses);
         }
         return entity;
     }

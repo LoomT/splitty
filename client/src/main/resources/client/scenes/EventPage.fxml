@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -21,7 +22,7 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="506.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="%EventPage.sendInvites" />
+            <Button layoutX="450.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="%EventPage.sendInvites" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
@@ -69,11 +70,23 @@
                   <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </HBox>
-            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+            <TabPane fx:id="expenseList" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
                <tabs>
-                  <Tab fx:id="allTab" text="%EventPage.all" />
-                  <Tab fx:id="fromTab" text="From John" />
-                  <Tab fx:id="includingTab" text="Including John" />
+                  <Tab fx:id="allTab" text="%EventPage.all">
+                     <content>
+                        <ListView fx:id="allListView" prefHeight="200.0" prefWidth="200.0" />
+                     </content>
+                  </Tab>
+                  <Tab fx:id="fromTab" text="From John">
+                     <content>
+                        <ListView fx:id="fromListView" prefHeight="200.0" prefWidth="200.0" />
+                     </content>
+                  </Tab>
+                  <Tab fx:id="includingTab" text="Including John">
+                     <content>
+                        <ListView fx:id="includingListView" prefHeight="200.0" prefWidth="200.0" />
+                     </content>
+                  </Tab>
                </tabs>
             </TabPane>
          </children>

@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.components.EventListItem;
+import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -9,7 +10,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.beans.binding.Bindings;
@@ -35,7 +36,7 @@ public class StartScreenCtrl {
     private TextField code;
 
     @FXML
-    private ChoiceBox<String> languageChoiceBox;
+    private ComboBox<String> languageChoiceBox;
 
     @FXML
     private VBox eventList;
@@ -82,6 +83,8 @@ public class StartScreenCtrl {
     private void initialize() {
         languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
+        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
@@ -92,29 +95,44 @@ public class StartScreenCtrl {
     }
 
     /**
-     * This method fetches the event codes and updates the list
+     * Reloads the event codes from the user config and updates the event list
+     *
      */
     private void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
+
         eventList.getChildren().clear();
 
-
-        for (int i = 0; i < recentEventCodes.size(); i++) {
-            int finalI = i;
-            list.add(
-                    new EventListItem(
-                            recentEventCodes.get(i),
-                            () -> {
-                                eventList.getChildren().remove(list.get(finalI));
-                            },
-                            (String c) -> {
-                                code.setText(c);
-                            }));
-            eventList.getChildren().add(list.get(i));
-
+        for (String eventCode : recentEventCodes) {
+            try {
+                Event event = server.getEvent(eventCode);
+                if (event == null) {
+                    throw new IllegalArgumentException("Event does not exist for code: "
+                            + eventCode);
+                }
+                EventListItem eventListItem = new EventListItem(
+                        event.getTitle(),
+                        eventCode,
+                        () -> {
+                            eventList.getChildren().remove(
+                                    list.get(
+                                            recentEventCodes.indexOf(eventCode)
+                                    )
+                            );
+                        },
+                        (String c) -> {
+                            code.setText(c);
+                        }
+                );
+                list.add(eventListItem);
+                eventList.getChildren().add(eventListItem);
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
     }
+
 
     /**
      * Call this when you want to load/reload the start screen,
@@ -201,6 +219,12 @@ public class StartScreenCtrl {
         }
         try {
             Event joinedEvent = server.getEvent(code.getText());
+            if(joinedEvent == null) {
+                System.out.println("Event not found");
+                // Show visually that event was not found
+                // a full error pop up might be too annoying in this case
+                return;
+            }
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
             throw e;

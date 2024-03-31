@@ -20,7 +20,8 @@ import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Participant;
+import commons.Expense;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
@@ -29,6 +30,8 @@ import javafx.util.Pair;
 import javafx.stage.Modality;
 
 import java.io.File;
+import java.time.ZoneId;
+import java.util.List;
 
 public class MainCtrl {
 
@@ -43,13 +46,16 @@ public class MainCtrl {
     private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
 
+    private AddExpenseCtrl addExpenseCtrl;
+    private Scene addExpense;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
     private UserConfig userConfig;
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
-    private Websocket websocket;
+    private final Websocket websocket;
 
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
@@ -76,6 +82,7 @@ public class MainCtrl {
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
      * @param errorPopup controller and scene for errorPopup
+     * @param addExpensePage controller and scene for addExpense
      */
     public void initialize(
             Stage primaryStage,
@@ -86,6 +93,7 @@ public class MainCtrl {
             Pair<AdminLoginCtrl, Parent> adminLogin,
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
+            Pair<AddExpenseCtrl, Parent> addExpensePage,
             Pair<ErrorPopupCtrl, Parent> errorPopup
     ) {
 
@@ -106,6 +114,9 @@ public class MainCtrl {
 
         this.editParticipantsCtrl = editParticipantsPage.getKey();
         this.editParticipants = new Scene(editParticipantsPage.getValue());
+
+        this.addExpenseCtrl = addExpensePage.getKey();
+        this.addExpense = new Scene(addExpensePage.getValue());
 
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
@@ -148,12 +159,7 @@ public class MainCtrl {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
-        for (Participant p :
-                eventToShow.getParticipants()) {
-            System.out.println(p.getParticipantId() + " " + p.getName());
-
-
-        }
+        startScreen.setCursor(Cursor.DEFAULT);
         primaryStage.setScene(eventPage);
     }
 
@@ -184,8 +190,9 @@ public class MainCtrl {
      */
     public void showAdminOverview(String password) {
         adminOverviewCtrl.setPassword(password);
+        adminOverviewCtrl.initPoller(5000L); // 5 sec time out
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
-        primaryStage.setTitle("Admin Overview");
+        primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
     }
 
@@ -216,62 +223,47 @@ public class MainCtrl {
         return fileChooser.showSaveDialog(primaryStage);
     }
 
-
     /**
-     * Getter for startScreenCtrl
+     * Opens the system file chooser to open multiple files
      *
-     * @return startScreenCtrl
+     * @param fileChooser file chooser
+     * @return selected files
      */
-    public StartScreenCtrl getStartScreenCtrl() {
-        return startScreenCtrl;
-    }
-
-
-    /**
-     * setter for startScreenCtrl
-     *
-     * @param startScreenCtrl start screen controller
-     */
-    public void setStartScreenCtrl(StartScreenCtrl startScreenCtrl) {
-        this.startScreenCtrl = startScreenCtrl;
+    public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
+        return fileChooser.showOpenMultipleDialog(primaryStage);
     }
 
     /**
-     * Display overview
+     * shows the add/edit expense page
+     * @param eventToShow the event to show the participant editor for
      */
-
-
-    /**
-     * AdminLoginCtrl getter
-     *
-     * @return admin login controller
-     */
-    public AdminLoginCtrl getAdminLoginCtrl() {
-        return adminLoginCtrl;
+    public void showAddExpensePage(Event eventToShow) {
+        addExpenseCtrl.displayAddExpensePage(eventToShow, null);
+        addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
+        primaryStage.setTitle(languageConf.get("AddExp.addexp"));
+        primaryStage.setScene(addExpense);
     }
 
     /**
-     * setter for adminLoginCtrl
-     *
-     * @param adminLoginCtrl admin login controller
+     * Handle editing an expense.
+     * @param exp The expense to edit.
+     * @param ev The event associated with the expense.
      */
-    public void setAdminLoginCtrl(AdminLoginCtrl adminLoginCtrl) {
-        this.adminLoginCtrl = adminLoginCtrl;
+    public void handleEditExpense(Expense exp, Event ev) {
+
+        addExpenseCtrl.displayAddExpensePage(ev, exp);
+        primaryStage.setTitle(languageConf.get("AddExp.editexp"));
+        primaryStage.setScene(addExpense);
+
+        addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
+        addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
+        addExpenseCtrl.setPurpose(exp.getPurpose());
+        addExpenseCtrl.setAmount(Double.toString(exp.getAmount()));
+        addExpenseCtrl.setCurrency(exp.getCurrency());
+        addExpenseCtrl.setDate(exp.getDate().toInstant().
+                atZone(ZoneId.systemDefault()).toLocalDate());
+        addExpenseCtrl.setType(exp.getType());
+        addExpenseCtrl.setSplitCheckboxes(exp, ev);
+
     }
-
-
-//    public void showOverview() {
-//        primaryStage.setTitle("Quotes: Overview");
-//        primaryStage.setScene(overview);
-//        overviewCtrl.refresh();
-//    }
-//
-//    /**
-//     * display adding quote scene
-//     */
-//    public void showAdd() {
-//        primaryStage.setTitle("Quotes: Adding Quote");
-//        primaryStage.setScene(add);
-//        add.setOnKeyPressed(e -> addCtrl.keyPressed(e));
-//    }
 }

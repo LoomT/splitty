@@ -1,17 +1,16 @@
 package server.api;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpStatus.*;
-
-import commons.WebsocketActions;
+import commons.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import server.AdminService;
 
-import commons.Expense;
-import commons.Participant;
-import commons.Event;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import java.util.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.http.HttpStatus.*;
 
 
 public class ExpenseControllerTest {
@@ -19,7 +18,6 @@ public class ExpenseControllerTest {
     private EventController eventContr;
     private TestExpenseRepository repoExpense;
     private ExpenseController expenseContr;
-    private TestParticipantRepository partRepo;
     private Expense expense, expense2, updExp;
     private Event event;
     private Participant p1, p2, expAuth;
@@ -32,11 +30,12 @@ public class ExpenseControllerTest {
         TestRandom random = new TestRandom();
         expPart = new ArrayList<>();
         repoExpense = new TestExpenseRepository();
-        partRepo = new TestParticipantRepository();
-        eventRepo = new TestEventRepository();
+        eventRepo = new TestEventRepository(repoExpense);
+        repoExpense.setEventRepo(eventRepo);
         template = new TestSimpMessagingTemplate((message, timeout) -> false);
-        expenseContr = new ExpenseController(repoExpense, eventRepo, template);
-        eventContr = new EventController(eventRepo, random, template);
+        AdminController adminController = new AdminController(eventRepo, new AdminService(random));
+        expenseContr = new ExpenseController(repoExpense, eventRepo, template, adminController);
+        eventContr = new EventController(eventRepo, random, template, adminController);
 
         // Creating sample participants
         p1 = new Participant("Mihai");
@@ -49,18 +48,17 @@ public class ExpenseControllerTest {
         expense2 = new Expense(p1, "Drinks", 10, "EUR", expPart, "Out");
         updExp = new Expense(p2, "Drinks", 30, "EUR", expPart, "Out");
         List<Expense> temp = new ArrayList<>();
-        temp.add(expense);
         event = new Event("title", expPart, temp);
         var added = eventContr.add(event);
         event = added.getBody();
+        expenseContr.addExpense(expense, event.getId());
+        event = eventRepo.getById(event.getId());
     }
 
     @Test
     public void testDatabaseIsUsed() {
-        expenseContr.addExpense(expense, event.getId());
+        expenseContr.addExpense(expense2, event.getId());
         assertTrue(repoExpense.getCalledMethods().contains("save"));
-        assertTrue(eventRepo.getCalledMethods().contains("findById"));
-        assertTrue(eventRepo.getCalledMethods().contains("save"));
         assertTrue(eventRepo.getCalledMethods().contains("existsById"));
     }
 
@@ -72,19 +70,17 @@ public class ExpenseControllerTest {
     }
 
     @Test
-    public void testGetByIdUnauthorized() {
-        Expense anotherExpense = new Expense();
-        anotherExpense.setExpenseID(5);
-        repoExpense.save(anotherExpense);
-        var actual = expenseContr.getById(anotherExpense.getExpenseID(), event.getId());
+    public void testGetByWrongEventId() {
+        expenseContr.addExpense(expense2, event.getId());
+        long id = ((Expense) template.getPayload()).getId();
+        var actual = expenseContr.getById(id, "fakeID");
 
-        assertEquals(UNAUTHORIZED, actual.getStatusCode());
+        assertEquals(NOT_FOUND, actual.getStatusCode());
     }
 
     @Test
     public void testGetByIdAuthorized() {
-        repoExpense.save(expense);
-        var actual = expenseContr.getById(expense.getExpenseID(), event.getId());
+        var actual = expenseContr.getById(expense.getId(), event.getId());
         assertEquals(OK, actual.getStatusCode());
     }
 
@@ -94,20 +90,10 @@ public class ExpenseControllerTest {
         var actual = expenseContr.addExpense(exp, event.getId());
         assertEquals(BAD_REQUEST, actual.getStatusCode());
     }
-
-    @Test
-    public void testAddBadRequest2() {
-        expense.setExpenseID(3);
-        var actual = expenseContr.addExpense(expense, event.getId());
-        assertEquals(BAD_REQUEST, actual.getStatusCode());
-    }
-
     @Test
     public void testAdd() {
         //work with new expense, expense2
         var actual = expenseContr.addExpense(expense2, event.getId());
-        assertTrue(eventRepo.getCalledMethods().contains("findById"));
-        assertTrue(eventRepo.getCalledMethods().contains("save"));
         assertTrue(repoExpense.getCalledMethods().contains("save"));
         assertTrue(eventRepo.getCalledMethods().contains("existsById"));
         assertEquals(NO_CONTENT, actual.getStatusCode());
@@ -117,7 +103,7 @@ public class ExpenseControllerTest {
     public void testAddWebsocket() {
         expenseContr.addExpense(expense2, event.getId());
         Expense saved = (Expense) template.getPayload();
-        expense.setExpenseID(saved.getExpenseID());
+        expense.setId(saved.getId());
         assertEquals(expense2, saved);
     }
 
@@ -130,20 +116,20 @@ public class ExpenseControllerTest {
     @Test
     public void testDeleteById() {
         expenseContr.addExpense(expense2, event.getId());
-        long expenseID = ((Expense)template.getPayload()).getExpenseID();
+        long expenseID = ((Expense)template.getPayload()).getId();
 
-        assertTrue(repoExpense.existsById(expenseID));
+        assertTrue(repoExpense.existsById(new EventWeakKey(event.getId(), expenseID)));
         assertTrue(eventRepo.findById(event.getId()).isPresent());
         assertTrue(eventRepo.findById(event.getId()).get().getExpenses().contains(expense2));
         assertEquals(NO_CONTENT, expenseContr.deleteById(expenseID, event.getId()).getStatusCode());
-        assertFalse(partRepo.existsById(expenseID));
+        assertFalse(repoExpense.existsById(new EventWeakKey(event.getId(), expenseID)));
 
     }
 
     @Test
     public void testDeleteWebsocket() {
         expenseContr.addExpense(expense2, event.getId());
-        long id = ((Expense)template.getPayload()).getExpenseID();
+        long id = ((Expense)template.getPayload()).getId();
         expenseContr.deleteById(id, event.getId());
         assertEquals(id, template.getPayload());
         assertEquals(WebsocketActions.REMOVE_EXPENSE, template.getHeaders().get("action"));
@@ -158,16 +144,17 @@ public class ExpenseControllerTest {
 
     @Test
     public void testUpdateExpenseSuccessful() {
-        expenseContr.addExpense(expense, event.getId());
-        var updated = expenseContr.updateExpense(expense.getExpenseID(), expense, event.getId());
+        expenseContr.addExpense(expense2, event.getId());
+        var updated = expenseContr.updateExpense(expense2.getId(), expense2, event.getId());
         assertEquals(NO_CONTENT, updated.getStatusCode());
     }
 
     @Test
     public void testUpdateWebsocket() {
-        expenseContr.addExpense(expense, event.getId());
-        long expenseID = ((Expense)template.getPayload()).getExpenseID();
-        updExp.setExpenseID(expenseID);
+        expenseContr.addExpense(expense2, event.getId());
+        long expenseID = ((Expense)template.getPayload()).getId();
+        updExp.setId(expenseID);
+        updExp.setEventID(event.getId());
         var actual = expenseContr.updateExpense(expenseID, updExp, event.getId());
 
         assertEquals(NO_CONTENT, actual.getStatusCode());
@@ -175,6 +162,44 @@ public class ExpenseControllerTest {
         assertEquals(updExp, template.getPayload());
     }
 
+    @Test
+    void activityUpdateAfterAddingExpense() {
+        Date before = event.getLastActivity();
+        expenseContr.addExpense(expense2, event.getId());
+        Event updated = eventRepo.getById(event.getId());
 
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
 
+    @Test
+    void activityUpdateAfterUpdatingExpense() {
+        Date before = event.getLastActivity();
+        Expense exp = event.getExpenses().getFirst();
+        exp.setPurpose("changed");
+        expenseContr.updateExpense(exp.getId(), exp, event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterDeletingExpense() {
+        Date before = event.getLastActivity();
+        expenseContr.deleteById(expense.getId(), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertTrue(updated.getLastActivity().compareTo(before) >= 0);
+        assertTrue(updated.getLastActivity().compareTo(new Date()) <= 0);
+    }
+
+    @Test
+    void activityUpdateAfterGettingExpense() {
+        Date before = event.getLastActivity();
+        expenseContr.getById(expense.getId(), event.getId());
+        Event updated = eventRepo.getById(event.getId());
+
+        assertEquals(updated.getLastActivity(), before);
+    }
 }
