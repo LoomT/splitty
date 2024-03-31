@@ -3,9 +3,12 @@ package client.scenes;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class AdminLoginCtrl {
 
@@ -16,9 +19,6 @@ public class AdminLoginCtrl {
 
     @FXML
     private TextField passwordTextField;
-
-    @FXML
-    private Button loginButton;
 
     /**
      * adminLogin screen controller constructor
@@ -59,5 +59,16 @@ public class AdminLoginCtrl {
         }
     }
 
+    public void checkEscape(Scene scene) {
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                backButtonClicked();
+                ke.consume(); // <-- stops passing the event to next node
+            } else if (ke.getCode() == KeyCode.ENTER  && ke.getTarget().equals(passwordTextField)) {
+                loginButtonClicked();
+            }
+        });
+    }
 }
 

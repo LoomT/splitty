@@ -11,6 +11,7 @@ import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -38,6 +39,13 @@ public class StartScreenCtrl {
 
     @FXML
     private VBox eventList;
+
+    @FXML
+    private Button eventButton;
+    @FXML
+    private Button joinButton;
+    @FXML
+    private Button adminButton;
 
 
     private UserConfig userConfig;
@@ -179,12 +187,14 @@ public class StartScreenCtrl {
             if (ke.getCode() == KeyCode.ENTER) {
                 System.out.println("Key Pressed: " + ke.getCode());
                 System.out.println(ke.getTarget());
-                if(ke.getTarget().equals(title)){
+                if(ke.getTarget().equals(title) || ke.getTarget().equals(eventButton)){
                     create();
                 }
-                else if(ke.getTarget().equals(code)){
+                else if(ke.getTarget().equals(code) || ke.getTarget().equals(joinButton)){
                     join();
                 }
+                else if(ke.getTarget().equals(adminButton)) showAdminLogin();
+                else return;
                 ke.consume(); // <-- stops passing the event to next node
             }
         });

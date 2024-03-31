@@ -118,7 +118,9 @@ public class MainCtrl {
         showStartScreen();
         primaryStage.show();
 
-
+        startScreenCtrl.checkEnter(this.startScreen);
+        adminOverviewCtrl.checkEscape(this.adminOverview);
+        adminLoginCtrl.checkEscape(this.adminLogin);
     }
 
     /**
@@ -129,7 +131,6 @@ public class MainCtrl {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
-        startScreenCtrl.checkEnter(startScreen);
 
     }
 

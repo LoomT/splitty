@@ -11,8 +11,11 @@ import com.google.inject.Inject;
 import commons.Event;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
@@ -278,5 +281,20 @@ public class AdminOverviewCtrl {
      */
     public void stopPoller() {
         poller.interrupt();
+    }
+
+    public void checkEscape(Scene scene){
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == KeyCode.ESCAPE) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                backButtonClicked();
+                ke.consume(); // <-- stops passing the event to next node
+            }
+            else if (ke.getCode() == KeyCode.F5) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                refreshButtonClicked();
+                ke.consume(); // <-- stops passing the event to next node
+            }
+        });
     }
 }
