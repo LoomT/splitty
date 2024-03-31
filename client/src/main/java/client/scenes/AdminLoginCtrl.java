@@ -53,7 +53,7 @@ public class AdminLoginCtrl {
     private void loginButtonClicked() {
         String password = passwordTextField.getText();
         if (server.verifyPassword(password)) {
-            mainCtrl.showAdminOverview(password, 5000L);
+            mainCtrl.showAdminOverview(password);
         } else {
             passwordLabel.setText("Incorrect password");
         }

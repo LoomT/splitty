@@ -104,6 +104,8 @@ public class Main extends Application {
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(
                 primaryStage,
+                languageConf,
+                userConfig,
                 start,
                 eventPage,
                 adminLogin,

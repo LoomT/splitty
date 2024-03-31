@@ -8,8 +8,6 @@ import commons.Participant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TestServerUtils implements ServerUtils {
 
@@ -17,9 +15,7 @@ public class TestServerUtils implements ServerUtils {
     private int counter;
     private Date lastChange;
     private final List<String> calls;
-    private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
-    private boolean polled;
 
     /**
      * constructor
@@ -31,8 +27,6 @@ public class TestServerUtils implements ServerUtils {
         lastChange = new Date();
         calls = new ArrayList<>();
         statuses = new ArrayList<>();
-        polled = false;
-        concurrentStatuses = new ConcurrentSkipListSet<>();
     }
 
     /**
@@ -52,24 +46,10 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
-     * @return status calls made by long polling
-     */
-    public Set<Integer> getConcurrentStatuses() {
-        return concurrentStatuses;
-    }
-
-    /**
      * @return returned statuses
      */
     public List<Integer> getStatuses() {
         return statuses;
-    }
-
-    /**
-     * @return true if long polled
-     */
-    public boolean isPolled() {
-        return polled;
     }
 
     /**
@@ -407,10 +387,9 @@ public class TestServerUtils implements ServerUtils {
      */
     @Override
     public int pollEvents(String inputPassword, Long timeOut) {
-//        calls.add("pollEvents"); this causes OutOfMemoryError
-        polled = true;
+        calls.add("pollEvents");
         if(!"password".equals(inputPassword)) {
-            concurrentStatuses.add(401);
+            statuses.add(401);
             return 401;
         }
         Date started = new Date();
@@ -418,13 +397,15 @@ public class TestServerUtils implements ServerUtils {
         while(new Date().getTime() - time < timeOut) {
             try {
                 if(started.before(lastChange)) {
-                    concurrentStatuses.add(204);
+                    statuses.add(204);
                     return 204;
                 }
-                Thread.sleep(10);
-            } catch (InterruptedException ignored) {}
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
-        concurrentStatuses.add(408);
+        statuses.add(408);
         return 408;
     }
 
