@@ -51,6 +51,9 @@ public class TestServerUtils implements ServerUtils {
         return calls;
     }
 
+    /**
+     * @return status calls made by long polling
+     */
     public Set<Integer> getConcurrentStatuses() {
         return concurrentStatuses;
     }
@@ -62,6 +65,9 @@ public class TestServerUtils implements ServerUtils {
         return statuses;
     }
 
+    /**
+     * @return true if long polled
+     */
     public boolean isPolled() {
         return polled;
     }

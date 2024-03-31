@@ -276,7 +276,9 @@ public class AdminOverviewCtrl {
                     Platform.runLater(this::loadAllEvents);
                 else if(status != 408) {
                     Platform.runLater(() -> {
-                        Alert alert = new Alert(Alert.AlertType.ERROR,"Long polling error " + status);
+                        // TODO translate
+                        Alert alert = new Alert(Alert.AlertType.ERROR,
+                                "Long polling error " + status);
                         alert.showAndWait();
                         stopPoller();
                         System.out.println(status);

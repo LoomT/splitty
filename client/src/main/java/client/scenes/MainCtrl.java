@@ -168,6 +168,7 @@ public class MainCtrl {
     /**
      * shows the admin overview
      * @param password admin password
+     * @param timeOut time out time in ms
      */
     public void showAdminOverview(String password, long timeOut) {
         adminOverviewCtrl.setPassword(password);
