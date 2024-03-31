@@ -174,13 +174,13 @@ public class StartScreenCtrl {
         if (title.getText().isEmpty()){
             System.out.println("Empty Title Error");
             token = "StartScreen.emptyEventToken";
-            mainCtrl.showErrorPopup(EmptyStringError, token, 0);
+            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
             return;
         }
         else if(title.getText().length() > 100){
-            System.out.println("Word Limit Error");
+            System.out.println("Character Limit Error");
             token = "StartScreen.eventWordLimitToken";
-            mainCtrl.showErrorPopup(WordLimitError, token ,100);
+            mainCtrl.showErrorPopup("characterLimitError", token ,100);
             return;
         }
         try {
@@ -202,19 +202,19 @@ public class StartScreenCtrl {
         if (code.getText().isEmpty()){
             token = "StartScreen.joinEmptyToken";
             System.out.println("Empty Field Error");
-            mainCtrl.showErrorPopup(EmptyStringError, token, 0);
+            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
             return;
         }
         if(code.getText().length() > 5){
             token = "StartScreen.joinWordLimitToken";
-            System.out.println("Word Limit Error");
-            mainCtrl.showErrorPopup(WordLimitError, token, 5);
+            System.out.println("Character Limit Error");
+            mainCtrl.showErrorPopup("characterLimitError", token, 5);
             return;
         }
         if(code.getText().length() != 5){
             token = "StartScreen.joinInvalidToken";
             System.out.println("Join Code Error");
-            mainCtrl.showErrorPopup(InvalidErrorCode, token, 5);
+            mainCtrl.showErrorPopup("invalidInputErrorHeader", token, 5);
             return;
         }
         try {

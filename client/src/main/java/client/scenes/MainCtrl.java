@@ -203,7 +203,7 @@ public class MainCtrl {
      * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
      * Check ErrorPopupCtrl for more detailed documentation
      */
-    public void showErrorPopup(ErrorPopupCtrl.ErrorCode code, String stringToken, int intToken){
+    public void showErrorPopup(String code, String stringToken, int intToken){
         errorPopupCtrl.generatePopup(code, stringToken, intToken);
         Stage stage = new Stage();
         stage.setScene(errorPopup);

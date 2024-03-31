@@ -68,38 +68,21 @@ public class ErrorPopupCtrl {
      *
      * @param stringToken String stringToken to be used
      * @param intToken    word intToken of the input
-     * @param code        code of the error as found in the ErrorCode enum
+     * @param code        code of the error as found in the properties file
      */
-    public void generatePopup(ErrorCode code, String stringToken, int intToken) {
+    public void generatePopup(String code, String stringToken, int intToken) {
         this.errorImage.setImage(new Image(String.valueOf(
                 getClass().getResource("/client/scenes/icons8-error-96.png"))));
         stringToken = languageConf.get(stringToken);
-        String header;
-        String description;
-        switch (code) {
-            case EmptyStringError -> {
-                header = String.format(languageConf.get(
-                        "ErrorPopup.emptyFieldErrorHeader"), stringToken);
-                description = String.format(languageConf.get(
-                        "ErrorPopup.emptyFieldErrorDescription"), stringToken);
-            }
-            case WordLimitError -> {
-                header = String.format(languageConf.get(
-                        "ErrorPopup.wordLimitErrorHeader"), stringToken);
-                description = String.format(languageConf.get(
-                        "ErrorPopup.wordLimitErrorDescription"), stringToken, intToken);
-            }
 
-            case InvalidErrorCode -> {
-                header = String.format(
-                        languageConf.get("ErrorPopup.invalidInputErrorHeader"), stringToken);
-                description = String.format(languageConf.get(
-                        "ErrorPopup.invalidInputErrorDescription"), stringToken, intToken);
-            }
-            default -> {
-                header = languageConf.get("ErrorPopup.unknownErrorHeader");
-                description = languageConf.get("ErrorPopup.unknownErrorDescription");
-            }
+        String header = String.format(languageConf.get(
+                "ErrorPopup." + code + "Header"), stringToken, intToken);
+        String description = String.format(languageConf.get(
+                "ErrorPopup." + code + "Description"), stringToken, intToken);
+
+        if(header == null || description == null){
+            header = languageConf.get("ErrorPopup.unknownErrorHeader");
+            description = languageConf.get("ErrorPopup.unknownErrorDescription");
         }
         this.errorHeader.setText(header);
         this.errorDescription.setText(description);
