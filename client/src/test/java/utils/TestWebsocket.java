@@ -205,6 +205,24 @@ public class TestWebsocket implements Websocket {
     public void resetAllActions() {
         functions.clear();
     }
+
+
+    /**
+     * Registers all the change listeners on WS if they're not registered already
+     * @param currEvent the event in which we listen on the participant changes
+     * @param updateEventCallback this is called when an Event is updated
+     */
+    @Override
+    public void registerEventChangeListener(Event currEvent, Consumer<Event> updateEventCallback) {
+        this.resetAction(WebsocketActions.TITLE_CHANGE);
+
+        this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
+            String title = (String) e;
+            currEvent.setTitle(title);
+            updateEventCallback.accept(currEvent);
+        });
+    }
+
     /**
      * simulateAction is used to simulate an action from the server.
      * It triggers all registered consumers for the specified action.

@@ -243,6 +243,64 @@ public class WebsocketImpl implements Websocket {
         EnumSet.allOf(WebsocketActions.class).forEach(this::resetAction);
     }
 
+    /**
+     * Makes the participants of an expense share the same instances as the participants of an event
+     *
+     * @param expense expense for which participants to link
+     * @param participants participant list from event
+     */
+    public void linkExpenseParticipants(Expense expense, List<Participant> participants) {
+        expense.setExpenseAuthor(participants.stream()
+                .filter(p -> p.getId() == expense.getExpenseAuthor().getId())
+                .findFirst().orElseThrow());
+        List<Long> ids = expense.getExpenseParticipants().stream().map(Participant::getId).toList();
+        expense.setExpenseParticipants(participants.stream()
+                .filter(p -> ids.contains(p.getId())).toList());
+    }
+
+    /**
+     * @param event event of which expense to update
+     * @param expense new expense
+     */
+
+    private void updateExpense(Event event, Expense expense) {
+        int index = -1;
+        for (int i = 0; i < event.getExpenses().size(); i++) {
+            Expense curr = event.getExpenses().get(i);
+            if (curr.getId() == expense.getId()) {
+                index = i;
+                break;
+            }
+        }
+        if (index == -1) {
+            throw new RuntimeException("The updated expense's ID ("
+                    + expense.getId()+
+                    ") does not match with any ID's of the already existing expenses");
+        }
+        event.getExpenses().remove(index);
+        linkExpenseParticipants(expense, event.getParticipants());
+        event.getExpenses().add(index, expense);
+    }
+
+    /**
+     * Registers all the change listeners on WS if they're not registered already
+     * @param currEvent the event in which we listen on the participant changes
+     * @param updateEventCallback this is called when an Event is updated
+     */
+    @Override
+    public void registerEventChangeListener(
+            Event currEvent,
+            Consumer<Event> updateEventCallback
+    ) {
+        this.resetAction(WebsocketActions.TITLE_CHANGE);
+
+        this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
+            String title = (String) e;
+            currEvent.setTitle(title);
+            updateEventCallback.accept(currEvent);
+        });
+    }
+
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {
 
         private static final Map<String, Type> typeMap = new HashMap<>(Map.of(

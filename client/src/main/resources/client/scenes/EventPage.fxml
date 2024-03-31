@@ -23,6 +23,7 @@
                </font>
             </Text>
             <Button layoutX="450.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="%EventPage.sendInvites" />
+            <Button layoutX="290.0" layoutY="18.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
@@ -75,15 +76,18 @@
                   <Tab fx:id="allTab" text="%EventPage.all">
                      <content>
                         <ListView fx:id="allListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
+                     </content>
+                  </Tab>
                   <Tab fx:id="fromTab" text="From John">
                      <content>
                         <ListView fx:id="fromListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
+                     </content>
+                  </Tab>
                   <Tab fx:id="includingTab" text="Including John">
                      <content>
                         <ListView fx:id="includingListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content></Tab>
+                     </content>
+                  </Tab>
                </tabs>
             </TabPane>
          </children>
