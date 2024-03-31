@@ -214,7 +214,7 @@ public class StartScreenCtrl {
         if(code.getText().length() != 5){
             token = "StartScreen.joinInvalidToken";
             System.out.println("Join Code Error");
-            mainCtrl.showErrorPopup("invalidInputErrorHeader", token, 5);
+            mainCtrl.showErrorPopup("invalidInputError", token, 5);
             return;
         }
         try {

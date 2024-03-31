@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 import javafx.scene.image.ImageView;
 
+import java.util.MissingResourceException;
+
 /**
  * Controller for the error popup.
  * A default error popup is initialized first and then the fields are changed
@@ -71,16 +73,18 @@ public class ErrorPopupCtrl {
      * @param code        code of the error as found in the properties file
      */
     public void generatePopup(String code, String stringToken, int intToken) {
+        String header;
+        String description;
+        try{
         this.errorImage.setImage(new Image(String.valueOf(
                 getClass().getResource("/client/scenes/icons8-error-96.png"))));
         stringToken = languageConf.get(stringToken);
 
-        String header = String.format(languageConf.get(
+        header = String.format(languageConf.get(
                 "ErrorPopup." + code + "Header"), stringToken, intToken);
-        String description = String.format(languageConf.get(
+        description = String.format(languageConf.get(
                 "ErrorPopup." + code + "Description"), stringToken, intToken);
-
-        if(header == null || description == null){
+        }catch(MissingResourceException e){
             header = languageConf.get("ErrorPopup.unknownErrorHeader");
             description = languageConf.get("ErrorPopup.unknownErrorDescription");
         }
