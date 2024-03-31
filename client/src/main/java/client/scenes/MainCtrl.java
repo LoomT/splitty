@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;

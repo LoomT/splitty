@@ -20,8 +20,6 @@ import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
 
-import static client.scenes.ErrorPopupCtrl.ErrorCode.*;
-
 
 public class StartScreenCtrl {
 

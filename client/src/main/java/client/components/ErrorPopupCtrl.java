@@ -1,5 +1,6 @@
-package client.scenes;
+package client.components;
 
+import client.scenes.MainCtrl;
 import client.utils.LanguageConf;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;

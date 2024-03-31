@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.components.ErrorPopupCtrl;
 import client.scenes.*;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
