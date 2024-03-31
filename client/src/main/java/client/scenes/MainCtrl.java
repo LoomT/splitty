@@ -79,7 +79,8 @@ public class MainCtrl {
      * @param adminLogin           admin login controller and scene
      * @param editParticipantsPage controller and scene for editParticipants
      * @param adminOverview        admin overview controller and scene
-     * @param addExpensePage controller and scene for addExpense
+     * @param addExpensePage       controller and scene for addExpense
+     * @param editTitlePage        controller and scene for editTitle
      */
     public void initialize(
             Stage primaryStage,
@@ -91,7 +92,7 @@ public class MainCtrl {
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
             Pair<AddExpenseCtrl, Parent> addExpensePage,
-            Pair<EditTitleCtrl, Parent> titleChangerPage
+            Pair<EditTitleCtrl, Parent> editTitlePage
     ) {
 
         this.primaryStage = primaryStage;
@@ -118,8 +119,8 @@ public class MainCtrl {
         this.adminOverviewCtrl = adminOverview.getKey();
         this.adminOverview = new Scene(adminOverview.getValue());
 
-        this.editTitleCtrl = titleChangerPage.getKey();
-        this.titleChanger = new Scene(titleChangerPage.getValue());
+        this.editTitleCtrl = editTitlePage.getKey();
+        this.titleChanger = new Scene(editTitlePage.getValue());
 
         //showOverview();
         showStartScreen();
@@ -139,7 +140,11 @@ public class MainCtrl {
 
     }
 
-    public void showChangeTitleScreen(EventPageCtrl eventPageCtrl){
+    /**
+     * Shows the change
+     * @param eventPageCtrl eventPageCtrl of the current event
+     */
+    public void showEditTitle(EventPageCtrl eventPageCtrl){
         editTitleCtrl.setEventPageCtrl(eventPageCtrl);
         Stage stage = new Stage();
         stage.setScene(titleChanger);

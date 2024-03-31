@@ -199,6 +199,7 @@ public class EventPageCtrl {
      * Changes the title of the event
      *
      * @param newTitle new title of the event
+     * @return 204 if successful, 400 if there is a problem with input, 404 if event cannot be found
      */
     public int changeTitle(String newTitle) {
         event.setTitle(newTitle);
@@ -354,7 +355,7 @@ public class EventPageCtrl {
      *
      */
     public void changeTitle(){
-        mainCtrl.showChangeTitleScreen(this);
+        mainCtrl.showEditTitle(this);
     }
 
     /**

@@ -9,10 +9,8 @@ import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import org.springframework.http.ResponseEntity;
 
 public class EditTitleCtrl {
     private final ServerUtils server;
@@ -60,10 +58,16 @@ public class EditTitleCtrl {
         this.websocket = websocket;
     }
 
+    /**
+     * Initializes the characterLimitError event listener.
+     */
     public void initialize(){
-        wordLimitError(nameTextField, titleError, 100);
+        characterLimitError(nameTextField, titleError, 100);
     }
 
+    /**
+     * Closes the popup and erases the textField
+     */
     @FXML
     public void cancelTitle(){
         nameTextField.textProperty().setValue("");
@@ -71,6 +75,9 @@ public class EditTitleCtrl {
         stage.close();
     }
 
+    /**
+     * Saves the new title if it isn't empty or over 100 characters.
+     */
     @FXML
     public void saveTitle(){
         if(eventPageCtrl == null
@@ -86,21 +93,25 @@ public class EditTitleCtrl {
         }
     }
 
+    /**
+     *
+     * @param eventPage currentEventPageCtrl to edit the Event.
+     */
     public void setEventPageCtrl(EventPageCtrl eventPage){
         this.eventPageCtrl = eventPage;
     }
 
     /**
-     *
-     * @param textField
-     * @param errorMessage
-     * @param limit
+     * Creates a characterLimitError which showcases an error
+     * iff a character limit has been exceeded.
+     * @param textField textField which is observed
+     * @param errorMessage Text where the message is displayed in the scene
+     * @param limit character limit to not be exceeded
      */
-    public void wordLimitError(TextField textField, Text errorMessage, int limit){
+    public void characterLimitError(TextField textField, Text errorMessage, int limit){
         String message = errorMessage.getText();
         errorMessage.setVisible(false);
         textField.textProperty().addListener((observableValue, number, t1)->{
-            errorMessage.setVisible(true);
             errorMessage.textProperty().bind(Bindings.concat(
                     message, String.format(" %d/%d", textField.getText().length(), limit)));
 

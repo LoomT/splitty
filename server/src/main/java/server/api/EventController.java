@@ -149,19 +149,20 @@ public class EventController {
     }
 
     /**
-     *
-     * @param id
-     * @param event
-     * @return
+     * Use this method for changing the title since Java Response doesn't support patch.
+     * @param id id of the Event wanted to be changed
+     * @param event event to replace the old event
+     * @return 204 if successful, 400 if the input is illegal, 404 if the id cannot be found
      */
-    /*
     @PostMapping("/{id}")
     public ResponseEntity<Event> changeEvent(@PathVariable String id,
                                                  @RequestBody Event event) {
         try {
-            if(!event.getId().equals(id)
+            if(event.getTitle() == null
+                    || event.getId() == null
+                    || !event.getId().equals(id)
                     || id.length() != 5
-                    || event.getTitle() == null
+                    || event.getTitle().length() > 100
                     || event.getTitle().isEmpty())
                 return ResponseEntity.badRequest().build();
 
@@ -180,7 +181,6 @@ public class EventController {
             return ResponseEntity.internalServerError().build();
         }
     }
-     */
 
 
 }
