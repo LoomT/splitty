@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.utils.LanguageConf;
+import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
@@ -59,6 +60,7 @@ public class EventPageCtrl {
     private final Websocket websocket;
     private final MainCtrl mainCtrl;
     private final LanguageConf languageConf;
+    private final ServerUtils server;
     private Event event;
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
@@ -72,11 +74,13 @@ public class EventPageCtrl {
     public EventPageCtrl(
         MainCtrl mainCtrl,
         LanguageConf languageConf,
-        Websocket websocket
+        Websocket websocket,
+        ServerUtils server
     ) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
 
+        this.server = server;
         this.websocket = websocket;
         websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> changeTitle((String) newTitle));
     }
