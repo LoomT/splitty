@@ -5,24 +5,15 @@ import client.utils.Websocket;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
-import javafx.application.Platform;
-import org.springframework.lang.NonNull;
-import org.springframework.messaging.simp.stomp.StompCommand;
-import org.springframework.messaging.simp.stomp.StompHeaders;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-
-import java.lang.reflect.Type;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class TestWebsocket implements Websocket {
 
     private String eventID;
     private boolean connected = false;
-    private final EnumMap<WebsocketActions, Consumer<Object>> functions;
+    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
 
 
     /**
@@ -64,7 +55,7 @@ public class TestWebsocket implements Websocket {
      */
     @Override
     public void on(WebsocketActions action, Consumer<Object> consumer) {
-        functions.put(action, consumer);
+        functions.get(action).add(consumer);
     }
 
     /**
@@ -214,21 +205,24 @@ public class TestWebsocket implements Websocket {
     public void resetAllActions() {
         functions.clear();
     }
-
     /**
-     * simulateAction is used to simulate an action from the server
+     * simulateAction is used to simulate an action from the server.
+     * It triggers all registered consumers for the specified action.
      *
-     * @param action
-     * @param payload
+     * @param action The WebSocket action to simulate.
+     * @param payload The payload to pass to the consumers for this action.
      */
-
     public void simulateAction(WebsocketActions action, Object payload) {
-        if (functions.containsKey(action)) {
-            functions.get(action).accept(payload);
+        Set<Consumer<Object>> consumers = functions.get(action);
+        if (consumers != null && !consumers.isEmpty()) {
+            for (Consumer<Object> consumer : consumers) {
+                consumer.accept(payload);
+            }
         } else {
             System.out.println("No listener for action: " + action);
         }
     }
+
 
     /**
      * isConnected is used to check if the websocket is connected
@@ -246,69 +240,5 @@ public class TestWebsocket implements Websocket {
      */
     public String getEventID() {
         return eventID;
-    }
-
-    private class MyStompSessionHandler extends StompSessionHandlerAdapter {
-
-        private static final Map<String, Type> typeMap = new HashMap<>(Map.of(
-                "commons.Event", Event.class,
-                "commons.Participant", Participant.class,
-                "commons.Expense", Expense.class,
-                "java.lang.String", String.class,
-                "java.lang.Long", Long.class));
-
-        /**
-         * Executes after successfully connecting to the server
-         *
-         * @param session          stomp session
-         * @param connectedHeaders headers of the message
-         */
-        @Override
-        public void afterConnected(@NonNull StompSession session,
-                                   @NonNull StompHeaders connectedHeaders) {
-            System.out.println("WS connected");
-        }
-
-        @Override
-        @NonNull
-        public Type getPayloadType(StompHeaders headers) {
-
-            return typeMap.get(headers.get("type").getFirst());
-        }
-
-        /**
-         * Executes when client receives a message from the server
-         *
-         * @param headers headers
-         * @param payload message body
-         */
-        @Override
-        public void handleFrame(StompHeaders headers, Object payload) {
-            try {
-                WebsocketActions action = WebsocketActions.valueOf(
-                        headers.get("action").getFirst());
-                Consumer<Object> consumer = functions.get(action);
-                if (consumer != null) {
-                    // This is necessary to run the Javafx updates on the same
-                    // thread as the app is run on, and not the WS thread
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            consumer.accept(payload);
-                            // This keeps the accept method but used directly
-                        }
-                    });
-                }
-            } catch (IllegalArgumentException e) {
-                System.out.println("Server sent an unknown action");
-            }
-        }
-
-        @Override
-        public void handleException(@NonNull StompSession session, StompCommand command,
-                                    @NonNull StompHeaders headers, @NonNull byte[] payload,
-                                    @NonNull Throwable exception) {
-            super.handleException(session, command, headers, payload, exception);
-        }
     }
 }
