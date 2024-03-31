@@ -94,10 +94,12 @@ public class CurrencyConverter {
         Map<String, Double> result = new HashMap<>();
         if (temp.isEmpty()) updateExchange();
 
-        for (int i = 2; i < temp.size() - 1; i++) {
+        for (int i = 2; i < temp.size(); i++) {
+            if(temp.get(i).startsWith("#") || temp.get(i).startsWith("base=")) continue;
             String[] tempArr = temp.get(i).split("=");
             result.put(tempArr[0], Double.parseDouble(tempArr[1]));
         }
+        currencyMap = result;
         return result;
     }
 
@@ -166,7 +168,7 @@ public class CurrencyConverter {
      */
     public boolean addCurrency(String name, double rate) {
         if (name == null || rate <= 0 || currencyMap.containsKey(name)) return false;
-        try (OutputStream outputstream = new FileOutputStream(path)) {
+        try (OutputStream outputstream = new FileOutputStream(path, true)) {
             Properties prop = new Properties();
             prop.setProperty(name, String.valueOf(rate));
             prop.store(outputstream, "new currency added");
@@ -174,5 +176,26 @@ public class CurrencyConverter {
             throw new RuntimeException(e);
         }
         return true;
+    }
+
+    /**
+     * @return the current base
+     */
+    public String getBase() {
+        return base;
+    }
+
+    /**
+     * @return the current conversion rate
+     */
+    public double getConversionRate() {
+        return conversionRate;
+    }
+
+    /**
+     * remove the currency converter, to replace dependency injected with mock and vise versa
+     */
+    public static void removeCC(){
+        currencyConverter = null;
     }
 }

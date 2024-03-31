@@ -2,16 +2,11 @@ package client;
 
 import client.utils.ServerUtilsImpl;
 import client.utils.UserConfig;
-import jakarta.ws.rs.core.MultivaluedMap;
-import jakarta.ws.rs.core.Response;
-import org.checkerframework.checker.units.qual.C;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import utils.TestIO;
-import utils.TestServerUtils;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -19,48 +14,79 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CurrencyConverterTest {
+    ServerUtilsImpl serverUtils;
 
-    TestServerUtils server = new TestServerUtils();
-    ServerUtilsImpl serverUtils = new ServerUtilsImpl(new UserConfig(new TestIO("""
+    CurrencyConverterTest() throws IOException {
+        serverUtils = new ServerUtilsImpl(new UserConfig(new TestIO("""
             serverURL=//localhost:8080/
             lang=en
             recentEventCodes=hello,there""")));
+    }
 
-    CurrencyConverterTest() throws IOException {
+    @BeforeEach
+    void setup() throws URISyntaxException {
+        //clean up the currency test property file before each test
+        try (Writer fileWriter = new FileWriter(Objects.requireNonNull(CurrencyConverter.
+                class.getClassLoader().getResource("client/currenciesTest.properties")).getPath())){
+                fileWriter.write("");
+        }catch(Exception ignored){}
+        CurrencyConverter.removeCC();
+    }
+    @Test
+    void getExchangeTest() throws URISyntaxException {
+        CurrencyConverter test = CurrencyConverter.createInstance(new URI("http://localhost:8080/api/mockCurrencyConverter")
+                ,"EUR", 1, Objects.requireNonNull(CurrencyConverter.
+                        class.getClassLoader().getResource("client/currenciesTest.properties")).getPath());
+        test.getExchange();
+        Map<String, Double> map = null;
+        try (Reader fileReader = new FileReader(Objects.requireNonNull(CurrencyConverter.
+                class.getClassLoader().getResource("client/currenciesTest.properties")).getPath())){
+            map = test.initializeCurrencyMap(fileReader);
+        }catch(Exception ignored){}
+        assert map != null;
+        assertEquals(map.get("USD"), 1);
+        assertEquals(map.get("EUR"), 2);
+        assertEquals(map.get("CHF"), 3);
+        assertEquals(map.get("GBP"), 4);
+
     }
 
     @Test
-    void getExchangeTest() {
-        //get request via server utils
-        List<Properties> response = serverUtils.getMockCC();
-        StringBuilder string = new StringBuilder();
-        for(Properties p : response){
-            string.append(p.toString());
-        }
-        int x = 0;
-
-
-//        URI uri = null;
-//        try {
-//            uri = new URI("localhost:8080/api/testCurrencyConverter");
-//            String test = uri.getScheme();
-//        } catch (Exception e) {
-//            fail();
-//        }
-//        CurrencyConverter test = CurrencyConverter.createInstance(uri, "EUR", 1, "src/main/resources/client/currencies.properties");
-//        test.getExchange();
-//        assertTrue(test.updateExchange());
-    }
-
-    @Test
-    void initiate(){
-
-
-    }
-
-    @Test
-    void invalidUpdate(){
-        CurrencyConverter test = CurrencyConverter.getInstance();
+    void addCurrencyTest() throws URISyntaxException {
+        CurrencyConverter test = CurrencyConverter.createInstance(new URI("http://localhost:8080/api/mockCurrencyConverter")
+                ,"EUR", 1, Objects.requireNonNull(CurrencyConverter.
+                        class.getClassLoader().getResource("client/currenciesTest.properties")).getPath());
         assertTrue(test.updateExchange());
+        //creating map without "CUR"
+        Map<String, Double> map = null;
+        try (Reader fileReader = new FileReader(Objects.requireNonNull(CurrencyConverter.
+                class.getClassLoader().getResource("client/currenciesTest.properties")).getPath())){
+            map = test.initializeCurrencyMap(fileReader);
+        }catch(Exception ignored){}
+        assert map != null;
+        assertNull(map.get("CUR"));
+        assertTrue(test.addCurrency("CUR", 5));
+        Map<String, Double> mapWithAddedCurr = null;
+        try (Reader fileReader = new FileReader(Objects.requireNonNull(CurrencyConverter.
+                class.getClassLoader().getResource("client/currenciesTest.properties")).getPath())){
+            mapWithAddedCurr = test.initializeCurrencyMap(fileReader);
+        }catch(Exception ignored){}
+        assert mapWithAddedCurr != null;
+        assertEquals(5, mapWithAddedCurr.get("CUR"));
+    }
+
+    @Test
+    void setBaseTest() throws URISyntaxException {
+        CurrencyConverter test = CurrencyConverter.createInstance(new URI("http://localhost:8080/api/mockCurrencyConverter")
+                ,"EUR", 1, Objects.requireNonNull(CurrencyConverter.
+                        class.getClassLoader().getResource("client/currenciesTest.properties")).getPath());
+        assertTrue(test.updateExchange());
+        try (Reader fileReader = new FileReader(Objects.requireNonNull(CurrencyConverter.
+                class.getClassLoader().getResource("client/currenciesTest.properties")).getPath())){
+                test.initializeCurrencyMap(fileReader);
+        }catch(Exception ignored){}
+       assertTrue(test.setBase("USD"));
+        assertEquals(test.getBase(), "USD");
+        assertEquals(test.getConversionRate(), 0.5);
     }
 }
