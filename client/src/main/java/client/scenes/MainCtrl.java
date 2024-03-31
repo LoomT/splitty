@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.components.KeyboardShortcuts;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -88,7 +89,7 @@ public class MainCtrl {
             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
             Pair<AdminOverviewCtrl, Parent> adminOverview,
             Pair<AddExpenseCtrl, Parent> addExpensePage
-    ) {
+    ){
 
         this.primaryStage = primaryStage;
         this.languageConf = languageConf;
@@ -119,8 +120,12 @@ public class MainCtrl {
         primaryStage.show();
 
         startScreenCtrl.checkEnter(this.startScreen);
-        adminOverviewCtrl.checkEscape(this.adminOverview);
-        adminLoginCtrl.checkEscape(this.adminLogin);
+        //adminOverviewCtrl.checkEscape(this.adminOverview);
+        //eventPageCtrl.checkEscape(this.eventPage);
+        adminOverviewCtrl.checkRefresh(this.adminOverview);
+        KeyboardShortcuts.checkEscape(this.adminOverview, adminOverviewCtrl);
+        KeyboardShortcuts.checkEscape(this.adminLogin, adminLoginCtrl);
+        KeyboardShortcuts.checkEscape(this.eventPage, eventPageCtrl);
     }
 
     /**
@@ -160,7 +165,7 @@ public class MainCtrl {
      * page from the participant/expense editors
      * @param event the event to show
      */
-    public void goBackToEventPage(Event event) {
+    public void goBack(Event event) {
         eventPageCtrl.displayEvent(event);
         primaryStage.setScene(eventPage);
     }

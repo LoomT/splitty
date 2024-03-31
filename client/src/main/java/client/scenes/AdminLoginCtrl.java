@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.Backable;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
@@ -10,7 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-public class AdminLoginCtrl {
+public class AdminLoginCtrl implements Backable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -40,7 +41,7 @@ public class AdminLoginCtrl {
      *
      */
     @FXML
-    private void backButtonClicked() {
+    public void backButtonClicked() {
         mainCtrl.showStartScreen();
     }
 
@@ -57,18 +58,6 @@ public class AdminLoginCtrl {
         } else {
             passwordLabel.setText("Incorrect password");
         }
-    }
-
-    public void checkEscape(Scene scene) {
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
-            if (ke.getCode() == KeyCode.ESCAPE) {
-                System.out.println("Key Pressed: " + ke.getCode());
-                backButtonClicked();
-                ke.consume(); // <-- stops passing the event to next node
-            } else if (ke.getCode() == KeyCode.ENTER  && ke.getTarget().equals(passwordTextField)) {
-                loginButtonClicked();
-            }
-        });
     }
 }
 

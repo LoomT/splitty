@@ -157,7 +157,7 @@ public class AddExpenseCtrl {
         }
 
         server.updateExpense(ex.getId(), ev.getId(), ex);
-        mainCtrl.goBackToEventPage(ev);
+        mainCtrl.goBack(ev);
     }
 
     private List<Participant> getExpenseParticipants(Event ev) {
@@ -282,7 +282,7 @@ public class AddExpenseCtrl {
                     expense.setDate(expenseDate);
                     server.createExpense(ev.getId(), expense);
                     resetExpenseFields();
-                    mainCtrl.goBackToEventPage(ev);
+                    mainCtrl.goBack(ev);
                 }
             } catch (NumberFormatException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -325,7 +325,7 @@ public class AddExpenseCtrl {
      */
     public void handleAbortButton(Event ev) {
         resetExpenseFields();
-        mainCtrl.goBackToEventPage(ev);
+        mainCtrl.goBack(ev);
     }
 
     /**

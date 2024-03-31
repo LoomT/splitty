@@ -179,7 +179,6 @@ public class StartScreenCtrl {
             //System.out.println("Something went wrong while joining an event");
         }
 
-
     }
 
     public void checkEnter(Scene scene){
@@ -199,7 +198,6 @@ public class StartScreenCtrl {
             }
         });
     }
-
 
     /**
      * Display admin login

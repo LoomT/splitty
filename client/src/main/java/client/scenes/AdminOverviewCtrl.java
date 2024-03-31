@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.components.EventListItemAdmin;
+import client.utils.Backable;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class AdminOverviewCtrl {
+public class AdminOverviewCtrl implements Backable {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -156,7 +157,7 @@ public class AdminOverviewCtrl {
      * Show admin login screen when back button is clicked
      */
     @FXML
-    private void backButtonClicked() {
+    public void backButtonClicked() {
         stopPoller();
         mainCtrl.showAdminLogin();
     }
@@ -283,14 +284,9 @@ public class AdminOverviewCtrl {
         poller.interrupt();
     }
 
-    public void checkEscape(Scene scene){
+    public void checkRefresh(Scene scene){
         scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
-            if (ke.getCode() == KeyCode.ESCAPE) {
-                System.out.println("Key Pressed: " + ke.getCode());
-                backButtonClicked();
-                ke.consume(); // <-- stops passing the event to next node
-            }
-            else if (ke.getCode() == KeyCode.F5) {
+            if (ke.getCode() == KeyCode.F5) {
                 System.out.println("Key Pressed: " + ke.getCode());
                 refreshButtonClicked();
                 ke.consume(); // <-- stops passing the event to next node

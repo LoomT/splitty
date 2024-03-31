@@ -1,6 +1,7 @@
 package client.scenes;
 
 
+import client.utils.Backable;
 import client.utils.LanguageConf;
 import client.utils.Websocket;
 import com.google.inject.Inject;
@@ -12,7 +13,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -23,7 +27,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class EventPageCtrl {
+public class EventPageCtrl implements Backable {
 
     @FXML
     private Text eventTitle;
@@ -194,7 +198,7 @@ public class EventPageCtrl {
      * action when back button is clicked
      */
     @FXML
-    private void backButtonClicked() {
+    public void backButtonClicked() {
         websocket.disconnect();
         mainCtrl.showStartScreen();
     }

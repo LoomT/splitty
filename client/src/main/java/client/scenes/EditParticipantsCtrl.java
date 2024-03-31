@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.Backable;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -8,14 +9,20 @@ import commons.Event;
 import commons.Participant;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-public class EditParticipantsCtrl {
+
+public class EditParticipantsCtrl implements Backable {
     @FXML
     private Text eventTitle;
     @FXML
@@ -151,8 +158,8 @@ public class EditParticipantsCtrl {
      * Handler for the back button
      */
     @FXML
-    private void backButtonClicked() {
-        mainCtrl.goBackToEventPage(event);
+    public void backButtonClicked() {
+        mainCtrl.goBack(event);
     }
 
     @FXML
@@ -219,4 +226,5 @@ public class EditParticipantsCtrl {
                         -fx-border-color: red;
                         -fx-text-inner-color: red""");
     }
+
 }
