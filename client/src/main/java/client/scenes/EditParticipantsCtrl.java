@@ -2,7 +2,7 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
-import client.utils.WebsocketImpl;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
@@ -41,7 +41,7 @@ public class EditParticipantsCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private final LanguageConf languageConf;
-    private final WebsocketImpl websocket;
+    private final Websocket websocket;
 
     /**
      * @param server       serverutils instance
@@ -54,7 +54,7 @@ public class EditParticipantsCtrl {
             ServerUtils server,
             MainCtrl mainCtrl,
             LanguageConf languageConf,
-            WebsocketImpl websocket
+            Websocket websocket
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;

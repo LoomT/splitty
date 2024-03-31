@@ -35,7 +35,7 @@ public class StartScreenCtrl {
 
 
     private UserConfig userConfig;
-    private WebsocketImpl websocket;
+    private Websocket websocket;
 
     /**
      * start screen controller constructor
@@ -52,7 +52,7 @@ public class StartScreenCtrl {
             MainCtrl mainCtrl,
             LanguageConf languageConf,
             UserConfig userConfig,
-            WebsocketImpl websocket
+            Websocket websocket
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;

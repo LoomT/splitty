@@ -3,7 +3,7 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
-import client.utils.WebsocketImpl;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -58,7 +58,7 @@ public class EventPageCtrl {
 
     private int selectedParticipantId;
 
-    private WebsocketImpl websocket;
+    private Websocket websocket;
 
     private ServerUtils server;
     private MainCtrl mainCtrl;
@@ -79,7 +79,7 @@ public class EventPageCtrl {
         ServerUtils server,
         MainCtrl mainCtrl,
         LanguageConf languageConf,
-        WebsocketImpl websocket
+        Websocket websocket
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;

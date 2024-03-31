@@ -17,7 +17,7 @@ package client.scenes;
 
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
-import client.utils.WebsocketImpl;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.scene.Cursor;
@@ -52,13 +52,13 @@ public class MainCtrl {
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
-    private final WebsocketImpl websocket;
+    private final Websocket websocket;
 
     /**
      * @param websocket the websocket instance
      */
     @Inject
-    public MainCtrl(WebsocketImpl websocket) {
+    public MainCtrl(Websocket websocket) {
         this.websocket = websocket;
 
     }
