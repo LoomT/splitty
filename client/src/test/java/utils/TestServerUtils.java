@@ -16,6 +16,7 @@ public class TestServerUtils implements ServerUtils {
     private Date lastChange;
     private final List<String> calls;
     private final List<Integer> statuses;
+    private boolean polled;
 
     /**
      * constructor
@@ -27,6 +28,7 @@ public class TestServerUtils implements ServerUtils {
         lastChange = new Date();
         calls = new ArrayList<>();
         statuses = new ArrayList<>();
+        polled = false;
     }
 
     /**
@@ -50,6 +52,10 @@ public class TestServerUtils implements ServerUtils {
      */
     public List<Integer> getStatuses() {
         return statuses;
+    }
+
+    public boolean isPolled() {
+        return polled;
     }
 
     /**
@@ -387,7 +393,8 @@ public class TestServerUtils implements ServerUtils {
      */
     @Override
     public int pollEvents(String inputPassword, Long timeOut) {
-        calls.add("pollEvents");
+//        calls.add("pollEvents"); this causes OutOfMemoryError
+        polled = true;
         if(!"password".equals(inputPassword)) {
             statuses.add(401);
             return 401;
@@ -401,9 +408,7 @@ public class TestServerUtils implements ServerUtils {
                     return 204;
                 }
                 Thread.sleep(100);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            } catch (InterruptedException ignored) {}
         }
         statuses.add(408);
         return 408;
