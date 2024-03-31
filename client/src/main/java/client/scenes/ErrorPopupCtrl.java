@@ -75,16 +75,16 @@ public class ErrorPopupCtrl {
     public void generatePopup(String code, String stringToken, int intToken) {
         String header;
         String description;
-        try{
-        this.errorImage.setImage(new Image(String.valueOf(
-                getClass().getResource("/client/scenes/icons8-error-96.png"))));
-        stringToken = languageConf.get(stringToken);
+        try {
+            this.errorImage.setImage(new Image(String.valueOf(
+                    getClass().getResource("/client/scenes/icons8-error-96.png"))));
+            stringToken = languageConf.get(stringToken);
 
-        header = String.format(languageConf.get(
-                "ErrorPopup." + code + "Header"), stringToken, intToken);
-        description = String.format(languageConf.get(
-                "ErrorPopup." + code + "Description"), stringToken, intToken);
-        }catch(MissingResourceException e){
+            header = String.format(languageConf.get(
+                    "ErrorPopup." + code + "Header"), stringToken, intToken);
+            description = String.format(languageConf.get(
+                    "ErrorPopup." + code + "Description"), stringToken, intToken);
+        } catch (MissingResourceException e) {
             header = languageConf.get("ErrorPopup.unknownErrorHeader");
             description = languageConf.get("ErrorPopup.unknownErrorDescription");
         }
