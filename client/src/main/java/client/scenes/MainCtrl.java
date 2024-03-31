@@ -34,43 +34,41 @@ import java.util.List;
 
 public class MainCtrl {
 
+    private final UserConfig userConfig;
+    private final LanguageConf languageConf;
+    private final Websocket websocket;
+
     private Stage primaryStage;
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
-    private Scene adminLogin;
-
-    private LanguageConf languageConf;
-
     private AdminLoginCtrl adminLoginCtrl;
+    private Scene adminLogin;
+    private AdminOverviewCtrl adminOverviewCtrl;
+    private Scene adminOverview;
     private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
-
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
-
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
-    private UserConfig userConfig;
-
-    private Scene adminOverview;
-    private AdminOverviewCtrl adminOverviewCtrl;
-    private final Websocket websocket;
 
     /**
      * @param websocket the websocket instance
+     * @param languageConf the language config
+     * @param userConfig the user configuration
      */
     @Inject
-    public MainCtrl(Websocket websocket) {
+    public MainCtrl(Websocket websocket, LanguageConf languageConf,
+                    UserConfig userConfig) {
         this.websocket = websocket;
-
+        this.languageConf = languageConf;
+        this.userConfig = userConfig;
     }
 
     /**
      * Initializes the UI
      *
      * @param primaryStage         stage
-     * @param languageConf         the language config
-     * @param userConfig           the user configuration
      * @param startScreen          controller and scene
      * @param eventPage            controller and scene for event page
      * @param adminLogin           admin login controller and scene
@@ -80,8 +78,6 @@ public class MainCtrl {
      */
     public void initialize(
             Stage primaryStage,
-            LanguageConf languageConf,
-            UserConfig userConfig,
             Pair<StartScreenCtrl, Parent> startScreen,
             Pair<EventPageCtrl, Parent> eventPage,
             Pair<AdminLoginCtrl, Parent> adminLogin,
@@ -91,9 +87,6 @@ public class MainCtrl {
     ) {
 
         this.primaryStage = primaryStage;
-        this.languageConf = languageConf;
-        this.userConfig = userConfig;
-
 
         this.adminLoginCtrl = adminLogin.getKey();
         this.adminLogin = new Scene(adminLogin.getValue());
@@ -125,11 +118,9 @@ public class MainCtrl {
      * Display start screen
      */
     public void showStartScreen() {
-        websocket.disconnect();
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
-
     }
 
     /**
@@ -177,10 +168,11 @@ public class MainCtrl {
     /**
      * shows the admin overview
      * @param password admin password
+     * @param timeOut time out time in ms
      */
-    public void showAdminOverview(String password) {
+    public void showAdminOverview(String password, long timeOut) {
         adminOverviewCtrl.setPassword(password);
-        adminOverviewCtrl.initPoller(5000L); // 5 sec time out
+        adminOverviewCtrl.initPoller(timeOut); // 5 sec time out
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
