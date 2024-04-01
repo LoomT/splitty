@@ -137,15 +137,20 @@ public class MainCtrl {
 
     /**
      * Shows the change
-     * @param eventPageCtrl eventPageCtrl of the current event
+     * @param event current event
      */
-    public void showEditTitle(EventPageCtrl eventPageCtrl){
-        editTitleCtrl.setEventPageCtrl(eventPageCtrl);
+    public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
+        editTitleCtrl.displayEditEventTitle(eventPageCtrl, event, stage);
+    }
+
+    /**
+     * Changes the title in the editEventTitle
+     * @param title title of the event to be changed to
+     */
+    public void updateTitleEditTitle(String title){
+        editTitleCtrl.changeTitle(title);
     }
 
     /**
