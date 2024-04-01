@@ -24,6 +24,8 @@ import utils.TestServerUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -102,6 +104,7 @@ public class EventPageCtrlTest {
     public void toStringText(FxRobot robot) {
         Participant p = new Participant("name");
         Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        ex.setDate(new Date("January 2, 2024"));
         Event e = new Event("test", List.of(p), List.of(ex));
         Platform.runLater(
                 new Runnable() {
@@ -116,9 +119,31 @@ public class EventPageCtrlTest {
                         };
 
                         String formattedAmount = currencyFormatter.format(ex.getAmount());
-                        assertEquals("31.3.2024     name paid " + formattedAmount + " for expense", ctrl.toString(ex));
+                        assertEquals("2.1.2024     name paid " + formattedAmount + " for expense", ctrl.toString(ex));
                     }
                 }
         );
+    }
+
+    @Test
+    public void getExpensesFromTest(FxRobot robot) {
+        Participant p = new Participant("name");
+        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        Event e = new Event("test", List.of(p), List.of(ex));
+
+        assertEquals(List.of(ex), ctrl.getExpensesFrom(e, "name"));
+
+    }
+
+    @Test
+    public void getExpensesIncludingTest(FxRobot robot) {
+        Participant p = new Participant("name");
+        Participant p2 = new Participant("name2");
+        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        Event e = new Event("test", List.of(p, p2), List.of(ex));
+
+        assertEquals(List.of(), ctrl.getExpensesIncluding(e, "name2"));
+        assertEquals(List.of(ex), ctrl.getExpensesIncluding(e, "name"));
+
     }
 }

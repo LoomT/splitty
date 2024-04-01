@@ -326,6 +326,7 @@ public class EventPageCtrl {
     public String toString(Expense exp) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(exp.getDate());
+        System.out.println(calendar.toString());
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
