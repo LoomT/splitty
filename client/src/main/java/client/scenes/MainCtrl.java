@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -22,12 +23,10 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import javafx.scene.Cursor;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Pair;
-
 import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
@@ -50,11 +49,19 @@ public class MainCtrl {
 
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
+
+    private EditTitleCtrl editTitleCtrl;
+    private Scene titleChanger;
+
     private UserConfig userConfig;
 
     private Scene adminOverview;
     private AdminOverviewCtrl adminOverviewCtrl;
     private final Websocket websocket;
+
+    private ErrorPopupCtrl errorPopupCtrl;
+    private Scene errorPopup;
+
 
     /**
      * @param websocket the websocket instance
@@ -71,23 +78,13 @@ public class MainCtrl {
      * @param primaryStage         stage
      * @param languageConf         the language config
      * @param userConfig           the user configuration
-     * @param startScreen          controller and scene
-     * @param eventPage            controller and scene for event page
-     * @param adminLogin           admin login controller and scene
-     * @param editParticipantsPage controller and scene for editParticipants
-     * @param adminOverview        admin overview controller and scene
-     * @param addExpensePage controller and scene for addExpense
+     * @param pairCollector        collector for all of pairs
      */
     public void initialize(
             Stage primaryStage,
             LanguageConf languageConf,
             UserConfig userConfig,
-            Pair<StartScreenCtrl, Parent> startScreen,
-            Pair<EventPageCtrl, Parent> eventPage,
-            Pair<AdminLoginCtrl, Parent> adminLogin,
-            Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
-            Pair<AdminOverviewCtrl, Parent> adminOverview,
-            Pair<AddExpenseCtrl, Parent> addExpensePage
+            PairCollector pairCollector
     ) {
 
         this.primaryStage = primaryStage;
@@ -95,24 +92,30 @@ public class MainCtrl {
         this.userConfig = userConfig;
 
 
-        this.adminLoginCtrl = adminLogin.getKey();
-        this.adminLogin = new Scene(adminLogin.getValue());
+        this.adminLoginCtrl = pairCollector.adminLogin().getKey();
+        this.adminLogin = new Scene(pairCollector.adminLogin().getValue());
 
-        this.startScreenCtrl = startScreen.getKey();
-        this.startScreen = new Scene(startScreen.getValue());
+        this.startScreenCtrl = pairCollector.startScreen().getKey();
+        this.startScreen = new Scene(pairCollector.startScreen().getValue());
 
-        this.eventPageCtrl = eventPage.getKey();
-        this.eventPage = new Scene(eventPage.getValue());
+        this.eventPageCtrl = pairCollector.eventPage().getKey();
+        this.eventPage = new Scene(pairCollector.eventPage().getValue());
 
 
-        this.editParticipantsCtrl = editParticipantsPage.getKey();
-        this.editParticipants = new Scene(editParticipantsPage.getValue());
+        this.editParticipantsCtrl = pairCollector.editParticipantsPage().getKey();
+        this.editParticipants = new Scene(pairCollector.editParticipantsPage().getValue());
 
-        this.addExpenseCtrl = addExpensePage.getKey();
-        this.addExpense = new Scene(addExpensePage.getValue());
+        this.addExpenseCtrl = pairCollector.addExpensePage().getKey();
+        this.addExpense = new Scene(pairCollector.addExpensePage().getValue());
 
-        this.adminOverviewCtrl = adminOverview.getKey();
-        this.adminOverview = new Scene(adminOverview.getValue());
+        this.adminOverviewCtrl = pairCollector.adminOverview().getKey();
+        this.adminOverview = new Scene(pairCollector.adminOverview().getValue());
+
+        this.editTitleCtrl = pairCollector.editTitlePage().getKey();
+        this.titleChanger = new Scene(pairCollector.editTitlePage().getValue());
+
+        this.errorPopupCtrl = pairCollector.errorPopup().getKey();
+        this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
 
         //showOverview();
         showStartScreen();
@@ -130,6 +133,19 @@ public class MainCtrl {
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
 
+    }
+
+    /**
+     * Shows the change
+     * @param eventPageCtrl eventPageCtrl of the current event
+     */
+    public void showEditTitle(EventPageCtrl eventPageCtrl){
+        editTitleCtrl.setEventPageCtrl(eventPageCtrl);
+        Stage stage = new Stage();
+        stage.setScene(titleChanger);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     /**
@@ -184,6 +200,23 @@ public class MainCtrl {
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
+    }
+
+    /**
+     * Show error popup for general usage
+     * @param stringToken String token to be used as a variable in the error text
+     * @param intToken int token to be used as a variable in the error text
+     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
+     * Check ErrorPopupCtrl for more detailed documentation
+     */
+    public void showErrorPopup(String code, String stringToken, int intToken){
+        errorPopupCtrl.generatePopup(code, stringToken, intToken);
+        Stage stage = new Stage();
+        stage.setScene(errorPopup);
+        stage.setResizable(false);
+        stage.setTitle("Error");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     /**

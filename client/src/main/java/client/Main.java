@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.components.ErrorPopupCtrl;
 import client.scenes.*;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -64,9 +65,7 @@ public class Main extends Application {
      *
      * @param primaryStage the primary stage
      */
-    public void loadLanguageResourcesAndStart(Stage primaryStage)
-    {
-        // Load all the FXML here:
+    public void loadLanguageResourcesAndStart(Stage primaryStage) {  // Load all the FXML here:
         var start = FXML.load(
                 StartScreenCtrl.class,
                 languageConf.getLanguageResources(),
@@ -82,37 +81,35 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EventPage.fxml"
         );
-
         var editParticipants = FXML.load(
                 EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EditParticipants.fxml"
         );
-
         var adminOverview = FXML.load(
                 AdminOverviewCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
-
+        var errorPopup = FXML.load(
+                ErrorPopupCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "ErrorPopup.fxml"
+        );
         var addExpense = FXML.load(
                 AddExpenseCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
-
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(
-                primaryStage,
-                languageConf,
-                userConfig,
-                start,
-                eventPage,
-                adminLogin,
-                editParticipants,
-                adminOverview,
-                addExpense
+        var titleChanger = FXML.load(
+                EditTitleCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "EditTitle.fxml"
         );
-
+        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        mainCtrl.initialize(primaryStage, languageConf, userConfig,new PairCollector(start,
+                eventPage, adminLogin, editParticipants,
+                adminOverview, addExpense, errorPopup, titleChanger)
+        );
     }
 }

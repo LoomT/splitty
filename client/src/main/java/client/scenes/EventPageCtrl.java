@@ -1,7 +1,7 @@
 package client.scenes;
 
-
 import client.utils.LanguageConf;
+import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
@@ -60,6 +60,7 @@ public class EventPageCtrl {
     private final Websocket websocket;
     private final MainCtrl mainCtrl;
     private final LanguageConf languageConf;
+    private final ServerUtils server;
     private Event event;
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
@@ -68,16 +69,19 @@ public class EventPageCtrl {
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
      * @param websocket the websocket instance
+     * @param server server to be ysed
      */
     @Inject
     public EventPageCtrl(
         MainCtrl mainCtrl,
         LanguageConf languageConf,
-        Websocket websocket
+        Websocket websocket,
+        ServerUtils server
     ) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
 
+        this.server = server;
         this.websocket = websocket;
         websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> changeTitle((String) newTitle));
     }
@@ -140,6 +144,10 @@ public class EventPageCtrl {
                 this::displayExpenses,
                 this::displayExpenses
         );
+        websocket.registerEventChangeListener(
+                event,
+                this::displayEvent
+        );
     }
 
 
@@ -184,10 +192,12 @@ public class EventPageCtrl {
      * Changes the title of the event
      *
      * @param newTitle new title of the event
+     * @return 204 if successful, 400 if there is a problem with input, 404 if event cannot be found
      */
-    public void changeTitle(String newTitle) {
+    public int changeTitle(String newTitle) {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
+        return server.updateEventTitle(event);
     }
 
     /**
@@ -353,6 +363,13 @@ public class EventPageCtrl {
             }
         }
         return temp;
+    }
+
+    /**
+     *
+     */
+    public void changeTitle(){
+        mainCtrl.showEditTitle(this);
     }
 
     /**

@@ -267,4 +267,27 @@ public class ServerUtilsImpl implements ServerUtils {
             return response.getStatus();
         }
     }
+
+    /**
+     * @param event     the event in which the participant should be updated
+     * @return 204 for success,
+     * 400 if the event is badly formatted,
+     * 404 if event is not found
+     */
+    @Override
+    public int updateEventTitle(Event event) {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + event.getId())
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(event, APPLICATION_JSON)))
+        {
+            System.out.println(response.toString());
+            return response.getStatus();
+        }
+
+
+
+
+    }
 }
