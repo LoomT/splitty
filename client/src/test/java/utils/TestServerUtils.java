@@ -422,7 +422,9 @@ public class TestServerUtils implements ServerUtils {
                     return 204;
                 }
                 Thread.sleep(10);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException e) {
+                break;
+            }
         }
         concurrentStatuses.add(408);
         return 408;

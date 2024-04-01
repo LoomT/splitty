@@ -272,7 +272,7 @@ public class AdminOverviewCtrl {
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
                 int status = server.pollEvents(password, timeOut);
-                if(status == 204)
+                if(status == 204 && poller.isAlive())
                     Platform.runLater(this::loadAllEvents);
                 else if(status != 408) {
                     Platform.runLater(() -> {
@@ -281,7 +281,6 @@ public class AdminOverviewCtrl {
                                 "Long polling error " + status);
                         alert.showAndWait();
                         stopPoller();
-                        System.out.println(status);
                         mainCtrl.showAdminLogin();
                     });
                     poller.interrupt();

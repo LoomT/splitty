@@ -69,4 +69,11 @@ public class EventListItemAdmin extends HBox {
     private void onEventClicked() {
         onClickCallback.run();
     }
+
+    /**
+     * @return event code of the list item
+     */
+    public Label getEventCodeLabel() {
+        return eventCodeLabel;
+    }
 }
