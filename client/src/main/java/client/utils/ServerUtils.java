@@ -129,5 +129,13 @@ public interface ServerUtils {
      */
 
     int importEvent(String password, Event event);
+
+    /**
+     * Sends an API call to change an event
+     * Since adding/removing participants and expenses exist, this should be used to change titles
+     * @param event event to change
+     * @return updated event
+     */
+    int updateEventTitle(Event event);
 }
 

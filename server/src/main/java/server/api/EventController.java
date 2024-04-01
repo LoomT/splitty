@@ -148,4 +148,39 @@ public class EventController {
         }
     }
 
+    /**
+     * Use this method for changing the title since Java Response doesn't support patch.
+     * @param id id of the Event wanted to be changed
+     * @param event event to replace the old event
+     * @return 204 if successful, 400 if the input is illegal, 404 if the id cannot be found
+     */
+    @PostMapping("/{id}")
+    public ResponseEntity<Event> changeEvent(@PathVariable String id,
+                                                 @RequestBody Event event) {
+        try {
+            if(event.getTitle() == null
+                    || event.getId() == null
+                    || !event.getId().equals(id)
+                    || id.length() != 5
+                    || event.getTitle().length() > 100
+                    || event.getTitle().isEmpty())
+                return ResponseEntity.badRequest().build();
+
+            Optional<Event> found = repo.findById(id);
+            if(found.isEmpty())
+                return ResponseEntity.notFound().build();
+            event.setLastActivity(new Date());
+            repo.save(event);
+            adminController.update();
+            simp.convertAndSend("/event/" + id, event.getTitle(),
+                    Map.of("action", WebsocketActions.TITLE_CHANGE,
+                                "type", String.class.getTypeName()));
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
 }
