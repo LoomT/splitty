@@ -13,6 +13,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.beans.binding.Bindings;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +39,11 @@ public class StartScreenCtrl {
     @FXML
     private VBox eventList;
 
+    @FXML
+    private Text joinError;
+
+    @FXML
+    private Text createEventError;
 
     private UserConfig userConfig;
     private Websocket websocket;
@@ -79,33 +87,50 @@ public class StartScreenCtrl {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
         reloadEventCodes();
+        wordLimitError(code, joinError, 5);
+        wordLimitError(title, createEventError,100);
 
     }
 
     /**
-     * This method fetches the event codes and updates the list
+     * Reloads the event codes from the user config and updates the event list
+     *
      */
     private void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
+
         eventList.getChildren().clear();
 
-
-        for (int i = 0; i < recentEventCodes.size(); i++) {
-            int finalI = i;
-            list.add(
-                    new EventListItem(
-                            recentEventCodes.get(i),
-                            () -> {
-                                eventList.getChildren().remove(list.get(finalI));
-                            },
-                            (String c) -> {
-                                code.setText(c);
-                            }));
-            eventList.getChildren().add(list.get(i));
-
+        for (String eventCode : recentEventCodes) {
+            try {
+                Event event = server.getEvent(eventCode);
+                if (event == null) {
+                    throw new IllegalArgumentException("Event does not exist for code: "
+                            + eventCode);
+                }
+                EventListItem eventListItem = new EventListItem(
+                        event.getTitle(),
+                        eventCode,
+                        () -> {
+                            eventList.getChildren().remove(
+                                    list.get(
+                                            recentEventCodes.indexOf(eventCode)
+                                    )
+                            );
+                        },
+                        (String c) -> {
+                            code.setText(c);
+                        }
+                );
+                list.add(eventListItem);
+                eventList.getChildren().add(eventListItem);
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
     }
+
 
     /**
      * Call this when you want to load/reload the start screen,
@@ -117,13 +142,45 @@ public class StartScreenCtrl {
         reloadEventCodes();
     }
 
+    /**
+     *
+     * @param textField
+     * @param errorMessage
+     * @param limit
+     */
+    public void wordLimitError(TextField textField, Text errorMessage, int limit){
+        String message = errorMessage.getText();
+        errorMessage.setFill(Color.RED);
+        errorMessage.setVisible(false);
+        textField.textProperty().addListener((observableValue, number, t1)->{
+            errorMessage.setVisible(true);
+            errorMessage.textProperty().bind(Bindings.concat(
+                    message, String.format(" %d/%d", textField.getText().length(), limit)));
+
+            errorMessage.setVisible(textField.getLength() > limit);
+        });
+    }
+
+
 
     /**
      * Creates and joins the event with provided title
      */
     public void create() {
         websocket.resetAllActions();
-        if (title.getText().isEmpty()) return;
+        String token;
+        if (title.getText().isEmpty()){
+            System.out.println("Empty Title Error");
+            token = "StartScreen.emptyEventToken";
+            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
+            return;
+        }
+        else if(title.getText().length() > 100){
+            System.out.println("Character Limit Error");
+            token = "StartScreen.eventWordLimitToken";
+            mainCtrl.showErrorPopup("characterLimitError", token ,100);
+            return;
+        }
         try {
             Event createdEvent = server.createEvent(new Event(title.getText()));
             mainCtrl.showEventPage(createdEvent);
@@ -139,7 +196,25 @@ public class StartScreenCtrl {
      */
     public void join() {
         websocket.resetAllActions();
-        if (code.getText().isEmpty()) return;
+        String token;
+        if (code.getText().isEmpty()){
+            token = "StartScreen.joinEmptyToken";
+            System.out.println("Empty Field Error");
+            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
+            return;
+        }
+        if(code.getText().length() > 5){
+            token = "StartScreen.joinWordLimitToken";
+            System.out.println("Character Limit Error");
+            mainCtrl.showErrorPopup("characterLimitError", token, 5);
+            return;
+        }
+        if(code.getText().length() != 5){
+            token = "StartScreen.joinInvalidToken";
+            System.out.println("Join Code Error");
+            mainCtrl.showErrorPopup("invalidInputError", token, 5);
+            return;
+        }
         try {
             Event joinedEvent = server.getEvent(code.getText());
             if(joinedEvent == null) {
@@ -151,7 +226,6 @@ public class StartScreenCtrl {
             mainCtrl.showEventPage(joinedEvent);
         } catch (Exception e) {
             throw e;
-            //System.out.println("Something went wrong while joining an event");
         }
 
 
