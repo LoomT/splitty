@@ -37,9 +37,9 @@ Feedback: The team was in charge of the meeting, and the atmosphere was construc
 
 #### Potentially Shippable Product
 
-Mark: Sufficient
+Mark: Very good
 
-Feedback: The team didn't present the changes since the last meeting. Manual review shows progress, and that the team is on-track to finish the project.
+Feedback: The team shows progress, and is on-track to finish the project.
 
 
 #### Work Contribution/Distribution in the Team
