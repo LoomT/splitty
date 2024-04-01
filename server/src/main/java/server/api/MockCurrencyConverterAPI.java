@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class MockCurrencyConverterAPI {
+    /**
+     * @return hardcoded api response to test currency converter
+     */
     @GetMapping("api/mockCurrencyConverter")
     public ResponseEntity<String> get(){
         //string to mimic real api response from openExchangeRates so all the methods work correctly
