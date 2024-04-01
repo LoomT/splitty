@@ -6,6 +6,7 @@ import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -55,7 +56,7 @@ public class TestWebsocket implements Websocket {
      */
     @Override
     public void on(WebsocketActions action, Consumer<Object> consumer) {
-        functions.get(action).add(consumer);
+        functions.computeIfAbsent(action, k -> new HashSet<>()).add(consumer);
     }
 
     /**
