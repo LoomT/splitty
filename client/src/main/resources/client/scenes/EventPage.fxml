@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -23,14 +25,13 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="290.0" layoutY="18.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
+            <Button layoutX="315.0" layoutY="18.0" mnemonicParsing="false" onAction="#changeTitle" prefHeight="25.0" prefWidth="100.0" text="%EventPage.editEventTitle" />
              <Label fx:id="inviteCode" layoutX="439.0" layoutY="16.0" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
                  <cursor>
                      <Cursor fx:constant="HAND" />
                  </cursor>
              </Label>
              <Label fx:id="copiedToClipboardMsg" layoutX="439.0" layoutY="33.0" text="%EventPage.copiedToClipboard" />
-            <Button layoutX="331.0" layoutY="21.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
