@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +17,7 @@ public class TestServerUtils implements ServerUtils {
     private Date lastChange;
     private final List<String> calls;
     private final List<Integer> statuses;
-
+    private TestWebsocket websocket;
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
@@ -27,6 +28,8 @@ public class TestServerUtils implements ServerUtils {
         lastChange = new Date();
         calls = new ArrayList<>();
         statuses = new ArrayList<>();
+        websocket = new TestWebsocket();
+
     }
 
     /**
@@ -128,6 +131,9 @@ public class TestServerUtils implements ServerUtils {
         clone.setEventID(event.getId());
         event.addParticipant(clone);
         event.setLastActivity(new Date());
+        if(clone != null){
+            websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
+        }
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -159,6 +165,9 @@ public class TestServerUtils implements ServerUtils {
         event.getParticipants().remove(old);
         event.addParticipant(participant);
         event.setLastActivity(new Date());
+        if(participant != null){
+            websocket.simulateAction(WebsocketActions.UPDATE_PARTICIPANT, participant);
+        }
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -190,6 +199,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getParticipants().remove(old);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_PARTICIPANT, old);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -272,6 +282,7 @@ public class TestServerUtils implements ServerUtils {
         linkExpenseParticipants(clone, event.getParticipants());
         event.addExpense(clone);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_EXPENSE, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -309,6 +320,7 @@ public class TestServerUtils implements ServerUtils {
         linkExpenseParticipants(clone, event.getParticipants());
         event.getExpenses().add(clone);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.UPDATE_EXPENSE, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -336,6 +348,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getExpenses().remove(old);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_EXPENSE, old);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -458,6 +471,7 @@ public class TestServerUtils implements ServerUtils {
             statuses.add(404);
             return 404;
         }
+        websocket.simulateAction(WebsocketActions.TITLE_CHANGE, event.getTitle());
         events.add(eventIndex, event);
         statuses.add(204);
         return 204;
