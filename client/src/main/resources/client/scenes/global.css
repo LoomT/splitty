@@ -1,0 +1,44 @@
+.backgroundAnchorpane {
+    -fx-background-color: #fcfcf5;
+}
+
+.navbar {
+    -fx-background-color: #efefe9;
+}
+
+
+.titleFont {
+    -fx-font-family: "Arial Rounded MT Bold";
+    -fx-font-size: 42;
+    -fx-fill: #0d0e04;
+}
+
+.textFont {
+    -fx-font-family: "Microsoft JhengHei UI Light";
+    -fx-font-size: 13;
+    -fx-font-weight: bold;
+    -fx-fill: #0d0e04;
+}
+
+.sstextfield {
+
+    /*-fx-background-color: -fx-text-box-border, -fx-background ;*/
+    -fx-background-insets: 0, 0 0 0 0 ;
+    -fx-border-radius: 8 0 0 8;
+    -fx-background-color: #eff3d2;
+    -fx-border-color: #b9cc45;
+    -fx-prompt-text-fill: #869432;
+    -fx-fill: #0d0e04;
+}
+
+.ssbutton {
+    -fx-background-color: #e1ef8f;
+    -fx-border-color: #b9cc45;
+    -fx-border-insets: 0, 0 0 0 0;
+    -fx-border-radius: 0 8 8 0;
+    -fx-background-radius: 0 8 8 0;
+}
+
+.errorText {
+    -fx-fill: #f13b3b;
+}
