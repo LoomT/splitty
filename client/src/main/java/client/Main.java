@@ -107,6 +107,7 @@ public class Main extends Application {
                 "client", "scenes", "EditTitle.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        eventPage.getKey().initialize();
         mainCtrl.initialize(primaryStage, languageConf, userConfig,new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, errorPopup, titleChanger)
