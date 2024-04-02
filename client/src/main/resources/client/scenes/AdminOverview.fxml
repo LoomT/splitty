@@ -40,5 +40,4 @@
          <ListView fx:id="eventList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
       </children>
    </GridPane>
-   <Button layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#importButtonClicked" text="%AdminOverview.importBtn" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0" />
 </AnchorPane>
