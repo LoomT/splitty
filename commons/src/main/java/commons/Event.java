@@ -245,6 +245,13 @@ public class Event implements Cloneable {
     }
 
     /**
+     * @param transactions transactions
+     */
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    /**
      * @param transaction transaction to add to the event
      */
     public void addTransaction(Transaction transaction) {
@@ -262,13 +269,13 @@ public class Event implements Cloneable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Event event = (Event) o;
-
-        if (!Objects.equals(id, event.id) || !Objects.equals(title, event.title)) return false;
-        if (!Objects.equals(participants, event.participants)) return false;
-        if (!Objects.equals(expenses, event.expenses)) return false;
-        return Objects.equals(creationDate, event.creationDate);
+        return Objects.equals(id, event.id) && Objects.equals(title, event.title)
+                && Objects.equals(participants, event.participants)
+                && Objects.equals(expenses, event.expenses)
+                && Objects.equals(creationDate, event.creationDate)
+                && Objects.equals(lastActivity, event.lastActivity)
+                && Objects.equals(transactions, event.transactions);
     }
 
     /**
@@ -278,12 +285,7 @@ public class Event implements Cloneable {
      */
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (participants != null ? participants.hashCode() : 0);
-        result = 31 * result + (expenses != null ? expenses.hashCode() : 0);
-        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
-        return result;
+        return Objects.hash(id, title, participants, expenses, creationDate, lastActivity, transactions);
     }
 
     /**
@@ -296,8 +298,9 @@ public class Event implements Cloneable {
                 ", title='" + title + '\'' +
                 ", participants=" + participants +
                 ", expenses=" + expenses +
-                ", lastActivity=" + lastActivity +
                 ", creationDate=" + creationDate +
+                ", lastActivity=" + lastActivity +
+                ", transactions=" + transactions +
                 '}';
     }
 
