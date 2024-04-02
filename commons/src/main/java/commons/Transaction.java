@@ -6,7 +6,7 @@ import java.util.Objects;
 
 @Entity
 @IdClass(EventWeakKey.class)
-public class Transaction {
+public class Transaction implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -72,10 +72,24 @@ public class Transaction {
     }
 
     /**
+     * @param giver participant that paid in this transaction
+     */
+    public void setGiver(Participant giver) {
+        this.giver = giver;
+    }
+
+    /**
      * @return participant that received in this transaction
      */
     public Participant getReceiver() {
         return receiver;
+    }
+
+    /**
+     * @param receiver participant that received in this transaction
+     */
+    public void setReceiver(Participant receiver) {
+        this.receiver = receiver;
     }
 
     /**
@@ -120,5 +134,17 @@ public class Transaction {
                 ", receiver=" + receiver +
                 ", amount=" + amount +
                 '}';
+    }
+
+    @Override
+    public Transaction clone() {
+        try {
+            Transaction clone = (Transaction) super.clone();
+            clone.giver = this.giver.clone();
+            clone.receiver = this.receiver.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

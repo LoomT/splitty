@@ -53,7 +53,7 @@ public class Event implements Cloneable {
     private Date lastActivity;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "event_id", updatable = false, insertable = false)
-    private final List<Transaction> transactions;
+    private List<Transaction> transactions;
 
     /**
      * No-Argument Constructor
@@ -244,6 +244,10 @@ public class Event implements Cloneable {
         return transactions;
     }
 
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+    }
+
     /**
      * Equals method that checks whether two instances are equal
      * Does not take the unique eventID into consideration
@@ -322,6 +326,17 @@ public class Event implements Cloneable {
                         .map(Participant::getId).collect(Collectors.toSet());
                 e.setExpenseParticipants(new ArrayList<>(clone.participants.stream()
                         .filter(p -> ids.contains(p.getId())).toList()));
+            }
+            clone.transactions = new ArrayList<>(this.transactions.size());
+            for(Transaction t : this.transactions) {
+                Transaction cloneTransaction = t.clone();
+                cloneTransaction.setGiver(clone.participants.stream()
+                        .filter(p -> p.getId() == cloneTransaction.getGiver().getId())
+                        .findAny().orElseThrow());
+                cloneTransaction.setReceiver(clone.participants.stream()
+                        .filter(p -> p.getId() == cloneTransaction.getReceiver().getId())
+                        .findAny().orElseThrow());
+                clone.transactions.add(cloneTransaction);
             }
             clone.creationDate = (Date) this.creationDate.clone();
             clone.lastActivity = (Date) this.lastActivity.clone();
