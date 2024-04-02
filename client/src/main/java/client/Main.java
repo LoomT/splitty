@@ -106,10 +106,16 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
         );
+
+        var openDebtsPage = FXML.load(
+                OpenDebtsPageCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "OpenDebtsPage.fxml"
+        );
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, languageConf, userConfig,new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger)
+                adminOverview, addExpense, errorPopup, titleChanger, openDebtsPage)
         );
     }
 }

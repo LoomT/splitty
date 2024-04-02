@@ -401,4 +401,10 @@ public class EventPageCtrl {
         return participantChoiceBox.getValue();
     }
 
+    /**
+     * Show the openDebts page with the current event
+     */
+    public void openDebtsPage() {
+        mainCtrl.showDebtsPage(event);
+    }
 }

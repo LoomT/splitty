@@ -47,6 +47,9 @@ public class MainCtrl {
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
 
+    private OpenDebtsPageCtrl openDebtsPageCtrl;
+    private Scene openDebtsPage;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
@@ -101,6 +104,8 @@ public class MainCtrl {
         this.eventPageCtrl = pairCollector.eventPage().getKey();
         this.eventPage = new Scene(pairCollector.eventPage().getValue());
 
+        this.openDebtsPageCtrl = pairCollector.openDebtsPage().getKey();
+        this.openDebtsPage = new Scene(pairCollector.openDebtsPage().getValue());
 
         this.editParticipantsCtrl = pairCollector.editParticipantsPage().getKey();
         this.editParticipants = new Scene(pairCollector.editParticipantsPage().getValue());
@@ -271,5 +276,14 @@ public class MainCtrl {
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
 
+    }
+
+    /**
+     * Shows the open debts page
+     * @param eventToShow the event to show the open debts for
+     */
+    public void showDebtsPage(Event eventToShow) {
+        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+        primaryStage.setScene(openDebtsPage);
     }
 }
