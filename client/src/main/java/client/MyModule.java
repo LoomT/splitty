@@ -38,7 +38,7 @@ public class MyModule implements Module {
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
         binder.bind(IOInterface.class).toInstance(new FileIO(UserConfig.class.getClassLoader()
                 .getResource("client/config.properties")));
-        binder.bind(Websocket.class).in(Scopes.SINGLETON);
+        binder.bind(Websocket.class).to(WebsocketImpl.class).in(Scopes.SINGLETON);
 
     }
 }
