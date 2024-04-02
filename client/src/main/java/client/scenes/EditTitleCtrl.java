@@ -7,8 +7,10 @@ import client.utils.Websocket;
 import com.google.inject.Inject;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -117,5 +119,16 @@ public class EditTitleCtrl {
 
             errorMessage.setVisible(textField.getLength() > limit);
         });
+    }
+
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Enter: create/join an event if the focus is on the respective textFields.
+     *      go to event focused on in the eventList
+     *      expand the languageBox if it is focused
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene){
+        MainCtrl.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);
     }
 }

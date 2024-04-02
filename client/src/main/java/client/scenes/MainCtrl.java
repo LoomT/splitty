@@ -53,7 +53,7 @@ public class MainCtrl {
     private Scene eventPage;
 
     private EditTitleCtrl editTitleCtrl;
-    private Scene titleChanger;
+    private Scene editTitle;
 
     private UserConfig userConfig;
 
@@ -114,7 +114,7 @@ public class MainCtrl {
         this.adminOverview = new Scene(pairCollector.adminOverview().getValue());
 
         this.editTitleCtrl = pairCollector.editTitlePage().getKey();
-        this.titleChanger = new Scene(pairCollector.editTitlePage().getValue());
+        this.editTitle = new Scene(pairCollector.editTitlePage().getValue());
 
         this.errorPopupCtrl = pairCollector.errorPopup().getKey();
         this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
@@ -137,7 +137,7 @@ public class MainCtrl {
         addExpenseCtrl.initializeShortcuts(addExpense);
         adminLoginCtrl.initializeShortcuts(adminLogin);
         adminOverviewCtrl.initializeShortcuts(adminOverview);
-
+        editTitleCtrl.initializeShortcuts(editTitle);
 
     }
 
@@ -200,7 +200,7 @@ public class MainCtrl {
     public void showEditTitle(EventPageCtrl eventPageCtrl){
         editTitleCtrl.setEventPageCtrl(eventPageCtrl);
         Stage stage = new Stage();
-        stage.setScene(titleChanger);
+        stage.setScene(editTitle);
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
