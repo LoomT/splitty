@@ -50,10 +50,12 @@ public class MainCtrl {
     private Scene addExpense;
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
+
     private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
+
 
 
     /**

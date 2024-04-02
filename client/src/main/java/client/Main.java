@@ -101,6 +101,7 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
+
         var titleChanger = FXML.load(
                 EditTitleCtrl.class,
                 languageConf.getLanguageResources(),
