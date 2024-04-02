@@ -51,12 +51,18 @@ public class Event implements Cloneable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date lastActivity;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
+    private final List<Transaction> transactions;
 
     /**
      * No-Argument Constructor
      * Required by JPA
      */
     public Event() {
+        this.participants = new ArrayList<>();
+        this.expenses = new ArrayList<>();
+        this.transactions = new ArrayList<>();
         this.creationDate = new Date();
         this.lastActivity = new Date();
     }
@@ -69,8 +75,6 @@ public class Event implements Cloneable {
     public Event(@NotNull String title) {
         this();
         this.title = title;
-        this.participants = new ArrayList<>();
-        this.expenses = new ArrayList<>();
     }
 
     /**
@@ -231,6 +235,13 @@ public class Event implements Cloneable {
      */
     public boolean hasExpense(Expense expense){
         return expenses.contains(expense);
+    }
+
+    /**
+     * @return transaction list
+     */
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
     /**
