@@ -123,10 +123,7 @@ public class EditTitleCtrl {
 
     /**
      * Initializes the shortcuts for AddExpense:
-     *      Enter: create/join an event if the focus is on the respective textFields.
-     *      go to event focused on in the eventList
-     *      expand the languageBox if it is focused
-     * @param scene scene the listeners are initialised in
+     *      Enter: saveTitle if the focus is on the textField.
      */
     public void initializeShortcuts(Scene scene){
         MainCtrl.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);
