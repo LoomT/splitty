@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +20,7 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
+    private TestWebsocket websocket;
     private boolean polled;
 
     /**
@@ -33,6 +35,7 @@ public class TestServerUtils implements ServerUtils {
         statuses = new ArrayList<>();
         polled = false;
         concurrentStatuses = new ConcurrentSkipListSet<>();
+        websocket = new TestWebsocket();
     }
 
     /**
@@ -148,6 +151,9 @@ public class TestServerUtils implements ServerUtils {
         clone.setEventID(event.getId());
         event.addParticipant(clone);
         event.setLastActivity(new Date());
+        if(clone != null){
+            websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
+        }
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -179,6 +185,7 @@ public class TestServerUtils implements ServerUtils {
         event.getParticipants().remove(old);
         event.addParticipant(participant);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.UPDATE_PARTICIPANT, participant);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -210,6 +217,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getParticipants().remove(old);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_PARTICIPANT, old);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -292,6 +300,7 @@ public class TestServerUtils implements ServerUtils {
         linkExpenseParticipants(clone, event.getParticipants());
         event.addExpense(clone);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_EXPENSE, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -329,6 +338,7 @@ public class TestServerUtils implements ServerUtils {
         linkExpenseParticipants(clone, event.getParticipants());
         event.getExpenses().add(clone);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.UPDATE_EXPENSE, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -356,6 +366,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getExpenses().remove(old);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_EXPENSE, old);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -422,7 +433,9 @@ public class TestServerUtils implements ServerUtils {
                     return 204;
                 }
                 Thread.sleep(10);
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException e) {
+                break;
+            }
         }
         concurrentStatuses.add(408);
         return 408;
@@ -477,6 +490,7 @@ public class TestServerUtils implements ServerUtils {
             statuses.add(404);
             return 404;
         }
+        websocket.simulateAction(WebsocketActions.TITLE_CHANGE, event.getTitle());
         events.add(eventIndex, event);
         statuses.add(204);
         return 204;

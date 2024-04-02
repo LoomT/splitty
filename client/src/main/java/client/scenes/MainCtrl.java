@@ -51,11 +51,11 @@ public class MainCtrl {
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-
-    private ErrorPopupCtrl errorPopupCtrl;
-    private Scene errorPopup;
     private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
+    private ErrorPopupCtrl errorPopupCtrl;
+    private Scene errorPopup;
+
 
 
     /**
@@ -75,14 +75,10 @@ public class MainCtrl {
      * Initializes the UI
      *
      * @param primaryStage         stage
-     * @param languageConf         the language config
-     * @param userConfig           the user configuration
      * @param pairCollector        collector for all of pairs
      */
     public void initialize(
             Stage primaryStage,
-            LanguageConf languageConf,
-            UserConfig userConfig,
             PairCollector pairCollector
     ) {
 

@@ -20,6 +20,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import utils.TestIO;
 import utils.TestServerUtils;
+import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +46,7 @@ public class EventPageCtrlTest {
                 serverURL=http://localhost:8080/
                 lang=en
                 recentEventCodes="""));
-        Websocket websocket = new Websocket(userConfig);
+        Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
         MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
 

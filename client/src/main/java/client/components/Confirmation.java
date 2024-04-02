@@ -4,6 +4,7 @@ import client.utils.LanguageConf;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.layout.Region;
 
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public class Confirmation {
                 .setText(languageConf.get("yes"));
         ((Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL))
                 .setText(languageConf.get("cancel"));
+        alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
     }
 
     /**
