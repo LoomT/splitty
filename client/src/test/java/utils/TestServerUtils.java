@@ -9,6 +9,8 @@ import commons.WebsocketActions;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TestServerUtils implements ServerUtils {
 
@@ -16,8 +18,11 @@ public class TestServerUtils implements ServerUtils {
     private int counter;
     private Date lastChange;
     private final List<String> calls;
+    private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
     private TestWebsocket websocket;
+    private boolean polled;
+
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
@@ -28,8 +33,9 @@ public class TestServerUtils implements ServerUtils {
         lastChange = new Date();
         calls = new ArrayList<>();
         statuses = new ArrayList<>();
+        polled = false;
+        concurrentStatuses = new ConcurrentSkipListSet<>();
         websocket = new TestWebsocket();
-
     }
 
     /**
@@ -49,10 +55,24 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * @return status calls made by long polling
+     */
+    public Set<Integer> getConcurrentStatuses() {
+        return concurrentStatuses;
+    }
+
+    /**
      * @return returned statuses
      */
     public List<Integer> getStatuses() {
         return statuses;
+    }
+
+    /**
+     * @return true if long polled
+     */
+    public boolean isPolled() {
+        return polled;
     }
 
     /**
@@ -165,9 +185,7 @@ public class TestServerUtils implements ServerUtils {
         event.getParticipants().remove(old);
         event.addParticipant(participant);
         event.setLastActivity(new Date());
-        if(participant != null){
-            websocket.simulateAction(WebsocketActions.UPDATE_PARTICIPANT, participant);
-        }
+        websocket.simulateAction(WebsocketActions.UPDATE_PARTICIPANT, participant);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -400,9 +418,10 @@ public class TestServerUtils implements ServerUtils {
      */
     @Override
     public int pollEvents(String inputPassword, Long timeOut) {
-        calls.add("pollEvents");
+//        calls.add("pollEvents"); this causes OutOfMemoryError
+        polled = true;
         if(!"password".equals(inputPassword)) {
-            statuses.add(401);
+            concurrentStatuses.add(401);
             return 401;
         }
         Date started = new Date();
@@ -410,15 +429,15 @@ public class TestServerUtils implements ServerUtils {
         while(new Date().getTime() - time < timeOut) {
             try {
                 if(started.before(lastChange)) {
-                    statuses.add(204);
+                    concurrentStatuses.add(204);
                     return 204;
                 }
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                break;
             }
         }
-        statuses.add(408);
+        concurrentStatuses.add(408);
         return 408;
     }
 
