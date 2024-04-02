@@ -43,7 +43,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-            <ListView fx:id="eventList" focusTraversable="false" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="5" />
+            <ListView fx:id="eventList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="5" />
             </children>
         </GridPane>
     </children>

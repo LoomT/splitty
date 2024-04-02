@@ -69,4 +69,11 @@ public class EventListItemAdmin extends HBox {
     private void onEventClicked() {
         onClickCallback.run();
     }
+
+    /**
+     * used to go to the event EventListItemAdmin is bound to
+     */
+    public void goToEvent(){
+        onEventClicked();
+    }
 }

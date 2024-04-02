@@ -1,6 +1,5 @@
 package client.scenes;
 
-import client.utils.Backable;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -15,14 +14,10 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
-
-public class EditParticipantsCtrl implements Backable {
+public class EditParticipantsCtrl{
     @FXML
     private Text eventTitle;
     @FXML
@@ -227,4 +222,15 @@ public class EditParticipantsCtrl implements Backable {
                         -fx-text-inner-color: red""");
     }
 
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Escape: go back
+     *      Enter: shows the chooseParticipant choiceBox
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.chooseParticipant.show(),
+                chooseParticipant, KeyCode.ENTER);
+    }
 }

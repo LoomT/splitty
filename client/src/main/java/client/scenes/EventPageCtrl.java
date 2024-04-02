@@ -1,7 +1,6 @@
 package client.scenes;
 
 
-import client.utils.Backable;
 import client.utils.LanguageConf;
 import client.utils.Websocket;
 import com.google.inject.Inject;
@@ -16,7 +15,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class EventPageCtrl implements Backable {
+public class EventPageCtrl{
 
     @FXML
     private Text eventTitle;
@@ -388,4 +386,16 @@ public class EventPageCtrl implements Backable {
         return participantChoiceBox.getValue();
     }
 
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Escape: go back
+     *      Enter: shows participantChoiceBox when focused
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.participantChoiceBox.show(),
+                participantChoiceBox, KeyCode.ENTER);
+
+    }
 }

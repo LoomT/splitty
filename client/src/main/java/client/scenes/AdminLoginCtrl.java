@@ -1,17 +1,14 @@
 package client.scenes;
 
-import client.utils.Backable;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
-public class AdminLoginCtrl implements Backable {
+public class AdminLoginCtrl{
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -34,6 +31,16 @@ public class AdminLoginCtrl implements Backable {
         this.mainCtrl = mainCtrl;
     }
 
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Escape: go back
+     *      Enter: on textField login
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, this::loginButtonClicked,  passwordTextField, KeyCode.ENTER);
+    }
 
 
     /**
@@ -59,5 +66,6 @@ public class AdminLoginCtrl implements Backable {
             passwordLabel.setText("Incorrect password");
         }
     }
+
 }
 

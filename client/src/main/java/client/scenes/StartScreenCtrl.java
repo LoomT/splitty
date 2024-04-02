@@ -16,8 +16,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -182,33 +180,31 @@ public class StartScreenCtrl {
 
     }
 
-    public void checkEnter(Scene scene){
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
-            if (ke.getCode() == KeyCode.ENTER) {
-                System.out.println("Key Pressed: " + ke.getCode());
-                System.out.println(ke.getTarget());
-                if(ke.getTarget().equals(title) || ke.getTarget().equals(eventButton)){
-                    create();
-                }
-                else if(ke.getTarget().equals(code) || ke.getTarget().equals(joinButton)){
-                    join();
-                }
-                else if(ke.getTarget().equals(adminButton)) showAdminLogin();
-                else if(ke.getTarget().equals(eventList)){
-                    int index = eventList.getSelectionModel().getSelectedIndex();
-                    if(index == -1) return;
-                    ((EventListItem)eventList.getItems().get(index)).goToEvent();
-                }
-                else return;
-                ke.consume(); // <-- stops passing the event to next node
-            }
-        });
-    }
-
     /**
      * Display admin login
      */
     public void showAdminLogin() {
         mainCtrl.showAdminLogin();
+    }
+
+    private void goToEventListed(){
+        int index = eventList.getSelectionModel().getSelectedIndex();
+        if(index == -1) index = 0;
+        ((EventListItem)eventList.getItems().get(index)).goToEvent();
+    }
+
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Enter: create/join an event if the focus is on the respective textFields.
+     *      go to event focused on in the eventList
+     *      expand the languageBox if it is focused
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene){
+        MainCtrl.checkKey(scene, this::join, code, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, this::goToEventListed, eventList, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
+                languageChoiceBox, KeyCode.ENTER);
     }
 }

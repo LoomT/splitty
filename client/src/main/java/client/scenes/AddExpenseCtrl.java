@@ -1,6 +1,5 @@
 package client.scenes;
 
-import client.utils.Backable;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -8,7 +7,9 @@ import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.TextFlow;
 import commons.Expense;
 
@@ -20,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AddExpenseCtrl implements Backable {
+public class AddExpenseCtrl{
 
     @FXML
     private ChoiceBox<String> expenseAuthor;
@@ -482,5 +483,20 @@ public class AddExpenseCtrl implements Backable {
                 }
             }
         }
+    }
+
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Escape: go back
+     *      Enter: shows currency and type choiceBox
+     *      Shift: shows datePicker
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.expenseAuthor.show(), expenseAuthor, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.currency.show(), currency, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.type.show(), type, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.date.show(), date, KeyCode.SHIFT);
     }
 }

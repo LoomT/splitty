@@ -15,7 +15,6 @@
  */
 package client.scenes;
 
-import client.components.KeyboardShortcuts;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -25,6 +24,8 @@ import commons.Expense;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -122,14 +123,60 @@ public class MainCtrl {
 
     }
 
+    /**
+     * Initializes the shortcuts for all scenes
+     */
     public void initializeShortcuts(){
-        startScreenCtrl.checkEnter(startScreen);
-        adminOverviewCtrl.checkRefresh(adminOverview);
-        KeyboardShortcuts.checkEscape(adminOverview, adminOverviewCtrl);
-        KeyboardShortcuts.checkEscape(adminLogin, adminLoginCtrl);
-        KeyboardShortcuts.checkEscape(eventPage, eventPageCtrl);
-        KeyboardShortcuts.checkEscape(editParticipants, editParticipantsCtrl);
-        KeyboardShortcuts.checkEscape(addExpense, addExpenseCtrl);
+
+        startScreenCtrl.initializeShortcuts(startScreen);
+        eventPageCtrl.initializeShortcuts(eventPage);
+        editParticipantsCtrl.initializeShortcuts(editParticipants);
+        addExpenseCtrl.initializeShortcuts(addExpense);
+        adminLoginCtrl.initializeShortcuts(adminLogin);
+        adminOverviewCtrl.initializeShortcuts(adminOverview);
+
+
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted.
+     * @param scene scene the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     */
+    public static void checkKey(Scene scene, Runnable function, KeyCode key) {
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                try {
+                    function.run();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                ke.consume(); // <-- stops passing the event to next node
+            }
+        });
+    }
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted in a particular field.
+     * @param scene scene the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     * @param field field that should be in the focus for the function to be executed
+     */
+    public static void checkKey(Scene scene, Runnable function, Object field, KeyCode key){
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                if(ke.getTarget().equals(field)){
+                    System.out.println("Key Pressed: " + ke.getCode());
+                    System.out.println(ke.getTarget());
+                    function.run();
+                    ke.consume(); // <-- stops passing the event to next node
+                }
+            }
+        });
     }
 
     /**

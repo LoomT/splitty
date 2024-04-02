@@ -66,6 +66,9 @@ public class EventListItem extends HBox {
         onClickCallback.accept(this.id);
     }
 
+    /**
+     * used to go to the event EventListItem is bound to
+     */
     public void goToEvent(){
         eventCodeClicked();
     }

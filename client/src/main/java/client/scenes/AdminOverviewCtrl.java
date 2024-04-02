@@ -1,7 +1,6 @@
 package client.scenes;
 
 import client.components.EventListItemAdmin;
-import client.utils.Backable;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -15,9 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class AdminOverviewCtrl implements Backable {
+public class AdminOverviewCtrl{
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -35,7 +33,7 @@ public class AdminOverviewCtrl implements Backable {
     private File initialDirectory;
 
     @FXML
-    private VBox eventList;
+    private ListView eventList;
     private String password;
 
     @FXML
@@ -109,7 +107,7 @@ public class AdminOverviewCtrl implements Backable {
         if (reverseOrderCheckBox.isSelected()) allEvents = allEvents.reversed();
 
 
-        eventList.getChildren().clear();
+        eventList.getItems().clear();
 
         for (Event event : allEvents) {
             final EventListItemAdmin item =
@@ -132,7 +130,7 @@ public class AdminOverviewCtrl implements Backable {
                                 mainCtrl.showEventPage(event);
                             }
                             );
-            eventList.getChildren().add(item);
+            eventList.getItems().add(item);
 
         }
     }
@@ -284,13 +282,28 @@ public class AdminOverviewCtrl implements Backable {
         poller.interrupt();
     }
 
-    public void checkRefresh(Scene scene){
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
-            if (ke.getCode() == KeyCode.F5) {
-                System.out.println("Key Pressed: " + ke.getCode());
-                refreshButtonClicked();
-                ke.consume(); // <-- stops passing the event to next node
-            }
-        });
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Escape: go back
+     *      Enter: shows currency and type choiceBox
+     *      Shift: shows datePicker
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::refreshButtonClicked, KeyCode.F5);
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.orderByChoiceBox.show(),
+                orderByChoiceBox, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, this::goToEventListed, eventList, KeyCode.ENTER);
+    }
+
+    /**
+     * go to event listed that is focused on in the eventList
+     */
+    private void goToEventListed(){
+        int index = eventList.getSelectionModel().getSelectedIndex();
+        if(index == -1) index = 0;
+        ((EventListItemAdmin)eventList.getItems().get(index)).goToEvent();
     }
 }
