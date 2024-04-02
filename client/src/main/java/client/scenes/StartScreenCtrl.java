@@ -11,12 +11,10 @@ import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
 import javafx.beans.binding.Bindings;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -41,7 +39,7 @@ public class StartScreenCtrl {
     private ComboBox<String> languageChoiceBox;
 
     @FXML
-    private VBox eventList;
+    private ListView eventList;
 
     @FXML
     private Text joinError;

@@ -154,7 +154,7 @@ public class EditParticipantsCtrl{
      */
     @FXML
     public void backButtonClicked() {
-        mainCtrl.goBack(event);
+        mainCtrl.goBackToEventPage(event);
     }
 
     @FXML

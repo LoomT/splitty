@@ -10,10 +10,8 @@
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<?import javafx.scene.control.ComboBox?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StartScreenCtrl">
     <children>
         <Button layoutX="20.0" layoutY="10.0" mnemonicParsing="false" onAction="#showAdminLogin" text="%StartScreen.adminLoginBtn" />
@@ -24,11 +22,12 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="80.0" minWidth="10.0" prefWidth="80.0" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints maxHeight="30.0" minHeight="0.0" percentHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="30.0" minHeight="10.0" percentHeight="5.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" percentHeight="50.0" prefHeight="0.0" vgrow="SOMETIMES" />
             <RowConstraints />
@@ -48,7 +47,7 @@
                         <Insets left="10.0" />
                     </GridPane.margin>
                 </Button>
-            <ListView fx:id="eventList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="5" />
+            <ListView fx:id="eventList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="7" />
                 <Text fx:id="createEventError" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: Red;" text="%StartScreen.wordLimitError" GridPane.rowIndex="2" />
                 <Text fx:id="joinError" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-fill: Red;" text="%StartScreen.wordLimitError" GridPane.rowIndex="5" />
             </children>
