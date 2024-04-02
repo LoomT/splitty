@@ -1,6 +1,5 @@
 package client.components;
 
-import client.scenes.EventPageCtrl;
 import client.utils.Backable;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -14,7 +13,6 @@ public class KeyboardShortcuts {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
             if (ke.getCode() == KeyCode.ESCAPE) {
                 System.out.println("Key Pressed: " + ke.getCode());
-                //backButtonClicked();
                 try {
                     backable.getClass().getMethod("backButtonClicked").invoke(backable);
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {

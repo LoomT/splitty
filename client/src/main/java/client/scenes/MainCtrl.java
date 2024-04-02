@@ -116,16 +116,20 @@ public class MainCtrl {
         this.adminOverview = new Scene(adminOverview.getValue());
 
         //showOverview();
+        initializeShortcuts();
         showStartScreen();
         primaryStage.show();
 
-        startScreenCtrl.checkEnter(this.startScreen);
-        //adminOverviewCtrl.checkEscape(this.adminOverview);
-        //eventPageCtrl.checkEscape(this.eventPage);
-        adminOverviewCtrl.checkRefresh(this.adminOverview);
-        KeyboardShortcuts.checkEscape(this.adminOverview, adminOverviewCtrl);
-        KeyboardShortcuts.checkEscape(this.adminLogin, adminLoginCtrl);
-        KeyboardShortcuts.checkEscape(this.eventPage, eventPageCtrl);
+    }
+
+    public void initializeShortcuts(){
+        startScreenCtrl.checkEnter(startScreen);
+        adminOverviewCtrl.checkRefresh(adminOverview);
+        KeyboardShortcuts.checkEscape(adminOverview, adminOverviewCtrl);
+        KeyboardShortcuts.checkEscape(adminLogin, adminLoginCtrl);
+        KeyboardShortcuts.checkEscape(eventPage, eventPageCtrl);
+        KeyboardShortcuts.checkEscape(editParticipants, editParticipantsCtrl);
+        KeyboardShortcuts.checkEscape(addExpense, addExpenseCtrl);
     }
 
     /**

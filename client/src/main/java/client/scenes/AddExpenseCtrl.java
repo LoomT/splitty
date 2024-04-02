@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.Backable;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -19,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class AddExpenseCtrl {
+public class AddExpenseCtrl implements Backable {
 
     @FXML
     private ChoiceBox<String> expenseAuthor;
@@ -54,6 +55,8 @@ public class AddExpenseCtrl {
     @FXML
     private Button add;
 
+
+    private Event event;
     private ServerUtils server;
     private MainCtrl mainCtrl;
     private List<Participant> expPart;
@@ -80,6 +83,7 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        this.event = event;
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
         equalSplit.setDisable(false);
@@ -115,7 +119,7 @@ public class AddExpenseCtrl {
             }
         });
         abort.setOnAction(x -> {
-            handleAbortButton(event);
+            backButtonClicked();
         });
     }
 
@@ -321,11 +325,10 @@ public class AddExpenseCtrl {
 
     /**
      * handle the behaviour for the abort button
-     * @param ev the current event
      */
-    public void handleAbortButton(Event ev) {
+    public void backButtonClicked() {
         resetExpenseFields();
-        mainCtrl.goBack(ev);
+        mainCtrl.goBack(event);
     }
 
     /**

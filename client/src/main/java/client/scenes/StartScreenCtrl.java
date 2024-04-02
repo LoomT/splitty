@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -38,7 +39,7 @@ public class StartScreenCtrl {
     private ComboBox<String> languageChoiceBox;
 
     @FXML
-    private VBox eventList;
+    private ListView eventList;
 
     @FXML
     private Button eventButton;
@@ -100,7 +101,9 @@ public class StartScreenCtrl {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
 
-        eventList.getChildren().clear();
+        eventList.getItems().clear();
+
+        //eventList.getChildren().clear();
 
         for (String eventCode : recentEventCodes) {
             try {
@@ -112,20 +115,18 @@ public class StartScreenCtrl {
                 EventListItem eventListItem = new EventListItem(
                         event.getTitle(),
                         eventCode,
-                        () -> {
-                            eventList.getChildren().remove(
-                                    list.get(
-                                            recentEventCodes.indexOf(eventCode)
-                                    )
-                            );
-                        },
+                        () -> eventList.getItems().remove(
+                                list.get(
+                                        recentEventCodes.indexOf(eventCode)
+                                )
+                        ),
                         (String c) -> {
                             code.setText(c);
                             join();
                         }
                 );
                 list.add(eventListItem);
-                eventList.getChildren().add(eventListItem);
+                eventList.getItems().add(eventListItem);
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -193,6 +194,11 @@ public class StartScreenCtrl {
                     join();
                 }
                 else if(ke.getTarget().equals(adminButton)) showAdminLogin();
+                else if(ke.getTarget().equals(eventList)){
+                    int index = eventList.getSelectionModel().getSelectedIndex();
+                    if(index == -1) return;
+                    ((EventListItem)eventList.getItems().get(index)).goToEvent();
+                }
                 else return;
                 ke.consume(); // <-- stops passing the event to next node
             }
