@@ -250,7 +250,7 @@ public class StartScreenCtrl {
     }
 
     /**
-     * Initializes the shortcuts for AddExpense:
+     * Initializes the shortcuts for StartScreen:
      *      Enter: create/join an event if the focus is on the respective textFields.
      *      go to event focused on in the eventList
      *      expand the languageBox if it is focused

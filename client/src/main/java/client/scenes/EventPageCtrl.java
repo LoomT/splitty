@@ -404,7 +404,7 @@ public class EventPageCtrl{
     }
 
     /**
-     * Initializes the shortcuts for AddExpense:
+     * Initializes the shortcuts for EventPage:
      *      Escape: go back
      *      Enter: shows participantChoiceBox when focused
      * @param scene scene the listeners are initialised in

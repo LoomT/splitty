@@ -32,7 +32,7 @@ public class AdminLoginCtrl{
     }
 
     /**
-     * Initializes the shortcuts for AddExpense:
+     * Initializes the shortcuts for AdminLogin:
      *      Escape: go back
      *      Enter: on textField login
      * @param scene scene the listeners are initialised in

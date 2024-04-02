@@ -122,8 +122,9 @@ public class EditTitleCtrl {
     }
 
     /**
-     * Initializes the shortcuts for AddExpense:
+     * Initializes the shortcuts for EditTitle
      *      Enter: saveTitle if the focus is on the textField.
+     * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene){
         MainCtrl.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);

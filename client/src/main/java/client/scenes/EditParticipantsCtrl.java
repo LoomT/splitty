@@ -223,7 +223,7 @@ public class EditParticipantsCtrl{
     }
 
     /**
-     * Initializes the shortcuts for AddExpense:
+     * Initializes the shortcuts for EditParticipants:
      *      Escape: go back
      *      Enter: shows the chooseParticipant choiceBox
      * @param scene scene the listeners are initialised in

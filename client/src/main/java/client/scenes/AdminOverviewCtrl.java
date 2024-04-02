@@ -283,7 +283,7 @@ public class AdminOverviewCtrl{
     }
 
     /**
-     * Initializes the shortcuts for AddExpense:
+     * Initializes the shortcuts for AdminOverview:
      *      Escape: go back
      *      Enter: shows currency and type choiceBox
      *      Shift: shows datePicker
