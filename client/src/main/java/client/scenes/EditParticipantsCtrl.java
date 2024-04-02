@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.components.Confirmation;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -14,7 +15,12 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.*;
 import javafx.scene.text.Text;
+
+import java.util.Optional;
+
+import static java.lang.String.format;
 
 
 public class EditParticipantsCtrl{
@@ -153,16 +159,27 @@ public class EditParticipantsCtrl{
      * Handler for the back button
      */
     @FXML
-    public void backButtonClicked() {
+    private void backButtonClicked() {
         mainCtrl.goBackToEventPage(event);
     }
 
+    /**
+     * When delete button is pressed, shows a confirmation screen
+     * and if confirmed deletes the participant
+     */
     @FXML
     private void deletePartClicked() {
         int index = chooseParticipant.getSelectionModel().getSelectedIndex();
         Participant part = event.getParticipants().get(index -1);
         String eventID = event.getId();
-        server.deleteParticipant(eventID, part.getId());
+        Confirmation confirmation =
+                new Confirmation((format(languageConf.get("EditP.deleteConfirmMessage"),
+                        part.getName())),
+                languageConf.get("Confirmation.areYouSure"), languageConf);
+        Optional<ButtonType> result = confirmation.showAndWait();
+        if(result.isPresent() && result.get() == ButtonType.YES) {
+            server.deleteParticipant(eventID, part.getId());
+        }
     }
 
     /**

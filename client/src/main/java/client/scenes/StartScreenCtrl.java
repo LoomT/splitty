@@ -2,10 +2,7 @@ package client.scenes;
 
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;

@@ -76,4 +76,11 @@ public class EventListItemAdmin extends HBox {
     public void goToEvent(){
         onEventClicked();
     }
+
+    /**
+     * @return event code of the list item
+     */
+    public Label getEventCodeLabel() {
+        return eventCodeLabel;
+    }
 }

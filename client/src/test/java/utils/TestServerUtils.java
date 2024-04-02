@@ -4,10 +4,13 @@ import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.WebsocketActions;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TestServerUtils implements ServerUtils {
 
@@ -15,7 +18,10 @@ public class TestServerUtils implements ServerUtils {
     private int counter;
     private Date lastChange;
     private final List<String> calls;
+    private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
+    private TestWebsocket websocket;
+    private boolean polled;
 
     /**
      * constructor
@@ -27,6 +33,9 @@ public class TestServerUtils implements ServerUtils {
         lastChange = new Date();
         calls = new ArrayList<>();
         statuses = new ArrayList<>();
+        polled = false;
+        concurrentStatuses = new ConcurrentSkipListSet<>();
+        websocket = new TestWebsocket();
     }
 
     /**
@@ -46,10 +55,24 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * @return status calls made by long polling
+     */
+    public Set<Integer> getConcurrentStatuses() {
+        return concurrentStatuses;
+    }
+
+    /**
      * @return returned statuses
      */
     public List<Integer> getStatuses() {
         return statuses;
+    }
+
+    /**
+     * @return true if long polled
+     */
+    public boolean isPolled() {
+        return polled;
     }
 
     /**
@@ -128,6 +151,9 @@ public class TestServerUtils implements ServerUtils {
         clone.setEventID(event.getId());
         event.addParticipant(clone);
         event.setLastActivity(new Date());
+        if(clone != null){
+            websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
+        }
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -159,6 +185,7 @@ public class TestServerUtils implements ServerUtils {
         event.getParticipants().remove(old);
         event.addParticipant(participant);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.UPDATE_PARTICIPANT, participant);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -190,6 +217,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getParticipants().remove(old);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_PARTICIPANT, old);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -272,6 +300,7 @@ public class TestServerUtils implements ServerUtils {
         linkExpenseParticipants(clone, event.getParticipants());
         event.addExpense(clone);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_EXPENSE, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -309,6 +338,7 @@ public class TestServerUtils implements ServerUtils {
         linkExpenseParticipants(clone, event.getParticipants());
         event.getExpenses().add(clone);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.UPDATE_EXPENSE, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -336,6 +366,7 @@ public class TestServerUtils implements ServerUtils {
         }
         event.getExpenses().remove(old);
         event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_EXPENSE, old);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -387,9 +418,10 @@ public class TestServerUtils implements ServerUtils {
      */
     @Override
     public int pollEvents(String inputPassword, Long timeOut) {
-        calls.add("pollEvents");
+//        calls.add("pollEvents"); this causes OutOfMemoryError
+        polled = true;
         if(!"password".equals(inputPassword)) {
-            statuses.add(401);
+            concurrentStatuses.add(401);
             return 401;
         }
         Date started = new Date();
@@ -397,15 +429,15 @@ public class TestServerUtils implements ServerUtils {
         while(new Date().getTime() - time < timeOut) {
             try {
                 if(started.before(lastChange)) {
-                    statuses.add(204);
+                    concurrentStatuses.add(204);
                     return 204;
                 }
-                Thread.sleep(100);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                break;
             }
         }
-        statuses.add(408);
+        concurrentStatuses.add(408);
         return 408;
     }
 
@@ -458,6 +490,7 @@ public class TestServerUtils implements ServerUtils {
             statuses.add(404);
             return 404;
         }
+        websocket.simulateAction(WebsocketActions.TITLE_CHANGE, event.getTitle());
         events.add(eventIndex, event);
         statuses.add(204);
         return 204;

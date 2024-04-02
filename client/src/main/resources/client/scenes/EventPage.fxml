@@ -24,7 +24,13 @@
                </font>
             </Text>
             <Button layoutX="290.0" layoutY="18.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
-            <Button layoutX="450.0" layoutY="18.0" mnemonicParsing="false" onAction="#sendInvitesClicked" text="%EventPage.sendInvites" />
+             <Label fx:id="inviteCode" layoutX="439.0" layoutY="16.0" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
+                 <cursor>
+                     <Cursor fx:constant="HAND" />
+                 </cursor>
+             </Label>
+             <Label fx:id="copiedToClipboardMsg" layoutX="439.0" layoutY="33.0" text="%EventPage.copiedToClipboard" />
+            <Button layoutX="331.0" layoutY="21.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
          </children>
       </Pane>
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">

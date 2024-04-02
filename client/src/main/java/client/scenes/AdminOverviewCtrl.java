@@ -12,6 +12,7 @@ import commons.Event;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
@@ -155,7 +156,7 @@ public class AdminOverviewCtrl{
      * Show admin login screen when back button is clicked
      */
     @FXML
-    public void backButtonClicked() {
+    private void backButtonClicked() {
         stopPoller();
         mainCtrl.showAdminLogin();
     }
@@ -266,11 +267,26 @@ public class AdminOverviewCtrl{
      * @param timeOut time in ms until server sends a time-out signal
      */
     public void initPoller(Long timeOut) {
+        if(poller != null && poller.isAlive()) {
+            System.out.println("tried to init poller while still alive");
+            return;
+        }
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
                 int status = server.pollEvents(password, timeOut);
-                if(status != 204) continue;
-                Platform.runLater(this::loadAllEvents);
+                if(status == 204 && poller.isAlive())
+                    Platform.runLater(this::loadAllEvents);
+                else if(status != 408) {
+                    Platform.runLater(() -> {
+                        // TODO translate
+                        Alert alert = new Alert(Alert.AlertType.ERROR,
+                                "Long polling error " + status);
+                        alert.showAndWait();
+                        stopPoller();
+                        mainCtrl.showAdminLogin();
+                    });
+                    poller.interrupt();
+                }
             }});
         poller.start();
     }

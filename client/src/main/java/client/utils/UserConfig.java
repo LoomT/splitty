@@ -85,7 +85,7 @@ public class UserConfig {
      * @return the codes for the recently accessed events
      */
     public List<String> getRecentEventCodes() {
-        String codes = configProperties.getProperty("recentEventCodes");
+        String codes = configProperties.getProperty("recentEventCodes", "");
         if (codes.isEmpty()) {
             return new ArrayList<>();
         }

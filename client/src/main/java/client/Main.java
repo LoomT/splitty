@@ -81,6 +81,8 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EventPage.fxml"
         );
+        eventPage.getKey().initialize();
+
         var editParticipants = FXML.load(
                 EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(),
@@ -101,13 +103,14 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
+
         var titleChanger = FXML.load(
                 EditTitleCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
-        mainCtrl.initialize(primaryStage, languageConf, userConfig,new PairCollector(start,
+        mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, errorPopup, titleChanger)
         );
