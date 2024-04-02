@@ -81,6 +81,8 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EventPage.fxml"
         );
+        eventPage.getKey().initialize();
+
         var editParticipants = FXML.load(
                 EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(),
