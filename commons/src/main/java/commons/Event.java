@@ -244,6 +244,9 @@ public class Event implements Cloneable {
         return transactions;
     }
 
+    /**
+     * @param transaction transaction to add to the event
+     */
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
     }

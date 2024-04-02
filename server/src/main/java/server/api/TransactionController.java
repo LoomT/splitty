@@ -51,7 +51,7 @@ public class TransactionController {
             if(found.isEmpty()) return ResponseEntity.notFound().build();
             Event event = found.get();
             if (transaction == null || !event.hasParticipant(transaction.getGiver())
-            || !event.hasParticipant(transaction.getReceiver())) {
+                || !event.hasParticipant(transaction.getReceiver())) {
                 return ResponseEntity.badRequest().build();
             }
             transaction.setEventID(eventID);

@@ -136,6 +136,14 @@ public class Transaction implements Cloneable {
                 '}';
     }
 
+    /**
+     * Creates and returns a deep copy of this object x such that:
+     * <blockquote>
+     * <pre>
+     * x.clone() != x
+     * x.clone().equals(x)</pre></blockquote>
+     * and this holds for all non-primitive fields inside recursively
+     */
     @Override
     public Transaction clone() {
         try {
