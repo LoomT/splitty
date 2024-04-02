@@ -128,5 +128,6 @@ public class EditTitleCtrl {
      */
     public void initializeShortcuts(Scene scene){
         MainCtrl.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, this::cancelTitle, KeyCode.ESCAPE);
     }
 }
