@@ -15,20 +15,19 @@
  */
 package client;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.util.ResourceBundle;
-
 import com.google.inject.Injector;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.Pair;
+
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.ResourceBundle;
 
 public class MyFXML {
 
@@ -42,13 +41,13 @@ public class MyFXML {
     }
 
     /**
-     * ¯\_(ツ)_/¯
+     * Constructs a scene and controller for it
      *
      * @param c unused obj
      * @param resources the resources for the module
      * @param parts path parts
      * @param <T> class
-     * @return ¯\_(ツ)_/¯
+     * @return fxml controller and scene pair
      */
     public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources, String... parts) {
         try {
@@ -74,7 +73,7 @@ public class MyFXML {
     }
 
     /**
-     * ¯\_(ツ)_/¯
+     * Returns a controller for a given type I think
      */
     private class MyFactory implements BuilderFactory, Callback<Class<?>, Object> {
 
