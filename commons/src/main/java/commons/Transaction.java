@@ -13,9 +13,9 @@ public class Transaction implements Cloneable {
     @Id
     @Column(name = "event_id", length = 5, nullable = false)
     private String eventID;
-    @OneToOne
+    @ManyToOne
     private Participant giver;
-    @OneToOne
+    @ManyToOne
     private Participant receiver;
     private double amount;
 

@@ -5,9 +5,7 @@ import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -183,6 +181,10 @@ public class EventPageCtrl {
                 event,
                 this::displayEvent
         );
+        websocket.on(WebsocketActions.ADD_TRANSACTION,
+                transaction -> event.addTransaction((Transaction) transaction));
+        websocket.on(WebsocketActions.REMOVE_TRANSACTION,
+                id -> event.getTransactions().removeIf(t -> t.getId() == (Long) id));
     }
 
 
