@@ -5,7 +5,8 @@
 <?import javafx.scene.text.Font?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AdminOverviewCtrl">
     <Button layoutX="20" layoutY="10" mnemonicParsing="false" onAction="#backButtonClicked" text="%AdminOverview.backBtn" />
-    <Button layoutX="100" layoutY="10" mnemonicParsing="false" onAction="#refreshButtonClicked" text="%AdminOverview.refreshBtn" />
+    <Button id="refreshBtn" layoutX="100" layoutY="10" mnemonicParsing="false" onAction="#refreshButtonClicked" text="%AdminOverview.refreshBtn" />
+   <Button id="importBtn" layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#importButtonClicked" text="%AdminOverview.importBtn" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0" />
    <GridPane layoutX="123.0" layoutY="68.0" prefHeight="264.0" prefWidth="370.0">
      <columnConstraints>
        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="355.0" />
@@ -15,11 +16,6 @@
        <RowConstraints maxHeight="201.60000000000002" minHeight="10.0" prefHeight="195.20000610351565" vgrow="SOMETIMES" />
      </rowConstraints>
       <children>
-         <ScrollPane hbarPolicy="NEVER" prefHeight="185.0" prefWidth="370.0" GridPane.rowIndex="1">
-             <content>
-                 <VBox fx:id="eventList" scaleShape="false" />
-             </content>
-         </ScrollPane>
          <Pane prefHeight="200.0" prefWidth="200.0">
             <children>
                <Label layoutY="5.0" prefHeight="41.0" prefWidth="233.0" text="%AdminOverview.allEvents">
@@ -27,12 +23,16 @@
                      <Font size="15.0" />
                   </font>
                </Label>
+               <CheckBox id="reverseBtn" fx:id="reverseOrderCheckBox" layoutY="42.0" mnemonicParsing="false" text="%AdminOverview.reverseOrder" />
                <Label layoutX="220.0" layoutY="17.0" text="%AdminOverview.orderBy" />
-               <ChoiceBox fx:id="orderByChoiceBox" layoutX="220.0" layoutY="38.0" prefWidth="150.0" />
-               <CheckBox fx:id="reverseOrderCheckBox" layoutY="42.0" mnemonicParsing="false" text="%AdminOverview.reverseOrder" />
+               <ChoiceBox id="orderDropdownBtn" fx:id="orderByChoiceBox" layoutX="220.0" layoutY="38.0" prefWidth="150.0" />
             </children>
          </Pane>
+         <ScrollPane id="eventList" hbarPolicy="NEVER" prefHeight="185.0" prefWidth="370.0" GridPane.rowIndex="1">
+             <content>
+                 <VBox fx:id="eventList" scaleShape="false" />
+             </content>
+         </ScrollPane>
       </children>
    </GridPane>
-   <Button layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#importButtonClicked" text="%AdminOverview.importBtn" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0" />
 </AnchorPane>

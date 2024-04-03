@@ -8,14 +8,21 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
+import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -52,9 +59,12 @@ public class EventPageCtrl {
     private ListView<String> fromListView;
 
     @FXML
-    private ListView<String> includingListView ;
-
-
+    private ListView<String> includingListView;
+    @FXML
+    private Label inviteCode;
+    @FXML
+    private Label copiedToClipboardMsg;
+    private FadeTransition ft;
     private int selectedParticipantId;
 
     private final Websocket websocket;
@@ -62,6 +72,13 @@ public class EventPageCtrl {
     private final LanguageConf languageConf;
     private final ServerUtils server;
     private Event event;
+
+    /**
+     * @return getter for the event
+     */
+    public Event getEvent() {
+        return event;
+    }
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
 
@@ -131,7 +148,25 @@ public class EventPageCtrl {
         });
         handleWS();
         displayExpenses(event);
+
+        copiedToClipboardMsg.setVisible(false);
+        inviteCode.setText(String.format(languageConf.get("EventPage.inviteCode"), event.getId()));
     }
+
+    /**
+     * Runs once after the fxml is loaded
+     */
+    public void initialize() {
+        ft = new FadeTransition(Duration.millis(2000), copiedToClipboardMsg);
+        ft.setFromValue(1.0);
+        ft.setToValue(0);
+        ft.setDelay(Duration.millis(1000));
+        ft.setOnFinished(e -> copiedToClipboardMsg.setVisible(false));
+    }
+
+    /**
+     *Registers websocket handlers
+     */
     private void handleWS() {
         websocket.registerParticipantChangeListener(
                 event,
@@ -226,12 +261,6 @@ public class EventPageCtrl {
         createExpenses(includingExpenses, includingListView, e);
     }
 
-
-    @FXML
-    private void sendInvitesClicked() {
-
-    }
-
     @FXML
     private void editParticipantsClicked() {
         mainCtrl.showEditParticipantsPage(event);
@@ -321,6 +350,7 @@ public class EventPageCtrl {
     public String toString(Expense exp) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(exp.getDate());
+        System.out.println(calendar.toString());
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
@@ -403,4 +433,19 @@ public class EventPageCtrl {
         return participantChoiceBox.getValue();
     }
 
+    /**
+     * Gets called when invite code in the event overview is clicked
+     * Copies the invite code to the system clipboard
+     * and displays a message informing that the code was copied which fades out
+     */
+    @FXML
+    public void inviteCodeClicked() {
+        StringSelection stringSelection = new StringSelection(event.getId());
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
+        ft.stop();
+        copiedToClipboardMsg.setVisible(true);
+        copiedToClipboardMsg.setOpacity(1.0);
+        ft.play();
+    }
 }
