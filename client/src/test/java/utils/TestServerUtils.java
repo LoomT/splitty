@@ -502,7 +502,8 @@ public class TestServerUtils implements ServerUtils {
     @Override
     public int addTransaction(String eventID, Transaction transaction) {
         calls.add("addTransaction");
-        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findFirst().orElse(null);
+        Event event = events.stream().filter(e -> e.getId().equals(eventID))
+                .findFirst().orElse(null);
         if(event == null) return 404;
         if (transaction == null || !event.hasParticipant(transaction.getGiver())
                 || !event.hasParticipant(transaction.getReceiver())) {

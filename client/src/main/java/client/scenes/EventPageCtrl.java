@@ -447,6 +447,9 @@ public class EventPageCtrl {
         ft.play();
     }
 
+    /**
+     * display custom transaction screen
+     */
     @FXML
     public void addCustomTransactionClicked() {
         mainCtrl.showAddCustomTransaction(event);
