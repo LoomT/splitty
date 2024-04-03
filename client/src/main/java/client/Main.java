@@ -109,10 +109,17 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
         );
+
+        var addCustomTransaction = FXML.load(
+                AddCustomTransactionCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "AddCustomTransaction.fxml"
+        );
+
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger)
+                adminOverview, addExpense, errorPopup, titleChanger, addCustomTransaction)
         );
     }
 }

@@ -27,6 +27,7 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
@@ -55,7 +56,8 @@ public class MainCtrl {
     private Scene titleChanger;
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
-
+    private AddCustomTransactionCtrl addCustomTransactionCtrl;
+    private Scene addCustomTransaction;
 
 
     /**
@@ -109,7 +111,9 @@ public class MainCtrl {
         this.errorPopupCtrl = pairCollector.errorPopup().getKey();
         this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
 
-        //showOverview();
+        this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
+        this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
+
         showStartScreen();
         primaryStage.show();
 
@@ -262,5 +266,15 @@ public class MainCtrl {
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
 
+    }
+
+    public void showAddCustomTransaction(Event event) {
+        Stage stage = new Stage();
+        stage.setTitle("Custom transaction");
+        addCustomTransactionCtrl.display(event, stage);
+        stage.setScene(addCustomTransaction);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 }
