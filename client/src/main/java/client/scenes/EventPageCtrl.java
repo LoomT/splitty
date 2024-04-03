@@ -446,4 +446,9 @@ public class EventPageCtrl {
         copiedToClipboardMsg.setOpacity(1.0);
         ft.play();
     }
+
+    @FXML
+    public void addCustomTransactionClicked() {
+        mainCtrl.showAddCustomTransaction(event);
+    }
 }

@@ -23,6 +23,7 @@
             <Label fx:id="copiedToClipboardMsg" layoutX="439.0" layoutY="33.0" text="%EventPage.copiedToClipboard" />
          </children>
       </Pane>
+      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="%EventPage.back" />
       <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
          <children>
             <HBox>
@@ -89,6 +90,6 @@
             </TabPane>
          </children>
       </VBox>
-      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" text="%EventPage.back" />
+      <Button layoutX="444.0" layoutY="72.0" mnemonicParsing="false" onAction="#addCustomTransactionClicked" text="Add custom transaction" />
    </children>
 </AnchorPane>
