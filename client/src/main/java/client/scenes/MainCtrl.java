@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.MockClass.EditEventTitleInterface;
 import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -51,7 +52,7 @@ public class MainCtrl {
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-    private EditTitleCtrl editTitleCtrl;
+    private EditEventTitleInterface editTitleCtrl;
     private Scene titleChanger;
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
@@ -267,5 +268,13 @@ public class MainCtrl {
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
 
+    }
+
+    /**
+     * Set editTitleCtrl for testing purposes
+     * @param editTitleCtrl new EditTitleCtrl
+     */
+    public void setEditTitleCtrl(EditEventTitleInterface editTitleCtrl) {
+        this.editTitleCtrl = editTitleCtrl;
     }
 }

@@ -1,5 +1,7 @@
 package client.scenes;
 
+
+import client.MockClass.EditEventTitleInterface;
 import client.utils.LanguageConf;
 import com.google.inject.Inject;
 import commons.Event;
@@ -11,7 +13,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class EditTitleCtrl {
+public class EditTitleCtrl implements EditEventTitleInterface {
 
     @FXML
     private TextField nameTextField;
