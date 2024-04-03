@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -20,6 +21,7 @@ import java.util.NoSuchElementException;
 public class AddCustomTransactionCtrl {
     private final MainCtrl mainCtrl;
     private final ServerUtils server;
+    private final LanguageConf languageConf;
     @FXML
     private ChoiceBox<String> chooseReceiver;
     @FXML
@@ -35,11 +37,14 @@ public class AddCustomTransactionCtrl {
     /**
      * @param mainCtrl main controller
      * @param server server utils
+     * @param languageConf language config
      */
     @Inject
-    public AddCustomTransactionCtrl(MainCtrl mainCtrl, ServerUtils server) {
+    public AddCustomTransactionCtrl(MainCtrl mainCtrl, ServerUtils server,
+                                    LanguageConf languageConf) {
         this.mainCtrl = mainCtrl;
         this.server = server;
+        this.languageConf = languageConf;
     }
 
     /**
@@ -76,9 +81,11 @@ public class AddCustomTransactionCtrl {
         this.event = event;
         this.stage = stage;
         chooseReceiver.getItems().clear();
-        chooseReceiver.getItems().addAll(event.getParticipants().stream().map(Participant::getName).toList());
+        chooseReceiver.getItems().addAll(event.getParticipants()
+                .stream().map(Participant::getName).toList());
         chooseGiver.getItems().clear();
-        chooseGiver.getItems().addAll(event.getParticipants().stream().map(Participant::getName).toList());
+        chooseGiver.getItems().addAll(event.getParticipants()
+                .stream().map(Participant::getName).toList());
         amountField.setText("");
     }
 
@@ -87,49 +94,65 @@ public class AddCustomTransactionCtrl {
      */
     @FXML
     public void saveClicked() {
-        if(chooseCurrency.getValue() == null) {
-            throw new RuntimeException();
-        }
-        if(chooseReceiver.getValue() == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Please select a receiver");
-            alert.showAndWait();
-            return;
-        }
-        if(amountField.getText() == null || amountField.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Please input an amount");
-            alert.showAndWait();
-            return;
-        }
-        if(chooseGiver.getValue() == null) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Please select a giver");
-            alert.showAndWait();
-            return;
-        }
-        if(chooseReceiver.getValue().equals(chooseGiver.getValue())) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Receiver and giver can not be the same participant");
-            alert.showAndWait();
-            return;
-        }
+        if(!checkFields()) return;
         Participant receiver;
         Participant giver;
         try {
             receiver = event.getParticipants().stream()
-                    .filter(p -> p.getName().equals(chooseReceiver.getValue())).findFirst().orElseThrow();
+                    .filter(p -> p.getName().equals(chooseReceiver.getValue()))
+                    .findFirst().orElseThrow();
             giver = event.getParticipants().stream()
-                    .filter(p -> p.getName().equals(chooseGiver.getValue())).findFirst().orElseThrow();;
+                    .filter(p -> p.getName().equals(chooseGiver.getValue()))
+                    .findFirst().orElseThrow();
 
         } catch (NoSuchElementException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Unexpected error");
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.error"));
             alert.show();
             backClicked();
             return;
         }
-        Transaction transaction = new Transaction(giver, receiver, Double.parseDouble(amountField.getText()));
+        Transaction transaction = new Transaction(giver, receiver,
+                Double.parseDouble(amountField.getText()));
         int status = server.addTransaction(event.getId(), transaction);
         if(status / 100 != 2) {
             System.out.println("server error: " + status);
         }
         backClicked();
+    }
+
+    /**
+     * @return true iff all fields are valid
+     */
+    private boolean checkFields() {
+        if(chooseCurrency.getValue() == null) {
+            throw new RuntimeException();
+        }
+        if(chooseReceiver.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.warningSelectReceiver"));
+            alert.showAndWait();
+            return false;
+        }
+        if(amountField.getText() == null || amountField.getText().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.warningInputAmount"));
+            alert.showAndWait();
+            return false;
+        }
+        if(chooseGiver.getValue() == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.warningSelectGiver"));
+            alert.showAndWait();
+            return false;
+        }
+        if(chooseReceiver.getValue().equals(chooseGiver.getValue())) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.warningSameParticipants"));
+            alert.showAndWait();
+            return false;
+        }
+        return true;
     }
 
     /**

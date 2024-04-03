@@ -268,9 +268,13 @@ public class MainCtrl {
 
     }
 
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
     public void showAddCustomTransaction(Event event) {
         Stage stage = new Stage();
-        stage.setTitle("Custom transaction");
+        stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));
         addCustomTransactionCtrl.display(event, stage);
         stage.setScene(addCustomTransaction);
         stage.setResizable(false);

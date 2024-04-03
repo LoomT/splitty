@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
@@ -9,7 +8,7 @@
    <children>
       <Pane layoutX="-4.0" prefHeight="61.0" prefWidth="462.0" style="-fx-background-color: #ddd;">
          <children>
-            <Text layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Add a transaction">
+            <Text layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%AddCustomTransaction.title">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
@@ -17,20 +16,20 @@
          </children>
       </Pane>
       <ChoiceBox fx:id="chooseReceiver" layoutX="28.0" layoutY="104.0" prefWidth="150.0" />
-      <Text layoutX="190.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="received">
+      <Text layoutX="190.0" layoutY="124.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%AddCustomTransaction.received">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
       <TextField fx:id="amountField" layoutX="279.0" layoutY="104.0" prefHeight="25.0" prefWidth="108.0" />
       <ChoiceBox fx:id="chooseCurrency" layoutX="387.0" layoutY="104.0" prefHeight="25.0" prefWidth="54.0" />
-      <Text layoutX="147.0" layoutY="182.0" strokeType="OUTSIDE" strokeWidth="0.0" text="from">
+      <Text layoutX="147.0" layoutY="182.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%AddCustomTransaction.from">
          <font>
             <Font size="20.0" />
          </font>
       </Text>
       <ChoiceBox fx:id="chooseGiver" layoutX="204.0" layoutY="162.0" prefWidth="150.0" />
-      <Button layoutX="23.0" layoutY="219.0" mnemonicParsing="false" onAction="#backClicked" text="Back" />
-      <Button layoutX="394.0" layoutY="219.0" mnemonicParsing="false" onAction="#saveClicked" text="Save" />
+      <Button layoutX="23.0" layoutY="219.0" mnemonicParsing="false" onAction="#backClicked" text="%AddCustomTransaction.back" AnchorPane.leftAnchor="20.0" />
+      <Button layoutX="299.0" layoutY="219.0" mnemonicParsing="false" onAction="#saveClicked" text="%AddCustomTransaction.save" AnchorPane.rightAnchor="20.0" />
    </children>
 </AnchorPane>
