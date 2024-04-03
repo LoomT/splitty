@@ -295,7 +295,8 @@ public class TestEventRepository implements EventRepository {
             expenseRepo.saveAll(expenses);
         }
         if(transactionRepo != null) {
-            transactionRepo.getTransactions().removeIf(t -> t.getEventID().equals(clone.getId()));
+            transactionRepo.getTransactions().removeIf(t -> t.getEventID().equals(clone.getId()) &&
+                    !clone.getTransactions().contains(t));
             List<Transaction> transactions = clone.getTransactions();
             clone.setTransactions(new ArrayList<>());
             transactionRepo.saveAll(transactions);

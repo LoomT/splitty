@@ -20,14 +20,15 @@ public class TestTransactionRepository implements TransactionRepository {
     private final List<Transaction> transactions = new ArrayList<>();
     private final List<String> calledMethods = new ArrayList<>();
     private final RandomGenerator random = new TestRandom();
-    private TestEventRepository eventRepo = null;
+    private final TestEventRepository eventRepo;
 
     /**
-     * @param repo event repo
+     * @param eventRepo event repository
      */
-    public void setEventRepo(TestEventRepository repo) {
-        eventRepo = repo;
+    public TestTransactionRepository(TestEventRepository eventRepo) {
+        this.eventRepo = eventRepo;
     }
+
     /**
      * @return called methods
      */
@@ -391,7 +392,8 @@ public class TestTransactionRepository implements TransactionRepository {
      */
     @Override
     public <S extends Transaction, R> R findBy(Example<S> example,
-                                               Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+                                               Function<FluentQuery.FetchableFluentQuery<S>, R>
+                                                       queryFunction) {
         // TODO Auto-generated method stub
         return null;
     }

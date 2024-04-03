@@ -285,7 +285,8 @@ public class Event implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, participants, expenses, creationDate, lastActivity, transactions);
+        return Objects.hash(id, title, participants, expenses,
+                creationDate, lastActivity, transactions);
     }
 
     /**

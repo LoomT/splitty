@@ -57,7 +57,7 @@ public class TransactionController {
             transaction.setEventID(eventID);
             Transaction saved = transactionRepo.save(transaction);
             update(eventID);
-            simp.convertAndSend("/event/" + eventID, transaction,
+            simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_TRANSACTION,
                             "type", Transaction.class.getTypeName()));
             return ResponseEntity.ok(saved);
@@ -76,7 +76,7 @@ public class TransactionController {
                                                   @PathVariable long id) {
         try {
             EventWeakKey key = new EventWeakKey(eventID, id);
-            if(transactionRepo.existsById(key)) {
+            if(!transactionRepo.existsById(key)) {
                 return ResponseEntity.notFound().build();
             }
             transactionRepo.deleteById(key);
