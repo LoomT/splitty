@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/events")
+@RequestMapping("/api/events/{eventID}/transactions")
 public class TransactionController {
     private final EventRepository eventRepo;
     private final TransactionRepository transactionRepo;
@@ -43,7 +43,7 @@ public class TransactionController {
      * @param transaction transaction
      * @return saved transaction
      */
-    @PostMapping("/{eventID}/transactions")
+    @PostMapping({"", "/"})
     public ResponseEntity<Transaction> add(@PathVariable String eventID,
                                      @RequestBody Transaction transaction) {
         try {
@@ -71,7 +71,7 @@ public class TransactionController {
      * @param id transaction id
      * @return 204 if deleted, 404 if not found
      */
-    @DeleteMapping("/{eventID}/transactions/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Transaction> deleteById(@PathVariable String eventID,
                                                   @PathVariable long id) {
         try {
