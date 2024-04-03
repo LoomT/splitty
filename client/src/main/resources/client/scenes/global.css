@@ -51,7 +51,7 @@
     -fx-cursor: hand;
 }
 
-.ssbutton:focused {
+.ssbutton:focused, .ssbutton:hover {
     -fx-border-color: #62d1d4;
     -fx-background-color: derive(#62d1d4, 60%);
 }
