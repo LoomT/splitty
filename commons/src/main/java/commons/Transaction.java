@@ -155,4 +155,24 @@ public class Transaction implements Cloneable {
             throw new AssertionError();
         }
     }
+
+    /**
+     * Clones the transaction and links the participant with
+     * participants of given event
+     *
+     * @param event event
+     * @return transaction
+     */
+    public Transaction clone(Event event) {
+        try {
+            Transaction clone = (Transaction) super.clone();
+            clone.receiver = event.getParticipants().stream()
+                    .filter(p -> p.getName().equals(receiver.getName())).findFirst().orElseThrow();
+            clone.giver = event.getParticipants().stream()
+                    .filter(p -> p.getName().equals(giver.getName())).findFirst().orElseThrow();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
