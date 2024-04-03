@@ -3,6 +3,7 @@ package server.api;
 import commons.Event;
 import commons.Participant;
 import commons.Transaction;
+import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -125,5 +126,33 @@ public class TransactionControllerTest {
     public void deleteNullID() {
         var response = transactionController.deleteById(null, 1);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteInvolvedParticipant() {
+        Transaction added = transactionController.add(event.getId(), transaction).getBody();
+        assert added != null;
+        var response = participantController.deleteById(added.getGiver().getId(), event.getId());
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+    }
+
+    @Test
+    public void deleteInvolvedParticipantWebsocket() {
+        Transaction added = transactionController.add(event.getId(), transaction).getBody();
+        assert added != null;
+        participantController.deleteById(added.getGiver().getId(), event.getId());
+        assertTrue(template.getAllHeaders().stream().map(map -> map.get("action"))
+                .toList().contains(WebsocketActions.REMOVE_TRANSACTION));
+    }
+
+    @Test
+    public void deleteInvolvedParticipantGoodEvent() {
+        Transaction added = transactionController.add(event.getId(), transaction).getBody();
+        assert added != null;
+        participantController.deleteById(added.getGiver().getId(), event.getId());
+        Event event2 = eventController.getById(event.getId()).getBody();
+        assert event2 != null;
+        assertEquals(1, event2.getParticipants().size());
+        assertEquals(0, event2.getTransactions().size());
     }
 }
