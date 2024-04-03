@@ -1,10 +1,7 @@
 package utils;
 
 import client.utils.ServerUtils;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -497,5 +494,28 @@ public class TestServerUtils implements ServerUtils {
 
     }
 
-
+    /**
+     * @param eventID     event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    @Override
+    public int addTransaction(String eventID, Transaction transaction) {
+        calls.add("addTransaction");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findFirst().orElse(null);
+        if(event == null) return 404;
+        if (transaction == null || !event.hasParticipant(transaction.getGiver())
+                || !event.hasParticipant(transaction.getReceiver())) {
+            return 400;
+        }
+        Transaction clone = transaction.clone(event);
+        clone.setEventID(eventID);
+        clone.setId(counter++);
+        event.addTransaction(clone);
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_TRANSACTION, clone);
+        lastChange = new Date();
+        statuses.add(200);
+        return 200;
+    }
 }
