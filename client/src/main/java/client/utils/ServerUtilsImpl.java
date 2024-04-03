@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Transaction;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -285,9 +286,22 @@ public class ServerUtilsImpl implements ServerUtils {
             System.out.println(response.toString());
             return response.getStatus();
         }
+    }
 
-
-
-
+    /**
+     * @param eventID     event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    @Override
+    public int addTransaction(String eventID, Transaction transaction) {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/transactions")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(transaction, APPLICATION_JSON))) {
+            System.out.println(response.toString());
+            return response.getStatus();
+        }
     }
 }
