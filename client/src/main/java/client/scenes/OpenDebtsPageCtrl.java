@@ -12,8 +12,9 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+
+import java.util.*;
 
 public class OpenDebtsPageCtrl {
 
@@ -32,8 +33,9 @@ public class OpenDebtsPageCtrl {
     private Event event;
 
     private ServerUtils server;
-
+    private boolean idk = true;
     private MainCtrl mainCtrl;
+    private Map<String, Double> participantDebtMap = new HashMap<>();
 
 
     /**
@@ -58,34 +60,31 @@ public class OpenDebtsPageCtrl {
      */
     public void displayOpenDebtsPage(Event event) {
         this.event = event;
-        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-
-        for(Participant participant : event.getParticipants()) {
-            double sum = 0;
-            for(Expense expense : event.getExpenses()) {
-                for(Participant expenseParticipant : expense.getExpenseParticipants()) {
-                    if(expenseParticipant.getName().equals(participant.getName())) {
-                        sum += expense.getAmount() / expense.getExpenseParticipants().size();
-                    }
-                }
+        Map<String, Double> map = new HashMap<>();
+        event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
+        double sum = 0;
+        for(Expense e : event.getExpenses()){
+            for(Participant p : e.getExpenseParticipants()){
+                double cost = e.getAmount() / e.getExpenseParticipants().size();
+                map.put(p.getName(), map.get(p.getName()) + cost);
             }
-            pieChartData.add(new PieChart.Data(participant.getName(), sum));
+            sum += e.getAmount();
         }
+        if(map.equals(participantDebtMap)) return;
+
+        participantDebtMap = map;
+        List<PieChart.Data> removalList = new ArrayList<>(this.shareChart.getData());
+        this.shareChart.getData().removeAll(removalList);
+
+        for(String s : map.keySet()){
+            this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
+        }
+
         for (PieChart.Data data : shareChart.getData()) {
             data.setName(data.getName() + ": " + (int) data.getPieValue() + "%");
         }
+        totalSumExp.setText("Total sum of all expenses in this event: " + sum);
 
-        Font font = new Font("Arial", 12);
-        for (PieChart.Data data : shareChart.getData()) {
-            data.getNode().setStyle("-fx-font-size: " + font.getSize() + "px;");
-        }
-        this.shareChart.setData(pieChartData);
-        this.shareChart.setStyle("-fx-background-color: transparent;");
-        double totalSum = 0;
-        for(Expense expense : event.getExpenses()) {
-            totalSum += expense.getAmount();
-        }
-        totalSumExp.setText("Total sum of all expenses in this event: " + totalSum);
     }
 
 
