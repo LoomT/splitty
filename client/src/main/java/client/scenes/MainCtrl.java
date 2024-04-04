@@ -15,7 +15,7 @@
  */
 package client.scenes;
 
-import client.MockClass.EditEventTitleInterface;
+import client.MockClass.*;
 import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -45,7 +45,7 @@ public class MainCtrl {
     private Scene adminLogin;
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
-    private EditParticipantsCtrl editParticipantsCtrl;
+    private EditParticipantInterface editParticipantsCtrl;
     private Scene editParticipants;
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
@@ -140,7 +140,7 @@ public class MainCtrl {
      * Changes the title in the editEventTitle
      * @param title title of the event to be changed to
      */
-    public void updateTitleEditTitle(String title){
+    public void updateEditTitle(String title){
         editTitleCtrl.changeTitle(title);
     }
 
@@ -187,9 +187,9 @@ public class MainCtrl {
     }
 
     /**
-     * shows the participant editor page
+     * edits the EditParticipantPage without opening it.
      *
-     * @param eventToShow the event to show the participant editor for
+     * @param eventToShow the event to update.
      */
     public void updateEditParticipantsPage(Event eventToShow) {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
@@ -285,5 +285,13 @@ public class MainCtrl {
      */
     public void setEditTitleCtrl(EditEventTitleInterface editTitleCtrl) {
         this.editTitleCtrl = editTitleCtrl;
+    }
+
+    /**
+     * Set editParticipantCtrl for testing purposes
+     * @param editParticipantCtrl new editParticipantCtrl
+     */
+    public void setEditParticipantsCtrl(EditParticipantMock editParticipantCtrl){
+        this.editParticipantsCtrl = editParticipantCtrl;
     }
 }

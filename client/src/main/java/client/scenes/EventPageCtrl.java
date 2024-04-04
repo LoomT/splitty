@@ -111,7 +111,7 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
-        mainCtrl.updateTitleEditTitle(e.getTitle());
+        mainCtrl.updateEditTitle(e.getTitle());
         mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
