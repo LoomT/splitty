@@ -137,5 +137,7 @@ public interface ServerUtils {
      * @return updated event
      */
     int updateEventTitle(Event event);
+
+    String getExchangeRates();
 }
 

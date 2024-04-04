@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -464,5 +465,24 @@ public class TestServerUtils implements ServerUtils {
 
     }
 
-
+    @Override
+    public String getExchangeRates(){
+        calls.add("getExchangeRates");
+        //string to mimic real api response from openExchangeRates so all the methods work correctly
+        String jsonResponse = """
+                {
+                 {
+                 "disclaimer": "Usage subject to terms: https://not-a-real-website.org/terms",
+                 "license": "https://not-a-real-website.org/license",
+                 "timestamp": 1711807220,
+                 "base": "USD",
+                 "rates": {
+                 "USD": 1,
+                 "EUR": 2,
+                 "CHF": 3,
+                 "GBP": 4
+                 }
+                }""";
+        return ResponseEntity.ok().body(jsonResponse).toString();
+    }
 }

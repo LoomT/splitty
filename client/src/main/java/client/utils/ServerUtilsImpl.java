@@ -26,6 +26,11 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -285,9 +290,18 @@ public class ServerUtilsImpl implements ServerUtils {
             System.out.println(response.toString());
             return response.getStatus();
         }
+    }
+    @Override
+    public String getExchangeRates(){
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://openexchangerates.org/api/" + "latest.json?app_id=4368d26633d149e0b992c5bcdce76270")).GET().build();
 
-
-
-
+        HttpResponse response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return response.body().toString();
     }
 }
