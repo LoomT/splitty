@@ -80,6 +80,8 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        blockDate();
+        setupDateListener();
         date.setDayCellFactory(param -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -123,6 +125,36 @@ public class AddExpenseCtrl {
         });
         abort.setOnAction(x -> {
             handleAbortButton(event);
+        });
+    }
+
+    /**
+     * Add an event listener to the date picker to check for future dates.
+     */
+    private void setupDateListener() {
+        date.valueProperty().addListener((observable, oldValue, newValue) -> {
+            LocalDate currentDate = LocalDate.now();
+            if (newValue != null && newValue.isAfter(currentDate)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Invalid Date");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select a date that is not in the future.");
+                alert.showAndWait();
+                date.setValue(currentDate);
+            }
+        });
+    }
+
+    /**
+     * method for blocking the user fronm choosing a future date
+     */
+    public void blockDate() {
+        date.setDayCellFactory(param -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+            }
         });
     }
 
