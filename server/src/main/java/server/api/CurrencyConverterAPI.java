@@ -11,11 +11,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 @RestController
-public class CurrencyConverterAPI {
-    /**
+public class CurrencyConverterAPI {   /**
      * @return string representation of exchange rates
      */
-    @GetMapping("api/mockCurrencyConverter")
+    @GetMapping("api/CurrencyConverter")
     public String get(){
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://openexchangerates.org/api/" + "latest.json?app_id=4368d26633d149e0b992c5bcdce76270")).GET().build();

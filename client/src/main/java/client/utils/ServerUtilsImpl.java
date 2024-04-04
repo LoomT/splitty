@@ -294,7 +294,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public String getExchangeRates(){
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create("https://openexchangerates.org/api/" + "latest.json?app_id=4368d26633d149e0b992c5bcdce76270")).GET().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "api/CurrencyConverter")).GET().build();
 
         HttpResponse response;
         try {
