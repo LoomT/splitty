@@ -497,6 +497,9 @@ public class TestServerUtils implements ServerUtils {
 
     }
 
+    /**
+     * @return mocked version of exchange rate api
+     */
     @Override
     public String getExchangeRates(){
         calls.add("getExchangeRates");
