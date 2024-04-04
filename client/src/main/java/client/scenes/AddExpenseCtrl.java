@@ -80,6 +80,13 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        date.setDayCellFactory(param -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+            }
+        });
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
         equalSplit.setDisable(false);
