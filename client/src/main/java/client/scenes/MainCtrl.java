@@ -187,6 +187,15 @@ public class MainCtrl {
     }
 
     /**
+     * shows the participant editor page
+     *
+     * @param eventToShow the event to show the participant editor for
+     */
+    public void updateEditParticipantsPage(Event eventToShow) {
+        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
+    }
+
+    /**
      * shows the admin overview
      * @param password admin password
      * @param timeOut time out time in ms

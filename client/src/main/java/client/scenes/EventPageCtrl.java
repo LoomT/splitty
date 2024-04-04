@@ -112,6 +112,7 @@ public class EventPageCtrl {
         this.event = e;
         eventTitle.setText(e.getTitle());
         mainCtrl.updateTitleEditTitle(e.getTitle());
+        mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
