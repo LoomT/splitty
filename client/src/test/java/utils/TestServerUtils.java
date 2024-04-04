@@ -501,7 +501,7 @@ public class TestServerUtils implements ServerUtils {
     public String getExchangeRates(){
         calls.add("getExchangeRates");
         //string to mimic real api response from openExchangeRates so all the methods work correctly
-        String jsonResponse = """
+        return """
                 {
                  {
                  "disclaimer": "Usage subject to terms: https://not-a-real-website.org/terms",
@@ -515,6 +515,5 @@ public class TestServerUtils implements ServerUtils {
                  "GBP": 4
                  }
                 }""";
-        return ResponseEntity.ok().body(jsonResponse).toString();
     }
 }
