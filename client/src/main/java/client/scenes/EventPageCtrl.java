@@ -16,6 +16,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
@@ -281,20 +282,26 @@ public class EventPageCtrl {
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         lv.setCellFactory(param -> new ListCell<>() {
             private final Button editButton = new Button("\uD83D\uDD89");
+            private final Button removeButton = new Button("\u274C");
+            private final HBox buttonBox = new HBox();
             private final StackPane stackPane = new StackPane();
-
             {
                 stackPane.setAlignment(Pos.CENTER_LEFT);
-                StackPane.setAlignment(editButton, Pos.CENTER_RIGHT);
-                stackPane.getChildren().add(editButton);
+                buttonBox.setAlignment(Pos.CENTER_RIGHT);
+                buttonBox.getChildren().addAll(editButton, removeButton);
+                stackPane.getChildren().addAll(new Text(), buttonBox);
                 editButton.setOnAction(event -> {
                     int index = getIndex();
                     System.out.println(index);
                     Expense expense = expenses.get(index);
                     mainCtrl.handleEditExpense(expense, ev);
                 });
+                removeButton.setOnAction(event -> {
+                    int index = getIndex();
+                    Expense expense = expenses.get(index);
+                    server.deleteExpense(expense.getId(), ev.getId());
+                });
             }
-
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -302,14 +309,17 @@ public class EventPageCtrl {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    setText(null);
-                    stackPane.getChildren().clear();
-                    stackPane.getChildren().addAll(new Text(item), editButton);
-                    setGraphic(stackPane);
+                    if (item.contains("(") && item.contains(")")) {
+                        setText(item);
+                        setGraphic(null);
+                    } else {
+                        setText(null);
+                        stackPane.getChildren().set(0, new Text(item));
+                        setGraphic(stackPane);
+                    }
                 }
             }
         });
-
         ObservableList<String> items = FXCollections.observableArrayList();
         for (Expense expense : expenses) {
             String expenseString = toString(expense);
