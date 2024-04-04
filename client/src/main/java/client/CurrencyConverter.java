@@ -50,7 +50,8 @@ public class CurrencyConverter {
         this.path = path;
         this.base = "EUR";
         try {
-            this.server = new ServerUtilsImpl(new UserConfig(new FileIO(Objects.requireNonNull(CurrencyConverter.
+            this.server = new ServerUtilsImpl(new UserConfig(
+                    new FileIO(Objects.requireNonNull(CurrencyConverter.
                     class.getClassLoader().getResource("client/config.properties")).getPath())));
         } catch (Exception ignored){}
         try (Reader fileReader = new FileReader(path)) {

@@ -138,6 +138,9 @@ public interface ServerUtils {
      */
     int updateEventTitle(Event event);
 
+    /**
+     * @return string representation of the exchange rates
+     */
     String getExchangeRates();
 }
 

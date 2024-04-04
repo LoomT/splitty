@@ -291,10 +291,15 @@ public class ServerUtilsImpl implements ServerUtils {
             return response.getStatus();
         }
     }
+
+    /**
+     * @return string representation of the current exchange rates
+     */
     @Override
     public String getExchangeRates(){
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(server + "api/CurrencyConverter")).GET().build();
+        HttpRequest request = HttpRequest.newBuilder().uri(
+                URI.create(server + "api/CurrencyConverter")).GET().build();
 
         HttpResponse response;
         try {
