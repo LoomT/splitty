@@ -1,28 +1,46 @@
+* {
+    -bg: #f3f6fb;
+    -header-bg: #f3f6fb;
+    -border-color:#e9ecf1;
+    -primary: #9dbce3;
+    -primary-hover: #7798c2;
+    -secondary: #e2dcf2;
+    -secondary-hover: #cec6e3;
+    -text: #060a10;
+    -graytext: #81868d;
+    -graybg: #e5eaf1;
+    -focus-col: #0077ff;
+    -error-col: #c9435c;
+
+}
+
 .backgroundAnchorpane {
-    -fx-background-color: #fcfcf5;
+    -fx-background-color: -bg;
 }
 
 .navbar {
-    -fx-background-color: #efefe9;
+    -fx-background-color: -header-bg;
+    -fx-border-color: -border-color;
+    -fx-border-width: 0 0 1 0;
 }
 
 
 .titleFont {
     -fx-font-family: "Arial Rounded MT Bold";
     -fx-font-size: 42;
-    -fx-fill: #0d0e04;
+    -fx-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
 }
 
 .labelFont {
     -fx-font-family: "Microsoft JhengHei UI Light";
     -fx-font-size: 16;
-    -fx-fill: #0d0e04;
+    -fx-fill: -text;
 }
 
 .textFont {
     -fx-font-family: "Microsoft JhengHei UI Light";
     -fx-font-size: 13;
-    -fx-fill: #0d0e04;
+    -fx-fill: -text;
 }
 /*ss stands for startscreen*/
 .sstextfield {
@@ -31,29 +49,40 @@
     -fx-background-insets: 0, 0 0 0 0 ;
     -fx-border-radius: 8 0 0 8;
     -fx-background-radius: 8 0 0 8;
-    -fx-background-color: #eff3d2;
-    -fx-border-color: #b9cc45;
-    -fx-prompt-text-fill: #869432;
-    -fx-fill: #0d0e04;
+    -fx-border-width: 1;
+    -fx-background-color: -bg;
+    -fx-border-color: -graybg;
+    -fx-prompt-text-fill: -graytext;
+    -fx-fill: -text;
+    -fx-effect: innershadow(gaussian, #e0e4e7, 6, .5, 0, 0);
 }
 
 .sstextfield:focused {
-    -fx-border-color: #62d1d4;
-    -fx-background-color: derive(#62d1d4, 90%);
+    -fx-border-color: -focus-col;
+    /*-fx-background-color: derive(#62d1d4, 90%);*/
 }
 
 .ssbutton {
-    -fx-background-color: #e1ef8f;
-    -fx-border-color: #b9cc45;
+    -fx-background-color: -primary;
+    -fx-border-color: -primary;
     -fx-border-insets: 0, 0 0 0 0;
+    -fx-background-insets: 0;
+    -fx-border-width: 1;
     -fx-border-radius: 0 8 8 0;
     -fx-background-radius: 0 8 8 0;
     -fx-cursor: hand;
+    -fx-text-fill: -text;
 }
 
-.ssbutton:focused, .ssbutton:hover {
-    -fx-border-color: #62d1d4;
-    -fx-background-color: derive(#62d1d4, 60%);
+
+.ssbutton:hover {
+    -fx-border-color: -primary-hover;
+    -fx-background-color: -primary-hover;
+}
+
+.ssbutton:focused {
+    -fx-border-color: -focus-col;
+
 }
 
 
@@ -63,32 +92,35 @@ I cant use .button as a selector as for some reason all
 the buttons have this class by default and the styles get overwritten
 */
 .sbutton {
-    -fx-background-color: #e3e3d3;
-    -fx-border-color: #c0c4a5;
+    -fx-background-color: -secondary;
+    -fx-border-width: 1;
+    -fx-border-color: -secondary;
     -fx-border-insets: 0, 0 0 0 0;
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
 
+
+
+.sbutton:hover {
+    -fx-border-color: -secondary-hover;
+    -fx-background-color: -secondary-hover;
+}
+
 .sbutton:focused {
-    -fx-border-color: #62d1d4;
+    -fx-border-color: -focus-col;
     /*-fx-background-color: derive(#62d1d4, 60%);*/
 }
 
-.sbutton:hover {
-    -fx-border-color: #62d1d4;
-    -fx-background-color: derive(#62d1d4, 60%);
-}
-
 .errorText {
-    -fx-fill: #f13b3b;
+    -fx-fill: -error-col;
 }
 
 .eventCodeScrollPane {
-    -fx-background-color: #fcfcf5;
-    -fx-background: #fcfcf5;
-    -fx-border-color: #e3e3d3;
+    -fx-background-color: -bg;
+    -fx-background: -bg;
+    -fx-border-color: -border-color;
     -fx-border-radius: 8;
     -fx-background-radius: 80;
 }
