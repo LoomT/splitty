@@ -31,9 +31,7 @@ public class OpenDebtsPageCtrl {
     private ScrollPane allDebtsPane;
 
     private Event event;
-
     private ServerUtils server;
-    private boolean idk = true;
     private MainCtrl mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
 
