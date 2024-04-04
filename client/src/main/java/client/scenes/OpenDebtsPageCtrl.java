@@ -71,11 +71,10 @@ public class OpenDebtsPageCtrl {
             sum += e.getAmount();
         }
         if(map.equals(participantDebtMap)) return;
-
         participantDebtMap = map;
+
         List<PieChart.Data> removalList = new ArrayList<>(this.shareChart.getData());
         this.shareChart.getData().removeAll(removalList);
-
         for(String s : map.keySet()){
             this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
         }
