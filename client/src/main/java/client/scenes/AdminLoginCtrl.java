@@ -7,6 +7,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
+import java.net.ConnectException;
+
 public class AdminLoginCtrl {
 
     private final ServerUtils server;
@@ -52,10 +54,14 @@ public class AdminLoginCtrl {
     @FXML
     private void loginButtonClicked() {
         String password = passwordTextField.getText();
-        if (server.verifyPassword(password)) {
-            mainCtrl.showAdminOverview(password, 5000L);
-        } else {
-            passwordLabel.setText("Incorrect password");
+        try {
+            if (server.verifyPassword(password)) {
+                mainCtrl.showAdminOverview(password, 5000L);
+            } else {
+                passwordLabel.setText("Incorrect password");
+            }
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
         }
     }
 

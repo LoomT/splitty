@@ -27,7 +27,9 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.io.File;
+import java.net.ConnectException;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -185,7 +187,7 @@ public class MainCtrl {
      * @param password admin password
      * @param timeOut time out time in ms
      */
-    public void showAdminOverview(String password, long timeOut) {
+    public void showAdminOverview(String password, long timeOut) throws ConnectException {
         adminOverviewCtrl.setPassword(password);
         adminOverviewCtrl.initPoller(timeOut); // 5 sec time out
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
@@ -262,5 +264,12 @@ public class MainCtrl {
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
 
+    }
+
+    public void handleServerNotFound() {
+        websocket.disconnect();
+        adminOverviewCtrl.stopPoller();
+        showStartScreen();
+        startScreenCtrl.showServerNotFoundError();
     }
 }

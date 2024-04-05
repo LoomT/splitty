@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.TextFlow;
 
+import java.net.ConnectException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -155,7 +156,12 @@ public class AddExpenseCtrl {
             return;
         }
 
-        server.updateExpense(ex.getId(), ev.getId(), ex);
+        try {
+            server.updateExpense(ex.getId(), ev.getId(), ex);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
         mainCtrl.goBackToEventPage(ev);
     }
 
@@ -269,7 +275,12 @@ public class AddExpenseCtrl {
                     Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
                             expCurrency, participants, expType);
                     expense.setDate(expenseDate);
-                    server.createExpense(ev.getId(), expense);
+                    try {
+                        server.createExpense(ev.getId(), expense);
+                    } catch (ConnectException e) {
+                        mainCtrl.handleServerNotFound();
+                        return;
+                    }
                     resetExpenseFields();
                     mainCtrl.goBackToEventPage(ev);
                 }

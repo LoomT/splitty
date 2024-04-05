@@ -88,7 +88,7 @@ public class EditTitleCtrl {
         if(result >= 400)
             System.out.println("An error has occurred");
         else{
-            System.out.println("An error has occurred");
+            System.out.println("No error has occurred");
             cancelTitle();
         }
     }

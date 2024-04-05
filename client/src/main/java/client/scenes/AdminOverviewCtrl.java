@@ -19,6 +19,7 @@ import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -114,7 +115,13 @@ public class AdminOverviewCtrl {
                             event.getTitle(),
                             event.getId(),
                             () -> {
-                                int status = server.deleteEvent(event.getId());
+                                int status;
+                                try {
+                                    status = server.deleteEvent(event.getId());
+                                } catch (ConnectException e) {
+                                    mainCtrl.handleServerNotFound();
+                                    return;
+                                }
                                 if(status != 204) {
                                     System.out.println("Server did not delete the event " + status);
                                     // TODO maybe trow an error message or smth
@@ -130,7 +137,6 @@ public class AdminOverviewCtrl {
                             }
                             );
             eventList.getChildren().add(item);
-
         }
     }
 
@@ -163,7 +169,12 @@ public class AdminOverviewCtrl {
      * Reload the events with events from the server
      */
     public void loadAllEvents() {
-        allEvents = server.getEvents(password);
+        try {
+            allEvents = server.getEvents(password);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
         orderAndDisplayEvents();
     }
 
@@ -254,7 +265,8 @@ public class AdminOverviewCtrl {
                     }
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Error reading the file(s)");
+                alert.showAndWait();
             }
         }
         loadAllEvents();
@@ -271,7 +283,13 @@ public class AdminOverviewCtrl {
         }
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
-                int status = server.pollEvents(password, timeOut);
+                int status;
+                try {
+                    status = server.pollEvents(password, timeOut);
+                } catch (ConnectException e) {
+                    mainCtrl.handleServerNotFound();
+                    return;
+                }
                 if(status == 204 && poller.isAlive())
                     Platform.runLater(this::loadAllEvents);
                 else if(status != 408) {
@@ -279,7 +297,7 @@ public class AdminOverviewCtrl {
                         // TODO translate
                         Alert alert = new Alert(Alert.AlertType.ERROR,
                                 "Long polling error " + status);
-                        alert.showAndWait();
+                        alert.show();
                         stopPoller();
                         mainCtrl.showAdminLogin();
                     });
@@ -293,6 +311,7 @@ public class AdminOverviewCtrl {
      * Stop the long poller
      */
     public void stopPoller() {
-        poller.interrupt();
+        if(poller != null && !poller.isInterrupted())
+            poller.interrupt();
     }
 }

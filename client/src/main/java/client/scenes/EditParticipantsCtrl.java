@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
+import java.net.ConnectException;
 import java.util.Optional;
 
 import static java.lang.String.format;
@@ -172,7 +173,11 @@ public class EditParticipantsCtrl {
                 languageConf.get("Confirmation.areYouSure"), languageConf);
         Optional<ButtonType> result = confirmation.showAndWait();
         if(result.isPresent() && result.get() == ButtonType.YES) {
-            server.deleteParticipant(eventID, part.getId());
+            try {
+                server.deleteParticipant(eventID, part.getId());
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         }
     }
 
@@ -205,7 +210,11 @@ public class EditParticipantsCtrl {
             }
             Participant newP = new Participant(name, email, beneficiary, iban);
 
-            server.createParticipant(event.getId(), newP);
+            try {
+                server.createParticipant(event.getId(), newP);
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         } else {
             Participant currP = event.getParticipants().get(index - 1);
             if(event.getParticipants().stream()
@@ -218,7 +227,11 @@ public class EditParticipantsCtrl {
             currP.setEmailAddress(email);
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
-            server.updateParticipant(event.getId(), currP);
+            try {
+                server.updateParticipant(event.getId(), currP);
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         }
     }
 

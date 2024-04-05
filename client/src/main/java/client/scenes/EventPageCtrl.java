@@ -7,7 +7,6 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
-import commons.WebsocketActions;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +22,7 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -100,7 +100,6 @@ public class EventPageCtrl {
 
         this.server = server;
         this.websocket = websocket;
-        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> changeTitle((String) newTitle));
     }
 
     /**
@@ -231,8 +230,12 @@ public class EventPageCtrl {
      */
     public int changeTitle(String newTitle) {
         event.setTitle(newTitle);
-        eventTitle.setText(newTitle);
-        return server.updateEventTitle(event);
+        try {
+            return server.updateEventTitle(event);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return 420;
+        }
     }
 
     /**

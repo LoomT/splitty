@@ -2,18 +2,23 @@ package client.scenes;
 
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.*;
+import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import client.utils.UserConfig;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.beans.binding.Bindings;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,9 +186,10 @@ public class StartScreenCtrl {
         try {
             Event createdEvent = server.createEvent(new Event(title.getText()));
             mainCtrl.showEventPage(createdEvent);
-
         } catch (WebApplicationException e) {
             System.out.println("Something went wrong while creating an event");
+        } catch (ConnectException e) {
+            showServerNotFoundError();
         }
     }
 
@@ -216,16 +222,14 @@ public class StartScreenCtrl {
             Event joinedEvent = server.getEvent(code.getText());
             if(joinedEvent == null) {
                 System.out.println("Event not found");
-                // Show visually that event was not found
+                // TODO Show visually that event was not found
                 // a full error pop up might be too annoying in this case
                 return;
             }
             mainCtrl.showEventPage(joinedEvent);
-        } catch (Exception e) {
-            throw e;
+        } catch (ConnectException e) {
+            showServerNotFoundError();
         }
-
-
     }
 
 
@@ -234,5 +238,13 @@ public class StartScreenCtrl {
      */
     public void showAdminLogin() {
         mainCtrl.showAdminLogin();
+    }
+
+    /**
+     * Shows the error if the server is unreachable for some reason
+     */
+    public void showServerNotFoundError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR, "Server not found");
+        alert.show();
     }
 }
