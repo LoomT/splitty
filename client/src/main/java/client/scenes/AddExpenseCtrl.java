@@ -9,8 +9,11 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import commons.Expense;
+import javafx.util.Callback;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -83,6 +86,8 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        event = server.getEvent(event.getId());
+        Event ev = event;
         blockDate();
         setupDateListener();
         date.setDayCellFactory(param -> new DateCell() {
@@ -96,7 +101,7 @@ public class AddExpenseCtrl {
         partialSplit.setSelected(false);
         equalSplit.setDisable(false);
         populateAuthorChoiceBox(event);
-        populateTypeBox();
+        populateTypeBox(event);
         purpose.clear();
         amount.clear();
         populateCurrencyChoiceBox();
@@ -105,13 +110,11 @@ public class AddExpenseCtrl {
         populateSplitPeople(event);
         disablePartialSplitCheckboxes(true);
         equalSplit.setOnAction(e -> {
-            //splitAll = false;
             if (equalSplit.isSelected()) {
-                //splitAll = true;
                 expPart.clear();
                 partialSplit.setSelected(false);
                 disablePartialSplitCheckboxes(true);
-                expPart.addAll(event.getParticipants());
+                expPart.addAll(ev.getParticipants());
             } else {
                 equalSplit.setSelected(true);
             }
@@ -120,16 +123,16 @@ public class AddExpenseCtrl {
 
         add.setOnAction(x -> {
             if (exp == null) {
-                handleAddButton(event);
+                handleAddButton(ev);
             } else {
-                editButton(event, exp);
+                editButton(ev, exp);
             }
         });
         abort.setOnAction(x -> {
-            handleAbortButton(event);
+            handleAbortButton(ev);
         });
         addTag.setOnAction(x -> {
-            handeAddTagButton(event, exp);
+            handeAddTagButton(ev, exp);
         });
     }
 
@@ -139,11 +142,8 @@ public class AddExpenseCtrl {
      * @param exp
      */
     public void handeAddTagButton(Event ev, Expense exp) {
-        Tag t1 = new Tag("food", "#00FF00");
-        Tag t2 = new Tag("entrance fees", "#0000FF");
-        Tag t3 = new Tag("travel", "#FF0000");
-        ev.setTags(List.of(t1, t2, t3));
         mainCtrl.showAddTagPage(ev);
+        //populateTypeBox(ev);
     }
 
     /**
@@ -195,7 +195,7 @@ public class AddExpenseCtrl {
         String expType = type.getValue();
 
         for (Participant p : ex.getExpenseParticipants()) {
-            if (p.getName() == expParticipant) {
+            if (p.getName().equals(expParticipant)) {
                 ex.setExpenseAuthor(p);
                 break;
             }
@@ -386,14 +386,109 @@ public class AddExpenseCtrl {
     }
 
     /**
-     * show corresponding tags for expense
+     * show the corresponding tags for expense
+     *
+     * @param ev the current event
      */
-    public void populateTypeBox() {
-        if (type.getItems().isEmpty()) {
-            type.getItems().add("food");
-            type.getItems().add("entrance fees");
-            type.getItems().add("travel");
+    public void populateTypeBox(Event ev) {
+        setupTypeComboBox(ev);
+    }
+
+    private void setupTypeComboBox(Event ev) {
+        type.getItems().clear();
+        for (Tag tag : ev.getTags()) {
+            type.getItems().add(tag.getName());
         }
+        type.setCellFactory(createTypeListCellFactory(ev));
+        type.setButtonCell(createTypeListCell(ev));
+    }
+
+    private Callback<ListView<String>, ListCell<String>> createTypeListCellFactory(Event ev) {
+        return param -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    Tag tag = findTagByName(item, ev.getTags());
+                    if (tag != null) {
+                        Label label = createLabelWithColor(item, hexToColor(tag.getColor()));
+                        setGraphic(label);
+                    }
+                } else {
+                    setText(null);
+                    setGraphic(null);
+                }
+            }
+        };
+    }
+
+    private ListCell<String> createTypeListCell(Event ev) {
+        return new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    Tag tag = findTagByName(item, ev.getTags());
+                    if (tag != null) {
+                        Label label = createLabelWithColor(item, hexToColor(tag.getColor()));
+                        setGraphic(label);
+                    }
+                } else {
+                    setText(null);
+                    setGraphic(null);
+                }
+            }
+        };
+    }
+
+    private Label createLabelWithColor(String text, Color backgroundColor) {
+        Label label = new Label(text);
+        if (backgroundColor != null) {
+            label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
+                    + "; -fx-padding: 5px; -fx-text-fill: white;");
+        }
+        double textWidth = new Text(text).getLayoutBounds().getWidth();
+        label.setMinWidth(textWidth + 10);
+        return label;
+    }
+
+    private Tag findTagByName(String tagName, List<Tag> tags) {
+        for (Tag tag : tags) {
+            if (tag.getName().equals(tagName)) {
+                return tag;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * convert from color to string
+     * @param color
+     * @return the String color
+     */
+    private String toHexString(Color color) {
+        return String.format("%02X%02X%02X",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255));
+    }
+
+    /**
+     * convert from string to color
+     * @param hexCode
+     * @return the Color color
+     */
+    public static Color hexToColor(String hexCode) {
+        if (!hexCode.startsWith("#")) {
+            hexCode = "#" + hexCode;
+        }
+
+        int red = Integer.parseInt(hexCode.substring(1, 3), 16);
+        int green = Integer.parseInt(hexCode.substring(3, 5), 16);
+        int blue = Integer.parseInt(hexCode.substring(5, 7), 16);
+
+        return Color.rgb(red, green, blue);
     }
 
     /**

@@ -9,8 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 import server.database.TagRepository;
-
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,31 +44,26 @@ public class TagController {
     @PostMapping({"", "/"})
     public ResponseEntity<Tag> addTag(@PathVariable String eventID, @RequestBody Tag tag) {
         try {
-            System.out.println("Received request for eventID: " + eventID);
 
             Optional<Event> found = eventRepo.findById(eventID);
             if(found.isEmpty()) {
-                System.out.println("Event not found for eventID: " + eventID);
                 return ResponseEntity.notFound().build();
             }
 
             Event event = found.get();
-            System.out.println("Event found for eventID: " + eventID);
 
             if (tag == null) {
-                System.out.println("Received null tag.");
                 return ResponseEntity.badRequest().build();
             }
 
             tag.setEventID(eventID);
             Tag saved = tagRepo.save(tag);
-            update(eventID, tag);
+            update(eventID);
             simp.convertAndSend("/event/" + eventID, saved,
                     Map.of("action", WebsocketActions.ADD_TAG,
                             "type", Tag.class.getTypeName()));
             return ResponseEntity.ok(saved);
         } catch (Exception e) {
-            System.out.println("Exception occurred: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }
@@ -80,11 +74,9 @@ public class TagController {
      *
      * @param eventID event id
      */
-    private void update(String eventID, Tag tag) {
+    private void update(String eventID) {
         Event event = eventRepo.getReferenceById(eventID);
-        List<Tag> temp = event.getTags();
-        temp.add(tag);
-        event.setTags(temp);
+        event.setLastActivity(new Date());
         eventRepo.save(event);
         adminController.update();
     }

@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.util.List;
@@ -36,8 +35,6 @@ public class AddTagCtrl {
     @FXML
     private TextField tagTextField;
 
-    private Stage stage;
-    private Event event;
     private Expense exp;
     private Color selectedColor;
 
@@ -59,29 +56,28 @@ public class AddTagCtrl {
      * initiliaze method
      */
     public void initialize() {
-        tags.getItems().clear();
 
     }
 
     /**
      * display the add tag page
-     * @param event
-     * @param stage
+     * @param ev
      */
-    public void displayAddTagPage(Event event, Stage stage) {
-        this.event = event;
-        this.stage = stage;
+    public void displayAddTagPage(Event ev) {
         tags.getItems().clear();
-        populateTypeBox(event);
+        populateTypeBox(ev);
         cp.setOnAction(e -> {
             selectedColor = cp.getValue();
         });
         add.setOnAction(e -> {
-            addButton(event);
+            addButton(ev);
+            populateTypeBox(ev);
         });
         back.setOnAction(e -> {
-            stage.close();
+            mainCtrl.showAddExpensePage(ev);
+            System.out.println(ev.getTags());
         });
+        populateTypeBox(ev);
     }
 
 
@@ -95,16 +91,10 @@ public class AddTagCtrl {
 
             String clr = toHexString(selectedColor);
             Tag tag = new Tag(name, clr);
-            int status = server.addTag(event.getId(), tag);
-            if(status / 100 != 2) {
-                System.out.println("server error: " + status);
-            }
-            //System.out.println(status);
-//            List<Tag> temp = new ArrayList<>(event.getTags());
-//            temp.add(tag);
-//            event.setTags(temp);
+            server.addTag(event.getId(), tag);
+            event.getTags().add(tag);
+            tag.setEventID(event.getId());
             tagTextField.clear();
-            populateTypeBox(event);
         }
     }
 

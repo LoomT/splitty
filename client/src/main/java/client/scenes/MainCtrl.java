@@ -252,13 +252,11 @@ public class MainCtrl {
      * @param event
      */
     public void showAddTagPage(Event event) {
-        Stage stage = new Stage();
-        stage.setTitle("Title");
-        addTagCtrl.displayAddTagPage(event, stage);
-        stage.setScene(addTag);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
+        addTagCtrl.displayAddTagPage(event);
+        primaryStage.setScene(addTag);
+        primaryStage.setResizable(false);
+        primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.show();
     }
 
     /**

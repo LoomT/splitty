@@ -14,10 +14,15 @@ public class Tag implements Cloneable{
     @Id
     @Column(name = "event_id", length = 5, nullable = false)
     private String eventID;
-    @ManyToOne
     private String name;
-    @ManyToOne
     private String color;
+
+    /**
+     * empty constructor for Tag class
+     */
+    public Tag() {
+
+    }
 
     /**
      * constructor for tag all parameters
