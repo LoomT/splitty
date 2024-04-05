@@ -13,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import commons.Expense;
 import javafx.util.Callback;
 
 import java.time.LocalDate;
@@ -84,8 +83,6 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
-        event = server.getEvent(event.getId());
-        Event ev = event;
         blockDate();
         setupDateListener();
         date.setDayCellFactory(param -> new DateCell() {
@@ -118,16 +115,16 @@ public class AddExpenseCtrl {
 
         add.setOnAction(x -> {
             if (exp == null) {
-                handleAddButton(ev);
+                handleAddButton(event);
             } else {
-                editButton(ev, exp);
+                editButton(event, exp);
             }
         });
         abort.setOnAction(x -> {
-            handleAbortButton(ev);
+            handleAbortButton(event);
         });
         addTag.setOnAction(x -> {
-            handeAddTagButton(ev, exp);
+            handeAddTagButton(event, exp);
         });
     }
 
@@ -515,7 +512,6 @@ public class AddExpenseCtrl {
         expenseAuthor.getSelectionModel().clearSelection();
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
-        expPart.clear();
         type.getSelectionModel().clearSelection();
     }
 

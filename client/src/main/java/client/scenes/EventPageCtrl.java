@@ -309,14 +309,9 @@ public class EventPageCtrl {
                     setText(null);
                     setGraphic(null);
                 } else {
-                    if (item.contains("(") && item.contains(")")) {
-                        setText(item);
-                        setGraphic(null);
-                    } else {
-                        setText(null);
-                        stackPane.getChildren().set(0, new Text(item));
-                        setGraphic(stackPane);
-                    }
+                    setText(null);
+                    stackPane.getChildren().set(0, new Text(item));
+                    setGraphic(stackPane);
                 }
             }
         });

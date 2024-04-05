@@ -253,6 +253,7 @@ public class MainCtrl {
      */
     public void showAddTagPage(Event event) {
         addTagCtrl.displayAddTagPage(event);
+        primaryStage.setTitle(languageConf.get("AddTag.addtag"));
         primaryStage.setScene(addTag);
         primaryStage.setResizable(false);
         primaryStage.initModality(Modality.APPLICATION_MODAL);
