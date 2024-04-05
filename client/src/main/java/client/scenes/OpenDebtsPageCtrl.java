@@ -1,17 +1,16 @@
 package client.scenes;
 
+import client.components.DebtListItem;
 import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import jakarta.inject.Inject;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.*;
@@ -28,7 +27,7 @@ public class OpenDebtsPageCtrl {
     private Text totalSumExp;
 
     @FXML
-    private ScrollPane allDebtsPane;
+    private VBox debtList;
 
     private Event event;
 
@@ -79,11 +78,28 @@ public class OpenDebtsPageCtrl {
             this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
         }
 
+        addDebtsToDebtList();
+
+
         for (PieChart.Data data : shareChart.getData()) {
-            data.setName(data.getName() + ": " + (int) data.getPieValue() + "%");
+            data.setName(data.getName() + ": " + data.getPieValue());
         }
         totalSumExp.setText("Total sum of all expenses in this event: " + sum);
 
+    }
+
+    /**
+     * Adds the debts to the debt list
+     */
+    private void addDebtsToDebtList() {
+        List<DebtListItem> debtListItems = new ArrayList<>();
+        debtList.getChildren().clear();
+        for (String name : participantDebtMap.keySet()) {
+            debtListItems.add(new DebtListItem(name + " owes: \n" + participantDebtMap.get(name)));
+        }
+        for(DebtListItem item : debtListItems){
+            debtList.getChildren().add(item);
+        }
     }
 
 
