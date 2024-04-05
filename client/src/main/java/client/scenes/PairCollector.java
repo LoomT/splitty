@@ -11,5 +11,6 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<AdminOverviewCtrl, Parent> adminOverview,
                             Pair<AddExpenseCtrl, Parent> addExpensePage,
                             Pair<ErrorPopupCtrl, Parent> errorPopup,
-                            Pair<EditTitleCtrl, Parent> editTitlePage) {
+                            Pair<EditTitleCtrl, Parent> editTitlePage,
+                            Pair<AddTagCtrl, Parent> addTagPage) {
 }

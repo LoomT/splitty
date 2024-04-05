@@ -4,6 +4,7 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -46,13 +47,15 @@ public class AddExpenseCtrl {
     private TextFlow expenseParticipants;
 
     @FXML
-    private ChoiceBox<String> type;
+    private ComboBox<String> type;
 
     @FXML
     private Button abort;
 
     @FXML
     private Button add;
+    @FXML
+    private Button addTag;
 
     private ServerUtils server;
     private MainCtrl mainCtrl;
@@ -115,7 +118,6 @@ public class AddExpenseCtrl {
         });
         partialSplit.setOnAction(this::handlePartialSplit);
 
-
         add.setOnAction(x -> {
             if (exp == null) {
                 handleAddButton(event);
@@ -126,6 +128,22 @@ public class AddExpenseCtrl {
         abort.setOnAction(x -> {
             handleAbortButton(event);
         });
+        addTag.setOnAction(x -> {
+            handeAddTagButton(event, exp);
+        });
+    }
+
+    /**
+     * behaviour for add tag button
+     * @param ev
+     * @param exp
+     */
+    public void handeAddTagButton(Event ev, Expense exp) {
+        Tag t1 = new Tag("food", "#00FF00");
+        Tag t2 = new Tag("entrance fees", "#0000FF");
+        Tag t3 = new Tag("travel", "#FF0000");
+        ev.setTags(List.of(t1, t2, t3));
+        mainCtrl.showAddTagPage(ev);
     }
 
     /**

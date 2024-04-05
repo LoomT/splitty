@@ -3,6 +3,7 @@ package client.utils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 
 import java.util.List;
 
@@ -137,5 +138,13 @@ public interface ServerUtils {
      * @return updated event
      */
     int updateEventTitle(Event event);
+
+    /**
+     * send an API call to add a tag
+     * @param eventID
+     * @param tag
+     * @return added tag
+     */
+    int addTag(String eventID, Tag tag);
 }
 
