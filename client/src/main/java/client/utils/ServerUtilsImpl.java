@@ -364,7 +364,7 @@ public class ServerUtilsImpl implements ServerUtils {
                 .target(server)
                 .path("api/events/" + event.getId())
                 .request(APPLICATION_JSON)
-                .post(Entity.entity(event, APPLICATION_JSON))) {
+                .put(Entity.entity(event, APPLICATION_JSON))) {
             return response.getStatus();
         } catch (ProcessingException e) {
             if(e.getMessage().contains("Connection refused"))

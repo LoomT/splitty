@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.MockClass.*;
 import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -46,14 +47,14 @@ public class MainCtrl {
     private Scene adminLogin;
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
-    private EditParticipantsCtrl editParticipantsCtrl;
+    private EditParticipantInterface editParticipantsCtrl;
     private Scene editParticipants;
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-    private EditTitleCtrl editTitleCtrl;
+    private EditEventTitleInterface editTitleCtrl;
     private Scene titleChanger;
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
@@ -129,15 +130,20 @@ public class MainCtrl {
 
     /**
      * Shows the change
-     * @param eventPageCtrl eventPageCtrl of the current event
+     * @param event current event
      */
-    public void showEditTitle(EventPageCtrl eventPageCtrl){
-        editTitleCtrl.setEventPageCtrl(eventPageCtrl);
+    public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
+        editTitleCtrl.displayEditEventTitle(eventPageCtrl, event, stage);
+    }
+
+    /**
+     * Changes the title in the editEventTitle
+     * @param title title of the event to be changed to
+     */
+    public void updateEditTitle(String title){
+        editTitleCtrl.changeTitle(title);
     }
 
     /**
@@ -180,6 +186,15 @@ public class MainCtrl {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
         primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
         primaryStage.setScene(editParticipants);
+    }
+
+    /**
+     * edits the EditParticipantPage without opening it.
+     *
+     * @param eventToShow the event to update.
+     */
+    public void updateEditParticipantsPage(Event eventToShow) {
+        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
     }
 
     /**
@@ -264,6 +279,22 @@ public class MainCtrl {
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
 
+    }
+
+    /**
+     * Set editTitleCtrl for testing purposes
+     * @param editTitleCtrl new EditTitleCtrl
+     */
+    public void setEditTitleCtrl(EditEventTitleInterface editTitleCtrl) {
+        this.editTitleCtrl = editTitleCtrl;
+    }
+
+    /**
+     * Set editParticipantCtrl for testing purposes
+     * @param editParticipantCtrl new editParticipantCtrl
+     */
+    public void setEditParticipantsCtrl(EditParticipantMock editParticipantCtrl){
+        this.editParticipantsCtrl = editParticipantCtrl;
     }
 
     /**
