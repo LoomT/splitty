@@ -22,6 +22,7 @@ import static com.google.inject.Guice.createInjector;
 public class OpenDebtsListItem extends HBox {
     @FXML
     private Label participantLabel;
+
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
