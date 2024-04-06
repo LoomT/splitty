@@ -58,8 +58,8 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
-                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveTitle" prefHeight="25.0" prefWidth="70.0" text="Save" />
-                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelTitle" prefHeight="25.0" prefWidth="70.0" text="Cancel" />
+                        <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveTitle" prefHeight="25.0" prefWidth="70.0" text="%save" />
+                        <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelTitle" prefHeight="25.0" prefWidth="70.0" text="%cancel" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
