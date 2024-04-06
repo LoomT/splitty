@@ -5,7 +5,6 @@ import commons.Expense;
 import commons.Participant;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public interface ServerUtils {
@@ -141,6 +140,7 @@ public interface ServerUtils {
     int updateEventTitle(Event event);
 
     /**
+     * @param calendar date of last usage
      * @return string representation of the exchange rates
      */
     String getExchangeRates(Calendar calendar);

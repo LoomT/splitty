@@ -109,7 +109,55 @@ public class CurrencyConverter {
      * @return a String of the http response.
      */
     public String getExchange() {
-        return server.getExchangeRates(new GregorianCalendar());
+        // get last date from file
+        List<String> temp;
+        try {
+            temp = new BufferedReader(new FileReader(path)).lines().toList();
+        } catch (Exception e){ throw new RuntimeException();}
+        String date = null;
+        for(int i = 0; i < temp.size(); i++){
+            if(temp.get(i).equals("#Last fetched:")){
+                date = temp.get(i+1);
+                break;
+            }
+        }
+        if(temp.isEmpty()){return server.getExchangeRates(new GregorianCalendar());}
+        assert date != null;
+        String[] array = date.split(" ");
+        int month = toMonth(array[1]);
+        int day = Integer.parseInt(array[2]);
+        String[] time = array[3].split(":");
+        int hour = Integer.parseInt(time[0]);
+        int minute = Integer.parseInt(time[1]);
+        int second = Integer.parseInt(time[2]);
+        int year = Integer.parseInt(array[5]);
+
+        Calendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
+        //pass along last fetched file to serverUtils
+        return server.getExchangeRates(calendar);
+    }
+
+    /**
+     * @param month string value representing a month
+     * @return the int value of the month derived from string value
+     */
+    private int toMonth(String month) {
+        return switch (month) {
+            case "Jan" -> Calendar.JANUARY;
+            case "Feb" -> Calendar.FEBRUARY;
+            case "Mar" -> Calendar.MARCH;
+            case "Apr" -> Calendar.APRIL;
+            case "May" -> Calendar.MAY;
+            case "Jun" -> Calendar.JUNE;
+            case "Jul" -> Calendar.JULY;
+            case "Aug" -> Calendar.AUGUST;
+            case "Sep" -> Calendar.SEPTEMBER;
+            case "Oct" -> Calendar.OCTOBER;
+            case "Nov" -> Calendar.NOVEMBER;
+            case "Dec" -> Calendar.DECEMBER;
+            //should be all cases, so default should give error
+            default -> throw new RuntimeException();
+        };
     }
 
     /**
@@ -134,7 +182,7 @@ public class CurrencyConverter {
                         tempArr[1].replaceAll("[, ]", ""));
             }
             prop.setProperty("base", base);
-            prop.store(outputstream, "Test");
+            prop.store(outputstream, "Last fetched:");
 
         } catch (IOException e) {
             return false;
