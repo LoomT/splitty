@@ -299,10 +299,12 @@ public class ServerUtilsImpl implements ServerUtils {
      */
     @Override
     public String getExchangeRates(Calendar calendar){
-        Calendar currentTime = new GregorianCalendar();
-        currentTime.add(Calendar.HOUR, 1);
-        if(calendar.after(currentTime)){
-            return null;
+        if(calendar != null) {
+            Calendar currentTime = new GregorianCalendar();
+            calendar.add(Calendar.HOUR, 1);
+            if (calendar.after(currentTime)) {
+                return null;
+            }
         }
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(
