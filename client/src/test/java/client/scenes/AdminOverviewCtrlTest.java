@@ -9,6 +9,7 @@ import commons.Participant;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,7 +68,7 @@ public class AdminOverviewCtrlTest {
     }
 
     @Test
-    void refreshNotClicked(FxRobot robot) {
+    void refreshNotClicked() {
         assertEquals(server.getStatuses().getFirst(), 200);
         assertEquals(server.getStatuses().size(), 1);
     }
@@ -80,10 +81,10 @@ public class AdminOverviewCtrlTest {
 
     @Test
     void autoRefresh(FxRobot robot) throws InterruptedException {
-        assertEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
+        assertEquals(0, robot.fromAll().lookup("#eventList").queryListView().getItems().size());
         server.createEvent(new Event("title"));
         Thread.sleep(1000);
-        assertEquals(1, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
+        assertEquals(1, robot.fromAll().lookup("#eventList").queryListView().getItems().size());
     }
     @Test
     void reverseOrder(FxRobot robot) throws InterruptedException {
@@ -91,14 +92,12 @@ public class AdminOverviewCtrlTest {
         Thread.sleep(50);
         server.createEvent(new Event("new"));
         robot.clickOn("#refreshBtn");
-        List<String> inOrder = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("2", "1"), inOrder);
+        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
+        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("2", "1"), inCreation);
         robot.clickOn("#reverseBtn");
-        List<String> reverseOrder = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
+        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
+        List<String> reverseOrder = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
         assertEquals(List.of("1", "2"), reverseOrder);
     }
 
@@ -108,10 +107,9 @@ public class AdminOverviewCtrlTest {
         Thread.sleep(50);
         server.createEvent(new Event("new"));
         robot.clickOn("#refreshBtn");
-        List<String> inOrder = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("2", "1"), inOrder);
+        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
+        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("2", "1"), inCreation);
     }
 
     @Test
@@ -122,16 +120,14 @@ public class AdminOverviewCtrlTest {
         Thread.sleep(50);
         server.createParticipant(event.getId(), new Participant("Bob"));
         robot.clickOn("#refreshBtn");
-        List<String> inCreation = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
+        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
+        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
         assertEquals(List.of("2", "1"), inCreation);
         ChoiceBox<String> choiceBox = robot.fromAll().lookup("#orderDropdownBtn").query();
         robot.clickOn(choiceBox);
         robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        List<String> inActivity = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
+        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
+        List<String> inActivity = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
         assertEquals(List.of("1", "2"), inActivity);
     }
 
@@ -142,17 +138,15 @@ public class AdminOverviewCtrlTest {
         server.createEvent(new Event("2"));
         server.createParticipant(event.getId(), new Participant("Bob"));
         robot.clickOn("#refreshBtn");
-        List<String> inCreation = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
+        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
+        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
         assertEquals(List.of("2", "1"), inCreation);
         ChoiceBox<String> choiceBox = robot.fromAll().lookup("#orderDropdownBtn").query();
         robot.clickOn(choiceBox);
         robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        List<String> inActivity = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("1", "2"), inActivity);
+        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
+        List<String> inName = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("1", "2"), inName);
     }
 
     @Test
@@ -162,56 +156,14 @@ public class AdminOverviewCtrlTest {
         server.createEvent(new Event("2"));
         server.createParticipant(event.getId(), new Participant("Bob"));
         robot.clickOn("#refreshBtn");
-        List<String> inCreation = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
+        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
+        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
         assertEquals(List.of("2", "1"), inCreation);
         ChoiceBox<String> choiceBox = robot.fromAll().lookup("#orderDropdownBtn").query();
         robot.clickOn(choiceBox);
         robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        List<String> inActivity = robot.fromAll().lookup(".eventListItemContainer")
-                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
-                        .getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("1", "2"), inActivity);
+        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
+        List<String> inParticipant = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("1", "2"), inParticipant);
     }
-
-    // not sure how to test concurrency
-//    @Test
-//    void initPollerTimeOut() throws InterruptedException {
-//        Thread.sleep(200);
-//        assertTrue(server.isPolled());
-//        assertTrue(server.getConcurrentStatuses().contains(408));
-//    }
-//
-//    @Test
-//    void initPollerResponse(FxRobot robot) throws InterruptedException {
-//        Thread.sleep(200);
-//        server.createEvent(new Event("title"));
-//        Thread.sleep(500);
-//        System.out.println(server.getConcurrentStatuses());
-//        assertTrue(server.isPolled());
-//        assertNotEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
-//    }
-//
-//    @Test
-//    void initPollerIncorrectPassword(FxRobot robot) throws InterruptedException {
-//        ctrl.setPassword("forgor");
-//        Thread.sleep(600);
-//        server.createEvent(new Event("title"));
-//        Thread.sleep(600);
-//        assertTrue(server.isPolled());
-//        assertTrue(server.getConcurrentStatuses().contains(401));
-//        assertFalse(server.getConcurrentStatuses().contains(204));
-//        assertEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
-//    }
-//
-//    @Test
-//    void stopPoller(FxRobot robot) throws InterruptedException {
-//        ctrl.stopPoller();
-//        Thread.sleep(600);
-//        server.createEvent(new Event("title"));
-//        Thread.sleep(300);
-//        assertTrue(server.isPolled());
-//        assertEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
-//    }
 }

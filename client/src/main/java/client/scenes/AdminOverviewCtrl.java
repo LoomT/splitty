@@ -34,7 +34,7 @@ public class AdminOverviewCtrl{
     private File initialDirectory;
 
     @FXML
-    private ListView eventList;
+    private ListView<EventListItemAdmin> eventList;
     private String password;
 
     @FXML
