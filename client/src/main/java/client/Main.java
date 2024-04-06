@@ -94,6 +94,7 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
+
         var titleChanger = FXML.load(EditTitleCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
@@ -102,11 +103,16 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AddCustomTransaction.fxml"
         );
+        var openDebtsPage = FXML.load(OpenDebtsPageCtrl.class,
+                languageConf.getLanguageResources(),
+                "client", "scenes", "OpenDebtsPage.fxml"
+        );
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger, addCustomTransaction)
+                adminOverview, addExpense, errorPopup, titleChanger,
+                addCustomTransaction, openDebtsPage)
         );
     }
 }

@@ -237,7 +237,6 @@ public class EventPageCtrl {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
         return server.updateEventTitle(event);
-
     }
 
     /**
@@ -450,6 +449,12 @@ public class EventPageCtrl {
         copiedToClipboardMsg.setVisible(true);
         copiedToClipboardMsg.setOpacity(1.0);
         ft.play();
+    }
+    /**
+     * Show the openDebts page with the current event
+     */
+    public void openDebtsPage() {
+        mainCtrl.showDebtsPage(event);
     }
 
     /**

@@ -12,5 +12,6 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<AddExpenseCtrl, Parent> addExpensePage,
                             Pair<ErrorPopupCtrl, Parent> errorPopup,
                             Pair<EditTitleCtrl, Parent> editTitlePage,
-                            Pair<AddCustomTransactionCtrl, Parent> addCustomTransaction) {
+                            Pair<AddCustomTransactionCtrl, Parent> addCustomTransaction,
+                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage) {
 }
