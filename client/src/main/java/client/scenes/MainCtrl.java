@@ -266,6 +266,9 @@ public class MainCtrl {
 
     }
 
+    /**
+     * Disconnects from the server
+     */
     public void handleServerNotFound() {
         websocket.disconnect();
         adminOverviewCtrl.stopPoller();

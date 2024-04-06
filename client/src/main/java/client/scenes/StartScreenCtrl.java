@@ -244,7 +244,9 @@ public class StartScreenCtrl {
      * Shows the error if the server is unreachable for some reason
      */
     public void showServerNotFoundError() {
-        Alert alert = new Alert(Alert.AlertType.ERROR, "Server not found");
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                languageConf.get("StartScreen.serverUnavailableErrorMessage"));
+        alert.setHeaderText(languageConf.get("StartScreen.serverUnavailableErrorHeader"));
         alert.show();
     }
 }
