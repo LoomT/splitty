@@ -3,6 +3,7 @@ package client.utils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Transaction;
 
 import java.util.List;
 
@@ -137,5 +138,12 @@ public interface ServerUtils {
      * @return updated event
      */
     int updateEventTitle(Event event);
+
+    /**
+     * @param eventID event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    int addTransaction(String eventID, Transaction transaction);
 }
 

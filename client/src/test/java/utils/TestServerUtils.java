@@ -1,10 +1,7 @@
 package utils;
 
 import client.utils.ServerUtils;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,14 +17,16 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
-    private TestWebsocket websocket;
+    private final TestWebsocket websocket;
     private boolean polled;
 
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
+     *
+     * @param websocket websocket client
      */
-    public TestServerUtils() {
+    public TestServerUtils(TestWebsocket websocket) {
         events = new ArrayList<>();
         counter = 1;
         lastChange = new Date();
@@ -35,7 +34,7 @@ public class TestServerUtils implements ServerUtils {
         statuses = new ArrayList<>();
         polled = false;
         concurrentStatuses = new ConcurrentSkipListSet<>();
-        websocket = new TestWebsocket();
+        this.websocket = websocket;
     }
 
     /**
@@ -151,9 +150,7 @@ public class TestServerUtils implements ServerUtils {
         clone.setEventID(event.getId());
         event.addParticipant(clone);
         event.setLastActivity(new Date());
-        if(clone != null){
-            websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
-        }
+        websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -497,5 +494,29 @@ public class TestServerUtils implements ServerUtils {
 
     }
 
-
+    /**
+     * @param eventID     event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    @Override
+    public int addTransaction(String eventID, Transaction transaction) {
+        calls.add("addTransaction");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID))
+                .findFirst().orElse(null);
+        if(event == null) return 404;
+        if (transaction == null || !event.hasParticipant(transaction.getGiver())
+                || !event.hasParticipant(transaction.getReceiver())) {
+            return 400;
+        }
+        Transaction clone = transaction.clone(event);
+        clone.setEventID(eventID);
+        clone.setId(counter++);
+        event.addTransaction(clone);
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_TRANSACTION, clone);
+        lastChange = new Date();
+        statuses.add(200);
+        return 200;
+    }
 }
