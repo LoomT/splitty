@@ -4,10 +4,8 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
+import commons.*;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import static commons.WebsocketActions.ADD_TAG;
 
 
 public class EventPageCtrl {
@@ -186,6 +186,12 @@ public class EventPageCtrl {
                 event,
                 this::displayEvent
         );
+        websocket.on(ADD_TAG, tag -> {
+            if (!event.getTags().contains((Tag) tag)) {
+                event.getTags().add((Tag) tag);
+            }
+
+        });
     }
 
 

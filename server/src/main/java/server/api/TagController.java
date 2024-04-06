@@ -16,10 +16,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/events/{eventID}/tags")
 public class TagController {
-    private EventRepository eventRepo;
-    private TagRepository tagRepo;
-    private SimpMessagingTemplate simp;
-    private AdminController adminController;
+    private final EventRepository eventRepo;
+    private final TagRepository tagRepo;
+    private final SimpMessagingTemplate simp;
+    private final AdminController adminController;
 
     /**
      * @param eventRepo Event repository
@@ -49,9 +49,6 @@ public class TagController {
             if(found.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-
-            Event event = found.get();
-
             if (tag == null) {
                 return ResponseEntity.badRequest().build();
             }
