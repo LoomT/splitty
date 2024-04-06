@@ -1,104 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
-      <Pane prefHeight="61.0" prefWidth="600.0">
+      <HBox prefWidth="600.0" styleClass="navbar">
          <children>
-            <Text fx:id="eventTitle" layoutX="14.0" layoutY="45.0" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleFont" text="New Year Party">
+            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleFont" text="New Year Party">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="331.0" layoutY="21.0" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle" />
-            <Label fx:id="inviteCode" layoutX="439.0" layoutY="16.0" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
+            <Button mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle" />
+            <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Label>
-            <Label fx:id="copiedToClipboardMsg" layoutX="439.0" layoutY="33.0" text="%EventPage.copiedToClipboard" />
+            <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
          </children>
-      </Pane>
-      <VBox layoutX="108.0" layoutY="78.0" prefHeight="289.0" prefWidth="383.0">
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+      </HBox>
+      <VBox layoutX="108.0" layoutY="92.0" prefHeight="289.0" prefWidth="383.0" styleClass="container">
          <children>
             <HBox>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.participants">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="headerFont" text="%EventPage.participants">
                      <font>
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Text>
-                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" text="%EventPage.editParticipants">
+                  <Button mnemonicParsing="false" onAction="#editParticipantsClicked" styleClass="pbutton" text="%EventPage.editParticipants">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Button>
                </children>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
             </HBox>
             <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David">
                <VBox.margin>
-                  <Insets left="5.0" />
+                  <Insets />
                </VBox.margin>
             </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.expenses">
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="headerFont" text="%EventPage.expenses">
                <font>
                   <Font name="System Bold" size="18.0" />
                </font>
                <VBox.margin>
-                  <Insets left="5.0" top="5.0" />
+                  <Insets top="5.0" />
                </VBox.margin>
             </Text>
             <HBox>
                <children>
-                  <ChoiceBox fx:id="participantChoiceBox" prefWidth="150.0" />
-                  <Button fx:id="addExpenseButton" mnemonicParsing="false" onAction="#addExpenseClicked" text="%EventPage.addExpense">
+                  <ChoiceBox fx:id="participantChoiceBox" prefWidth="150.0" styleClass="sbutton" />
+                  <Button fx:id="addExpenseButton" mnemonicParsing="false" onAction="#addExpenseClicked" styleClass="pbutton" text="%EventPage.addExpense">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Button>
                </children>
                <padding>
-                  <Insets bottom="10.0" left="5.0" right="5.0" top="5.0" />
+                  <Insets bottom="10.0" top="5.0" />
                </padding>
             </HBox>
-            <TabPane fx:id="expenseList" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
-               <tabs>
-                  <Tab fx:id="allTab" text="%EventPage.all">
-                     <content>
-                        <ListView fx:id="allListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </Tab>
-                  <Tab fx:id="fromTab" text="From John">
-                     <content>
-                        <ListView fx:id="fromListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </Tab>
-                  <Tab fx:id="includingTab" text="Including John">
-                     <content>
-                        <ListView fx:id="includingListView" prefHeight="200.0" prefWidth="200.0" />
-                     </content>
-                  </Tab>
-               </tabs>
-            </TabPane>
+            <HBox styleClass="tabHeader">
+               <children>
+                  <Button fx:id="allTab" mnemonicParsing="false" styleClass="tabButton" text="All" />
+                  <Button fx:id="fromTab" mnemonicParsing="false" styleClass="tabButton" text="From John">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="includingTab" mnemonicParsing="false" styleClass="tabButton" text="Including John" />
+               </children>
+            </HBox>
+            <VBox fx:id="expenseVbox" prefHeight="200.0" prefWidth="100.0" styleClass="expenseVBox" />
          </children>
       </VBox>
-      <Button layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
+      <Button layoutX="14.0" layoutY="78.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
    </children>
+   <stylesheets>
+      <URL value="@client/scenes/global.css" />
+   </stylesheets>
 </AnchorPane>

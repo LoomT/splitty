@@ -1,7 +1,8 @@
 * {
     -bg: #f3f6fb;
+    -bluebg: #e8f3fc;
     -header-bg: #f3f6fb;
-    -border-color:#e9ecf1;
+    -border-color: #e0e2e7;
     -primary: #9dbce3;
     -primary-hover: #7798c2;
     -secondary: #e2dcf2;
@@ -24,6 +25,14 @@
     -fx-border-width: 0 0 1 0;
 }
 
+.container {
+    -fx-background-color: -bg;
+    -fx-border-radius: 18;
+    -fx-background-radius: 18;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, -border-color, 15, .1, 0, 2);
+}
+
 
 .titleFont {
     -fx-font-family: "Arial Rounded MT Bold";
@@ -32,8 +41,18 @@
 }
 
 .labelFont {
-    -fx-font-family: "Microsoft JhengHei UI Light";
+    /*-fx-font-family: "Microsoft JhengHei UI Light";*/
+    -fx-font-family: Bahnschrift;
+    -fx-font-weight: 600;
     -fx-font-size: 16;
+    -fx-fill: -text;
+}
+
+.headerFont {
+    /*-fx-font-family: "Microsoft JhengHei UI Light";*/
+    -fx-font-family: Bahnschrift;
+    -fx-font-weight: 700;
+    -fx-font-size: 18;
     -fx-fill: -text;
 }
 
@@ -113,6 +132,28 @@ the buttons have this class by default and the styles get overwritten
     /*-fx-background-color: derive(#62d1d4, 60%);*/
 }
 
+.pbutton {
+    -fx-background-color: -primary;
+    -fx-border-color: -primary;
+    -fx-border-insets: 0, 0 0 0 0;
+    -fx-background-insets: 0;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+    -fx-text-fill: -text;
+}
+
+.pbutton:hover {
+    -fx-border-color: -primary-hover;
+    -fx-background-color: -primary-hover;
+}
+
+.pbutton:focused {
+    -fx-border-color: -focus-col;
+}
+
+
 .errorText {
     -fx-fill: -error-col;
 }
@@ -129,4 +170,61 @@ the buttons have this class by default and the styles get overwritten
     /*-fx-background-color: blue;*/
     /*-fx-border-radius: 6;*/
     /*-fx-background-radius: 6;*/
+}
+
+.tabHeader {
+    -fx-border-radius: 8 8 0 0;
+    -fx-background-radius: 8 8 0 0;
+    -fx-background-color: -bg;
+    -fx-border-color: -border-color;
+    -fx-padding: 5 5 0 5;
+
+}
+
+.tabButton {
+    -fx-background-color: -secondary;
+    -fx-border-width: 1;
+    -fx-border-color: -secondary;
+    -fx-border-insets: 0, 0 0 0 0;
+    -fx-border-radius: 3 3 0 0;
+    -fx-background-radius: 3 3 0 0;
+    -fx-cursor: hand;
+}
+
+
+
+.tabButton:hover {
+    -fx-border-color: -secondary-hover;
+    -fx-background-color: -secondary-hover;
+}
+
+.tabButton:focused {
+    -fx-border-color: -focus-col;
+    /*-fx-background-color: derive(#62d1d4, 60%);*/
+}
+
+.expenseVBox {
+    -fx-border-width: 0 1 1 1;
+    -fx-background-radius: 0 0 8 8;
+    -fx-border-radius: 0 0 8 8;
+    -fx-border-color: -border-color;
+}
+
+.ntextfield {
+
+    /*-fx-background-color: -fx-text-box-border, -fx-background ;*/
+    -fx-background-insets: 0, 0 0 0 0 ;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-border-width: 1;
+    -fx-background-color: -bg;
+    -fx-border-color: -graybg;
+    -fx-prompt-text-fill: -graytext;
+    -fx-fill: -text;
+    -fx-effect: innershadow(gaussian, #e0e4e7, 6, .5, 0, 0);
+}
+
+.ntextfield:focused {
+    -fx-border-color: -focus-col;
+    /*-fx-background-color: derive(#62d1d4, 90%);*/
 }

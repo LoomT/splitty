@@ -350,6 +350,7 @@ public class AddExpenseCtrl {
         AtomicInteger selectedPart = new AtomicInteger();
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
+            checkBox.getStyleClass().add("textFont");
             checkBox.setOnAction(e -> {
                 if (checkBox.isSelected()) {
                     expPart.add(participant);

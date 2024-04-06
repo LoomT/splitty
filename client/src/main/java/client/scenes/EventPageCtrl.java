@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -39,13 +40,14 @@ public class EventPageCtrl {
     private Text participantText;
 
     @FXML
-    private Tab allTab;
+    private Button allTab;
 
     @FXML
-    private Tab fromTab;
+    private Button fromTab;
 
     @FXML
-    private Tab includingTab;
+    private Button includingTab;
+    private int selectedTab = 0;
 
     @FXML
     private ChoiceBox<String> participantChoiceBox;
@@ -53,17 +55,12 @@ public class EventPageCtrl {
     private Button addExpenseButton;
 
     @FXML
-    private ListView<String> allListView;
-
-    @FXML
-    private ListView<String> fromListView;
-
-    @FXML
-    private ListView<String> includingListView;
+    private VBox expenseVbox;
     @FXML
     private Label inviteCode;
     @FXML
     private Label copiedToClipboardMsg;
+
     private FadeTransition ft;
     private int selectedParticipantId;
 
@@ -79,9 +76,6 @@ public class EventPageCtrl {
     public Event getEvent() {
         return event;
     }
-    private List<Expense> fromExpenses;
-    private List<Expense> includingExpenses;
-
     /**
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
@@ -138,15 +132,11 @@ public class EventPageCtrl {
             String name = e.getParticipants().get(selectedParticipantId).getName();
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
-            fromListView.getItems().clear();
-            includingListView.getItems().clear();
-            fromExpenses = getExpensesFrom(e, name);
-            includingExpenses = getExpensesIncluding(e, name);
-            createExpenses(fromExpenses, fromListView, e);
-            createExpenses(includingExpenses, includingListView, e);
+            expenseVbox.getChildren().clear();
+            populateExpenses();
         });
         handleWS();
-        displayExpenses(event);
+        updateExpenses(event);
 
         copiedToClipboardMsg.setVisible(false);
         inviteCode.setText(String.format(languageConf.get("EventPage.inviteCode"), event.getId()));
@@ -175,9 +165,9 @@ public class EventPageCtrl {
         );
         websocket.registerExpenseChangeListener(
                 event,
-                this::displayExpenses,
-                this::displayExpenses,
-                this::displayExpenses
+                this::updateExpenses,
+                this::updateExpenses,
+                this::updateExpenses
         );
         websocket.registerEventChangeListener(
                 event,
@@ -217,9 +207,9 @@ public class EventPageCtrl {
      * display the expenses
      * @param e event
      */
-    public void displayExpenses(Event e) {
-        String selectedName = extractSelectedName();
-        tabSelectionChanged(e, selectedName);
+    public void updateExpenses(Event e) {
+       event = e;
+       populateExpenses();
     }
 
 
@@ -244,19 +234,36 @@ public class EventPageCtrl {
         mainCtrl.showStartScreen();
     }
 
-    /**
-     * actions for when the tab selection is changed
-     * @param e event
-     * @param selectedParticipantName selected participant name
-     */
     @FXML
-    public void tabSelectionChanged(Event e, String selectedParticipantName) {
-        List<Expense> allExpenses = getAllExpenses(e);
-        fromExpenses = getExpensesFrom(e, selectedParticipantName);
-        includingExpenses = getExpensesIncluding(e, selectedParticipantName);
-        createExpenses(allExpenses, allListView, e);
-        createExpenses(fromExpenses, fromListView, e);
-        createExpenses(includingExpenses, includingListView, e);
+    private void allTabClicked() {
+        selectedTab = 0;
+        populateExpenses();
+
+    }
+
+    @FXML
+    private void fromTabClicked() {
+        selectedTab = 1;
+        populateExpenses();
+
+    }
+
+    @FXML
+    private void includingTabClicked() {
+        selectedTab = 2;
+        populateExpenses();
+    }
+
+    private void populateExpenses() {
+        List<Expense> expList = switch (selectedTab) {
+            case 0 -> getAllExpenses(event);
+            case 1 -> getExpensesFrom(event, extractSelectedName());
+            case 2 -> getExpensesIncluding(event, extractSelectedName());
+            default -> throw new IllegalStateException("Unexpected value: " + selectedTab);
+        };
+
+        expenseVbox.getChildren().clear();
+
     }
 
     @FXML
