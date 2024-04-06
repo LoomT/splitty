@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
@@ -62,19 +63,22 @@ public class AddExpenseCtrl {
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final LanguageConf languageConf;
 
     /**
      * @param server   server utils instance
      * @param mainCtrl main control instance
-
+     * @param languageConf language config
      */
     @Inject
     public AddExpenseCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl
+            MainCtrl mainCtrl,
+            LanguageConf languageConf
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.languageConf = languageConf;
     }
 
     /**
@@ -124,18 +128,16 @@ public class AddExpenseCtrl {
             handleAbortButton(event);
         });
         addTag.setOnAction(x -> {
-            handeAddTagButton(event, exp);
+            handeAddTagButton(event);
         });
     }
 
     /**
      * behaviour for add tag button
      * @param ev
-     * @param exp
      */
-    public void handeAddTagButton(Event ev, Expense exp) {
+    public void handeAddTagButton(Event ev) {
         mainCtrl.showAddTagPage(ev);
-        //populateTypeBox(ev);
     }
 
     /**
@@ -146,9 +148,9 @@ public class AddExpenseCtrl {
             LocalDate currentDate = LocalDate.now();
             if (newValue != null && newValue.isAfter(currentDate)) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setTitle("Invalid Date");
+                alert.setTitle(languageConf.get("AddExp.invdate"));
                 alert.setHeaderText(null);
-                alert.setContentText("Please select a date that is not in the future.");
+                alert.setContentText(languageConf.get("AddExp.invdatemess"));
                 alert.showAndWait();
                 date.setValue(currentDate);
             }
@@ -325,9 +327,9 @@ public class AddExpenseCtrl {
                 }
             } catch (NumberFormatException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Amount");
+                alert.setTitle(languageConf.get("AddExp.invamount"));
                 alert.setHeaderText(null);
-                alert.setContentText("Please enter a valid number for the amount.");
+                alert.setContentText(languageConf.get("AddExp.invamountmess"));
                 alert.showAndWait();
             }
         }
@@ -338,9 +340,9 @@ public class AddExpenseCtrl {
      */
     public void alertAllFields() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Incomplete Fields");
+        alert.setTitle(languageConf.get("AddExp.incfields"));
         alert.setHeaderText(null);
-        alert.setContentText("Please fill in all fields before adding the expense.");
+        alert.setContentText(languageConf.get("AddExp.incfieldsmess"));
         alert.showAndWait();
     }
 
@@ -350,12 +352,10 @@ public class AddExpenseCtrl {
      */
     public void alertSelectPart() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("No Participants Selected");
+        alert.setTitle(languageConf.get("AddExp.nopart"));
         alert.setHeaderText(null);
-        alert.setContentText("Please select at least one " +
-                "participant for partial splitting.");
+        alert.setContentText(languageConf.get("AddExp.nopartmess"));
         alert.showAndWait();
-        return;
     }
 
     /**

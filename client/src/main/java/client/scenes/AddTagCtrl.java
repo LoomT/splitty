@@ -70,14 +70,30 @@ public class AddTagCtrl {
             selectedColor = cp.getValue();
         });
         add.setOnAction(e -> {
-            addButton(ev);
-            populateTypeBox(ev);
+            if (selectedColor == null) {
+                showAlert(languageConf.get("AddTag.colnotsel"),
+                        languageConf.get("AddTag.colnotselmess"));
+            } else if (tagTextField.getText().isEmpty()) {
+                showAlert(languageConf.get("AddTag.emptyname"),
+                        languageConf.get("AddTag.emptynamemess"));
+            } else {
+                addButton(ev);
+                populateTypeBox(ev);
+            }
         });
         back.setOnAction(e -> {
             mainCtrl.showAddExpensePage(ev);
             System.out.println(ev.getTags());
         });
         populateTypeBox(ev);
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
 
@@ -91,9 +107,18 @@ public class AddTagCtrl {
 
             String clr = toHexString(selectedColor);
             Tag tag = new Tag(name, clr);
-            server.addTag(event.getId(), tag);
-            event.getTags().add(tag);
-            tag.setEventID(event.getId());
+            List<String> tagNames = event.getTags().stream()
+                    .map(Tag::getName)
+                    .toList();
+            if (!tagNames.contains(tag.getName())) {
+                server.addTag(event.getId(), tag);
+                event.getTags().add(tag);
+                tag.setEventID(event.getId());
+            }
+            else {
+                showAlert(languageConf.get("AddTag.alrexist"),
+                        languageConf.get("AddTag.alrexistmess"));
+            }
             tagTextField.clear();
         }
     }
