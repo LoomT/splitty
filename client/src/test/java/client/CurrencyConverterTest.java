@@ -82,10 +82,5 @@ class CurrencyConverterTest {
        assertTrue(test.setBase("USD"));
         assertEquals(test.getBase(), "USD");
         assertEquals(test.getConversionRate(), 0.5);
-        CurrencyConverter.removeCC();
-        CurrencyConverter cur = CurrencyConverter.getInstance();
-        cur.updateExchange();
-        cur.getExchange();
-
     }
 }
