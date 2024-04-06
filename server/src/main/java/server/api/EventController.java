@@ -169,7 +169,7 @@ public class EventController {
      * @param event event to replace the old event
      * @return 204 if successful, 400 if the input is illegal, 404 if the id cannot be found
      */
-    @PostMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Event> changeEvent(@PathVariable String id,
                                                  @RequestBody Event event) {
         try {
