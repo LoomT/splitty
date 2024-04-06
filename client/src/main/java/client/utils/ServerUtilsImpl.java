@@ -320,6 +320,8 @@ public class ServerUtilsImpl implements ServerUtils {
         } catch (ProcessingException e) {
             if(e.getMessage().contains("Connection refused"))
                 throw (ConnectException) e.getCause();
+            else if(e.getMessage().contains("Connection reset"))
+                throw new ConnectException();
             else
                 throw new WebApplicationException();
         }
