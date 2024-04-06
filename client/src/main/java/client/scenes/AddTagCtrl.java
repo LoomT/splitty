@@ -98,7 +98,7 @@ public class AddTagCtrl {
 
 
     /**
-     * behaviour for add tag button
+     * behaviour for add tag button on the page
      * @param event
      */
     public void addButton(Event event) {
