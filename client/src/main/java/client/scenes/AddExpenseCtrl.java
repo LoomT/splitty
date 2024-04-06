@@ -12,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.TextFlow;
-import commons.Expense;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,13 +58,10 @@ public class AddExpenseCtrl {
 
 
     private Event event;
-    private ServerUtils server;
-    private MainCtrl mainCtrl;
-    private List<Participant> expPart;
-    private boolean splitAll = false;
-
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private List<Participant> expPart;
+    private boolean splitAll = false;
 
     /**
      * @param server   server utils instance

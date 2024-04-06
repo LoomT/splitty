@@ -2,6 +2,7 @@ package client.MockClass;
 
 import client.scenes.EventPageCtrl;
 import commons.Event;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class EditTitleMock implements EditEventTitleInterface {
@@ -32,5 +33,13 @@ public class EditTitleMock implements EditEventTitleInterface {
      */
     public void displayEditEventTitle(EventPageCtrl eventPageCtrl, Event event, Stage stage){
         return;
+    }
+
+    /**
+     * initializes shortcuts for page
+     * @param editTitle scene to be added shortcuts into
+     */
+    public void initializeShortcuts(Scene editTitle){
+
     }
 }

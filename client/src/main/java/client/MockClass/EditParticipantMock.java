@@ -1,6 +1,7 @@
 package client.MockClass;
 
 import commons.Event;
+import javafx.scene.Scene;
 
 public class EditParticipantMock implements EditParticipantInterface {
 
@@ -18,5 +19,13 @@ public class EditParticipantMock implements EditParticipantInterface {
      */
     public void displayEditParticipantsPage(Event e){
         event = e;
+    }
+
+    /**
+     * initializes shortcuts for page
+     * @param editParticipants scene to be added shortcuts into
+     */
+    public void initializeShortcuts(Scene editParticipants) {
+
     }
 }

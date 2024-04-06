@@ -195,7 +195,7 @@ public class MainCtrl {
      */
     public void showEditTitle(Event event){
         Stage stage = new Stage();
-        stage.setScene(titleChanger);
+        stage.setScene(editTitle);
         editTitleCtrl.displayEditEventTitle(eventPageCtrl, event, stage);
     }
 
