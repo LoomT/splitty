@@ -456,12 +456,4 @@ public class EventPageCtrl {
     public void openDebtsPage() {
         mainCtrl.showDebtsPage(event);
     }
-
-    /**
-     * display custom transaction screen
-     */
-    @FXML
-    public void addCustomTransactionClicked() {
-        mainCtrl.showAddCustomTransaction(event);
-    }
 }
