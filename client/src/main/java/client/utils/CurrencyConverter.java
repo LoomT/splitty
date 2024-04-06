@@ -1,9 +1,5 @@
-package client;
+package client.utils;
 
-import client.utils.FileIO;
-import client.utils.ServerUtils;
-import client.utils.ServerUtilsImpl;
-import client.utils.UserConfig;
 import com.google.inject.Inject;
 
 import java.io.*;
@@ -52,7 +48,7 @@ public class CurrencyConverter {
         try {
             this.server = new ServerUtilsImpl(new UserConfig(
                     new FileIO(Objects.requireNonNull(CurrencyConverter.
-                    class.getClassLoader().getResource("client/config.properties")).getPath())));
+                    class.getClassLoader().getResource("client/config.properties")))));
         } catch (Exception ignored){}
         try (Reader fileReader = new FileReader(path)) {
             currencyMap = initializeCurrencyMap(fileReader);
@@ -113,7 +109,7 @@ public class CurrencyConverter {
      * @return a String of the http response.
      */
     public String getExchange() {
-        return server.getExchangeRates();
+        return server.getExchangeRates(new GregorianCalendar());
     }
 
     /**

@@ -25,18 +25,6 @@ public class FileIO implements IOInterface{
     }
 
     /**
-     * second constructor to insert a URI directly instead of URL
-     * @param path the uri of the config file
-     */
-    public FileIO(@Nullable String path){
-        if(path == null) {
-            //TODO replace crash with a pop up
-            throw new RuntimeException("Config file not found");
-        }
-        file = new File(path);
-    }
-
-    /**
      * @return file reader
      */
     @Override

@@ -1,11 +1,11 @@
 package client;
 
+import client.utils.CurrencyConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.TestServerUtils;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.Objects;
 

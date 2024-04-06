@@ -6,10 +6,7 @@ import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class TestServerUtils implements ServerUtils {
@@ -501,7 +498,7 @@ public class TestServerUtils implements ServerUtils {
      * @return mocked version of exchange rate api
      */
     @Override
-    public String getExchangeRates(){
+    public String getExchangeRates(Calendar calendar){
         calls.add("getExchangeRates");
         //string to mimic real api response from openExchangeRates so all the methods work correctly
         return """

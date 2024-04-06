@@ -31,6 +31,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -296,10 +299,15 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return string representation of the current exchange rates
      */
     @Override
-    public String getExchangeRates(){
+    public String getExchangeRates(Calendar calendar){
+        Calendar currentTime = new GregorianCalendar();
+        currentTime.add(Calendar.HOUR, 1);
+        if(calendar.after(currentTime)){
+            return null;
+        }
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(
-                URI.create(server + "api/CurrencyConverter")).GET().build();
+                URI.create(server + "api/currency")).GET().build();
 
         HttpResponse response;
         try {
