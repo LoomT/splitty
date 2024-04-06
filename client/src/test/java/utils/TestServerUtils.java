@@ -23,6 +23,8 @@ public class TestServerUtils implements ServerUtils {
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
+     *
+     * @param websocket websocket client
      */
     public TestServerUtils(TestWebsocket websocket) {
         events = new ArrayList<>();
@@ -148,9 +150,7 @@ public class TestServerUtils implements ServerUtils {
         clone.setEventID(event.getId());
         event.addParticipant(clone);
         event.setLastActivity(new Date());
-        if(clone != null){
-            websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
-        }
+        websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
         lastChange = new Date();
         statuses.add(204);
         return 204;
