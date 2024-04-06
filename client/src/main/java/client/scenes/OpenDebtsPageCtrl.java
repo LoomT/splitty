@@ -10,6 +10,7 @@ import jakarta.inject.Inject;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
@@ -77,6 +78,10 @@ public class OpenDebtsPageCtrl {
         if(participantToParticipantMap.equals(debtMap)) return;
         participantToParticipantMap = debtMap;
 
+        allDebtsPane.getChildren().clear();
+        for(Map.Entry<Participant, Participant> m : debtMap.keySet()){
+            allDebtsPane.getChildren().add(new OpenDebtsListItem(m.getKey(), m.getValue(), debtMap.get(m)));
+        }
 
         if(map.equals(participantDebtMap)) return;
         participantDebtMap = map;
