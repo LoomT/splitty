@@ -98,7 +98,15 @@ public class StartScreenCtrl {
 
         title.textProperty().addListener((observable, oldValue, newValue) -> {
             createEventError.setVisible(false);
-            if(newValue.length() > 50) newValue = newValue.substring(0, 50);
+            int maxLength = 50;
+            if(newValue.length() > maxLength) {
+                newValue = newValue.substring(0, maxLength);
+            }
+            if(newValue.length() == maxLength) {
+                createEventError.setText(
+                        String.format(languageConf.get("StartScreen.maxEventNameLength"), maxLength));
+                createEventError.setVisible(true);
+            }
             title.setText(newValue);
         });
     }
@@ -148,8 +156,8 @@ public class StartScreenCtrl {
      * for example when you exit the event page with the back button to reset the fields.
      */
     public void reset() {
-        title.setText("");
-        code.setText("");
+        joinError.setVisible(false);
+        createEventError.setVisible(false);
         reloadEventCodes();
     }
 
