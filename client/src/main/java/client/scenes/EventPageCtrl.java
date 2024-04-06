@@ -111,6 +111,8 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        mainCtrl.updateEditTitle(e.getTitle());
+        mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
@@ -233,6 +235,7 @@ public class EventPageCtrl {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
         return server.updateEventTitle(event);
+
     }
 
     /**
@@ -399,7 +402,7 @@ public class EventPageCtrl {
      *
      */
     public void changeTitle(){
-        mainCtrl.showEditTitle(this);
+        mainCtrl.showEditTitle(this.event);
     }
 
     /**
