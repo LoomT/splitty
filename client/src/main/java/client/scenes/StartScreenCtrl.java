@@ -96,19 +96,7 @@ public class StartScreenCtrl {
             code.setText(filteredValue.toUpperCase());
         });
 
-        title.textProperty().addListener((observable, oldValue, newValue) -> {
-            createEventError.setVisible(false);
-            int maxLength = 50;
-            if(newValue.length() > maxLength) {
-                newValue = newValue.substring(0, maxLength);
-            }
-            if(newValue.length() == maxLength) {
-                createEventError.setText(
-                        String.format(languageConf.get("StartScreen.maxEventNameLength"), maxLength));
-                createEventError.setVisible(true);
-            }
-            title.setText(newValue);
-        });
+        EditTitleCtrl.eventTitleListener(title, createEventError, languageConf);
     }
 
     /**

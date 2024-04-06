@@ -5,7 +5,6 @@ import client.MockClass.EditEventTitleInterface;
 import client.utils.LanguageConf;
 import com.google.inject.Inject;
 import commons.Event;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -47,7 +46,32 @@ public class EditTitleCtrl implements EditEventTitleInterface {
      * Initializes the characterLimitError event listener.
      */
     public void initialize(){
-        characterLimitError(nameTextField, titleError, 100);
+        eventTitleListener(nameTextField, titleError, languageConf);
+    }
+
+    /**
+     * Adds a listener to the titleField which will make the errorField visible
+     * with a message informing the user that the
+     * length of the text reached maxLength which is currently 50
+     *
+     * @param titleField event title text field
+     * @param errorField error text node
+     * @param languageConf languageConf
+     */
+    static void eventTitleListener(TextField titleField, Text errorField, LanguageConf languageConf) {
+        titleField.textProperty().addListener((observable, oldValue, newValue) -> {
+            errorField.setVisible(false);
+            int maxLength = 50;
+            if(newValue.length() > maxLength) {
+                newValue = newValue.substring(0, maxLength);
+            }
+            if(newValue.length() == maxLength) {
+                errorField.setText(
+                        String.format(languageConf.get("StartScreen.maxEventNameLength"), maxLength));
+                errorField.setVisible(true);
+            }
+            titleField.setText(newValue);
+        });
     }
 
     /**
@@ -99,23 +123,5 @@ public class EditTitleCtrl implements EditEventTitleInterface {
         stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
         nameTextField.textProperty().setValue("");
         stage.show();
-    }
-
-    /**
-     * Creates a characterLimitError which showcases an error
-     * iff a character limit has been exceeded.
-     * @param textField textField which is observed
-     * @param errorMessage Text where the message is displayed in the scene
-     * @param limit character limit to not be exceeded
-     */
-    public void characterLimitError(TextField textField, Text errorMessage, int limit){
-        String message = errorMessage.getText();
-        errorMessage.setVisible(false);
-        textField.textProperty().addListener((observableValue, number, t1)->{
-            errorMessage.textProperty().bind(Bindings.concat(
-                    message, String.format(" %d/%d", textField.getText().length(), limit)));
-
-            errorMessage.setVisible(textField.getLength() > limit);
-        });
     }
 }
