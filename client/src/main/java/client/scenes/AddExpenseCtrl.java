@@ -3,13 +3,13 @@ package client.scenes;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import commons.Participant;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.text.TextFlow;
-import commons.Expense;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,10 +54,8 @@ public class AddExpenseCtrl {
     @FXML
     private Button add;
 
-    private ServerUtils server;
-    private MainCtrl mainCtrl;
-    private List<Participant> expPart;
-    private boolean splitAll = false;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
 
     /**
      * @param server   server utils instance
@@ -71,7 +69,6 @@ public class AddExpenseCtrl {
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
-        expPart = new ArrayList<>();
     }
 
     /**
@@ -96,17 +93,12 @@ public class AddExpenseCtrl {
         amount.clear();
         populateCurrencyChoiceBox();
         date.setValue(LocalDate.now());
-        expPart.clear();
         populateSplitPeople(event);
         disablePartialSplitCheckboxes(true);
         equalSplit.setOnAction(e -> {
-            //splitAll = false;
             if (equalSplit.isSelected()) {
-                //splitAll = true;
-                expPart.clear();
                 partialSplit.setSelected(false);
                 disablePartialSplitCheckboxes(true);
-                expPart.addAll(event.getParticipants());
             } else {
                 equalSplit.setSelected(true);
             }
@@ -158,7 +150,7 @@ public class AddExpenseCtrl {
         ex.setExpenseParticipants(expParticipants);
         ex.setType(expType);
 
-        if (expParticipants.size() == 0) {
+        if (expParticipants.isEmpty()) {
             alertSelectPart();
             return;
         }
@@ -173,6 +165,8 @@ public class AddExpenseCtrl {
             expParticipants.addAll(ev.getParticipants());
         } else if (partialSplit.isSelected()) {
             expParticipants.addAll(getSelectedParticipants(ev));
+        } else {
+            throw new RuntimeException();
         }
         return expParticipants;
     }
@@ -182,10 +176,10 @@ public class AddExpenseCtrl {
         for (Node node : expenseParticipants.getChildren()) {
             if (node instanceof CheckBox participantCheckBox && participantCheckBox.isSelected()) {
                 String participantName = participantCheckBox.getText();
-                ev.getParticipants().stream()
+                selectedParticipants.add(ev.getParticipants().stream()
                         .filter(p -> p.getName().equals(participantName))
                         .findFirst()
-                        .ifPresent(selectedParticipants::add);
+                        .orElseThrow());
             }
         }
         return selectedParticipants;
@@ -200,15 +194,6 @@ public class AddExpenseCtrl {
         if (partialSplit.isSelected()) {
             equalSplit.setSelected(false);
             disablePartialSplitCheckboxes(false);
-            for (Node node : expenseParticipants.getChildren()) {
-                if (node instanceof CheckBox participantCheckBox) {
-                    if (participantCheckBox.isSelected()) {
-                        String participantName = participantCheckBox.getText();
-                        Participant selectedParticipant = new Participant(participantName);
-                        expPart.add(selectedParticipant);
-                    }
-                }
-            }
         } else {
             partialSplit.setSelected(true);
         }
@@ -263,12 +248,9 @@ public class AddExpenseCtrl {
                 type.getValue() == null) {
             alertAllFields();
         } else {
-            if (partialSplit.isSelected() && expPart.isEmpty()) {
-                alertSelectPart();
-            }
-            String amountText = amount.getText();
             try {
-                double expAmount = Double.parseDouble(amountText);
+                List<Participant> participants = getExpenseParticipants(ev);
+                double expAmount = Double.parseDouble(amount.getText());
                 LocalDate expDate = date.getValue();
                 LocalDateTime localDateTime = expDate.atStartOfDay();
                 Date expenseDate = Date.from(localDateTime.
@@ -285,7 +267,7 @@ public class AddExpenseCtrl {
 
                     String expType = type.getValue();
                     Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
-                            expCurrency, expPart, expType);
+                            expCurrency, participants, expType);
                     expense.setDate(expenseDate);
                     server.createExpense(ev.getId(), expense);
                     resetExpenseFields();
@@ -323,7 +305,6 @@ public class AddExpenseCtrl {
         alert.setContentText("Please select at least one " +
                 "participant for partial splitting.");
         alert.showAndWait();
-        return;
     }
 
     /**
@@ -352,21 +333,10 @@ public class AddExpenseCtrl {
      */
     public void populateSplitPeople(Event event) {
         expenseParticipants.getChildren().clear();
-        expPart.clear();
         int totalPart = event.getParticipants().size();
         AtomicInteger selectedPart = new AtomicInteger();
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
-            checkBox.setOnAction(e -> {
-                if (checkBox.isSelected()) {
-                    expPart.add(participant);
-                    selectedPart.getAndIncrement();
-                } else {
-                    expPart.remove(participant);
-                    selectedPart.getAndDecrement();
-                }
-                //updateEqualSplitCheckbox();
-            });
             expenseParticipants.getChildren().add(checkBox);
         }
         if (totalPart == selectedPart.get()) {
@@ -396,7 +366,6 @@ public class AddExpenseCtrl {
         expenseAuthor.getSelectionModel().clearSelection();
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
-        expPart.clear();
         type.getSelectionModel().clearSelection();
     }
 
