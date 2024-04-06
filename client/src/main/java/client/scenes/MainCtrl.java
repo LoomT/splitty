@@ -332,13 +332,4 @@ public class MainCtrl {
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
     }
-
-    /**
-     * Shows the open debts page
-     * @param eventToShow the event to show the open debts for
-     */
-    public void showDebtsPage(Event eventToShow) {
-        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
-        primaryStage.setScene(openDebtsPage);
-    }
 }
