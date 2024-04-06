@@ -1,5 +1,7 @@
 package client.scenes;
 
+import client.MockClass.EditParticipantMock;
+import client.MockClass.EditTitleMock;
 import client.MyFXML;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -25,7 +27,6 @@ import utils.TestWebsocket;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +50,8 @@ public class EventPageCtrlTest {
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
         MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
+        mainCtrl.setEditTitleCtrl(new EditTitleMock());
+        mainCtrl.setEditParticipantsCtrl(new EditParticipantMock());
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,
@@ -74,12 +77,9 @@ public class EventPageCtrlTest {
     public void testDisplayEvent(FxRobot robot) {
         Event e = new Event("test", List.of(new Participant("name")), List.of());
         Platform.runLater(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        ctrl.displayEvent(e);
-                        assertEquals(e, ctrl.getEvent());
-                    }
+                () -> {
+                    ctrl.displayEvent(e);
+                    assertEquals(e, ctrl.getEvent());
                 }
         );
     }

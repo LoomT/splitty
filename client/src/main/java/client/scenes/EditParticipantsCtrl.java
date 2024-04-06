@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.EditParticipantInterface;
 import client.components.Confirmation;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -17,7 +18,7 @@ import java.util.Optional;
 import static java.lang.String.format;
 
 
-public class EditParticipantsCtrl {
+public class EditParticipantsCtrl implements EditParticipantInterface {
     @FXML
     private Text eventTitle;
     @FXML

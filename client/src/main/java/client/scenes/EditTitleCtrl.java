@@ -1,21 +1,19 @@
 package client.scenes;
 
+
+import client.MockClass.EditEventTitleInterface;
 import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
 import com.google.inject.Inject;
+import commons.Event;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class EditTitleCtrl {
-    private final ServerUtils server;
-    private final MainCtrl mainCtrl;
-    private final LanguageConf languageConf;
+public class EditTitleCtrl implements EditEventTitleInterface {
 
     @FXML
     private TextField nameTextField;
@@ -24,38 +22,25 @@ public class EditTitleCtrl {
     private Button saveButton;
 
     @FXML
-    private Button cancelButton;
+    private Text eventTitle;
+
     @FXML
     private Text titleError;
 
     private EventPageCtrl eventPageCtrl;
-
-    private UserConfig userConfig;
-    private Websocket websocket;
+    private final LanguageConf languageConf;
 
     /**
      * start screen controller constructor
      *
-     * @param server       utils
-     * @param mainCtrl     main scene controller
      * @param languageConf language config instance
-     * @param userConfig   the user configuration
-     * @param websocket the ws instance
      */
     @Inject
     public EditTitleCtrl(
-            ServerUtils server,
-            MainCtrl mainCtrl,
-            LanguageConf languageConf,
-            UserConfig userConfig,
-            Websocket websocket
+            LanguageConf languageConf
     ) {
-        this.mainCtrl = mainCtrl;
-        this.server = server;
 
         this.languageConf = languageConf;
-        this.userConfig = userConfig;
-        this.websocket = websocket;
     }
 
     /**
@@ -66,11 +51,18 @@ public class EditTitleCtrl {
     }
 
     /**
-     * Closes the popup and erases the textField
+     * Change the title of the EditTitle page
+     * @param title new title
+     */
+    public void changeTitle(String title) {
+        eventTitle.setText(title);
+    }
+
+    /**
+     * Closes the popup.
      */
     @FXML
     public void cancelTitle(){
-        nameTextField.textProperty().setValue("");
         Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
     }
@@ -88,17 +80,25 @@ public class EditTitleCtrl {
         if(result >= 400)
             System.out.println("An error has occurred");
         else{
-            System.out.println("An error has occurred");
+            System.out.println("Event Title changed to: " + nameTextField.getText());
             cancelTitle();
         }
     }
 
     /**
-     *
-     * @param eventPage currentEventPageCtrl to edit the Event.
+     * Sets up the EditTitle screen and displays it.
+     * @param eventPageCtrl EventPageCtrl which will be changed
+     * @param event Event which is displayed
+     * @param stage Stage at which the editEventTitle will be displayed
      */
-    public void setEventPageCtrl(EventPageCtrl eventPage){
-        this.eventPageCtrl = eventPage;
+    public void displayEditEventTitle(EventPageCtrl eventPageCtrl, Event event, Stage stage){
+        this.eventPageCtrl = eventPageCtrl;
+        eventTitle.setText(event.getTitle());
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        nameTextField.textProperty().setValue("");
+        stage.show();
     }
 
     /**
