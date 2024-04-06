@@ -1,10 +1,7 @@
 package client.utils;
 
 import com.google.inject.Inject;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 import javafx.application.Platform;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.converter.CompositeMessageConverter;
@@ -285,6 +282,7 @@ public class WebsocketImpl implements Websocket {
                 "commons.Event", Event.class,
                 "commons.Participant", Participant.class,
                 "commons.Expense", Expense.class,
+                "commons.Transaction", Transaction.class,
                 "java.lang.String", String.class,
                 "java.lang.Long", Long.class));
 

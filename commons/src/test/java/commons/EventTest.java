@@ -258,4 +258,33 @@ public class EventTest {
         assertNotSame(event.getExpenses(), clone.getExpenses());
         assertEquals(event.getExpenses(), clone.getExpenses());
     }
+
+    @Test
+    void cloneTransactions() {
+        Participant p1 = new Participant("Tom");
+        p1.setId(1);
+        Participant p2 = new Participant("Bob");
+        p2.setId(2);
+        Event event = new Event("title", List.of(p1, p2), null);
+        event.addTransaction(new Transaction(p1, p2, 10));
+        Event clone = event.clone();
+
+        assertNotSame(event.getTransactions(), clone.getTransactions());
+        assertEquals(event.getTransactions(), clone.getTransactions());
+        assertNotSame(event.getTransactions().getFirst(), clone.getTransactions().getFirst());
+    }
+
+    @Test
+    void cloneTransactionsParticipants() {
+        Participant p1 = new Participant("Tom");
+        p1.setId(1);
+        Participant p2 = new Participant("Bob");
+        p2.setId(2);
+        Event event = new Event("title", List.of(p1, p2), null);
+        event.addTransaction(new Transaction(p1, p2, 10));
+        Event clone = event.clone();
+
+        assertSame(clone.getParticipants().getFirst(), clone.getTransactions().getFirst().getGiver());
+        assertNotSame(event.getParticipants().getFirst(), clone.getTransactions().getFirst().getGiver());
+    }
 }

@@ -28,6 +28,7 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
@@ -65,7 +66,8 @@ public class MainCtrl {
 
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
-
+    private AddCustomTransactionCtrl addCustomTransactionCtrl;
+    private Scene addCustomTransaction;
 
 
     /**
@@ -121,7 +123,9 @@ public class MainCtrl {
         this.errorPopupCtrl = pairCollector.errorPopup().getKey();
         this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
 
-        //showOverview();
+        this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
+        this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
+
         showStartScreen();
         primaryStage.show();
 
@@ -304,6 +308,20 @@ public class MainCtrl {
      */
     public void setEditParticipantsCtrl(EditParticipantMock editParticipantCtrl){
         this.editParticipantsCtrl = editParticipantCtrl;
+    }
+
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
+    public void showAddCustomTransaction(Event event) {
+        Stage stage = new Stage();
+        stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));
+        addCustomTransactionCtrl.display(event, stage);
+        stage.setScene(addCustomTransaction);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     /**

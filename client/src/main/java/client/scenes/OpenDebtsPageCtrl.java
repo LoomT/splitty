@@ -6,14 +6,16 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import jakarta.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class OpenDebtsPageCtrl {
 
@@ -109,5 +111,13 @@ public class OpenDebtsPageCtrl {
     @FXML
     public void backButtonClicked() {
         mainCtrl.goBackToEventPage(event);
+    }
+
+    /**
+     * display custom transaction screen
+     */
+    @FXML
+    public void addCustomTransactionClicked() {
+        mainCtrl.showAddCustomTransaction(event);
     }
 }

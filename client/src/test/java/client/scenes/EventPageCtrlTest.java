@@ -41,7 +41,7 @@ public class EventPageCtrlTest {
 
     @Start
     public void start(Stage stage) throws IOException {
-        server = new TestServerUtils();
+        server = new TestServerUtils(new TestWebsocket());
 
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=http://localhost:8080/
