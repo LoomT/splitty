@@ -42,12 +42,16 @@ public class MainCtrl {
     private Stage primaryStage;
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+
     private AdminLoginCtrl adminLoginCtrl;
     private Scene adminLogin;
+
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
+
     private EditParticipantInterface editParticipantsCtrl;
     private Scene editParticipants;
+
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
 
@@ -59,6 +63,7 @@ public class MainCtrl {
 
     private EditEventTitleInterface editTitleCtrl;
     private Scene titleChanger;
+
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
