@@ -128,30 +128,42 @@ public class AddCustomTransactionCtrl {
         if(chooseCurrency.getValue() == null) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     languageConf.get("AddCustomTransaction.errorNoCurrencySelected"));
+            alert.setHeaderText(null);
             alert.showAndWait();
             return false;
         }
         if(chooseReceiver.getValue() == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
                     languageConf.get("AddCustomTransaction.warningSelectReceiver"));
+            alert.setHeaderText(null);
             alert.showAndWait();
             return false;
         }
         if(amountField.getText() == null || amountField.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
                     languageConf.get("AddCustomTransaction.warningInputAmount"));
+            alert.setHeaderText(null);
             alert.showAndWait();
             return false;
         }
         if(chooseGiver.getValue() == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
                     languageConf.get("AddCustomTransaction.warningSelectGiver"));
+            alert.setHeaderText(null);
             alert.showAndWait();
             return false;
         }
         if(chooseReceiver.getValue().equals(chooseGiver.getValue())) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
                     languageConf.get("AddCustomTransaction.warningSameParticipants"));
+            alert.setHeaderText(null);
+            alert.showAndWait();
+            return false;
+        }
+        if(Double.parseDouble(amountField.getText()) <= 0) {
+            Alert alert = new Alert(Alert.AlertType.WARNING,
+                    languageConf.get("AddCustomTransaction.warningInvalidAmount"));
+            alert.setHeaderText(null);
             alert.showAndWait();
             return false;
         }
