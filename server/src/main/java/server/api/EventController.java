@@ -1,6 +1,7 @@
 package server.api;
 
 import commons.Event;
+import commons.Tag;
 import commons.WebsocketActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,9 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import server.database.EventRepository;
 
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.random.RandomGenerator;
 
 @RestController
@@ -85,6 +84,22 @@ public class EventController {
                 id = generateId();
             } while (repo.existsById(id));
             event.setId(id);
+            List<Tag> temp = new ArrayList<>();
+            Tag t1 = new Tag("food", "#00FF00");
+            Tag t2 = new Tag("entrance fees", "#0000FF");
+            Tag t3 = new Tag("travel", "#FF0000");
+            temp.addAll(List.of(t1, t2, t3));
+            event.setTags(temp);
+            final String eventID = id;
+            for (Tag t : event.getTags()) {
+                t.setEventID(eventID);
+            }
+
+//            event.getTags().addAll(List.of(new Tag("food", "#39E4422"),
+//                    new Tag("entrance fees", "1AC1E7"),
+//                    new Tag("travel", "E7491A")));
+//            final String eventID = id;
+//            event.getTags().forEach(tag -> tag.setEventID(eventID));
             event.setLastActivity(new Date());
             Event saved = repo.save(event);
             adminController.update();

@@ -27,6 +27,7 @@ import commons.Expense;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -56,6 +57,9 @@ public class MainCtrl {
 
     private EditEventTitleInterface editTitleCtrl;
     private Scene titleChanger;
+    private AddTagCtrl addTagCtrl;
+    private Scene addTag;
+
 
 
     /**
@@ -106,6 +110,10 @@ public class MainCtrl {
         this.editTitleCtrl = pairCollector.editTitlePage().getKey();
         this.titleChanger = new Scene(pairCollector.editTitlePage().getValue());
 
+        this.addTagCtrl = pairCollector.addTagPage().getKey();
+        this.addTag = new Scene(pairCollector.addTagPage().getValue());
+
+        //showOverview();
         showStartScreen();
         primaryStage.show();
 
@@ -233,6 +241,20 @@ public class MainCtrl {
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
+        primaryStage.setResizable(false);
+    }
+
+    /**
+     * show the add tag page
+     * @param event
+     */
+    public void showAddTagPage(Event event) {
+        addTagCtrl.displayAddTagPage(event);
+        primaryStage.setTitle(languageConf.get("AddTag.addtag"));
+        primaryStage.setScene(addTag);
+        primaryStage.setResizable(false);
+        primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.show();
     }
 
     /**

@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
@@ -365,6 +366,28 @@ public class ServerUtilsImpl implements ServerUtils {
                 .path("api/events/" + event.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(event, APPLICATION_JSON))) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
+
+    }
+
+    /**
+     * @param eventID     event id
+     * @param tag tag to save
+     * @return status code
+     */
+    @Override
+    public int addTag(String eventID, Tag tag) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/tags")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(tag, APPLICATION_JSON))) {
             return response.getStatus();
         } catch (ProcessingException e) {
             if(e.getMessage().contains("Connection refused"))

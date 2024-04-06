@@ -3,6 +3,7 @@ package client.utils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 
 import java.net.ConnectException;
 import java.util.List;
@@ -138,5 +139,13 @@ public interface ServerUtils {
      * @return updated event
      */
     int updateEventTitle(Event event) throws ConnectException;
+
+    /**
+     * send an API call to add a tag
+     * @param eventID event id
+     * @param tag tag to add
+     * @return added tag
+     */
+    int addTag(String eventID, Tag tag) throws ConnectException;
 }
 

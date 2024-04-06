@@ -9,5 +9,6 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
                             Pair<AdminOverviewCtrl, Parent> adminOverview,
                             Pair<AddExpenseCtrl, Parent> addExpensePage,
-                            Pair<EditTitleCtrl, Parent> editTitlePage) {
+                            Pair<EditTitleCtrl, Parent> editTitlePage,
+                            Pair<AddTagCtrl, Parent> addTagPage) {
 }

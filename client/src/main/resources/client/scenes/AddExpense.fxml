@@ -4,6 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -25,7 +27,7 @@
                 </Text>
             </children>
         </Pane>
-        <VBox layoutX="154.0" layoutY="94.0" prefHeight="267.0" prefWidth="298.0">
+        <VBox layoutX="154.0" layoutY="94.0" prefHeight="267.0" prefWidth="447.0">
             <children>
                 <HBox prefHeight="38.0" prefWidth="298.0">
                     <children>
@@ -81,7 +83,7 @@
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Text>
-                <HBox prefHeight="28.0" prefWidth="144.0">
+                <HBox prefHeight="28.0" prefWidth="362.0">
                     <children>
                         <CheckBox fx:id="equalSplit" mnemonicParsing="false" text="%AddExp.equalsplit">
                             <font>
@@ -114,7 +116,7 @@
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Text>
-                <ChoiceBox fx:id="type" prefHeight="26.0" prefWidth="134.0" style="-fx-translate-x: 30;" />
+                <ComboBox fx:id="type" prefHeight="26.0" prefWidth="134.0" style="-fx-translate-x: 30;" />
             </children>
         </HBox>
         <HBox layoutX="252.0" layoutY="453.0" prefHeight="28.0" prefWidth="200.0">
@@ -131,5 +133,6 @@
                 </Button>
             </children>
         </HBox>
+        <Button fx:id="addTag" layoutX="43.0" layoutY="455.0" mnemonicParsing="false"  text="%AddExp.addtag" />
     </children>
 </AnchorPane>

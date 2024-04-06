@@ -1,15 +1,20 @@
 package client.scenes;
 
+import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.util.Callback;
 
 import java.net.ConnectException;
 import java.time.LocalDate;
@@ -47,29 +52,34 @@ public class AddExpenseCtrl {
     private TextFlow expenseParticipants;
 
     @FXML
-    private ChoiceBox<String> type;
+    private ComboBox<String> type;
 
     @FXML
     private Button abort;
 
     @FXML
     private Button add;
+    @FXML
+    private Button addTag;
 
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
+    private final LanguageConf languageConf;
 
     /**
      * @param server   server utils instance
      * @param mainCtrl main control instance
-
+     * @param languageConf language config
      */
     @Inject
     public AddExpenseCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl
+            MainCtrl mainCtrl,
+            LanguageConf languageConf
     ) {
         this.server = server;
         this.mainCtrl = mainCtrl;
+        this.languageConf = languageConf;
     }
 
     /**
@@ -78,6 +88,8 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        blockDate();
+        setupDateListener();
         date.setDayCellFactory(param -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
@@ -89,7 +101,7 @@ public class AddExpenseCtrl {
         partialSplit.setSelected(false);
         equalSplit.setDisable(false);
         populateAuthorChoiceBox(event);
-        populateTypeBox();
+        populateTypeBox(event);
         purpose.clear();
         amount.clear();
         populateCurrencyChoiceBox();
@@ -106,7 +118,6 @@ public class AddExpenseCtrl {
         });
         partialSplit.setOnAction(this::handlePartialSplit);
 
-
         add.setOnAction(x -> {
             if (exp == null) {
                 handleAddButton(event);
@@ -116,6 +127,47 @@ public class AddExpenseCtrl {
         });
         abort.setOnAction(x -> {
             handleAbortButton(event);
+        });
+        addTag.setOnAction(x -> {
+            handeAddTagButton(event);
+        });
+    }
+
+    /**
+     * behaviour for add tag button
+     * @param ev
+     */
+    public void handeAddTagButton(Event ev) {
+        mainCtrl.showAddTagPage(ev);
+    }
+
+    /**
+     * Add an event listener to the date picker to check for future dates.
+     */
+    private void setupDateListener() {
+        date.valueProperty().addListener((observable, oldValue, newValue) -> {
+            LocalDate currentDate = LocalDate.now();
+            if (newValue != null && newValue.isAfter(currentDate)) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle(languageConf.get("AddExp.invdate"));
+                alert.setHeaderText(null);
+                alert.setContentText(languageConf.get("AddExp.invdatemess"));
+                alert.showAndWait();
+                date.setValue(currentDate);
+            }
+        });
+    }
+
+    /**
+     * method for blocking the user fronm choosing a future date
+     */
+    public void blockDate() {
+        date.setDayCellFactory(param -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+            }
         });
     }
 
@@ -138,7 +190,7 @@ public class AddExpenseCtrl {
         String expType = type.getValue();
 
         for (Participant p : ex.getExpenseParticipants()) {
-            if (p.getName() == expParticipant) {
+            if (p.getName().equals(expParticipant)) {
                 ex.setExpenseAuthor(p);
                 break;
             }
@@ -286,9 +338,9 @@ public class AddExpenseCtrl {
                 }
             } catch (NumberFormatException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Invalid Amount");
+                alert.setTitle(languageConf.get("AddExp.invamount"));
                 alert.setHeaderText(null);
-                alert.setContentText("Please enter a valid number for the amount.");
+                alert.setContentText(languageConf.get("AddExp.invamountmess"));
                 alert.showAndWait();
             }
         }
@@ -299,9 +351,9 @@ public class AddExpenseCtrl {
      */
     public void alertAllFields() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Incomplete Fields");
+        alert.setTitle(languageConf.get("AddExp.incfields"));
         alert.setHeaderText(null);
-        alert.setContentText("Please fill in all fields before adding the expense.");
+        alert.setContentText(languageConf.get("AddExp.incfieldsmess"));
         alert.showAndWait();
     }
 
@@ -311,10 +363,9 @@ public class AddExpenseCtrl {
      */
     public void alertSelectPart() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("No Participants Selected");
+        alert.setTitle(languageConf.get("AddExp.nopart"));
         alert.setHeaderText(null);
-        alert.setContentText("Please select at least one " +
-                "participant for partial splitting.");
+        alert.setContentText(languageConf.get("AddExp.nopartmess"));
         alert.showAndWait();
     }
 
@@ -328,14 +379,109 @@ public class AddExpenseCtrl {
     }
 
     /**
-     * show corresponding tags for expense
+     * show the corresponding tags for expense
+     *
+     * @param ev the current event
      */
-    public void populateTypeBox() {
-        if (type.getItems().isEmpty()) {
-            type.getItems().add("food");
-            type.getItems().add("entrance fees");
-            type.getItems().add("travel");
+    public void populateTypeBox(Event ev) {
+        setupTypeComboBox(ev);
+    }
+
+    private void setupTypeComboBox(Event ev) {
+        type.getItems().clear();
+        for (Tag tag : ev.getTags()) {
+            type.getItems().add(tag.getName());
         }
+        type.setCellFactory(createTypeListCellFactory(ev));
+        type.setButtonCell(createTypeListCell(ev));
+    }
+
+    private Callback<ListView<String>, ListCell<String>> createTypeListCellFactory(Event ev) {
+        return param -> new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    Tag tag = findTagByName(item, ev.getTags());
+                    if (tag != null) {
+                        Label label = createLabelWithColor(item, hexToColor(tag.getColor()));
+                        setGraphic(label);
+                    }
+                } else {
+                    setText(null);
+                    setGraphic(null);
+                }
+            }
+        };
+    }
+
+    private ListCell<String> createTypeListCell(Event ev) {
+        return new ListCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item != null && !empty) {
+                    Tag tag = findTagByName(item, ev.getTags());
+                    if (tag != null) {
+                        Label label = createLabelWithColor(item, hexToColor(tag.getColor()));
+                        setGraphic(label);
+                    }
+                } else {
+                    setText(null);
+                    setGraphic(null);
+                }
+            }
+        };
+    }
+
+    private Label createLabelWithColor(String text, Color backgroundColor) {
+        Label label = new Label(text);
+        if (backgroundColor != null) {
+            label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
+                    + "; -fx-padding: 5px; -fx-text-fill: white;");
+        }
+        double textWidth = new Text(text).getLayoutBounds().getWidth();
+        label.setMinWidth(textWidth + 10);
+        return label;
+    }
+
+    private Tag findTagByName(String tagName, List<Tag> tags) {
+        for (Tag tag : tags) {
+            if (tag.getName().equals(tagName)) {
+                return tag;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * convert from color to string
+     * @param color
+     * @return the String color
+     */
+    private String toHexString(Color color) {
+        return String.format("%02X%02X%02X",
+                (int) (color.getRed() * 255),
+                (int) (color.getGreen() * 255),
+                (int) (color.getBlue() * 255));
+    }
+
+    /**
+     * convert from string to color
+     * @param hexCode
+     * @return the Color color
+     */
+    public static Color hexToColor(String hexCode) {
+        if (!hexCode.startsWith("#")) {
+            hexCode = "#" + hexCode;
+        }
+
+        int red = Integer.parseInt(hexCode.substring(1, 3), 16);
+        int green = Integer.parseInt(hexCode.substring(3, 5), 16);
+        int blue = Integer.parseInt(hexCode.substring(5, 7), 16);
+
+        return Color.rgb(red, green, blue);
     }
 
     /**
