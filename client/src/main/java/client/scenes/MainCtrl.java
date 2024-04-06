@@ -56,6 +56,8 @@ public class MainCtrl {
     private Scene titleChanger;
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
+    private AddTagCtrl addTagCtrl;
+    private Scene addTag;
 
 
 
@@ -109,6 +111,9 @@ public class MainCtrl {
 
         this.errorPopupCtrl = pairCollector.errorPopup().getKey();
         this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
+
+        this.addTagCtrl = pairCollector.addTagPage().getKey();
+        this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
         //showOverview();
         showStartScreen();
@@ -254,6 +259,20 @@ public class MainCtrl {
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
+        primaryStage.setResizable(false);
+    }
+
+    /**
+     * show the add tag page
+     * @param event
+     */
+    public void showAddTagPage(Event event) {
+        addTagCtrl.displayAddTagPage(event);
+        primaryStage.setTitle(languageConf.get("AddTag.addtag"));
+        primaryStage.setScene(addTag);
+        primaryStage.setResizable(false);
+        primaryStage.initModality(Modality.APPLICATION_MODAL);
+        primaryStage.show();
     }
 
     /**
