@@ -15,10 +15,8 @@
  */
 package client;
 
-import client.components.ErrorPopupCtrl;
 import client.scenes.*;
 import client.utils.LanguageConf;
-import client.utils.UserConfig;
 import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -30,7 +28,6 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-    private static final UserConfig userConfig = INJECTOR.getInstance(UserConfig.class);
     private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
@@ -93,11 +90,6 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
-        var errorPopup = FXML.load(
-                ErrorPopupCtrl.class,
-                languageConf.getLanguageResources(),
-                "client", "scenes", "ErrorPopup.fxml"
-        );
         var addExpense = FXML.load(
                 AddExpenseCtrl.class,
                 languageConf.getLanguageResources(),
@@ -112,7 +104,7 @@ public class Main extends Application {
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger)
+                adminOverview, addExpense, titleChanger)
         );
     }
 }

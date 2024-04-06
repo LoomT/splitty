@@ -15,8 +15,9 @@
  */
 package client.scenes;
 
-import client.MockClass.*;
-import client.components.ErrorPopupCtrl;
+import client.MockClass.EditEventTitleInterface;
+import client.MockClass.EditParticipantInterface;
+import client.MockClass.EditParticipantMock;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -26,7 +27,6 @@ import commons.Expense;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
@@ -56,9 +56,6 @@ public class MainCtrl {
 
     private EditEventTitleInterface editTitleCtrl;
     private Scene titleChanger;
-    private ErrorPopupCtrl errorPopupCtrl;
-    private Scene errorPopup;
-
 
 
     /**
@@ -109,10 +106,6 @@ public class MainCtrl {
         this.editTitleCtrl = pairCollector.editTitlePage().getKey();
         this.titleChanger = new Scene(pairCollector.editTitlePage().getValue());
 
-        this.errorPopupCtrl = pairCollector.errorPopup().getKey();
-        this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
-
-        //showOverview();
         showStartScreen();
         primaryStage.show();
 
@@ -164,6 +157,7 @@ public class MainCtrl {
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -208,23 +202,6 @@ public class MainCtrl {
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
-    }
-
-    /**
-     * Show error popup for general usage
-     * @param stringToken String token to be used as a variable in the error text
-     * @param intToken int token to be used as a variable in the error text
-     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
-     * Check ErrorPopupCtrl for more detailed documentation
-     */
-    public void showErrorPopup(String code, String stringToken, int intToken){
-        errorPopupCtrl.generatePopup(code, stringToken, intToken);
-        Stage stage = new Stage();
-        stage.setScene(errorPopup);
-        stage.setResizable(false);
-        stage.setTitle("Error");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
     }
 
     /**
