@@ -17,14 +17,14 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
-    private TestWebsocket websocket;
+    private final TestWebsocket websocket;
     private boolean polled;
 
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
      */
-    public TestServerUtils() {
+    public TestServerUtils(TestWebsocket websocket) {
         events = new ArrayList<>();
         counter = 1;
         lastChange = new Date();
@@ -32,7 +32,7 @@ public class TestServerUtils implements ServerUtils {
         statuses = new ArrayList<>();
         polled = false;
         concurrentStatuses = new ConcurrentSkipListSet<>();
-        websocket = new TestWebsocket();
+        this.websocket = websocket;
     }
 
     /**
