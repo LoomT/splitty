@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.MockClass.MainCtrlInterface;
 import client.scenes.MainCtrl;
 import client.scenes.StartScreenCtrl;
 import client.utils.*;
@@ -31,7 +32,7 @@ public class MyModule implements Module {
      */
     @Override
     public void configure(Binder binder) {
-        binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(MainCtrlInterface.class).to(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
         binder.bind(UserConfig.class).in(Scopes.SINGLETON);
         binder.bind(ServerUtils.class).to(ServerUtilsImpl.class).in(Scopes.SINGLETON);

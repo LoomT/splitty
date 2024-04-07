@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.MockClass.MainCtrlInterface;
 import client.scenes.*;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
@@ -90,20 +91,19 @@ public class Main extends Application {
                 "client", "scenes", "AdminOverview.fxml"
         );
         var addExpense = FXML.load(
-                AddExpenseCtrl.class,
-                languageConf.getLanguageResources(),
+                AddExpenseCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
         var titleChanger = FXML.load(
-                EditTitleCtrl.class,
-                languageConf.getLanguageResources(),
+                EditTitleCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
         );
         var addTag = FXML.load(
                 AddTagCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "AddTag.fxml"
         );
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
+        primaryStage.setResizable(false);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, titleChanger, addTag)
