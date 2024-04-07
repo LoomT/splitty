@@ -230,3 +230,10 @@ the buttons have this class by default and the styles get overwritten
     -fx-border-color: -focus-col;
     /*-fx-background-color: derive(#62d1d4, 90%);*/
 }
+
+.expenseContainer {
+    -fx-padding: 5 10 5 10;
+    -fx-border-color: -border-color;
+    -fx-border-width: 0 0 1 0;
+
+}
