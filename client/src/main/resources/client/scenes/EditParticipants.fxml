@@ -1,65 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditParticipantsCtrl">
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditParticipantsCtrl">
     <children>
-        <VBox layoutY="58.0" prefHeight="343.0" prefWidth="174.0" style="-fx-background-color: #ddd;">
+        <HBox prefHeight="49.0" prefWidth="600.0" styleClass="navbar">
             <children>
-                <Button mnemonicParsing="false" onAction="#backButtonClicked" text="%EditP.back">
-                    <VBox.margin>
-                        <Insets top="5.0" />
-                    </VBox.margin></Button>
-                <Label text="%EditP.createOrEditP" wrapText="true">
-                    <VBox.margin>
-                        <Insets bottom="5.0" top="10.0" />
-                    </VBox.margin>
-                </Label>
-                <ChoiceBox fx:id="chooseParticipant" prefWidth="150.0" />
-            </children>
-            <padding>
-                <Insets bottom="10.0" left="10.0" right="10.0" />
-            </padding>
-        </VBox>
-        <HBox alignment="CENTER" prefHeight="58.0" prefWidth="600.0" style="-fx-background-color: #ddd;">
-            <children>
-                <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" text="Event Title">
+                <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleFont" text="Event Title">
                     <font>
                         <Font name="System Bold" size="36.0" />
                     </font>
                 </Text>
             </children>
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
         </HBox>
-        <GridPane layoutX="215.0" layoutY="120.0" prefHeight="141.0" prefWidth="304.0">
-            <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.39996337890625" minWidth="10.0" prefWidth="64.0" />
-                <ColumnConstraints hgrow="SOMETIMES" maxWidth="272.0" minWidth="10.0" prefWidth="216.0" />
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            </rowConstraints>
-            <children>
-                <Label text="%EditP.name" />
-                <Label text="Email" GridPane.rowIndex="1" />
-                <Label text="%EditP.beneficiary" GridPane.rowIndex="2" />
-                <Label text="IBAN" GridPane.rowIndex="3" />
-                <Label text="BIC" GridPane.rowIndex="4" />
-                <TextField fx:id="nameField" GridPane.columnIndex="1" />
-                <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <TextField fx:id="beneficiaryField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <TextField fx:id="ibanField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <TextField fx:id="bicField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            </children>
-        </GridPane>
-        <Button fx:id="deletePartButton" layoutX="291.0" layoutY="268.0" mnemonicParsing="false" onAction="#deletePartClicked" text="%EditP.deletePart" />
-        <Button fx:id="saveButton" layoutX="478.0" layoutY="268.0" mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" AnchorPane.rightAnchor="81.2" />
-      <Label fx:id="participantEditWarning" layoutX="291.0" layoutY="303.0" prefHeight="17.0" prefWidth="228.0" />
+          <Button layoutX="14.0" layoutY="89.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EditP.back" />
+      <VBox layoutX="105.0" layoutY="89.0" prefHeight="272.0" prefWidth="390.0" styleClass="container">
+         <children>
+            <HBox alignment="CENTER_LEFT" prefWidth="200.0">
+               <children>
+                      <Label styleClass="textFont" text="%EditP.createOrEditP" wrapText="true">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                      </Label>
+                      <ChoiceBox fx:id="chooseParticipant" prefWidth="150.0" styleClass="sbutton" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </HBox>
+              <GridPane prefHeight="230.0" prefWidth="370.0">
+                  <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.39996337890625" minWidth="10.0" prefWidth="129.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="309.59998321533203" minWidth="10.0" prefWidth="292.0" />
+                  </columnConstraints>
+                  <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  </rowConstraints>
+                  <children>
+                      <Label styleClass="labelFont" text="%EditP.name" />
+                      <Label styleClass="labelFont" text="Email" GridPane.rowIndex="1" />
+                      <Label styleClass="labelFont" text="%EditP.beneficiary" GridPane.rowIndex="2" />
+                      <Label styleClass="labelFont" text="IBAN" GridPane.rowIndex="3" />
+                      <Label styleClass="labelFont" text="BIC" GridPane.rowIndex="4" />
+                      <TextField fx:id="nameField" styleClass="ntextfield" GridPane.columnIndex="1" />
+                      <TextField fx:id="emailField" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                      <TextField fx:id="beneficiaryField" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                      <TextField fx:id="ibanField" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                      <TextField fx:id="bicField" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label fx:id="participantEditWarning" prefHeight="17.0" prefWidth="228.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                     <children>
+                          <Button fx:id="saveButton" mnemonicParsing="false" onAction="#saveButtonClicked" styleClass="pbutton" text="Save">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin></Button>
+                          <Button fx:id="deletePartButton" mnemonicParsing="false" onAction="#deletePartClicked" styleClass="sbutton" text="%EditP.deletePart">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </HBox>
+                  </children>
+              </GridPane>
+         </children>
+      </VBox>
     </children>
+    <stylesheets>
+        <URL value="@client/scenes/global.css" />
+    </stylesheets>
 </AnchorPane>

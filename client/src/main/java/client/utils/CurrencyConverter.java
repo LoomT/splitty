@@ -1,37 +1,35 @@
-package client;
+package client.utils;
+
+import com.google.inject.Inject;
 
 import java.io.*;
 import java.util.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 /**
  * Currency converter which can scan the currencies.properties file to
  * create a map of currencies and respective exchange rates and fetch
- * exchange rates from openexchangerates API.
+ * exchange rates from openExchangeRates API.
  * Uses singleton pattern.
  */
 public class CurrencyConverter {
 
     private static CurrencyConverter currencyConverter;
     private static Map<String, Double> currencyMap;
-    private URI apiURI;
     private String base;
     private double conversionRate;
     private String path;
+    @Inject
+    private ServerUtils server;
 
 
     /**
-     * @param apiURI custom uri for dependency injection
+     * @param server ServerUtils for testing
      */
-    private CurrencyConverter(URI apiURI, String base, double conversionRate, String path) {
-        this.apiURI = apiURI;
+    private CurrencyConverter(String base, double conversionRate, String path, ServerUtils server) {
         this.base = base;
         this.conversionRate = conversionRate;
         this.path = path;
+        this.server = server;
         try (Reader fileReader = new FileReader(path)) {
             currencyMap = initializeCurrencyMap(fileReader);
         } catch (IOException e) {
@@ -47,11 +45,15 @@ public class CurrencyConverter {
                 class.getClassLoader().getResource("client/currencies.properties")).getPath();
         this.path = path;
         this.base = "EUR";
+        try {
+            this.server = new ServerUtilsImpl(new UserConfig(
+                    new FileIO(Objects.requireNonNull(CurrencyConverter.
+                    class.getClassLoader().getResource("client/config.properties")))));
+        } catch (Exception ignored){}
         try (Reader fileReader = new FileReader(path)) {
-            this.apiURI = new URI("https://openexchangerates.org/api/" + "latest.json?app_id=4368d26633d149e0b992c5bcdce76270");
             currencyMap = initializeCurrencyMap(fileReader);
             this.conversionRate = 1;
-        } catch (URISyntaxException | IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -69,16 +71,16 @@ public class CurrencyConverter {
     /**
      * Instance creator with variables so that it can be used with testing and dependency injection
      *
-     * @param apiURI         URI of the api used
      * @param base           base currency used in the local application
      * @param conversionRate value of base divided by value of Euro
      * @param path           path of config file
+     * @param server         Server utils to be able to set server to test server utils
      * @return Instance of currency converter
      */
     public static CurrencyConverter createInstance(
-            URI apiURI, String base, double conversionRate, String path) {
+            String base, double conversionRate, String path, ServerUtils server) {
         if (currencyConverter == null) {
-            currencyConverter = new CurrencyConverter(apiURI, base, conversionRate, path);
+            currencyConverter = new CurrencyConverter(base, conversionRate, path, server);
         }
         return currencyConverter;
     }
@@ -94,10 +96,12 @@ public class CurrencyConverter {
         Map<String, Double> result = new HashMap<>();
         if (temp.isEmpty()) updateExchange();
 
-        for (int i = 2; i < temp.size() - 1; i++) {
+        for (int i = 2; i < temp.size(); i++) {
+            if(temp.get(i).startsWith("#") || temp.get(i).startsWith("base=")) continue;
             String[] tempArr = temp.get(i).split("=");
             result.put(tempArr[0], Double.parseDouble(tempArr[1]));
         }
+        currencyMap = result;
         return result;
     }
 
@@ -105,16 +109,55 @@ public class CurrencyConverter {
      * @return a String of the http response.
      */
     public String getExchange() {
-        HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(apiURI).GET().build();
-
-        HttpResponse response;
+        // get last date from file
+        List<String> temp;
         try {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            temp = new BufferedReader(new FileReader(path)).lines().toList();
+        } catch (Exception e){ throw new RuntimeException();}
+        String date = null;
+        for(int i = 0; i < temp.size(); i++){
+            if(temp.get(i).equals("#Last fetched:")){
+                date = temp.get(i+1);
+                break;
+            }
         }
-        return response.body().toString();
+        if(temp.isEmpty()){return server.getExchangeRates(null);}
+        assert date != null;
+        String[] array = date.split(" ");
+        int month = toMonth(array[1]);
+        int day = Integer.parseInt(array[2]);
+        String[] time = array[3].split(":");
+        int hour = Integer.parseInt(time[0]);
+        int minute = Integer.parseInt(time[1]);
+        int second = Integer.parseInt(time[2]);
+        int year = Integer.parseInt(array[5]);
+
+        Calendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
+        //pass along last fetched file to serverUtils
+        return server.getExchangeRates(calendar);
+    }
+
+    /**
+     * @param month string value representing a month
+     * @return the int value of the month derived from string value
+     */
+    private int toMonth(String month) {
+        return switch (month) {
+            case "Jan" -> Calendar.JANUARY;
+            case "Feb" -> Calendar.FEBRUARY;
+            case "Mar" -> Calendar.MARCH;
+            case "Apr" -> Calendar.APRIL;
+            case "May" -> Calendar.MAY;
+            case "Jun" -> Calendar.JUNE;
+            case "Jul" -> Calendar.JULY;
+            case "Aug" -> Calendar.AUGUST;
+            case "Sep" -> Calendar.SEPTEMBER;
+            case "Oct" -> Calendar.OCTOBER;
+            case "Nov" -> Calendar.NOVEMBER;
+            case "Dec" -> Calendar.DECEMBER;
+            //should be all cases, so default should give error
+            default -> throw new RuntimeException();
+        };
     }
 
     /**
@@ -123,7 +166,10 @@ public class CurrencyConverter {
      * up-to-date exchange data from the API.
      */
     public boolean updateExchange() {
-        String response = getExchange();
+        String response;
+        try {
+            response = getExchange();
+        }catch (Exception e){return false;}
         if (response == null) return false;
         List<String> propertiesList = new BufferedReader(
                 new StringReader(response)).lines().toList();
@@ -136,7 +182,7 @@ public class CurrencyConverter {
                         tempArr[1].replaceAll("[, ]", ""));
             }
             prop.setProperty("base", base);
-            prop.store(outputstream, "Test");
+            prop.store(outputstream, "Last fetched:");
 
         } catch (IOException e) {
             return false;
@@ -146,15 +192,16 @@ public class CurrencyConverter {
 
     /**
      *
-     * @param base change the base currency of the user
+     * @param newBase change the base currency of the user
      * @return true if the base currency can be changed, false otherwise
      */
-    public boolean setBase(String base) {
+    public boolean setBase(String newBase) {
+        String oldBase = this.base;
         if (base == null || !currencyMap.containsKey(base)) {
             return false;
         }
-        this.base = base;
-        this.conversionRate = currencyMap.get(base) / currencyMap.get("EUR");
+        this.base = newBase;
+        this.conversionRate = currencyMap.get(newBase) / currencyMap.get(oldBase);
         return true;
     }
 
@@ -166,7 +213,7 @@ public class CurrencyConverter {
      */
     public boolean addCurrency(String name, double rate) {
         if (name == null || rate <= 0 || currencyMap.containsKey(name)) return false;
-        try (OutputStream outputstream = new FileOutputStream(path)) {
+        try (OutputStream outputstream = new FileOutputStream(path, true)) {
             Properties prop = new Properties();
             prop.setProperty(name, String.valueOf(rate));
             prop.store(outputstream, "new currency added");
@@ -174,5 +221,26 @@ public class CurrencyConverter {
             throw new RuntimeException(e);
         }
         return true;
+    }
+
+    /**
+     * @return the current base
+     */
+    public String getBase() {
+        return base;
+    }
+
+    /**
+     * @return the current conversion rate
+     */
+    public double getConversionRate() {
+        return conversionRate;
+    }
+
+    /**
+     * remove the currency converter, to replace dependency injected with mock and vise versa
+     */
+    public static void removeCC(){
+        currencyConverter = null;
     }
 }

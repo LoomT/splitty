@@ -484,6 +484,19 @@ public class AddExpenseCtrl {
         AtomicInteger selectedPart = new AtomicInteger();
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
+            checkBox.getStyleClass().add("textFont");
+            checkBox.setStyle("-fx-label-padding: 0 10 0 3");
+//            checkBox.setOnAction(e -> {
+//                if (checkBox.isSelected()) {
+//                    expPart.add(participant);
+//                    selectedPart.getAndIncrement();
+//                } else {
+//                    expPart.remove(participant);
+//                    selectedPart.getAndDecrement();
+//                }
+//                //updateEqualSplitCheckbox();
+//            });
+
             expenseParticipants.getChildren().add(checkBox);
         }
         if (totalPart == selectedPart.get()) {

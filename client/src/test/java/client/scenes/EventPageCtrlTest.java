@@ -25,7 +25,8 @@ import utils.TestWebsocket;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.NumberFormat;
-import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,38 +87,32 @@ public class EventPageCtrlTest {
         Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
         Event e = new Event("test", List.of(p), List.of(ex));
         Platform.runLater(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        ListView lv = new ListView();
-                        ctrl.createExpenses(List.of(ex), lv, e);
-                        assertEquals(1, lv.getItems().size());
-                    }
+                () -> {
+                    ListView<String> lv = new ListView<>();
+                    ctrl.createExpenses(List.of(ex), lv, e);
+                    assertEquals(1, lv.getItems().size());
                 }
         );
     }
 
     @Test
-    public void toStringText(FxRobot robot) {
+    public void toStringText(FxRobot robot) throws ParseException {
         Participant p = new Participant("name");
         Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
-        ex.setDate(new Date("January 2, 2024"));
+        ex.setDate(new SimpleDateFormat("MM/dd/yy").parse("01/02/2024"));
         Event e = new Event("test", List.of(p), List.of(ex));
         Platform.runLater(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        NumberFormat currencyFormatter = switch (ex.getCurrency()) {
-                            case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
-                            case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
-                            case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
-                            case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
-                            default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
-                        };
+                () -> {
+                    NumberFormat currencyFormatter = switch (ex.getCurrency()) {
+                        case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
+                        case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
+                        case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
+                        case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
+                        default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
+                    };
 
-                        String formattedAmount = currencyFormatter.format(ex.getAmount());
-                        assertEquals("2.1.2024     name paid " + formattedAmount + " for expense", ctrl.toString(ex));
-                    }
+                    String formattedAmount = currencyFormatter.format(ex.getAmount());
+                    assertEquals("2.1.2024     name paid " + formattedAmount + " for expense", ctrl.toString(ex));
                 }
         );
     }

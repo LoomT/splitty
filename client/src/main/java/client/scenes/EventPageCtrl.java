@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.ExpenseItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -19,6 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -44,13 +46,14 @@ public class EventPageCtrl {
     private Text participantText;
 
     @FXML
-    private Tab allTab;
+    private Button allTab;
 
     @FXML
-    private Tab fromTab;
+    private Button fromTab;
 
     @FXML
-    private Tab includingTab;
+    private Button includingTab;
+    private int selectedTab = 0;
 
     @FXML
     private ChoiceBox<String> participantChoiceBox;
@@ -58,17 +61,14 @@ public class EventPageCtrl {
     private Button addExpenseButton;
 
     @FXML
-    private ListView<String> allListView;
-
-    @FXML
-    private ListView<String> fromListView;
-
-    @FXML
-    private ListView<String> includingListView;
+    private VBox expenseVbox;
     @FXML
     private Label inviteCode;
     @FXML
     private Label copiedToClipboardMsg;
+    @FXML
+    private Button editTitleButton;
+
     private FadeTransition ft;
     private int selectedParticipantId;
 
@@ -84,14 +84,12 @@ public class EventPageCtrl {
     public Event getEvent() {
         return event;
     }
-    private List<Expense> fromExpenses;
-    private List<Expense> includingExpenses;
 
     /**
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
-     * @param websocket the websocket instance
-     * @param server server to be ysed
+     * @param websocket    the websocket instance
+     * @param server       server to be ysed
      */
     @Inject
     public EventPageCtrl(
@@ -115,6 +113,7 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        editTitleButton.setText("\uD83D\uDD89");
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
@@ -142,15 +141,11 @@ public class EventPageCtrl {
             String name = e.getParticipants().get(selectedParticipantId).getName();
             fromTab.setText(languageConf.get("EventPage.from") + " " + name);
             includingTab.setText(languageConf.get("EventPage.including") + " " + name);
-            fromListView.getItems().clear();
-            includingListView.getItems().clear();
-            fromExpenses = getExpensesFrom(e, name);
-            includingExpenses = getExpensesIncluding(e, name);
-            createExpenses(fromExpenses, fromListView, e);
-            createExpenses(includingExpenses, includingListView, e);
+            expenseVbox.getChildren().clear();
+            populateExpenses();
         });
         handleWS();
-        displayExpenses(event);
+        updateExpenses(event);
 
         copiedToClipboardMsg.setVisible(false);
         inviteCode.setText(String.format(languageConf.get("EventPage.inviteCode"), event.getId()));
@@ -178,7 +173,7 @@ public class EventPageCtrl {
     }
 
     /**
-     *Registers websocket handlers
+     * Registers websocket handlers
      */
     private void handleWS() {
         websocket.registerParticipantChangeListener(
@@ -189,9 +184,9 @@ public class EventPageCtrl {
         );
         websocket.registerExpenseChangeListener(
                 event,
-                this::displayExpenses,
-                this::displayExpenses,
-                this::displayExpenses
+                this::updateExpenses,
+                this::updateExpenses,
+                this::updateExpenses
         );
     }
 
@@ -225,11 +220,12 @@ public class EventPageCtrl {
 
     /**
      * display the expenses
+     *
      * @param e event
      */
-    public void displayExpenses(Event e) {
-        String selectedName = extractSelectedName();
-        tabSelectionChanged(e, selectedName);
+    public void updateExpenses(Event e) {
+        event = e;
+        populateExpenses();
     }
 
     /**
@@ -241,19 +237,54 @@ public class EventPageCtrl {
         mainCtrl.showStartScreen();
     }
 
-    /**
-     * actions for when the tab selection is changed
-     * @param e event
-     * @param selectedParticipantName selected participant name
-     */
     @FXML
-    public void tabSelectionChanged(Event e, String selectedParticipantName) {
-        List<Expense> allExpenses = getAllExpenses(e);
-        fromExpenses = getExpensesFrom(e, selectedParticipantName);
-        includingExpenses = getExpensesIncluding(e, selectedParticipantName);
-        createExpenses(allExpenses, allListView, e);
-        createExpenses(fromExpenses, fromListView, e);
-        createExpenses(includingExpenses, includingListView, e);
+    private void allTabClicked() {
+        selectedTab = 0;
+        populateExpenses();
+
+    }
+
+    @FXML
+    private void fromTabClicked() {
+        selectedTab = 1;
+        populateExpenses();
+
+    }
+
+    @FXML
+    private void includingTabClicked() {
+        selectedTab = 2;
+        populateExpenses();
+    }
+
+    private void populateExpenses() {
+        List<Expense> expList = switch (selectedTab) {
+            case 0 -> getAllExpenses(event);
+            case 1 -> getExpensesFrom(event, extractSelectedName());
+            case 2 -> getExpensesIncluding(event, extractSelectedName());
+            default -> throw new IllegalStateException("Unexpected value: " + selectedTab);
+        };
+
+        expenseVbox.getChildren().clear();
+        for (int i = 0; i < expList.size(); i++) {
+            Expense e = expList.get(i);
+            String partString = "Included participants: " +
+                    buildParticipantsList(e.getExpenseParticipants(),
+                    event.getParticipants());
+
+            ExpenseItem ei = new ExpenseItem(
+                toString(e),
+                partString,
+                () -> {
+                    mainCtrl.handleEditExpense(e, event);
+                },
+                () -> {
+                    server.deleteExpense(e.getId(), event.getId());
+                }
+            );
+            expenseVbox.getChildren().add(ei);
+        }
+
     }
 
     @FXML
@@ -271,9 +302,10 @@ public class EventPageCtrl {
 
     /**
      * create the specific displayed expenses for a listview
+     *
      * @param expenses expenses from which to create the list view
-     * @param lv list view
-     * @param ev event
+     * @param lv       list view
+     * @param ev       event
      */
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         lv.setCellFactory(param -> new ListCell<>() {
@@ -281,6 +313,7 @@ public class EventPageCtrl {
             private final Button removeButton = new Button("\u274C");
             private final HBox buttonBox = new HBox();
             private final StackPane stackPane = new StackPane();
+
             {
                 stackPane.setAlignment(Pos.CENTER_LEFT);
                 buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -298,6 +331,7 @@ public class EventPageCtrl {
                     server.deleteExpense(expense.getId(), ev.getId());
                 });
             }
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -322,7 +356,6 @@ public class EventPageCtrl {
     }
 
 
-
     private String buildParticipantsList(List<Participant> participants,
                                          List<Participant> allParticipants) {
         StringBuilder participantsList = new StringBuilder();
@@ -343,6 +376,7 @@ public class EventPageCtrl {
 
     /**
      * return form for displaying the expenses in the event page
+     *
      * @param exp the expense
      * @return human-readable form
      */
@@ -372,6 +406,7 @@ public class EventPageCtrl {
 
     /**
      * return all expenses
+     *
      * @param ev event
      * @return all expenses
      */
@@ -381,7 +416,8 @@ public class EventPageCtrl {
 
     /**
      * return all expenses from a certain person
-     * @param ev event
+     *
+     * @param ev   event
      * @param name name of participant
      * @return all expenses from a certain person
      */
@@ -399,13 +435,14 @@ public class EventPageCtrl {
     /**
      *
      */
-    public void changeTitle(){
+    public void changeTitle() {
         mainCtrl.showEditTitle(this.event);
     }
 
     /**
      * return all expenses including a certain person
-     * @param ev event
+     *
+     * @param ev   event
      * @param name name of participant
      * @return all expenses including a certain person
      */
@@ -425,7 +462,8 @@ public class EventPageCtrl {
     }
 
     /**
-     *extract the selected name from the choice box
+     * extract the selected name from the choice box
+     *
      * @return the name
      */
     public String extractSelectedName() {
