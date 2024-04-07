@@ -72,6 +72,11 @@ public class EditParticipantsCtrl {
      */
     public void initialize() {
         lengthListener(nameField, warningLabel, 30, languageConf.get("EditP.nameLimit"));
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(oldValue.length() != newValue.length()) {
+                nameField.setStyle("");
+            }
+        });
         websocket.on(TITLE_CHANGE, title -> {
             if(event != null)
                 event.setTitle((String) title);
