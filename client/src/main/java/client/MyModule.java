@@ -15,8 +15,7 @@
  */
 package client;
 
-import client.scenes.MainCtrl;
-import client.scenes.StartScreenCtrl;
+import client.scenes.*;
 import client.utils.*;
 import com.google.inject.Binder;
 import com.google.inject.Module;
@@ -33,6 +32,12 @@ public class MyModule implements Module {
     public void configure(Binder binder) {
         binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AddCustomTransactionCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AddExpenseCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AdminLoginCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EditParticipantsCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EditTitleCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EventPageCtrl.class).in(Scopes.SINGLETON);
         binder.bind(UserConfig.class).in(Scopes.SINGLETON);
         binder.bind(ServerUtils.class).to(ServerUtilsImpl.class).in(Scopes.SINGLETON);
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);

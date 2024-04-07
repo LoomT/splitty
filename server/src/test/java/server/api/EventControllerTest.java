@@ -1,7 +1,6 @@
 package server.api;
 
 import commons.Event;
-import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 import org.junit.jupiter.api.BeforeEach;
@@ -179,15 +178,13 @@ class EventControllerTest {
     }
 
     @Test
-    void changeEvent(){
+    void changeTitle(){
         Event event = new Event("title");
         Event added = sut.add(event).getBody();
         assert added != null;
-        event.addParticipant(new Participant());
-        event.addExpense(new Expense());
-        event.setTitle("new title");
-        sut.changeEvent(event.getId(), event);
-        assertEquals("/event/" + event.getId(), template.getDestination());
+        added.setTitle("new title");
+        sut.changeEvent(event.getId(), added);
+        assertEquals("/event/" + added.getId(), template.getDestination());
         assertEquals(WebsocketActions.TITLE_CHANGE, template.getHeaders().get("action"));
         assertEquals("new title", template.getPayload());
     }

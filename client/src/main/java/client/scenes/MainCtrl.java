@@ -15,6 +15,7 @@
  */
 package client.scenes;
 
+import client.MockClass.*;
 import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -23,12 +24,11 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import javafx.scene.Cursor;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
@@ -42,12 +42,16 @@ public class MainCtrl {
     private Stage primaryStage;
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+
     private AdminLoginCtrl adminLoginCtrl;
     private Scene adminLogin;
+
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
-    private EditParticipantsCtrl editParticipantsCtrl;
+
+    private EditParticipantInterface editParticipantsCtrl;
     private Scene editParticipants;
+
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
 
@@ -57,11 +61,13 @@ public class MainCtrl {
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-    private EditTitleCtrl editTitleCtrl;
+    private EditEventTitleInterface editTitleCtrl;
     private Scene titleChanger;
+
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
-
+    private AddCustomTransactionCtrl addCustomTransactionCtrl;
+    private Scene addCustomTransaction;
 
 
     /**
@@ -117,7 +123,9 @@ public class MainCtrl {
         this.errorPopupCtrl = pairCollector.errorPopup().getKey();
         this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
 
-        //showOverview();
+        this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
+        this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
+
         showStartScreen();
         primaryStage.show();
 
@@ -135,15 +143,20 @@ public class MainCtrl {
 
     /**
      * Shows the change
-     * @param eventPageCtrl eventPageCtrl of the current event
+     * @param event current event
      */
-    public void showEditTitle(EventPageCtrl eventPageCtrl){
-        editTitleCtrl.setEventPageCtrl(eventPageCtrl);
+    public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
-        stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
+        editTitleCtrl.displayEditEventTitle(eventPageCtrl, event, stage);
+    }
+
+    /**
+     * Changes the title in the editEventTitle
+     * @param title title of the event to be changed to
+     */
+    public void updateEditTitle(String title){
+        editTitleCtrl.changeTitle(title);
     }
 
     /**
@@ -186,6 +199,15 @@ public class MainCtrl {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
         primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
         primaryStage.setScene(editParticipants);
+    }
+
+    /**
+     * edits the EditParticipantPage without opening it.
+     *
+     * @param eventToShow the event to update.
+     */
+    public void updateEditParticipantsPage(Event eventToShow) {
+        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
     }
 
     /**
@@ -273,11 +295,41 @@ public class MainCtrl {
     }
 
     /**
+     * Set editTitleCtrl for testing purposes
+     * @param editTitleCtrl new EditTitleCtrl
+     */
+    public void setEditTitleCtrl(EditEventTitleInterface editTitleCtrl) {
+        this.editTitleCtrl = editTitleCtrl;
+    }
+
+    /**
+     * Set editParticipantCtrl for testing purposes
+     * @param editParticipantCtrl new editParticipantCtrl
+     */
+    public void setEditParticipantsCtrl(EditParticipantMock editParticipantCtrl){
+        this.editParticipantsCtrl = editParticipantCtrl;
+    }
+
+    /**
      * Shows the open debts page
      * @param eventToShow the event to show the open debts for
      */
     public void showDebtsPage(Event eventToShow) {
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
         primaryStage.setScene(openDebtsPage);
+    }
+
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
+    public void showAddCustomTransaction(Event event) {
+        Stage stage = new Stage();
+        stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));
+        addCustomTransactionCtrl.display(event, stage);
+        stage.setScene(addCustomTransaction);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 }

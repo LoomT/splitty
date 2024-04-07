@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.components.OpenDebtsListItem;
 import client.utils.LanguageConf;
+import client.components.DebtListItem;
 import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
@@ -106,8 +107,11 @@ public class OpenDebtsPageCtrl {
             this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
         }
 
+        addDebtsToDebtList();
+
+
         for (PieChart.Data data : shareChart.getData()) {
-            data.setName(data.getName() + ": " + (int) data.getPieValue() + "%");
+            data.setName(data.getName() + ": " + data.getPieValue());
         }
         totalSumExp.setText("Total sum of all expenses in this event: " + sum);
     }
@@ -131,6 +135,20 @@ public class OpenDebtsPageCtrl {
         }
     }
 
+    /**
+     * Adds the debts to the debt list
+     */
+    private void addDebtsToDebtList() {
+        List<DebtListItem> debtListItems = new ArrayList<>();
+        debtList.getChildren().clear();
+        for (String name : participantDebtMap.keySet()) {
+            debtListItems.add(new DebtListItem(name + " owes: \n" + participantDebtMap.get(name)));
+        }
+        for(DebtListItem item : debtListItems){
+            debtList.getChildren().add(item);
+        }
+    }
+
 
     /**
      * Handles the back button click event functionality
@@ -138,5 +156,13 @@ public class OpenDebtsPageCtrl {
     @FXML
     public void backButtonClicked() {
         mainCtrl.goBackToEventPage(event);
+    }
+
+    /**
+     * display custom transaction screen
+     */
+    @FXML
+    public void addCustomTransactionClicked() {
+        mainCtrl.showAddCustomTransaction(event);
     }
 }
