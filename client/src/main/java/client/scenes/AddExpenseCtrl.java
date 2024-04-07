@@ -343,7 +343,7 @@ public class AddExpenseCtrl {
             return expense;
 
         } catch (NumberFormatException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+            Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(languageConf.get("AddExp.invamount"));
             alert.setHeaderText(null);
             alert.setContentText(languageConf.get("AddExp.invamountmess"));
