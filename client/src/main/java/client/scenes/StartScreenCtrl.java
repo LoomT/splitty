@@ -166,6 +166,7 @@ public class StartScreenCtrl {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     languageConf.get("restartTheAppMessage"));
             alert.setHeaderText(languageConf.get("unexpectedError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
             alert.showAndWait();
         } catch (ConnectException e) {
             showServerNotFoundError();
@@ -212,5 +213,6 @@ public class StartScreenCtrl {
                 languageConf.get("StartScreen.serverUnavailableErrorMessage"));
         alert.setHeaderText(languageConf.get("StartScreen.serverUnavailableErrorHeader"));
         alert.show();
+        java.awt.Toolkit.getDefaultToolkit().beep();
     }
 }

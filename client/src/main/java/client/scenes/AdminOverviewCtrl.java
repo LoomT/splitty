@@ -153,6 +153,7 @@ public class AdminOverviewCtrl {
                     .format(languageConf
                                     .get("AdminOverview.unexpectedServerResponse"),
                             status));
+            java.awt.Toolkit.getDefaultToolkit().beep();
             alert.showAndWait();
         } else {
             allEvents.remove(event);
@@ -245,6 +246,7 @@ public class AdminOverviewCtrl {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     languageConf.get("AdminOverview.writeError"));
             alert.setHeaderText(languageConf.get("AdminOverview.exportError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
             alert.showAndWait();
         }
     }
@@ -282,12 +284,14 @@ public class AdminOverviewCtrl {
                         Alert alert = new Alert(Alert.AlertType.ERROR,
                                 languageConf.get("AdminOverview.missingParticipantError"));
                         alert.setHeaderText(languageConf.get("AdminOverview.importError"));
+                        java.awt.Toolkit.getDefaultToolkit().beep();
                         alert.showAndWait();
                     }
                     case 409 -> {
                         Alert alert = new Alert(Alert.AlertType.WARNING,
                                 languageConf.get("AdminOverview.eventConflictError"));
                         alert.setHeaderText(languageConf.get("AdminOverview.importError"));
+                        java.awt.Toolkit.getDefaultToolkit().beep();
                         alert.showAndWait();
                     }
                 }
@@ -295,6 +299,7 @@ public class AdminOverviewCtrl {
                 Alert alert = new Alert(Alert.AlertType.ERROR,
                         languageConf.get("AdminOverview.readError"));
                 alert.setHeaderText(languageConf.get("AdminOverview.importError"));
+                java.awt.Toolkit.getDefaultToolkit().beep();
                 alert.showAndWait();
             }
         }
@@ -324,6 +329,7 @@ public class AdminOverviewCtrl {
                     Platform.runLater(() -> {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setHeaderText(languageConf.get("unexpectedError"));
+                        java.awt.Toolkit.getDefaultToolkit().beep();
                         alert.show();
                         stopPoller();
                         mainCtrl.showAdminLogin();
