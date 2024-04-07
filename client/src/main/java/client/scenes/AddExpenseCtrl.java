@@ -17,6 +17,8 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
 import java.net.ConnectException;
+import java.text.DecimalFormat;
+import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -82,6 +84,25 @@ public class AddExpenseCtrl {
         this.languageConf = languageConf;
     }
 
+    public void initialize() {
+        DecimalFormat format = new DecimalFormat( "#.0" );
+
+        // only lets the users type decimal numbers
+        amount.setTextFormatter(new TextFormatter<>(c -> {
+            if(c.getControlNewText().isEmpty())
+                return c;
+
+            ParsePosition parsePosition = new ParsePosition( 0);
+            Object object = format.parse(c.getControlNewText(), parsePosition);
+
+            if(object == null || parsePosition.getIndex() < c.getControlNewText().length()) {
+                return null;
+            } else {
+                return c;
+            }
+        }));
+    }
+
     /**
      * Method for displaying the page with a blank expense.
      * @param event the event page to return to
@@ -94,7 +115,7 @@ public class AddExpenseCtrl {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+                setDisable(empty || date.isAfter(LocalDate.now()));
             }
         });
         equalSplit.setSelected(false);
@@ -166,7 +187,7 @@ public class AddExpenseCtrl {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+                setDisable(empty || date.isAfter(LocalDate.now()));
             }
         });
     }
@@ -174,40 +195,14 @@ public class AddExpenseCtrl {
 
     /**
      * behaviour for the edit button
-     * @param ev
-     * @param ex
+     * @param ev event
+     * @param ex expense
      */
     public void editButton(Event ev, Expense ex) {
-        String expParticipant = expenseAuthor.getValue();
-        String expPurpose = purpose.getText();
-        Double expAmount = Double.parseDouble(amount.getText());
-        String expCurrency = currency.getValue();
-        LocalDate temp = date.getValue();
-        LocalDateTime localDateTime = temp.atStartOfDay();
-        Date expDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        List<Participant> expParticipants = getExpenseParticipants(ev);
-
-        String expType = type.getValue();
-
-        for (Participant p : ex.getExpenseParticipants()) {
-            if (p.getName().equals(expParticipant)) {
-                ex.setExpenseAuthor(p);
-                break;
-            }
-        }
-        //ex.setExpenseAuthor(new Participant(expParticipant));
-        ex.setPurpose(expPurpose);
-        ex.setAmount(expAmount);
-        ex.setCurrency(expCurrency);
-        ex.setDate(expDate);
-        ex.setExpenseParticipants(expParticipants);
-        ex.setType(expType);
-
-        if (expParticipants.isEmpty()) {
-            alertSelectPart();
-            return;
-        }
-
+        Expense expense = makeExpense(ev);
+        if(expense == null) return;
+        expense.setEventID(expense.getEventID());
+        expense.setId(expense.getId());
         try {
             server.updateExpense(ex.getId(), ev.getId(), ex);
         } catch (ConnectException e) {
@@ -257,10 +252,6 @@ public class AddExpenseCtrl {
         }
     }
 
-
-
-
-
     /**
      * @param event
      * Fill the choices for the author of the expense.
@@ -297,6 +288,19 @@ public class AddExpenseCtrl {
      * @param ev current event
      */
     public void handleAddButton(Event ev) {
+        Expense expense = makeExpense(ev);
+        if(expense == null) return;
+        try {
+            server.createExpense(ev.getId(), expense);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
+        resetExpenseFields();
+        mainCtrl.goBackToEventPage(ev);
+    }
+
+    private Expense makeExpense(Event ev) {
         if (expenseAuthor.getValue() == null ||
                 purpose.getText().isEmpty() ||
                 amount.getText().isEmpty() ||
@@ -305,45 +309,40 @@ public class AddExpenseCtrl {
                 date.getValue() == null ||
                 type.getValue() == null) {
             alertAllFields();
-        } else {
-            try {
-                List<Participant> participants = getExpenseParticipants(ev);
-                double expAmount = Double.parseDouble(amount.getText());
-                LocalDate expDate = date.getValue();
-                LocalDateTime localDateTime = expDate.atStartOfDay();
-                Date expenseDate = Date.from(localDateTime.
-                        atZone(ZoneId.systemDefault()).toInstant());
-                String expPurpose = purpose.getText();
-                String selectedParticipantName = expenseAuthor.getValue();
-                Participant selectedParticipant = ev.getParticipants().stream()
-                        .filter(participant -> participant.getName().
-                                equals(selectedParticipantName))
-                        .findFirst().orElse(null);
-                if (selectedParticipant != null) {
-                    String expCurrency = currency.getValue();
-                    //expPart.add(selectedParticipant);
-
-                    String expType = type.getValue();
-                    Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
-                            expCurrency, participants, expType);
-                    expense.setDate(expenseDate);
-                    try {
-                        server.createExpense(ev.getId(), expense);
-                    } catch (ConnectException e) {
-                        mainCtrl.handleServerNotFound();
-                        return;
-                    }
-                    resetExpenseFields();
-                    mainCtrl.goBackToEventPage(ev);
-                }
-            } catch (NumberFormatException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(languageConf.get("AddExp.invamount"));
-                alert.setHeaderText(null);
-                alert.setContentText(languageConf.get("AddExp.invamountmess"));
-                alert.showAndWait();
-            }
+            return null;
         }
+        try {
+            List<Participant> participants = getExpenseParticipants(ev);
+            double expAmount = Double.parseDouble(amount.getText());
+            if(expAmount <= 0) throw new NumberFormatException();
+
+            LocalDate expDate = date.getValue();
+            LocalDateTime localDateTime = expDate.atStartOfDay();
+            Date expenseDate = Date.from(localDateTime.
+                    atZone(ZoneId.systemDefault()).toInstant());
+            String expPurpose = purpose.getText();
+            String selectedParticipantName = expenseAuthor.getValue();
+            Participant selectedParticipant = ev.getParticipants().stream()
+                    .filter(participant -> participant.getName().
+                            equals(selectedParticipantName))
+                    .findFirst().orElseThrow();
+
+            String expCurrency = currency.getValue();
+
+            String expType = type.getValue();
+            Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+                    expCurrency, participants, expType);
+            expense.setDate(expenseDate);
+            return expense;
+
+        } catch (NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(languageConf.get("AddExp.invamount"));
+            alert.setHeaderText(null);
+            alert.setContentText(languageConf.get("AddExp.invamountmess"));
+            alert.showAndWait();
+        }
+        return null;
     }
 
     /**
