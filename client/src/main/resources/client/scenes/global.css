@@ -40,6 +40,12 @@
     -fx-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
 }
 
+.eventTitleFont {
+    -fx-font-family: "Arial Rounded MT Bold";
+    -fx-font-size: 32;
+    -fx-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
+}
+
 .labelFont {
     /*-fx-font-family: "Microsoft JhengHei UI Light";*/
     -fx-font-family: Bahnschrift;

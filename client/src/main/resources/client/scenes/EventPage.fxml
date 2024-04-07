@@ -17,14 +17,14 @@
    <children>
       <HBox prefWidth="600.0" styleClass="navbar">
          <children>
-            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleFont" text="New Year Party">
+            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="New Year Party">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <children>
-                  <Button mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
+                  <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>

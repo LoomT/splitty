@@ -62,6 +62,8 @@ public class EventPageCtrl {
     private Label inviteCode;
     @FXML
     private Label copiedToClipboardMsg;
+    @FXML
+    private Button editTitleButton;
 
     private FadeTransition ft;
     private int selectedParticipantId;
@@ -108,6 +110,7 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        editTitleButton.setText("\uD83D\uDD89");
         mainCtrl.updateEditTitle(e.getTitle());
         mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
