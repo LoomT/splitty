@@ -236,6 +236,7 @@ public class WebsocketImpl implements Websocket {
 
     /**
      * Resets all action listeners
+     * DO NOT USE THIS, WILL BREAK SOME LISTENERS
      */
     @Override
     public void resetAllActions() {
@@ -255,24 +256,6 @@ public class WebsocketImpl implements Websocket {
         List<Long> ids = expense.getExpenseParticipants().stream().map(Participant::getId).toList();
         expense.setExpenseParticipants(participants.stream()
                 .filter(p -> ids.contains(p.getId())).toList());
-    }
-
-    /**
-     * Registers all the change listeners on WS if they're not registered already
-     * @param currEvent the event in which we listen on the participant changes
-     * @param updateEventCallback this is called when an Event is updated
-     */
-    @Override
-    public void registerEventChangeListener(
-            Event currEvent,
-            Consumer<Event> updateEventCallback
-    ) {
-
-        this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
-            String title = (String) e;
-            currEvent.setTitle(title);
-            updateEventCallback.accept(currEvent);
-        });
     }
 
     private class MyStompSessionHandler extends StompSessionHandlerAdapter {

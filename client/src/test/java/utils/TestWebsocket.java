@@ -1,10 +1,11 @@
 package utils;
 
-import commons.Event;
 import client.utils.Websocket;
+import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
+
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -205,23 +206,6 @@ public class TestWebsocket implements Websocket {
     @Override
     public void resetAllActions() {
         functions.clear();
-    }
-
-
-    /**
-     * Registers all the change listeners on WS if they're not registered already
-     * @param currEvent the event in which we listen on the participant changes
-     * @param updateEventCallback this is called when an Event is updated
-     */
-    @Override
-    public void registerEventChangeListener(Event currEvent, Consumer<Event> updateEventCallback) {
-        this.resetAction(WebsocketActions.TITLE_CHANGE);
-
-        this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
-            String title = (String) e;
-            currEvent.setTitle(title);
-            updateEventCallback.accept(currEvent);
-        });
     }
 
     /**

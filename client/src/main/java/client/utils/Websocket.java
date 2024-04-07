@@ -80,15 +80,4 @@ public interface Websocket {
      * Resets all action listeners
      */
     void resetAllActions();
-
-    /**
-     * Registers all the change listeners on WS if they're not registered already
-     * @param currEvent the event in which we listen on the participant changes
-     * @param updateEventCallback this is called when an Event is updated
-     */
-    void registerEventChangeListener(
-            Event currEvent,
-            Consumer<Event> updateEventCallback
-    );
-
 }
