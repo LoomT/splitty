@@ -121,7 +121,7 @@ public class CurrencyConverter {
                 break;
             }
         }
-        if(temp.isEmpty()){return server.getExchangeRates(new GregorianCalendar());}
+        if(temp.isEmpty()){return server.getExchangeRates(null);}
         assert date != null;
         String[] array = date.split(" ");
         int month = toMonth(array[1]);
