@@ -210,6 +210,8 @@ the buttons have this class by default and the styles get overwritten
     -fx-background-radius: 0 0 8 8;
     -fx-border-radius: 0 0 8 8;
     -fx-border-color: -border-color;
+    -fx-background-color: -bg;
+    -fx-background: -bg;
 }
 
 .ntextfield {
@@ -236,4 +238,9 @@ the buttons have this class by default and the styles get overwritten
     -fx-border-color: -border-color;
     -fx-border-width: 0 0 1 0;
 
+}
+
+.eventListItemContainer:hover {
+    -fx-border-width: 0 0 1 0;
+    -fx-border-color: -border-color;
 }

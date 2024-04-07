@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -21,13 +22,25 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle" />
-            <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-            </Label>
-            <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+               <children>
+                  <Button mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
+                  <VBox alignment="CENTER_LEFT">
+                     <children>
+                        <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Label>
+                        <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
          </children>
          <padding>
             <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
@@ -89,7 +102,11 @@
                   <Button fx:id="includingTab" mnemonicParsing="false" styleClass="tabButton" text="Including John" />
                </children>
             </HBox>
-            <VBox fx:id="expenseVbox" prefHeight="200.0" prefWidth="100.0" styleClass="expenseVBox" />
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" styleClass="expenseVBox">
+               <content>
+                  <VBox fx:id="expenseVbox" />
+               </content>
+            </ScrollPane>
          </children>
       </VBox>
       <Button layoutX="14.0" layoutY="78.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
