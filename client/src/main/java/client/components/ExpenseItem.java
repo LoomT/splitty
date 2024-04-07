@@ -22,7 +22,18 @@ public class ExpenseItem extends HBox {
     private Runnable onEdit;
     private Runnable onDelete;
 
-    public ExpenseItem(String description, String participants, Runnable onEdit, Runnable onDelete) {
+    /**
+     * @param description the description of the expense
+     * @param participants the participants included in the expense
+     * @param onEdit onedit callback
+     * @param onDelete ondelte callback
+     */
+    public ExpenseItem(
+            String description,
+            String participants,
+            Runnable onEdit,
+            Runnable onDelete
+    ) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass()
                         .getResource("/client/components/ExpenseItem.fxml")
