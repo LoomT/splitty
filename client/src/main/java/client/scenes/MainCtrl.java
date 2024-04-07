@@ -15,7 +15,7 @@
  */
 package client.scenes;
 
-import client.MockClass.*;
+import client.MockClass.MainCtrlInterface;
 import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -28,11 +28,12 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
 
-public class MainCtrl {
+public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
     private final LanguageConf languageConf;
@@ -45,14 +46,14 @@ public class MainCtrl {
     private Scene adminLogin;
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
-    private EditParticipantInterface editParticipantsCtrl;
+    private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-    private EditEventTitleInterface editTitleCtrl;
+    private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
     private ErrorPopupCtrl errorPopupCtrl;
     private Scene errorPopup;
@@ -80,6 +81,7 @@ public class MainCtrl {
      * @param primaryStage         stage
      * @param pairCollector        collector for all of pairs
      */
+    @Override
     public void initialize(
             Stage primaryStage,
             PairCollector pairCollector
@@ -125,6 +127,7 @@ public class MainCtrl {
     /**
      * Display start screen
      */
+    @Override
     public void showStartScreen() {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
@@ -135,23 +138,17 @@ public class MainCtrl {
      * Shows the change
      * @param event current event
      */
+    @Override
     public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
-        editTitleCtrl.displayEditEventTitle(eventPageCtrl, event, stage);
-    }
-
-    /**
-     * Changes the title in the editEventTitle
-     * @param title title of the event to be changed to
-     */
-    public void updateEditTitle(String title){
-        editTitleCtrl.changeTitle(title);
+        editTitleCtrl.displayEditEventTitle(event, stage);
     }
 
     /**
      * Display admin login
      */
+    @Override
     public void showAdminLogin() {
         primaryStage.setTitle(languageConf.get("AdminLogin.title"));
         primaryStage.setScene(adminLogin);
@@ -162,6 +159,7 @@ public class MainCtrl {
      *
      * @param eventToShow the event to display
      */
+    @Override
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
@@ -175,6 +173,7 @@ public class MainCtrl {
      * page from the participant/expense editors
      * @param event the event to show
      */
+    @Override
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
         primaryStage.setScene(eventPage);
@@ -185,6 +184,7 @@ public class MainCtrl {
      *
      * @param eventToShow the event to show the participant editor for
      */
+    @Override
     public void showEditParticipantsPage(Event eventToShow) {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
         primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
@@ -192,19 +192,11 @@ public class MainCtrl {
     }
 
     /**
-     * edits the EditParticipantPage without opening it.
-     *
-     * @param eventToShow the event to update.
-     */
-    public void updateEditParticipantsPage(Event eventToShow) {
-        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
-    }
-
-    /**
      * shows the admin overview
      * @param password admin password
      * @param timeOut time out time in ms
      */
+    @Override
     public void showAdminOverview(String password, long timeOut) {
         adminOverviewCtrl.setPassword(password);
         adminOverviewCtrl.initPoller(timeOut); // 5 sec time out
@@ -220,6 +212,7 @@ public class MainCtrl {
      * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
      * Check ErrorPopupCtrl for more detailed documentation
      */
+    @Override
     public void showErrorPopup(String code, String stringToken, int intToken){
         errorPopupCtrl.generatePopup(code, stringToken, intToken);
         Stage stage = new Stage();
@@ -236,6 +229,7 @@ public class MainCtrl {
      * @param fileChooser file chooser
      * @return opened file
      */
+    @Override
     public File showSaveFileDialog(FileChooser fileChooser) {
         return fileChooser.showSaveDialog(primaryStage);
     }
@@ -246,6 +240,7 @@ public class MainCtrl {
      * @param fileChooser file chooser
      * @return selected files
      */
+    @Override
     public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
         return fileChooser.showOpenMultipleDialog(primaryStage);
     }
@@ -254,6 +249,7 @@ public class MainCtrl {
      * shows the add/edit expense page
      * @param eventToShow the event to show the participant editor for
      */
+    @Override
     public void showAddExpensePage(Event eventToShow) {
         addExpenseCtrl.displayAddExpensePage(eventToShow, null);
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
@@ -264,8 +260,9 @@ public class MainCtrl {
 
     /**
      * show the add tag page
-     * @param event
+     * @param event event to show
      */
+    @Override
     public void showAddTagPage(Event event) {
         addTagCtrl.displayAddTagPage(event);
         primaryStage.setTitle(languageConf.get("AddTag.addtag"));
@@ -280,6 +277,7 @@ public class MainCtrl {
      * @param exp The expense to edit.
      * @param ev The event associated with the expense.
      */
+    @Override
     public void handleEditExpense(Expense exp, Event ev) {
 
         addExpenseCtrl.displayAddExpensePage(ev, exp);
@@ -296,21 +294,5 @@ public class MainCtrl {
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
 
-    }
-
-    /**
-     * Set editTitleCtrl for testing purposes
-     * @param editTitleCtrl new EditTitleCtrl
-     */
-    public void setEditTitleCtrl(EditEventTitleInterface editTitleCtrl) {
-        this.editTitleCtrl = editTitleCtrl;
-    }
-
-    /**
-     * Set editParticipantCtrl for testing purposes
-     * @param editParticipantCtrl new editParticipantCtrl
-     */
-    public void setEditParticipantsCtrl(EditParticipantMock editParticipantCtrl){
-        this.editParticipantsCtrl = editParticipantCtrl;
     }
 }

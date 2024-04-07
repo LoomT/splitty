@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
@@ -62,7 +63,7 @@ public class AddExpenseCtrl {
     private Button addTag;
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
 
     /**
@@ -73,7 +74,7 @@ public class AddExpenseCtrl {
     @Inject
     public AddExpenseCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf
     ) {
         this.server = server;
@@ -483,6 +484,19 @@ public class AddExpenseCtrl {
         AtomicInteger selectedPart = new AtomicInteger();
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
+            checkBox.getStyleClass().add("textFont");
+            checkBox.setStyle("-fx-label-padding: 0 10 0 3");
+//            checkBox.setOnAction(e -> {
+//                if (checkBox.isSelected()) {
+//                    expPart.add(participant);
+//                    selectedPart.getAndIncrement();
+//                } else {
+//                    expPart.remove(participant);
+//                    selectedPart.getAndDecrement();
+//                }
+//                //updateEqualSplitCheckbox();
+//            });
+
             expenseParticipants.getChildren().add(checkBox);
         }
         if (totalPart == selectedPart.get()) {

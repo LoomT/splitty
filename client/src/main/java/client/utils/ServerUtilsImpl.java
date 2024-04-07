@@ -27,6 +27,13 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -304,5 +311,30 @@ public class ServerUtilsImpl implements ServerUtils {
             System.out.println(response.toString());
             return response.getStatus();
         }
+    }
+
+    /**
+     * @return string representation of the current exchange rates
+     */
+    @Override
+    public String getExchangeRates(Calendar calendar){
+        if(calendar != null) {
+            Calendar currentTime = new GregorianCalendar();
+            calendar.add(Calendar.HOUR, 1);
+            if (calendar.after(currentTime)) {
+                return null;
+            }
+        }
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder().uri(
+                URI.create(server + "api/currency")).GET().build();
+
+        HttpResponse response;
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return response.body().toString();
     }
 }

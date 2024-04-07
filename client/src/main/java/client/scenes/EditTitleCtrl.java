@@ -1,8 +1,10 @@
 package client.scenes;
 
 
-import client.MockClass.EditEventTitleInterface;
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.beans.binding.Bindings;
@@ -13,7 +15,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-public class EditTitleCtrl implements EditEventTitleInterface {
+import static commons.WebsocketActions.TITLE_CHANGE;
+
+public class EditTitleCtrl {
 
     @FXML
     private TextField nameTextField;
@@ -27,19 +31,27 @@ public class EditTitleCtrl implements EditEventTitleInterface {
     @FXML
     private Text titleError;
 
-    private EventPageCtrl eventPageCtrl;
+    private final MainCtrlInterface mainCtrl;
+    private final ServerUtils server;
+    private final Websocket websocket;
     private final LanguageConf languageConf;
+
+    private Event event;
 
     /**
      * start screen controller constructor
      *
+     * @param mainCtrl main controller
+     * @param server server utils
+     * @param websocket websocket client
      * @param languageConf language config instance
      */
     @Inject
-    public EditTitleCtrl(
-            LanguageConf languageConf
-    ) {
-
+    public EditTitleCtrl(MainCtrlInterface mainCtrl, ServerUtils server, Websocket websocket,
+            LanguageConf languageConf) {
+        this.mainCtrl = mainCtrl;
+        this.server = server;
+        this.websocket = websocket;
         this.languageConf = languageConf;
     }
 
@@ -48,14 +60,11 @@ public class EditTitleCtrl implements EditEventTitleInterface {
      */
     public void initialize(){
         characterLimitError(nameTextField, titleError, 100);
-    }
-
-    /**
-     * Change the title of the EditTitle page
-     * @param title new title
-     */
-    public void changeTitle(String title) {
-        eventTitle.setText(title);
+        websocket.on(TITLE_CHANGE, title -> {
+            if(event != null)
+                event.setTitle((String) title);
+            eventTitle.setText((String) title);
+        });
     }
 
     /**
@@ -72,11 +81,11 @@ public class EditTitleCtrl implements EditEventTitleInterface {
      */
     @FXML
     public void saveTitle(){
-        if(eventPageCtrl == null
-                || nameTextField.getText().isEmpty()
+        if(nameTextField.getText().isEmpty()
                 || nameTextField.getLength() > 100) return;
 
-        int result = eventPageCtrl.changeTitle(nameTextField.getText());
+        event.setTitle(nameTextField.getText());
+        int result = server.updateEventTitle(event);
         if(result >= 400)
             System.out.println("An error has occurred");
         else{
@@ -87,12 +96,11 @@ public class EditTitleCtrl implements EditEventTitleInterface {
 
     /**
      * Sets up the EditTitle screen and displays it.
-     * @param eventPageCtrl EventPageCtrl which will be changed
      * @param event Event which is displayed
      * @param stage Stage at which the editEventTitle will be displayed
      */
-    public void displayEditEventTitle(EventPageCtrl eventPageCtrl, Event event, Stage stage){
-        this.eventPageCtrl = eventPageCtrl;
+    public void displayEditEventTitle(Event event, Stage stage){
+        this.event = event;
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
