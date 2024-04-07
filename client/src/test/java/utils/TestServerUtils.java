@@ -1,13 +1,12 @@
 package utils;
 
 import client.utils.ServerUtils;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestServerUtils implements ServerUtils {
 
@@ -492,6 +491,18 @@ public class TestServerUtils implements ServerUtils {
         statuses.add(204);
         return 204;
 
+    }
+
+    /**
+     * test for add tag
+     * @param eventID
+     * @param tag
+     * @return
+     */
+    @Override
+    public int addTag(String eventID, Tag tag) {
+        assertTrue(true);
+        return 204;
     }
 
     /**

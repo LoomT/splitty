@@ -19,6 +19,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
@@ -289,6 +290,24 @@ public class ServerUtilsImpl implements ServerUtils {
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(event, APPLICATION_JSON)))
         {
+            System.out.println(response.toString());
+            return response.getStatus();
+        }
+
+    }
+
+    /**
+     * @param eventID     event id
+     * @param tag tag to save
+     * @return status code
+     */
+    @Override
+    public int addTag(String eventID, Tag tag) {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/tags")
+                .request(APPLICATION_JSON)
+                .post(Entity.entity(tag, APPLICATION_JSON))) {
             System.out.println(response.toString());
             return response.getStatus();
         }
