@@ -16,10 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.testfx.api.FxRobot;
@@ -82,6 +79,15 @@ public class AddExpenseCtrlTest {
 
     }
 
+    @BeforeAll
+    static void setUp() {
+        System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("prism.order", "sw");
+        System.setProperty("prism.text", "t2k");
+        System.setProperty("java.awt.headless", "true");
+    }
+
     @Test
     @Order(1)
     public void displayAddExpenseTest(FxRobot robot) {
@@ -114,7 +120,6 @@ public class AddExpenseCtrlTest {
 
             spyCtrl.displayAddExpensePage(event, null);
             robot.clickOn("#add");
-            spyCtrl.alertAllFields();
 
 
         });
