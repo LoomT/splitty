@@ -141,6 +141,8 @@ public class StartScreenCtrl {
      * for example when you exit the event page with the back button to reset the fields.
      */
     public void reset() {
+        title.setText("");
+        code.setText("");
         joinError.setVisible(false);
         createEventError.setVisible(false);
         reloadEventCodes();
