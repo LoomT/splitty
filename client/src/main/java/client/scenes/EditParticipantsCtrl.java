@@ -8,7 +8,6 @@ import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
@@ -16,6 +15,7 @@ import javafx.scene.text.Text;
 import java.net.ConnectException;
 import java.util.Optional;
 
+import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.TITLE_CHANGE;
 import static java.lang.String.format;
 
@@ -40,7 +40,7 @@ public class EditParticipantsCtrl {
     @FXML
     private Button deletePartButton;
     @FXML
-    private Label participantEditWarning;
+    private Label warningLabel;
 
     private Event event;
     private final ServerUtils server;
@@ -71,24 +71,12 @@ public class EditParticipantsCtrl {
      * Initialize listeners
      */
     public void initialize() {
-        nameField.textProperty().addListener(this::nameFieldChanged);
+        lengthListener(nameField, warningLabel, 30, languageConf.get("EditP.nameLimit"));
         websocket.on(TITLE_CHANGE, title -> {
             if(event != null)
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
-    }
-
-    /**
-     * Resets the style of the name text field when text changes
-     *
-     * @param observableValue string visible to user
-     * @param oldString old text
-     * @param newString new text
-     */
-    private void nameFieldChanged(ObservableValue<? extends String> observableValue,
-                                  String oldString, String newString) {
-        if (!oldString.equals(newString)) nameField.setStyle("");
     }
 
     /**
@@ -153,7 +141,7 @@ public class EditParticipantsCtrl {
         beneficiaryField.setText("");
         ibanField.setText("");
         bicField.setText("");
-        participantEditWarning.setVisible(false);
+        warningLabel.setVisible(false);
         nameField.setStyle("");
     }
 
@@ -204,8 +192,8 @@ public class EditParticipantsCtrl {
 
         if (index < 0) return;
         if(name.isEmpty()) {
-            participantEditWarning.setVisible(true);
-            participantEditWarning.setText(languageConf.get("EditP.nameMissing"));
+            warningLabel.setVisible(true);
+            warningLabel.setText(languageConf.get("EditP.nameMissing"));
             nameField.setStyle("-fx-border-color: red;");
             return;
         }
@@ -246,8 +234,8 @@ public class EditParticipantsCtrl {
      * Inform user that a participant with the same name already exists
      */
     private void informNameExists() {
-        participantEditWarning.setVisible(true);
-        participantEditWarning.setText(languageConf.get("EditP.nameExists"));
+        warningLabel.setVisible(true);
+        warningLabel.setText(languageConf.get("EditP.nameExists"));
         nameField.setStyle("""
                         -fx-border-color: red;
                         -fx-text-inner-color: red""");
