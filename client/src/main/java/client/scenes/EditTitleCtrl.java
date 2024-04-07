@@ -128,11 +128,21 @@ public class EditTitleCtrl {
     }
 
     /**
-     * Sets the eventPageCtrl
+     * Setter for the event.
      *
-     * @param eventPageCtrl eventPageCtrl linked to the event
+     * @param event event to set
      */
-    public void setEventPageCtrl(EventPageCtrl eventPageCtrl) {
-        this.eventPageCtrl = eventPageCtrl;
+    public void setEvent(Event event) {
+        this.event = event;
     }
+
+    /**
+     * Getter for the event.
+     *
+     * @return event
+     */
+    public Event getEvent() {
+        return event;
+    }
+
 }
