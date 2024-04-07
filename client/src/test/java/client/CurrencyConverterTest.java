@@ -4,6 +4,7 @@ import client.utils.CurrencyConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.TestServerUtils;
+import utils.TestWebsocket;
 
 import java.io.*;
 import java.util.Map;
@@ -17,7 +18,7 @@ class CurrencyConverterTest {
     //ServerUtilsImpl realTest = new ServerUtilsImpl(new UserConfig(new FileIO(URI.create("config.properties").toURL())));
 
     CurrencyConverterTest() {
-        serverUtils = new TestServerUtils();
+        serverUtils = new TestServerUtils(new TestWebsocket());
     }
 
     @BeforeEach

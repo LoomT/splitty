@@ -7,6 +7,7 @@ import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
 import commons.Event;
+import commons.WebsocketActions;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -43,12 +44,14 @@ public class EditTitleCtrlTest {
 
     Stage stage;
     TestServerUtils server;
+    TestWebsocket websocket;
 
 
     @Start
     public void start(Stage stage) throws IOException {
         this.stage = stage;
-        server = new TestServerUtils();
+        websocket = new TestWebsocket();
+        server = new TestServerUtils(websocket);
         mainCtrl = new TestMainCtrl();
 
         UserConfig userConfig = new UserConfig(new TestIO("""
@@ -71,6 +74,10 @@ public class EditTitleCtrlTest {
         server.createEvent(event);
         stage.setScene(scene);
         stage.show();
+
+        websocket.on(WebsocketActions.TITLE_CHANGE, (s) -> {
+            event.setTitle((String) s);
+        });
 
 
     }
@@ -108,6 +115,10 @@ public class EditTitleCtrlTest {
         robot.lookup("#nameTextField").queryAs(TextField.class).setText(newTitle);
         robot.clickOn("#saveButton");
         assertEquals("new title", ctrl.getEvent().getTitle());
+        websocket.simulateAction(WebsocketActions.TITLE_CHANGE, newTitle);
+        assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.TITLE_CHANGE));
+        assertTrue(websocket.hasPayloadBeenSent(newTitle));
+
 
     }
 
