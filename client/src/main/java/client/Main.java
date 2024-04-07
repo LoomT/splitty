@@ -110,9 +110,9 @@ public class Main extends Application {
                 "client", "scenes", "AddTag.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        primaryStage.setResizable(false);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger, addTag)
-        );
+                adminOverview, addExpense, errorPopup, titleChanger, addTag));
     }
 }
