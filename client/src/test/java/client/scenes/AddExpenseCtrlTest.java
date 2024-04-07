@@ -13,27 +13,29 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
-import org.testfx.util.WaitForAsyncUtils;
 import utils.TestIO;
 import utils.TestServerUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.testfx.util.WaitForAsyncUtils.waitForAsync;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ExtendWith(ApplicationExtension.class)
 public class AddExpenseCtrlTest {
 
@@ -81,6 +83,7 @@ public class AddExpenseCtrlTest {
     }
 
     @Test
+    @Order(1)
     public void displayAddExpenseTest(FxRobot robot) {
         Platform.runLater(() -> {
 
@@ -103,6 +106,7 @@ public class AddExpenseCtrlTest {
     }
 
     @Test
+    @Order(2)
     public void handleAddEmptyExpenseButtonTest(FxRobot robot) {
         AddExpenseCtrl spyCtrl = Mockito.spy(ctrl);
 
@@ -120,6 +124,7 @@ public class AddExpenseCtrlTest {
     }
 
     @Test
+    @Order(3)
     public void handelAddButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
             ctrl.displayAddExpensePage(event, null);
@@ -138,6 +143,7 @@ public class AddExpenseCtrlTest {
     }
 
     @Test
+    @Order(4)
     public void handleEditButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
             Expense expense = new Expense(event.getParticipants().getFirst(), "testPurpose", 10, "EUR", event.getParticipants(), "food");
@@ -155,5 +161,70 @@ public class AddExpenseCtrlTest {
         waitForFxEvents();
         assertEquals(server.getCalls().get(1), "updateExpense");
     }
+
+    @Test
+    @Order(5)
+    public void handleAddTagTest(FxRobot robot) {
+        Platform.runLater(() -> {
+            ctrl.displayAddExpensePage(event, null);
+            robot.clickOn("#addTag");
+
+        });
+        waitForFxEvents();
+        assertEquals(mainCtrl.getScenes().getFirst(), "AddTagPage");
+    }
+
+    @Test
+    @Order(6)
+    public void testGetSelectedParticipants(FxRobot robot) {
+        Platform.runLater(() -> {
+            ctrl.displayAddExpensePage(event, null);
+            robot.clickOn("#partialSplit");
+            TextFlow textFlow = robot.lookup("#expenseParticipants").queryAs(TextFlow.class);
+            CheckBox first = (CheckBox) textFlow.getChildren().getFirst();
+            assertEquals(first.getText(), "test");
+
+        });
+    }
+
+    @Test
+    @Order(7)
+    public void testHandlePartialSplit(FxRobot robot) {
+        Platform.runLater(() -> {
+            ctrl.displayAddExpensePage(event, null);
+            robot.clickOn("#partialSplit");
+            TextFlow textFlow = robot.lookup("#expenseParticipants").queryAs(TextFlow.class);
+            CheckBox first = (CheckBox) textFlow.getChildren().getFirst();
+            first.setSelected(true);
+            robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#purpose").queryAs(TextField.class).setText("test");
+            robot.lookup("#amount").queryAs(TextField.class).setText("10");
+            robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
+            robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.clickOn("#add");
+        });
+        waitForFxEvents();
+        assertEquals(server.getCalls().get(1), "createExpense");
+    }
+
+    @Test
+    @Order(8)
+    public void testCatchNumberFormatException (FxRobot robot) {
+        Platform.runLater(() -> {
+            ctrl.displayAddExpensePage(event, null);
+            robot.lookup("#amount").queryAs(TextField.class).setText("abc");
+            robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#purpose").queryAs(TextField.class).setText("test");
+            robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
+            robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.clickOn("#equalSplit");
+            robot.clickOn("#add");
+        });
+        waitForFxEvents();
+        assertEquals(server.getCalls().size(), 1);
+    }
+
 
 }

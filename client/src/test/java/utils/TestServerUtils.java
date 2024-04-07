@@ -495,12 +495,13 @@ public class TestServerUtils implements ServerUtils {
 
     /**
      * test for add tag
-     * @param eventID
-     * @param tag
-     * @return
+     * @param eventID event id
+     * @param tag tag to add
+     * @return 204
      */
     @Override
     public int addTag(String eventID, Tag tag) {
+        calls.add("addTag");
         assertTrue(true);
         return 204;
     }
