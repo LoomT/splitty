@@ -351,6 +351,7 @@ public class AddExpenseCtrl {
         for (Participant participant : event.getParticipants()) {
             CheckBox checkBox = new CheckBox(participant.getName());
             checkBox.getStyleClass().add("textFont");
+            checkBox.setStyle("-fx-label-padding: 0 10 0 3");
             checkBox.setOnAction(e -> {
                 if (checkBox.isSelected()) {
                     expPart.add(participant);
