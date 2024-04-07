@@ -1,6 +1,5 @@
 package client.scenes;
 
-import client.MockClass.EditParticipantInterface;
 import client.components.Confirmation;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -15,10 +14,11 @@ import javafx.scene.text.Text;
 
 import java.util.Optional;
 
+import static commons.WebsocketActions.TITLE_CHANGE;
 import static java.lang.String.format;
 
 
-public class EditParticipantsCtrl implements EditParticipantInterface {
+public class EditParticipantsCtrl {
     @FXML
     private Text eventTitle;
     @FXML
@@ -70,6 +70,11 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
      */
     public void initialize() {
         nameField.textProperty().addListener(this::nameFieldChanged);
+        websocket.on(TITLE_CHANGE, title -> {
+            if(event != null)
+                event.setTitle((String) title);
+            eventTitle.setText((String) title);
+        });
     }
 
     /**

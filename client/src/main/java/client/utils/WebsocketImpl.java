@@ -267,7 +267,6 @@ public class WebsocketImpl implements Websocket {
             Event currEvent,
             Consumer<Event> updateEventCallback
     ) {
-        this.resetAction(WebsocketActions.TITLE_CHANGE);
 
         this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
             String title = (String) e;

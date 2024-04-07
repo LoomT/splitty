@@ -4,8 +4,10 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
-import commons.*;
 import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static commons.WebsocketActions.ADD_TAG;
+import static commons.WebsocketActions.TITLE_CHANGE;
 
 
 public class EventPageCtrl {
@@ -101,7 +104,6 @@ public class EventPageCtrl {
 
         this.server = server;
         this.websocket = websocket;
-        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> changeTitle((String) newTitle));
     }
 
     /**
@@ -112,8 +114,6 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
-        mainCtrl.updateEditTitle(e.getTitle());
-        mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
@@ -164,6 +164,16 @@ public class EventPageCtrl {
         ft.setToValue(0);
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> copiedToClipboardMsg.setVisible(false));
+
+        websocket.on(TITLE_CHANGE, title -> {
+            event.setTitle(((String) title));
+            eventTitle.setText(event.getTitle());
+        });
+        websocket.on(ADD_TAG, tag -> {
+            if (!event.getTags().contains((Tag) tag)) {
+                event.getTags().add((Tag) tag);
+            }
+        });
     }
 
     /**
@@ -182,16 +192,6 @@ public class EventPageCtrl {
                 this::displayExpenses,
                 this::displayExpenses
         );
-        websocket.registerEventChangeListener(
-                event,
-                this::displayEvent
-        );
-        websocket.on(ADD_TAG, tag -> {
-            if (!event.getTags().contains((Tag) tag)) {
-                event.getTags().add((Tag) tag);
-            }
-
-        });
     }
 
 
@@ -229,20 +229,6 @@ public class EventPageCtrl {
     public void displayExpenses(Event e) {
         String selectedName = extractSelectedName();
         tabSelectionChanged(e, selectedName);
-    }
-
-
-    /**
-     * Changes the title of the event
-     *
-     * @param newTitle new title of the event
-     * @return 204 if successful, 400 if there is a problem with input, 404 if event cannot be found
-     */
-    public int changeTitle(String newTitle) {
-        event.setTitle(newTitle);
-        eventTitle.setText(newTitle);
-        return server.updateEventTitle(event);
-
     }
 
     /**
