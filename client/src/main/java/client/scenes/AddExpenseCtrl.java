@@ -460,7 +460,7 @@ public class AddExpenseCtrl {
     /**
      * convert from string to color
      * @param hexCode
-     * @return the Color color
+     * @return the Color
      */
     public static Color hexToColor(String hexCode) {
         if (!hexCode.startsWith("#")) {
