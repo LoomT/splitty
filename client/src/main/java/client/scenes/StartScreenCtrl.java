@@ -6,22 +6,21 @@ import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
-import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static client.utils.CommonFunctions.lengthListener;
 
 
 public class StartScreenCtrl {
@@ -43,13 +42,12 @@ public class StartScreenCtrl {
     private VBox eventList;
 
     @FXML
-    private Text joinError;
+    private Label joinError;
 
     @FXML
-    private Text createEventError;
+    private Label createEventError;
 
     private final UserConfig userConfig;
-    private final Websocket websocket;
 
     /**
      * start screen controller constructor
@@ -58,23 +56,19 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
-     * @param websocket the ws instance
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig,
-            Websocket websocket
+            UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.websocket = websocket;
-
     }
 
     /**
@@ -98,8 +92,8 @@ public class StartScreenCtrl {
             if(filteredValue.length() > 5) filteredValue = filteredValue.substring(0, 5);
             code.setText(filteredValue.toUpperCase());
         });
-
-        EditTitleCtrl.eventTitleListener(title, createEventError, languageConf);
+        lengthListener(title, createEventError, 30,
+                languageConf.get("StartScreen.maxEventNameLength"));
     }
 
     /**

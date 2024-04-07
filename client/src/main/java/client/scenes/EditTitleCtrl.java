@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -16,6 +17,7 @@ import javafx.stage.Stage;
 
 import java.net.ConnectException;
 
+import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.TITLE_CHANGE;
 
 public class EditTitleCtrl {
@@ -30,7 +32,7 @@ public class EditTitleCtrl {
     private Text eventTitle;
 
     @FXML
-    private Text titleError;
+    private Label warningLabel;
 
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
@@ -60,45 +62,13 @@ public class EditTitleCtrl {
      * Initializes the characterLimitError event listener.
      */
     public void initialize(){
-        eventTitleListener(nameTextField, titleError, languageConf);
+        lengthListener(nameTextField, warningLabel, 30,
+                languageConf.get("StartScreen.maxEventNameLength"));
         websocket.on(TITLE_CHANGE, title -> {
             if(event != null)
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
-    }
-
-    /**
-     * Adds a listener to the titleField which will make the errorField visible
-     * with a message informing the user that the
-     * length of the text reached maxLength which is currently 50
-     *
-     * @param titleField event title text field
-     * @param errorField error text node
-     * @param languageConf languageConf
-     */
-    static void eventTitleListener(TextField titleField, Text errorField, LanguageConf languageConf) {
-        titleField.textProperty().addListener((observable, oldValue, newValue) -> {
-            errorField.setVisible(false);
-            int maxLength = 50;
-            if(newValue.length() > maxLength) {
-                newValue = newValue.substring(0, maxLength);
-            }
-            if(newValue.length() == maxLength) {
-                errorField.setText(
-                        String.format(languageConf.get("StartScreen.maxEventNameLength"), maxLength));
-                errorField.setVisible(true);
-            }
-            titleField.setText(newValue);
-        });
-    }
-
-    /**
-     * Change the title of the EditTitle page
-     * @param title new title
-     */
-    public void changeTitle(String title) {
-        eventTitle.setText(title);
     }
 
     /**
@@ -116,8 +86,8 @@ public class EditTitleCtrl {
     @FXML
     public void saveTitle(){
         if(nameTextField.getText().isEmpty()) {
-            titleError.setText(languageConf.get("StartScreen.emptyEventName"));
-            titleError.setVisible(true);
+            warningLabel.setText(languageConf.get("StartScreen.emptyEventName"));
+            warningLabel.setVisible(true);
         }
 
         event.setTitle(nameTextField.getText());
@@ -143,7 +113,7 @@ public class EditTitleCtrl {
      */
     public void displayEditEventTitle(Event event, Stage stage){
         this.event = event;
-        titleError.setVisible(false);
+        warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
