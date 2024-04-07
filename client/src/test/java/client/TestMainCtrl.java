@@ -163,7 +163,7 @@ public class TestMainCtrl implements MainCtrlInterface {
     /**
      * show the add tag page
      *
-     * @param event
+     * @param event event
      */
     @Override
     public void showAddTagPage(Event event) {

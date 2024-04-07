@@ -41,6 +41,9 @@ public class EditTitleCtrl {
     /**
      * start screen controller constructor
      *
+     * @param mainCtrl main controller
+     * @param server server utils
+     * @param websocket websocket client
      * @param languageConf language config instance
      */
     @Inject
