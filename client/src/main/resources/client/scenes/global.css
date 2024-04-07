@@ -118,6 +118,7 @@ the buttons have this class by default and the styles get overwritten
     -fx-border-radius: 8;
     -fx-background-radius: 8;
     -fx-cursor: hand;
+    -fx-font-size: 12;
 }
 
 
@@ -142,6 +143,7 @@ the buttons have this class by default and the styles get overwritten
     -fx-background-radius: 8;
     -fx-cursor: hand;
     -fx-text-fill: -text;
+    -fx-font-size: 12;
 }
 
 .pbutton:hover {

@@ -1,5 +1,7 @@
 package client.scenes;
 
+import client.MockClass.EditParticipantMock;
+import client.MockClass.EditTitleMock;
 import client.MyFXML;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -49,6 +51,8 @@ public class EventPageCtrlTest {
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
         MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
+        mainCtrl.setEditTitleCtrl(new EditTitleMock());
+        mainCtrl.setEditParticipantsCtrl(new EditParticipantMock());
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,

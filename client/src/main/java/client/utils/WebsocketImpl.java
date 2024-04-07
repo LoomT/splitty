@@ -1,10 +1,7 @@
 package client.utils;
 
 import com.google.inject.Inject;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
+import commons.*;
 import javafx.application.Platform;
 import org.springframework.lang.NonNull;
 import org.springframework.messaging.converter.CompositeMessageConverter;
@@ -126,12 +123,15 @@ public class WebsocketImpl implements Websocket {
                 }
             }
             if (index == -1) {
-                throw new RuntimeException("The updated participant's ID ("
-                        + p.getId() +
+                throw new RuntimeException("The updated participant's ID (" + p.getId() +
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);
             event.getParticipants().add(index, p);
+            //updates the participants in expenses
+            for(Expense expense : event.getExpenses()) {
+                linkExpenseParticipants(expense, event.getParticipants());
+            }
             updatePartCallback.accept(event);
         });
         this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
@@ -150,8 +150,7 @@ public class WebsocketImpl implements Websocket {
                 }
             }
             if (index == -1) {
-                throw new RuntimeException("The deleted participant's ID ("
-                        + partId +
+                throw new RuntimeException("The deleted participant's ID (" + partId +
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);
@@ -182,6 +181,7 @@ public class WebsocketImpl implements Websocket {
 
         this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
+            linkExpenseParticipants(expense, event.getParticipants());
             event.getExpenses().add(expense);
             addExpCallback.accept(event);
         });
@@ -196,11 +196,11 @@ public class WebsocketImpl implements Websocket {
                 }
             }
             if (index == -1) {
-                throw new RuntimeException("The updated expense's ID ("
-                        + expense.getId() +
+                throw new RuntimeException("The updated expense's ID (" + expense.getId() +
                         ") does not match with any ID's of the already existing expenses");
             }
             event.getExpenses().remove(index);
+            linkExpenseParticipants(expense, event.getParticipants());
             event.getExpenses().add(index, expense);
             updateExpCallback.accept(event);
         });
@@ -215,8 +215,7 @@ public class WebsocketImpl implements Websocket {
                 }
             }
             if (index == -1) {
-                throw new RuntimeException("The deleted expense's ID ("
-                        + expId +
+                throw new RuntimeException("The deleted expense's ID (" + expId +
                         ") does not match with any ID's of the already existing expenses");
             }
             event.getExpenses().remove(index);
@@ -259,30 +258,6 @@ public class WebsocketImpl implements Websocket {
     }
 
     /**
-     * @param event event of which expense to update
-     * @param expense new expense
-     */
-
-    private void updateExpense(Event event, Expense expense) {
-        int index = -1;
-        for (int i = 0; i < event.getExpenses().size(); i++) {
-            Expense curr = event.getExpenses().get(i);
-            if (curr.getId() == expense.getId()) {
-                index = i;
-                break;
-            }
-        }
-        if (index == -1) {
-            throw new RuntimeException("The updated expense's ID ("
-                    + expense.getId()+
-                    ") does not match with any ID's of the already existing expenses");
-        }
-        event.getExpenses().remove(index);
-        linkExpenseParticipants(expense, event.getParticipants());
-        event.getExpenses().add(index, expense);
-    }
-
-    /**
      * Registers all the change listeners on WS if they're not registered already
      * @param currEvent the event in which we listen on the participant changes
      * @param updateEventCallback this is called when an Event is updated
@@ -308,7 +283,8 @@ public class WebsocketImpl implements Websocket {
                 "commons.Participant", Participant.class,
                 "commons.Expense", Expense.class,
                 "java.lang.String", String.class,
-                "java.lang.Long", Long.class));
+                "java.lang.Long", Long.class,
+                "commons.Tag", Tag.class));
 
         /**
          * Executes after successfully connecting to the server

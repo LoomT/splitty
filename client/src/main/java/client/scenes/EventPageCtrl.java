@@ -4,10 +4,8 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
+import commons.*;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.WebsocketActions;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -29,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
+import static commons.WebsocketActions.ADD_TAG;
 
 
 public class EventPageCtrl {
@@ -105,6 +106,8 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        mainCtrl.updateEditTitle(e.getTitle());
+        mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
@@ -173,6 +176,12 @@ public class EventPageCtrl {
                 event,
                 this::displayEvent
         );
+        websocket.on(ADD_TAG, tag -> {
+            if (!event.getTags().contains((Tag) tag)) {
+                event.getTags().add((Tag) tag);
+            }
+
+        });
     }
 
 
@@ -223,6 +232,7 @@ public class EventPageCtrl {
         event.setTitle(newTitle);
         eventTitle.setText(newTitle);
         return server.updateEventTitle(event);
+
     }
 
     /**
@@ -288,20 +298,26 @@ public class EventPageCtrl {
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         lv.setCellFactory(param -> new ListCell<>() {
             private final Button editButton = new Button("\uD83D\uDD89");
+            private final Button removeButton = new Button("\u274C");
+            private final HBox buttonBox = new HBox();
             private final StackPane stackPane = new StackPane();
-
             {
                 stackPane.setAlignment(Pos.CENTER_LEFT);
-                StackPane.setAlignment(editButton, Pos.CENTER_RIGHT);
-                stackPane.getChildren().add(editButton);
+                buttonBox.setAlignment(Pos.CENTER_RIGHT);
+                buttonBox.getChildren().addAll(editButton, removeButton);
+                stackPane.getChildren().addAll(new Text(), buttonBox);
                 editButton.setOnAction(event -> {
                     int index = getIndex();
                     System.out.println(index);
                     Expense expense = expenses.get(index);
                     mainCtrl.handleEditExpense(expense, ev);
                 });
+                removeButton.setOnAction(event -> {
+                    int index = getIndex();
+                    Expense expense = expenses.get(index);
+                    server.deleteExpense(expense.getId(), ev.getId());
+                });
             }
-
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -310,13 +326,11 @@ public class EventPageCtrl {
                     setGraphic(null);
                 } else {
                     setText(null);
-                    stackPane.getChildren().clear();
-                    stackPane.getChildren().addAll(new Text(item), editButton);
+                    stackPane.getChildren().set(0, new Text(item));
                     setGraphic(stackPane);
                 }
             }
         });
-
         ObservableList<String> items = FXCollections.observableArrayList();
         for (Expense expense : expenses) {
             String expenseString = toString(expense);
@@ -406,7 +420,7 @@ public class EventPageCtrl {
      *
      */
     public void changeTitle(){
-        mainCtrl.showEditTitle(this);
+        mainCtrl.showEditTitle(this.event);
     }
 
     /**
