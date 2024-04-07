@@ -81,11 +81,18 @@ public class AddTagCtrl {
         warningText.setVisible(false);
     }
 
+    /**
+     * Back button clicked
+     * Closes the stage
+     */
     @FXML
     public void backClicked() {
         stage.close();
     }
 
+    /**
+     * Add button clicked
+     */
     @FXML
     public void addClicked() {
         if (selectedColor == null) {
@@ -99,6 +106,9 @@ public class AddTagCtrl {
         }
     }
 
+    /**
+     * Sets colour when colour gets changed
+     */
     @FXML
     public void colourChanged() {
         selectedColor = cp.getValue();

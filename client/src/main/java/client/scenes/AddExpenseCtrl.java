@@ -74,8 +74,9 @@ public class AddExpenseCtrl {
     private final LanguageConf languageConf;
 
     /**
-     * @param server   server utils instance
      * @param mainCtrl main control instance
+     * @param server   server utils instance
+     * @param websocket websocket client
      * @param languageConf language config
      */
     @Inject
@@ -91,6 +92,10 @@ public class AddExpenseCtrl {
         this.languageConf = languageConf;
     }
 
+    /**
+     * Runs when app starts
+     * Sets a listener for amount field which only let input double amounts
+     */
     public void initialize() {
         DecimalFormat format = new DecimalFormat( "#.0" );
 
