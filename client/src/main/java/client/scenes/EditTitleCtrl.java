@@ -38,7 +38,6 @@ public class EditTitleCtrl implements EditEventTitleInterface {
     public EditTitleCtrl(
             LanguageConf languageConf
     ) {
-
         this.languageConf = languageConf;
     }
 
@@ -96,9 +95,10 @@ public class EditTitleCtrl implements EditEventTitleInterface {
      */
     @FXML
     public void saveTitle(){
-        if(eventPageCtrl == null
-                || nameTextField.getText().isEmpty()
-                || nameTextField.getLength() > 100) return;
+        if(eventPageCtrl == null || nameTextField.getText().isEmpty()) {
+            titleError.setText(languageConf.get("StartScreen.emptyEventName"));
+            titleError.setVisible(true);
+        }
 
         int result = eventPageCtrl.changeTitle(nameTextField.getText());
         if(result >= 400)
@@ -117,6 +117,7 @@ public class EditTitleCtrl implements EditEventTitleInterface {
      */
     public void displayEditEventTitle(EventPageCtrl eventPageCtrl, Event event, Stage stage){
         this.eventPageCtrl = eventPageCtrl;
+        titleError.setVisible(false);
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
