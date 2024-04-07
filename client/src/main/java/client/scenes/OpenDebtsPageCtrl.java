@@ -36,8 +36,8 @@ public class OpenDebtsPageCtrl {
     private final LanguageConf languageConf;
     private String selectedParticipantName;
     private Event event;
-    private ServerUtils server;
-    private MainCtrl mainCtrl;
+    private final ServerUtils server;
+    private final MainCtrl mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
     private Map<Map.Entry<Participant, Participant>, Double> participantToParticipantMap = new HashMap<>();
 
@@ -82,10 +82,9 @@ public class OpenDebtsPageCtrl {
 
         for (Expense e : event.getExpenses()) {
             for (Participant p : e.getExpenseParticipants()) {
-                if(e.getExpenseAuthor().equals(p)) break;
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
                 map.put(p.getName(), map.get(p.getName()) + cost);
-                debtMap.put(Map.entry(e.getExpenseAuthor(), p), cost);
+                if(!e.getExpenseAuthor().equals(p)) debtMap.put(Map.entry(e.getExpenseAuthor(), p), cost);
             }
             sum += e.getAmount();
         }
@@ -123,7 +122,6 @@ public class OpenDebtsPageCtrl {
                 break;
             }
         }
-
         allDebtsPane.getChildren().clear();
         for (Map.Entry<Participant, Participant> m : participantToParticipantMap.keySet()) {
             if (!flag || m.getKey().equals(participant) || m.getValue().equals(participant)) {
