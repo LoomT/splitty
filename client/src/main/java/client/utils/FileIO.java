@@ -1,5 +1,7 @@
 package client.utils;
 
+import javafx.scene.control.Alert;
+
 import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URISyntaxException;
@@ -13,13 +15,21 @@ public class FileIO implements IOInterface{
      */
     public FileIO(@Nullable URL url) {
         if(url == null) {
-            //TODO replace crash with a pop up
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Config file not found.\nIf the error persists, try reinstalling the app");
+            alert.setHeaderText("Unexpected error");
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
             throw new RuntimeException("Config file not found");
         }
         try {
             file = new File(url.toURI());
         } catch (URISyntaxException e) {
-            //TODO replace crash with a pop up or not
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Config file not found.\nIf the error persists, try reinstalling the app");
+            alert.setHeaderText("Unexpected error");
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
             throw new RuntimeException(e);
         }
     }
