@@ -1,32 +1,26 @@
 package client.components;
 
-import client.MyModule;
 import client.utils.LanguageConf;
-import com.google.inject.Injector;
-import commons.Expense;
 import commons.Participant;
-import jakarta.servlet.http.Part;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 
 import java.io.IOException;
-import java.util.ResourceBundle;
 
 import static com.google.inject.Guice.createInjector;
 
 public class OpenDebtsListItem extends HBox {
+    private final LanguageConf languageConf;
     @FXML
     private Label participantLabel;
 
-    private static final Injector INJECTOR = createInjector(new MyModule());
-    private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
-
-    public OpenDebtsListItem(Participant debtor, Participant lender, double amount) {
+    public OpenDebtsListItem(String template, Participant debtor,
+                             Participant lender,
+                             double amount,
+                             LanguageConf languageConf) {
+        this.languageConf = languageConf;
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass().getResource("/client/components/OpenDebtsListItem.fxml")
         );
@@ -38,7 +32,8 @@ public class OpenDebtsListItem extends HBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-        String text = debtor.getName() + " owes " + lender.getName() + " " + amount;
+        template = languageConf.get(template);
+        String text = String.format(template, debtor.getName(), lender.getName(), amount);
         participantLabel.setText(text);
     }
 

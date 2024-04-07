@@ -2,7 +2,6 @@ package client.scenes;
 
 import client.components.OpenDebtsListItem;
 import client.utils.LanguageConf;
-import client.components.DebtListItem;
 import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
@@ -40,7 +39,8 @@ public class OpenDebtsPageCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
-    private Map<Map.Entry<Participant, Participant>, Double> participantToParticipantMap = new HashMap<>();
+    private Map<Map.Entry<Participant, Participant>, Double>
+            participantToParticipantMap = new HashMap<>();
 
 
     /**
@@ -85,7 +85,8 @@ public class OpenDebtsPageCtrl {
             for (Participant p : e.getExpenseParticipants()) {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
                 map.put(p.getName(), map.get(p.getName()) + cost);
-                if(!e.getExpenseAuthor().equals(p)) debtMap.put(Map.entry(e.getExpenseAuthor(), p), cost);
+                if(!e.getExpenseAuthor().equals(p))
+                    debtMap.put(Map.entry(e.getExpenseAuthor(), p), cost);
             }
             sum += e.getAmount();
         }
@@ -106,8 +107,6 @@ public class OpenDebtsPageCtrl {
         for (String s : map.keySet()) {
             this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
         }
-
-        addDebtsToDebtList();
 
 
         for (PieChart.Data data : shareChart.getData()) {
@@ -130,22 +129,11 @@ public class OpenDebtsPageCtrl {
         for (Map.Entry<Participant, Participant> m : participantToParticipantMap.keySet()) {
             if (!flag || m.getKey().equals(participant) || m.getValue().equals(participant)) {
                 allDebtsPane.getChildren().add(new OpenDebtsListItem(
-                        m.getKey(), m.getValue(), participantToParticipantMap.get(m)));
+                        "OpenDebtsListItem.template", m.getKey(),
+                        m.getValue(),
+                        participantToParticipantMap.get(m),
+                        languageConf));
             }
-        }
-    }
-
-    /**
-     * Adds the debts to the debt list
-     */
-    private void addDebtsToDebtList() {
-        List<DebtListItem> debtListItems = new ArrayList<>();
-        debtList.getChildren().clear();
-        for (String name : participantDebtMap.keySet()) {
-            debtListItems.add(new DebtListItem(name + " owes: \n" + participantDebtMap.get(name)));
-        }
-        for(DebtListItem item : debtListItems){
-            debtList.getChildren().add(item);
         }
     }
 
