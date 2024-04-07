@@ -8,13 +8,18 @@ import commons.Event;
 import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.net.ConnectException;
 import java.util.List;
+
+import static client.utils.CommonFunctions.lengthListener;
 
 public class AddTagCtrl {
 
@@ -23,18 +28,14 @@ public class AddTagCtrl {
     private final LanguageConf languageConf;
 
     @FXML
-    private Button add;
-
-    @FXML
-    private Button back;
-
-    @FXML
     private ColorPicker cp;
 
     @FXML
     private TextField tagTextField;
     @FXML
     private Label warningText;
+    @FXML
+    private Label confirmationLabel;
     private FadeTransition ft;
 
     private Color selectedColor;
@@ -59,11 +60,13 @@ public class AddTagCtrl {
      * initiliaze method
      */
     public void initialize() {
-        ft = new FadeTransition(Duration.millis(2000), warningText);
+        ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
         ft.setFromValue(1.0);
         ft.setToValue(0);
         ft.setDelay(Duration.millis(1000));
-        ft.setOnFinished(e -> warningText.setVisible(false));
+        ft.setOnFinished(e -> confirmationLabel.setVisible(false));
+        warningText.setVisible(false);
+        lengthListener(tagTextField, warningText, 15, languageConf.get("EditP.nameLimit"));
     }
 
     /**
@@ -74,7 +77,7 @@ public class AddTagCtrl {
     public void displayAddTagPage(Event event, Stage stage) {
         this.event = event;
         this.stage = stage;
-
+        confirmationLabel.setVisible(false);
         warningText.setVisible(false);
     }
 
@@ -132,8 +135,8 @@ public class AddTagCtrl {
                 }
                 tagTextField.clear();
                 ft.stop();
-                warningText.setVisible(true);
-                warningText.setOpacity(1.0);
+                confirmationLabel.setVisible(true);
+                confirmationLabel.setOpacity(1.0);
                 ft.play();
             }
             else {

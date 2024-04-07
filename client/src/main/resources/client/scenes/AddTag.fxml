@@ -14,8 +14,8 @@
         <rowConstraints>
           <RowConstraints maxHeight="66.0" minHeight="10.0" prefHeight="66.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="66.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="66.0" minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="99.0" minHeight="10.0" prefHeight="67.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="66.0" minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="99.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <ColorPicker fx:id="cp" onAction="#colourChanged" GridPane.halignment="CENTER" GridPane.rowIndex="1">
@@ -40,7 +40,8 @@
                   <Insets left="20.0" right="20.0" />
                </GridPane.margin>
             </TextField>
-            <Label fx:id="warningText" text="Tag added successfully" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <Label fx:id="confirmationLabel" text="%AddTag.confirmation" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+            <Label fx:id="warningText" prefHeight="39.0" prefWidth="176.0" styleClass="warningLabel" text="%EditP.nameLimit" textFill="RED" wrapText="true" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="TOP" />
          </children>
       </GridPane>
    </children>
