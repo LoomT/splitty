@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -42,7 +43,7 @@ public class EditParticipantsCtrl {
 
     private Event event;
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -55,7 +56,7 @@ public class EditParticipantsCtrl {
     @Inject
     public EditParticipantsCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             Websocket websocket
     ) {

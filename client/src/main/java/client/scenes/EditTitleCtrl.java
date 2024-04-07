@@ -1,6 +1,7 @@
 package client.scenes;
 
 
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -30,7 +31,7 @@ public class EditTitleCtrl {
     @FXML
     private Text titleError;
 
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
     private final Websocket websocket;
     private final LanguageConf languageConf;
@@ -43,7 +44,7 @@ public class EditTitleCtrl {
      * @param languageConf language config instance
      */
     @Inject
-    public EditTitleCtrl(MainCtrl mainCtrl, ServerUtils server, Websocket websocket,
+    public EditTitleCtrl(MainCtrlInterface mainCtrl, ServerUtils server, Websocket websocket,
             LanguageConf languageConf) {
         this.mainCtrl = mainCtrl;
         this.server = server;
@@ -61,14 +62,6 @@ public class EditTitleCtrl {
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
-    }
-
-    /**
-     * Change the title of the EditTitle page
-     * @param title new title
-     */
-    public void changeTitle(String title) {
-        eventTitle.setText(title);
     }
 
     /**

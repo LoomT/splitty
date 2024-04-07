@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -72,7 +73,7 @@ public class EventPageCtrl {
     private int selectedParticipantId;
 
     private final Websocket websocket;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
     private Event event;
@@ -94,7 +95,7 @@ public class EventPageCtrl {
      */
     @Inject
     public EventPageCtrl(
-        MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
         LanguageConf languageConf,
         Websocket websocket,
         ServerUtils server

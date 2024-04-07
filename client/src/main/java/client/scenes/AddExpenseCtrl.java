@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
@@ -62,7 +63,7 @@ public class AddExpenseCtrl {
     private Button addTag;
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
 
     /**
@@ -73,7 +74,7 @@ public class AddExpenseCtrl {
     @Inject
     public AddExpenseCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf
     ) {
         this.server = server;

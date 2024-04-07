@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.ErrorPopupCtrl;
 import client.scenes.*;
 import client.utils.LanguageConf;
@@ -109,7 +110,7 @@ public class Main extends Application {
                 AddTagCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "AddTag.fxml"
         );
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, errorPopup, titleChanger, addTag)

@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
 import client.utils.LanguageConf;
@@ -24,7 +25,7 @@ import java.util.List;
 public class StartScreenCtrl {
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
 
     @FXML
@@ -60,7 +61,7 @@ public class StartScreenCtrl {
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             UserConfig userConfig,
             Websocket websocket
