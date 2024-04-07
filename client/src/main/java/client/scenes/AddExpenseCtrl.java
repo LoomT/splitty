@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Transaction;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -270,6 +271,21 @@ public class AddExpenseCtrl {
                             expCurrency, participants, expType);
                     expense.setDate(expenseDate);
                     server.createExpense(ev.getId(), expense);
+                    int expenseSize = expense.getExpenseParticipants().size();
+                    /*
+                    for(Participant p : expense.getExpenseParticipants()){
+                        if(p.equals(expense.getExpenseAuthor())) continue;
+                        Transaction t = new Transaction(p,
+                                expense.getExpenseAuthor(),
+                                expense.getAmount()/expenseSize);
+                        server.addTransaction(ev.getId(), t);
+                    }
+                    */
+                    Transaction t = new Transaction(expense.getExpenseAuthor(),
+                            expense.getExpenseAuthor(),
+                            expense.getAmount()/expenseSize);
+
+                    server.addTransaction(ev.getId(), t);
                     resetExpenseFields();
                     mainCtrl.goBackToEventPage(ev);
                 }

@@ -20,6 +20,7 @@ public class OpenDebtsListItem extends HBox {
                              Participant lender,
                              double amount,
                              LanguageConf languageConf) {
+
         this.languageConf = languageConf;
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass().getResource("/client/components/OpenDebtsListItem.fxml")

@@ -67,6 +67,7 @@ public class OpenDebtsPageCtrl {
      * @param event the event
      */
     public void displayOpenDebtsPage(Event event) {
+        System.out.println(event.getTransactions());
         this.event = event;
         Map<String, Double> map = new HashMap<>();
         Map<Map.Entry<Participant, Participant>, Double> debtMap = new HashMap<>();
@@ -85,7 +86,7 @@ public class OpenDebtsPageCtrl {
             for (Participant p : e.getExpenseParticipants()) {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
                 map.put(p.getName(), map.get(p.getName()) + cost);
-                if(!e.getExpenseAuthor().equals(p))
+                if (!e.getExpenseAuthor().equals(p))
                     debtMap.put(Map.entry(e.getExpenseAuthor(), p), cost);
             }
             sum += e.getAmount();
@@ -95,7 +96,7 @@ public class OpenDebtsPageCtrl {
         populateExpense(selectedParticipantName);
 
         includingChoiceBox.setOnAction(e -> {
-            if(includingChoiceBox.getSelectionModel().getSelectedItem() != null)
+            if (includingChoiceBox.getSelectionModel().getSelectedItem() != null)
                 selectedParticipantName = includingChoiceBox.getSelectionModel().getSelectedItem();
             populateExpense(selectedParticipantName);
         });
@@ -116,24 +117,34 @@ public class OpenDebtsPageCtrl {
     }
 
     public void populateExpense(String name) {
-        Participant participant = null;
+        final String template = "OpenDebtsListItem.template";
         boolean flag = false;
         for (Participant p : event.getParticipants()) {
             if (p.getName().equals(name)) {
                 flag = true;
-                participant = p;
                 break;
             }
         }
         allDebtsPane.getChildren().clear();
-        for (Map.Entry<Participant, Participant> m : participantToParticipantMap.keySet()) {
-            if (!flag || m.getKey().equals(participant) || m.getValue().equals(participant)) {
-                allDebtsPane.getChildren().add(new OpenDebtsListItem(
-                        "OpenDebtsListItem.template", m.getKey(),
-                        m.getValue(),
-                        participantToParticipantMap.get(m),
-                        languageConf));
-            }
+        if (!flag) {
+            event.getTransactions().stream().distinct().forEach(
+                    x -> allDebtsPane.getChildren().add(
+                            new OpenDebtsListItem(
+                                    template,
+                                    x.getGiver(),
+                                    x.getReceiver(),
+                                    x.getAmount(),
+                                    languageConf)));
+        } else {
+            event.getTransactions().stream().distinct().filter(
+                    x -> x.getGiver().getName().equals(name)).forEach(
+                    x -> allDebtsPane.getChildren().add(
+                            new OpenDebtsListItem(
+                                    template,
+                                    x.getGiver(),
+                                    x.getReceiver(),
+                                    x.getAmount(),
+                                    languageConf)));
         }
     }
 
