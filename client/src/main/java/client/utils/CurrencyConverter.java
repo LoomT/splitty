@@ -141,7 +141,7 @@ public class CurrencyConverter {
      * @param month string value representing a month
      * @return the int value of the month derived from string value
      */
-    private int toMonth(String month) {
+    public static int toMonth(String month) {
         return switch (month) {
             case "Jan" -> Calendar.JANUARY;
             case "Feb" -> Calendar.FEBRUARY;
