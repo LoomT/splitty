@@ -4,7 +4,10 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
-import commons.*;
+import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -309,7 +312,11 @@ public class EventPageCtrl {
                 removeButton.setOnAction(event -> {
                     int index = getIndex();
                     Expense expense = expenses.get(index);
-                    server.deleteExpense(expense.getId(), ev.getId());
+                    try {
+                        server.deleteExpense(expense.getId(), ev.getId());
+                    } catch (ConnectException e) {
+                        mainCtrl.handleServerNotFound();
+                    }
                 });
             }
             @Override
