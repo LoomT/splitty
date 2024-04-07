@@ -145,6 +145,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void showAdminLogin() {
         primaryStage.setTitle(languageConf.get("AdminLogin.title"));
+        adminLoginCtrl.display();
         primaryStage.setScene(adminLogin);
     }
 
