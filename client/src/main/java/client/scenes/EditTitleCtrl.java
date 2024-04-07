@@ -118,4 +118,13 @@ public class EditTitleCtrl implements EditEventTitleInterface {
             errorMessage.setVisible(textField.getLength() > limit);
         });
     }
+
+    /**
+     * Sets the eventPageCtrl
+     *
+     * @param eventPageCtrl eventPageCtrl linked to the event
+     */
+    public void setEventPageCtrl(EventPageCtrl eventPageCtrl) {
+        this.eventPageCtrl = eventPageCtrl;
+    }
 }

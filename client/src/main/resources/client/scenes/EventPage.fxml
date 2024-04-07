@@ -14,7 +14,7 @@
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <Button layoutX="331.0" layoutY="21.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
+            <Button fx:id="editTitleButton" layoutX="331.0" layoutY="21.0" mnemonicParsing="false" onAction="#changeTitle" text="%EventPage.editEventTitle" />
             <Label fx:id="inviteCode" layoutX="439.0" layoutY="16.0" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
                <cursor>
                   <Cursor fx:constant="HAND" />
