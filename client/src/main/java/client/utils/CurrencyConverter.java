@@ -3,6 +3,7 @@ package client.utils;
 import com.google.inject.Inject;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.util.*;
 
 /**
@@ -121,7 +122,14 @@ public class CurrencyConverter {
                 break;
             }
         }
-        if(temp.isEmpty()){return server.getExchangeRates(null);}
+        if(temp.isEmpty()) {
+            try {
+                return server.getExchangeRates(null);
+            } catch (ConnectException e) {
+                //TODO should perhaps use the mainCtrl.handleServerNotFound() method
+                throw new RuntimeException(e);
+            }
+        }
         assert date != null;
         String[] array = date.split(" ");
         int month = toMonth(array[1]);
@@ -134,7 +142,12 @@ public class CurrencyConverter {
 
         Calendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
         //pass along last fetched file to serverUtils
-        return server.getExchangeRates(calendar);
+        try {
+            return server.getExchangeRates(calendar);
+        } catch (ConnectException e) {
+            //TODO should perhaps use the mainCtrl.handleServerNotFound() method
+            throw new RuntimeException(e);
+        }
     }
 
     /**
