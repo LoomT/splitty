@@ -3,6 +3,7 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static commons.WebsocketActions.ADD_TAG;
 
 public class AddExpenseCtrl {
 
@@ -65,8 +68,9 @@ public class AddExpenseCtrl {
     @FXML
     private Button addTag;
 
-    private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
+    private final ServerUtils server;
+    private final Websocket websocket;
     private final LanguageConf languageConf;
 
     /**
@@ -76,12 +80,14 @@ public class AddExpenseCtrl {
      */
     @Inject
     public AddExpenseCtrl(
-            ServerUtils server,
             MainCtrlInterface mainCtrl,
+            ServerUtils server,
+            Websocket websocket,
             LanguageConf languageConf
     ) {
-        this.server = server;
         this.mainCtrl = mainCtrl;
+        this.server = server;
+        this.websocket = websocket;
         this.languageConf = languageConf;
     }
 
@@ -394,6 +400,13 @@ public class AddExpenseCtrl {
         }
         type.setCellFactory(createTypeListCellFactory(ev));
         type.setButtonCell(createTypeListCell(ev));
+        websocket.on(ADD_TAG, tag -> {
+            String typeName = ((Tag) tag).getName();
+            if (!type.getItems().contains(typeName)) {
+                type.getItems().add(typeName);
+            }
+        });
+
     }
 
     private Callback<ListView<String>, ListCell<String>> createTypeListCellFactory(Event ev) {

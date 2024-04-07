@@ -241,12 +241,13 @@ public class MainCtrl implements MainCtrlInterface{
      */
     @Override
     public void showAddTagPage(Event event) {
-        addTagCtrl.displayAddTagPage(event);
-        primaryStage.setTitle(languageConf.get("AddTag.addtag"));
-        primaryStage.setScene(addTag);
-        primaryStage.setResizable(false);
-        primaryStage.initModality(Modality.APPLICATION_MODAL);
-        primaryStage.show();
+        Stage stage = new Stage();
+        addTagCtrl.displayAddTagPage(event, stage);
+        stage.setTitle(languageConf.get("AddTag.addtag"));
+        stage.setScene(addTag);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     /**
@@ -270,7 +271,6 @@ public class MainCtrl implements MainCtrlInterface{
                 atZone(ZoneId.systemDefault()).toLocalDate());
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
-
     }
 
     /**
