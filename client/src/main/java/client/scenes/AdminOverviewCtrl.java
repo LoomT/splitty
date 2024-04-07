@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.EventListItemAdmin;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -26,7 +27,7 @@ import java.util.List;
 public class AdminOverviewCtrl {
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
 
     private final UserConfig userConfig;
     private File initialDirectory;
@@ -57,7 +58,7 @@ public class AdminOverviewCtrl {
     @Inject
     public AdminOverviewCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             UserConfig userConfig,
             LanguageConf languageConf
     ) {

@@ -1,16 +1,20 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.*;
+import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import client.utils.UserConfig;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.beans.binding.Bindings;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
@@ -21,7 +25,7 @@ import java.util.List;
 public class StartScreenCtrl {
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
 
     @FXML
@@ -57,7 +61,7 @@ public class StartScreenCtrl {
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             UserConfig userConfig,
             Websocket websocket
@@ -164,7 +168,6 @@ public class StartScreenCtrl {
      * Creates and joins the event with provided title
      */
     public void create() {
-        websocket.resetAllActions();
         String token;
         if (title.getText().isEmpty()){
             System.out.println("Empty Title Error");
@@ -192,7 +195,6 @@ public class StartScreenCtrl {
      * Tries to join the inputted event
      */
     public void join() {
-        websocket.resetAllActions();
         String token;
         if (code.getText().isEmpty()){
             token = "StartScreen.joinEmptyToken";

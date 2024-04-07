@@ -1,12 +1,15 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.ExpenseItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
-import commons.*;
 import commons.Event;
+import commons.Expense;
+import commons.Participant;
+import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static commons.WebsocketActions.ADD_TAG;
+import static commons.WebsocketActions.TITLE_CHANGE;
 
 
 public class EventPageCtrl {
@@ -69,7 +73,7 @@ public class EventPageCtrl {
     private int selectedParticipantId;
 
     private final Websocket websocket;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
     private Event event;
@@ -89,17 +93,16 @@ public class EventPageCtrl {
      */
     @Inject
     public EventPageCtrl(
-            MainCtrl mainCtrl,
-            LanguageConf languageConf,
-            Websocket websocket,
-            ServerUtils server
+            MainCtrlInterface mainCtrl,
+        LanguageConf languageConf,
+        Websocket websocket,
+        ServerUtils server
     ) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
 
         this.server = server;
         this.websocket = websocket;
-        websocket.on(WebsocketActions.TITLE_CHANGE, (newTitle) -> changeTitle((String) newTitle));
     }
 
     /**
@@ -111,8 +114,6 @@ public class EventPageCtrl {
         this.event = e;
         eventTitle.setText(e.getTitle());
         editTitleButton.setText("\uD83D\uDD89");
-        mainCtrl.updateEditTitle(e.getTitle());
-        mainCtrl.updateEditParticipantsPage(e);
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
@@ -159,6 +160,16 @@ public class EventPageCtrl {
         ft.setToValue(0);
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> copiedToClipboardMsg.setVisible(false));
+
+        websocket.on(TITLE_CHANGE, title -> {
+            event.setTitle(((String) title));
+            eventTitle.setText(event.getTitle());
+        });
+        websocket.on(ADD_TAG, tag -> {
+            if (!event.getTags().contains((Tag) tag)) {
+                event.getTags().add((Tag) tag);
+            }
+        });
     }
 
     /**
@@ -177,16 +188,6 @@ public class EventPageCtrl {
                 this::updateExpenses,
                 this::updateExpenses
         );
-        websocket.registerEventChangeListener(
-                event,
-                this::displayEvent
-        );
-        websocket.on(ADD_TAG, tag -> {
-            if (!event.getTags().contains((Tag) tag)) {
-                event.getTags().add((Tag) tag);
-            }
-
-        });
     }
 
 
@@ -225,20 +226,6 @@ public class EventPageCtrl {
     public void updateExpenses(Event e) {
         event = e;
         populateExpenses();
-    }
-
-
-    /**
-     * Changes the title of the event
-     *
-     * @param newTitle new title of the event
-     * @return 204 if successful, 400 if there is a problem with input, 404 if event cannot be found
-     */
-    public int changeTitle(String newTitle) {
-        event.setTitle(newTitle);
-        eventTitle.setText(newTitle);
-        return server.updateEventTitle(event);
-
     }
 
     /**

@@ -1,19 +1,23 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Tag;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 
 import java.util.List;
 
 public class AddTagCtrl {
 
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
     private final LanguageConf languageConf;
 
@@ -37,7 +41,7 @@ public class AddTagCtrl {
      * @param languageConf language config
      */
     @Inject
-    public AddTagCtrl(MainCtrl mainCtrl, ServerUtils server,
+    public AddTagCtrl(MainCtrlInterface mainCtrl, ServerUtils server,
                                     LanguageConf languageConf) {
         this.mainCtrl = mainCtrl;
         this.server = server;
