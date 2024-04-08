@@ -75,7 +75,6 @@ public class AddExpenseCtrl {
     private final ServerUtils server;
     private final Websocket websocket;
     private final LanguageConf languageConf;
-    private Tag tag = new Tag(null, null);
 
     /**
      * @param mainCtrl main control instance
@@ -127,6 +126,9 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+//        if (!event.getTags().contains(noneTag)) {
+//            event.getTags().addFirst(noneTag);
+//        }
         warningLabel.setVisible(false);
         blockDate();
         setupDateListener();
@@ -402,22 +404,18 @@ public class AddExpenseCtrl {
      * @param ev the current event
      */
     public void populateTypeBox(Event ev) {
-//        if (type.getItems().getFirst().getName().equals("food")) {
-//            type.getItems().addFirst(new Tag(null, null));
-//        }
         setupTypeComboBox(ev);
     }
 
     private void setupTypeComboBox(Event ev) {
         type.getItems().clear();
-        type.getItems().add(null);
         for (Tag tag : ev.getTags()) {
             type.getItems().add(tag);
         }
         type.setCellFactory(createTypeListCellFactory(ev));
         type.setButtonCell(createTypeListCell(ev));
+        type.getItems().add(0, null);
         websocket.on(ADD_TAG, tag -> {
-            //String typeName = ((Tag) tag).getName();
             if (!type.getItems().contains((Tag) tag)) {
                 type.getItems().add((Tag) tag);
             }
@@ -431,16 +429,19 @@ public class AddExpenseCtrl {
             protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
-                    Tag tag = findTagByName(item.getId(), ev.getTags());
+                    Tag tag = findTagById(item.getId(), ev.getTags());
                     if (tag != null) {
                         Label label = createLabelWithColor(item.getName(),
                                 hexToColor(tag.getColor()));
                         label.setUserData(tag.getId());
                         setGraphic(label);
+                    } else {
+                        setText(item.getName());
+                        setGraphic(null);
                     }
                 } else {
-                    setText(null);
-                    setGraphic(null);
+                    Label noneLabel = new Label("None");
+                    setGraphic(noneLabel);
                 }
             }
         };
@@ -452,16 +453,21 @@ public class AddExpenseCtrl {
             protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
-                    Tag tag = findTagByName(item.getId(), ev.getTags());
-                    if (tag != null) {
-                        Label label = createLabelWithColor(item.getName(),
-                                hexToColor(tag.getColor()));
-                        label.setUserData(tag.getId());
-                        setGraphic(label);
+                    if (item.getName().equals("None")) {
+                        setText(item.getName());
+                        setGraphic(null);
+                    } else {
+                        Tag tag = findTagById(item.getId(), ev.getTags());
+                        if (tag != null) {
+                            Label label = createLabelWithColor(item.getName(),
+                                    hexToColor(tag.getColor()));
+                            label.setUserData(tag.getId());
+                            setGraphic(label);
+                        }
                     }
                 } else {
-                    setText(null);
-                    setGraphic(null);
+                    Label noneLabel = new Label("None");
+                    setGraphic(noneLabel);
                 }
             }
         };
@@ -478,7 +484,7 @@ public class AddExpenseCtrl {
         return label;
     }
 
-    private Tag findTagByName(long id, List<Tag> tags) {
+    private Tag findTagById(long id, List<Tag> tags) {
         for (Tag tag : tags) {
             if (tag.getId() == id) {
                 return tag;
