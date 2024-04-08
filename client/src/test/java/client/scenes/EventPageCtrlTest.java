@@ -7,6 +7,7 @@ import client.utils.Websocket;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -83,8 +84,9 @@ public class EventPageCtrlTest {
 
     @Test
     public void createExpensesTest(FxRobot robot) {
+        Tag tag = new Tag("food", "#00FF00");
         Participant p = new Participant("name");
-        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), tag);
         Event e = new Event("test", List.of(p), List.of(ex));
         Platform.runLater(
                 () -> {
@@ -97,8 +99,9 @@ public class EventPageCtrlTest {
 
     @Test
     public void toStringText(FxRobot robot) throws ParseException {
+        Tag tag = new Tag("food", "#00FF00");
         Participant p = new Participant("name");
-        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), tag);
         ex.setDate(new SimpleDateFormat("MM/dd/yy").parse("01/02/2024"));
         Event e = new Event("test", List.of(p), List.of(ex));
         Platform.runLater(
@@ -119,8 +122,9 @@ public class EventPageCtrlTest {
 
     @Test
     public void getExpensesFromTest(FxRobot robot) {
+        Tag tag = new Tag("food", "#00FF00");
         Participant p = new Participant("name");
-        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), tag);
         Event e = new Event("test", List.of(p), List.of(ex));
 
         assertEquals(List.of(ex), ctrl.getExpensesFrom(e, "name"));
@@ -129,9 +133,10 @@ public class EventPageCtrlTest {
 
     @Test
     public void getExpensesIncludingTest(FxRobot robot) {
+        Tag tag = new Tag("food", "#00FF00");
         Participant p = new Participant("name");
         Participant p2 = new Participant("name2");
-        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), tag);
         Event e = new Event("test", List.of(p, p2), List.of(ex));
 
         assertEquals(List.of(), ctrl.getExpensesIncluding(e, "name2"));

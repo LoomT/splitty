@@ -112,6 +112,7 @@ public class EventPageCtrl {
      * @param e the event to be shown
      */
     public void displayEvent(Event e) {
+        System.out.println("\n\n\n" + e.getExpenses().size() + "\n\n\n");
         this.event = e;
         eventTitle.setText(e.getTitle());
         editTitleButton.setText("\uD83D\uDD89");

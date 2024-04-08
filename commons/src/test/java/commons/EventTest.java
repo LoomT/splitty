@@ -148,20 +148,22 @@ public class EventTest {
 
     @Test
     void addingExpenseTest() {
+        Tag tag = new Tag("test", "FF0000");
         Participant author = new Participant("test", "test");
         Expense expense  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
+                new ArrayList<>(), tag);
         event.addExpense(expense);
         assertEquals(event.getExpenses().getFirst(), expense);
     }
 
     @Test
     void settingExpenseTest(){
+        Tag tag = new Tag("test", "FF0000");
         List<Expense> testList = new ArrayList<>();
         Participant author = new Participant("test", "test");
         for(int i = 0; i<4; i++){
             testList.add(new Expense(author, "test" + i, 2.0, "EUR",
-                    new ArrayList<>(), "test" + i));
+                    new ArrayList<>(), tag));
         }
         Event event1 = new Event("title", null, null);
         event1.setExpenses(testList);
@@ -171,9 +173,10 @@ public class EventTest {
 
     @Test
     void testExpenseParticipant() {
+        Tag tag = new Tag("test", "FF0000");
         Participant author = new Participant("test", "test");
         Expense expense  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
+                new ArrayList<>(), tag);
         event.addExpense(expense);
         assertTrue(event.deleteExpense(expense));
         assertFalse(event.getExpenses().contains(expense));
@@ -181,20 +184,22 @@ public class EventTest {
 
     @Test
     void testDeleteNothing() {
+        Tag tag = new Tag("test", "FF0000");
         Participant author = new Participant("test", "test");
         Expense expense  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
+                new ArrayList<>(), tag);
         assertFalse(event.deleteExpense(expense));
         assertFalse(event.getExpenses().contains(expense));
     }
 
     @Test
     void testParticipantList() {
+        Tag tag = new Tag("test", "FF0000");
         Participant author = new Participant("test", "test");
         Expense expense1  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
+                new ArrayList<>(), tag);
         Expense expense2  = new Expense(author, "test", 2.0, "EUR",
-                new ArrayList<>(), "test");
+                new ArrayList<>(), tag);
         event.addExpense(expense1);
         event.addExpense(expense2);
         event.deleteExpense(expense1);
