@@ -16,7 +16,7 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
-    private TestWebsocket websocket;
+    private final TestWebsocket websocket;
     private boolean polled;
 
     /**
@@ -506,12 +506,18 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * Has an up to 5% variance for different dates
      * @return mocked version of exchange rate api
      */
     @Override
     public Map<String, Double> getExchangeRates(String date){
         calls.add("getExchangeRates");
-        //string to mimic real api response from openExchangeRates so all the methods work correctly
-        return Map.of("USD", 1d, "EUR", 2d, "JPY", 100d);
+        int count = 0;
+        Map<String, Double> map = new HashMap<>(Map.of(
+                "USD", 1d, "EUR", 2d, "JPY", 100d, "GBP", 1.5d, "CHF", 0.9d));
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            entry.setValue(entry.getValue() * (((double) Objects.hash(date, count++) / Integer.MAX_VALUE) / 20d + 1));
+        }
+        return map;
     }
 }
