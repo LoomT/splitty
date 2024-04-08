@@ -3,7 +3,9 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.UserConfig;
 import client.utils.Websocket;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -75,24 +77,32 @@ public class AddExpenseCtrl {
     private final ServerUtils server;
     private final Websocket websocket;
     private final LanguageConf languageConf;
+    private final CurrencyConverter converter;
+    private final UserConfig userConfig;
 
     /**
      * @param mainCtrl main control instance
      * @param server   server utils instance
      * @param websocket websocket client
      * @param languageConf language config
+     * @param converter currency converter
+     * @param userConfig user config
      */
     @Inject
     public AddExpenseCtrl(
             MainCtrlInterface mainCtrl,
             ServerUtils server,
             Websocket websocket,
-            LanguageConf languageConf
+            LanguageConf languageConf,
+            CurrencyConverter converter,
+            UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
         this.websocket = websocket;
         this.languageConf = languageConf;
+        this.converter = converter;
+        this.userConfig = userConfig;
     }
 
     /**
@@ -291,13 +301,12 @@ public class AddExpenseCtrl {
      * Fill the choices with currency.
      */
     public void populateCurrencyChoiceBox() {
-        List<String> currencies = new ArrayList<>();
-        currencies.add("USD");
-        currencies.add("EUR");
-        currencies.add("GBP");
-        currencies.add("JPY");
         currency.getItems().clear();
+        List<String> currencies = converter.getCurrencies();
         currency.getItems().addAll(currencies);
+        String cur = userConfig.getCurrency();
+        if(!cur.equals("None"))
+            currency.setValue(cur);
     }
 
 
@@ -331,6 +340,10 @@ public class AddExpenseCtrl {
         }
         try {
             List<Participant> participants = getExpenseParticipants(ev);
+            if(participants.isEmpty()) {
+                alertSelectPart();
+                return null;
+            }
             double expAmount = Double.parseDouble(amount.getText());
             if(expAmount <= 0) throw new NumberFormatException();
 
@@ -520,16 +533,6 @@ public class AddExpenseCtrl {
             CheckBox checkBox = new CheckBox(participant.getName());
             checkBox.getStyleClass().add("textFont");
             checkBox.setStyle("-fx-label-padding: 0 10 0 3");
-//            checkBox.setOnAction(e -> {
-//                if (checkBox.isSelected()) {
-//                    expPart.add(participant);
-//                    selectedPart.getAndIncrement();
-//                } else {
-//                    expPart.remove(participant);
-//                    selectedPart.getAndDecrement();
-//                }
-//                //updateEqualSplitCheckbox();
-//            });
 
             expenseParticipants.getChildren().add(checkBox);
         }
