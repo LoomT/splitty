@@ -320,6 +320,14 @@ public class MainCtrl {
     }
 
     /**
+     * Updates the event page
+     * @param eventToShow the event to show the open debts for
+     */
+    public void updateOpenDebtsPage(Event eventToShow) {
+        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+    }
+
+    /**
      * Display a window for adding a custom transaction
      * @param event event to load
      */

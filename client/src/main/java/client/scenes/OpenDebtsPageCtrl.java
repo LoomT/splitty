@@ -3,10 +3,8 @@ package client.scenes;
 import client.components.OpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.Transaction;
+import client.utils.Websocket;
+import commons.*;
 import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
@@ -34,6 +32,7 @@ public class OpenDebtsPageCtrl {
 
     @FXML
     private ChoiceBox<String> includingChoiceBox;
+
     private final LanguageConf languageConf;
     private String selectedParticipantName;
     private Event event;
@@ -42,24 +41,29 @@ public class OpenDebtsPageCtrl {
     private Map<String, Double> participantDebtMap = new HashMap<>();
     private Map<Map.Entry<Participant, Participant>, Double>
             partToPartMap = new HashMap<>();
+    private Websocket websocket;
 
 
     /**
      * Constructor
      *
-     * @param serverUtils the server utils
-     * @param mainCtrl    the main controller
+     * @param serverUtils  the server utils
+     * @param mainCtrl     the main controller
+     * @param languageConf language conf of the user
+     * @param websocket    websocket
      */
     @Inject
     public OpenDebtsPageCtrl(
             ServerUtils serverUtils,
             MainCtrl mainCtrl,
-            LanguageConf languageConf
+            LanguageConf languageConf,
+            Websocket websocket
     ) {
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.selectedParticipantName = languageConf.get("OpenDebtsPage.allParticipants");
+        this.websocket = websocket;
     }
 
     /**
@@ -88,7 +92,7 @@ public class OpenDebtsPageCtrl {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
                 map.put(p.getName(), map.get(p.getName()) + cost);
                 if (e.getExpenseAuthor().equals(p)) continue;
-                if(!debtMap.containsKey(Map.entry(e.getExpenseAuthor(), p))){
+                if (!debtMap.containsKey(Map.entry(e.getExpenseAuthor(), p))) {
                     debtMap.put(Map.entry(e.getExpenseAuthor(), p), 0.0);
                 }
                 debtMap.put(Map.entry(e.getExpenseAuthor(), p),
@@ -136,7 +140,7 @@ public class OpenDebtsPageCtrl {
         for (Map.Entry<Participant, Participant> m : partToPartMap.keySet()) {
 
             double cost = partToPartMap.get(m) - event.getTransactions().stream().filter(
-                    x -> x.getGiver().equals(m.getValue()) && x.getReceiver().equals(m.getKey())).
+                            x -> x.getGiver().equals(m.getValue()) && x.getReceiver().equals(m.getKey())).
                     mapToDouble(Transaction::getAmount).sum();
 
             if (!flag || m.getKey().equals(participant) || m.getValue().equals(participant)) {

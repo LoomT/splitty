@@ -184,9 +184,12 @@ public class EventPageCtrl {
                 this::displayEvent
         );
         websocket.on(WebsocketActions.ADD_TRANSACTION,
-                transaction -> event.addTransaction((Transaction) transaction));
+                transaction -> {event.addTransaction((Transaction) transaction);
+                mainCtrl.updateOpenDebtsPage(event);});
+
         websocket.on(WebsocketActions.REMOVE_TRANSACTION,
-                id -> event.getTransactions().removeIf(t -> t.getId() == (Long) id));
+                id -> {event.getTransactions().removeIf(t -> t.getId() == (Long) id);
+                mainCtrl.updateOpenDebtsPage(event);});
     }
 
 
