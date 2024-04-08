@@ -117,7 +117,7 @@ public class AddExpenseCtrl {
             }
         }));
 
-        lengthListener(purpose, warningLabel, 30, languageConf.get("AddExp.charLimit"));
+        lengthListener(purpose, warningLabel, 20, languageConf.get("AddExp.charLimit"));
     }
 
     /**
