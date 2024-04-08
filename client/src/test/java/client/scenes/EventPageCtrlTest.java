@@ -48,7 +48,7 @@ public class EventPageCtrlTest {
                 recentEventCodes="""));
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
+        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,

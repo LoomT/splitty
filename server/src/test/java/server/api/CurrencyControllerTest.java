@@ -1,17 +1,16 @@
 package server.api;
 
-import org.apache.catalina.connector.Response;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CurrencyControllerTest {
 
@@ -26,5 +25,6 @@ class CurrencyControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         Map<String, Double> rates = response.getBody();
         assertNotNull(rates);
+        System.out.println(rates.keySet());
     }
 }
