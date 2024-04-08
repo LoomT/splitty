@@ -42,6 +42,7 @@ public class CurrencyController {
             Map<String, Object> rates = (Map<String, Object>) map.get("rates");
             Map<String, Double> fixedRates = new HashMap<>();
             for(Map.Entry<String, Object> entry : rates.entrySet()){
+                if(entry.getKey().equals("BTC")) continue;
                 fixedRates.put(entry.getKey(), Double.valueOf(String.valueOf(entry.getValue())));
             }
             return ResponseEntity.ok(fixedRates);
