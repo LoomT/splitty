@@ -16,7 +16,7 @@ public class OpenDebtsListItem extends HBox {
     @FXML
     private Label participantLabel;
 
-    public OpenDebtsListItem(String template, Participant lender,
+    public OpenDebtsListItem(Participant lender,
                              Participant debtor,
                              double amount,
                              LanguageConf languageConf) {
@@ -33,7 +33,7 @@ public class OpenDebtsListItem extends HBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-        template = languageConf.get(template);
+        String template = languageConf.get("OpenDebtsListItem.template");
         String text = String.format(template, debtor.getName(), lender.getName(), amount);
         participantLabel.setText(text);
     }

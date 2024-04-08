@@ -39,7 +39,7 @@ public class OpenDebtsPageCtrl {
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
-    private Map<Map.Entry<Participant, Participant>, Double>
+    private Map<Participant, Map<Participant, Double>>
             partToPartMap = new HashMap<>();
     private Websocket websocket;
 
@@ -75,7 +75,7 @@ public class OpenDebtsPageCtrl {
 
         this.event = event;
         Map<String, Double> map = new HashMap<>();
-        Map<Map.Entry<Participant, Participant>, Double> debtMap = new HashMap<>();
+        Map<Participant, Map<Participant, Double>> debtMap = new HashMap<>();
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
         double sum = 0;
 
@@ -92,11 +92,11 @@ public class OpenDebtsPageCtrl {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
                 map.put(p.getName(), map.get(p.getName()) + cost);
                 if (e.getExpenseAuthor().equals(p)) continue;
-                if (!debtMap.containsKey(Map.entry(e.getExpenseAuthor(), p))) {
-                    debtMap.put(Map.entry(e.getExpenseAuthor(), p), 0.0);
-                }
-                debtMap.put(Map.entry(e.getExpenseAuthor(), p),
-                        cost + debtMap.get(Map.entry(e.getExpenseAuthor(), p)));
+
+                debtMap.putIfAbsent(e.getExpenseAuthor(), new HashMap<>());
+                Map<Participant, Double> temp = debtMap.get(e.getExpenseAuthor());
+                temp.putIfAbsent(p, 0.0);
+                temp.put(p, temp.get(p) + cost);
             }
             sum += e.getAmount();
         }
@@ -137,21 +137,44 @@ public class OpenDebtsPageCtrl {
             }
         }
         allDebtsPane.getChildren().clear();
-        for (Map.Entry<Participant, Participant> m : partToPartMap.keySet()) {
+        for (Participant receiver : partToPartMap.keySet()) {
+            for(Participant giver : partToPartMap.get(receiver).keySet()){
+                double cost = partToPartMap.get(receiver).get(giver) - event.getTransactions().stream()
+                        .filter(x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver)).
+                        mapToDouble(Transaction::getAmount).sum();
+                if (cost == 0
+                        || (flag
+                        && giver.equals(participant)
+                        && receiver.equals(participant))) {
+                    continue;
+                }
+                if(partToPartMap.get(giver) == null || partToPartMap.get(giver).get(receiver) == null){
+                    allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
+                            giver, cost, languageConf));
+                }
+                else if(partToPartMap.get(receiver).get(giver) - partToPartMap.get(giver).get(receiver) > 0){
+                    cost =  partToPartMap.get(receiver).get(giver) - partToPartMap.get(giver).get(receiver);
+                    allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
+                            giver, cost, languageConf));
+                }
 
-            double cost = partToPartMap.get(m) - event.getTransactions().stream().filter(
-                            x -> x.getGiver().equals(m.getValue()) && x.getReceiver().equals(m.getKey())).
-                    mapToDouble(Transaction::getAmount).sum();
+            }
+        }
+    }
 
-            if (!flag || m.getKey().equals(participant) || m.getValue().equals(participant)) {
-                allDebtsPane.getChildren().add(new OpenDebtsListItem(
+    /*
+
+    if(cost != 0
+                    && (!flag
+                    || m.getKey().equals(participant)
+                    || m.getValue().equals(participant)))
+
+    allDebtsPane.getChildren().add(new OpenDebtsListItem(
                         "OpenDebtsListItem.template", m.getKey(),
                         m.getValue(),
                         cost,
                         languageConf));
-            }
-        }
-    }
+     */
 
 
     /**
