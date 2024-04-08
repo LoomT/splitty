@@ -90,7 +90,6 @@ public class EditTitleCtrlTest {
     @Test
     public void testInitializeAndDisplayEditEventTitle(FxRobot robot) {
         Platform.runLater(() -> {
-            ctrl.initialize();
             ctrl.displayEditEventTitle(event, stage);
             assertEquals(event.getTitle(), robot.lookup("#eventTitle").queryAs(Text.class).getText());
             assertFalse(robot.lookup("#warningLabel").queryAs(Label.class).isVisible());
@@ -104,7 +103,6 @@ public class EditTitleCtrlTest {
     @Test
     public void testSaveButton(FxRobot robot) {
         Platform.runLater(() -> {
-            ctrl.initialize();
             ctrl.displayEditEventTitle(event, stage);
             robot.lookup("#nameTextField").queryAs(TextField.class).setText("newTitle");
             robot.clickOn("#saveButton");
@@ -123,7 +121,6 @@ public class EditTitleCtrlTest {
         Platform.runLater(() -> {
             server.getCalls().clear();
             websocket.resetTriggers();
-            ctrl.initialize();
             ctrl.displayEditEventTitle(event, stage);
             robot.lookup("#nameTextField").queryAs(TextField.class).setText("newTitle");
             robot.clickOn("#cancelButton");
@@ -143,7 +140,6 @@ public class EditTitleCtrlTest {
         Platform.runLater(() -> {
             server.getCalls().clear();
             websocket.resetTriggers();
-            ctrl.initialize();
             ctrl.displayEditEventTitle(event, stage);
             robot.clickOn("#saveButton");
         });
@@ -160,7 +156,6 @@ public class EditTitleCtrlTest {
         Platform.runLater(() -> {
             server.getCalls().clear();
             websocket.resetTriggers();
-            ctrl.initialize();
             ctrl.displayEditEventTitle(event, stage);
             String longTitle = "thisTitleIsLongerThan30Characters";
             robot.lookup("#nameTextField").queryAs(TextField.class).setText(longTitle);
