@@ -5,9 +5,7 @@ import client.MyFXML;
 import client.TestMainCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
+import commons.*;
 import commons.Tag;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +22,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import utils.TestIO;
 import utils.TestServerUtils;
+import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -44,12 +43,18 @@ public class AddExpenseCtrlTest {
 
     Scene scene;
 
+    TestWebsocket websocket;
+
     Event event;
+
+    Stage stage;
 
 
     @Start
     public void start(Stage stage) throws IOException {
-        server = new TestServerUtils();
+        this.stage = stage;
+        websocket = new TestWebsocket();
+        server = new TestServerUtils(websocket);
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=http://localhost:8080/
                 lang=en
@@ -60,17 +65,24 @@ public class AddExpenseCtrlTest {
         var addExpenseLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AddExpense.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new AddExpenseCtrl(server, mainCtrl, languageConf),
+                (type) -> new AddExpenseCtrl(mainCtrl,server, websocket, languageConf),
                 StandardCharsets.UTF_8);
         scene = new Scene(addExpenseLoader.load());
         ctrl = addExpenseLoader.getController();
 
         this.event = new Event("test");
-        event.addParticipant(new Participant("test"));
-        event.addParticipant(new Participant("test2"));
-        List<Tag> eventTags = List.of(new Tag("food", "FF0000"), new Tag("drinks", "0000ff"));
-        event.setTags(eventTags);
-        server.createEvent(event);
+        event = server.createEvent(event);
+        Participant p1 = new Participant("test");
+        Participant p2 = new Participant("test2");
+        server.createParticipant(event.getId(), p1);
+        server.createParticipant(event.getId(), p2);
+        Tag t1 = new Tag("food", "FF0000");
+        Tag t2 = new Tag("drinks", "0000ff");
+        server.addTag(event.getId(), t1);
+        server.addTag(event.getId(), t2);
+        event = server.getEvent(event.getId());
+        event.setTags(List.of(t1, t2));
+
 
 
         stage.setScene(scene);
@@ -94,19 +106,15 @@ public class AddExpenseCtrlTest {
         Platform.runLater(() -> {
 
             ctrl.displayAddExpensePage(event, null);
-
-            assertNotNull(robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class), "Expense Author ChoiceBox should not be null.");
-            assertNotNull(robot.lookup("#purpose").queryAs(TextField.class), "Purpose TextField should not be null.");
-            assertNotNull(robot.lookup("#amount").queryAs(TextField.class), "Amount TextField should not be null.");
-            assertNotNull(robot.lookup("#currency").queryAs(ChoiceBox.class), "Currency ChoiceBox should not be null.");
-            assertNotNull(robot.lookup("#date").queryAs(DatePicker.class), "Date DatePicker should not be null.");
-            assertNotNull(robot.lookup("#type").queryAs(ComboBox.class), "Type ComboBox should not be null.");
-            assertNotNull(robot.lookup("#equalSplit").query(), "Equal Split CheckBox should not be null.");
-            assertNotNull(robot.lookup("#partialSplit").query(), "Partial Split CheckBox should not be null.");
-            assertNotNull(robot.lookup("#expenseParticipants").query(), "Expense Participants TextFlow should not be null.");
-            assertNotNull(robot.lookup("#addTag").queryAs(Button.class), "Add Tag Button should not be null.");
-            assertNotNull(robot.lookup("#add").queryAs(Button.class), "Add Button should not be null.");
-            assertNotNull(robot.lookup("#abort").queryAs(Button.class), "Abort Button should not be null.");
+            assertFalse(robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getItems().isEmpty());
+            assertTrue(robot.lookup("#purpose").queryAs(TextField.class).getText().isEmpty());
+            assertTrue(robot.lookup("#amount").queryAs(TextField.class).getText().isEmpty());
+            assertFalse(robot.lookup("#currency").queryAs(ChoiceBox.class).getItems().isEmpty());
+            assertFalse(robot.lookup("#date").queryAs(DatePicker.class).getValue().toString().isEmpty());
+            assertFalse(robot.lookup("#type").queryAs(ComboBox.class).getItems().isEmpty());
+            assertFalse(robot.lookup("#expenseParticipants").queryAs(TextFlow.class).getChildren().isEmpty());
+            assertFalse(robot.lookup("#partialSplit").queryAs(CheckBox.class).isSelected());
+            assertFalse(robot.lookup("#equalSplit").queryAs(CheckBox.class).isSelected());
         });
         waitForFxEvents();
     }
@@ -117,12 +125,10 @@ public class AddExpenseCtrlTest {
         AddExpenseCtrl spyCtrl = Mockito.spy(ctrl);
 
         Platform.runLater(() -> {
-
             spyCtrl.displayAddExpensePage(event, null);
             robot.clickOn("#add");
-
-
         });
+
         waitForFxEvents();
         Mockito.verify(spyCtrl, Mockito.times(1)).alertAllFields();
 
@@ -130,8 +136,11 @@ public class AddExpenseCtrlTest {
 
     @Test
     @Order(3)
-    public void handelAddButtonTest(FxRobot robot) {
+    public void handleAddButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
+            server.getCalls().clear();
+            server.getStatuses().clear();
+            websocket.resetTriggers();
             ctrl.displayAddExpensePage(event, null);
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
@@ -139,18 +148,22 @@ public class AddExpenseCtrlTest {
             robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
             robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
-            robot.clickOn("#equalSplit");
+            robot.lookup("#equalSplit").queryAs(CheckBox.class).setSelected(true);
             robot.clickOn("#add");
 
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().get(1), "createExpense");
+        assertEquals(server.getCalls().getFirst(), "createExpense");
+        System.out.println(server.getStatuses().getFirst());
+        //assertTrue(websocket.hasPayloadBeenSent(new Expense()));
     }
 
     @Test
     @Order(4)
     public void handleEditButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
+            server.getCalls().clear();
+            server.getStatuses().clear();
             Expense expense = new Expense(event.getParticipants().getFirst(), "testPurpose", 10, "EUR", event.getParticipants(), "food");
             ctrl.displayAddExpensePage(event, expense);
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(1);
@@ -164,13 +177,14 @@ public class AddExpenseCtrlTest {
 
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().get(1), "updateExpense");
+        assertEquals(server.getCalls().getFirst(), "updateExpense");
     }
 
     @Test
     @Order(5)
     public void handleAddTagTest(FxRobot robot) {
         Platform.runLater(() -> {
+
             ctrl.displayAddExpensePage(event, null);
             robot.clickOn("#addTag");
 
@@ -196,6 +210,8 @@ public class AddExpenseCtrlTest {
     @Order(7)
     public void testHandlePartialSplit(FxRobot robot) {
         Platform.runLater(() -> {
+            server.getCalls().clear();
+            server.getStatuses().clear();
             ctrl.displayAddExpensePage(event, null);
             robot.clickOn("#partialSplit");
             TextFlow textFlow = robot.lookup("#expenseParticipants").queryAs(TextFlow.class);
@@ -210,13 +226,14 @@ public class AddExpenseCtrlTest {
             robot.clickOn("#add");
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().get(1), "createExpense");
+        assertEquals(server.getCalls().getFirst(), "createExpense");
     }
 
     @Test
     @Order(8)
     public void testCatchNumberFormatException (FxRobot robot) {
         Platform.runLater(() -> {
+            server.getCalls().clear();
             ctrl.displayAddExpensePage(event, null);
             robot.lookup("#amount").queryAs(TextField.class).setText("abc");
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
@@ -228,7 +245,7 @@ public class AddExpenseCtrlTest {
             robot.clickOn("#add");
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().size(), 1);
+        assertTrue(server.getCalls().isEmpty());
     }
 
 

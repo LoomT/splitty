@@ -6,9 +6,7 @@ import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class TestWebsocket implements Websocket {
@@ -16,6 +14,9 @@ public class TestWebsocket implements Websocket {
     private String eventID;
     private boolean connected = false;
     private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+
+    private final List<WebsocketActions> triggeredActions = new ArrayList<>();
+    private final List<Object> payloads = new ArrayList<>();
 
 
     /**
@@ -221,6 +222,8 @@ public class TestWebsocket implements Websocket {
             for (Consumer<Object> consumer : consumers) {
                 consumer.accept(payload);
             }
+            triggeredActions.add(action);
+            payloads.add(payload);
         } else {
             System.out.println("No listener for action: " + action);
         }
@@ -244,4 +247,35 @@ public class TestWebsocket implements Websocket {
     public String getEventID() {
         return eventID;
     }
+
+
+    /**
+     * Checks if a specific action has been triggered
+     *
+     * @param action The action to check for
+     * @return true if the action has been triggered, false otherwise
+     */
+    public boolean hasActionBeenTriggered(WebsocketActions action) {
+        return triggeredActions.contains(action);
+    }
+
+    /**
+     * Checks if a specific payload has been sent
+     *
+     * @param expectedPayload The payload to check for
+     * @return true if the payload has been sent, false otherwise
+     */
+    public boolean hasPayloadBeenSent(Object expectedPayload) {
+        return payloads.stream().anyMatch(payload -> payload.equals(expectedPayload));
+    }
+
+    /**
+     * Resets the list of triggered actions and payloads
+     */
+
+    public void resetTriggers() {
+        triggeredActions.clear();
+        payloads.clear();
+    }
 }
+
