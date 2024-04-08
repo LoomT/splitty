@@ -85,7 +85,6 @@ public class StartScreenCtrl {
         });
         joinError.setVisible(false);
         createEventError.setVisible(false);
-        reloadEventCodes();
         code.textProperty().addListener((observable, oldValue, newValue) -> {
             joinError.setVisible(false);
             String filteredValue = newValue.replaceAll("[^a-zA-Z]", "");
@@ -100,7 +99,7 @@ public class StartScreenCtrl {
      * Reloads the event codes from the user config and updates the event list
      *
      */
-    private void reloadEventCodes() {
+    public void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
 
@@ -129,8 +128,9 @@ public class StartScreenCtrl {
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+                break;
             }
         }
     }
@@ -145,7 +145,6 @@ public class StartScreenCtrl {
         code.setText("");
         joinError.setVisible(false);
         createEventError.setVisible(false);
-        reloadEventCodes();
     }
 
     /**

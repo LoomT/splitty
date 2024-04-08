@@ -125,6 +125,7 @@ public class MainCtrl implements MainCtrlInterface{
     public void showStartScreen() {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
+        startScreenCtrl.reloadEventCodes();
         primaryStage.setScene(startScreen);
     }
 
@@ -281,7 +282,9 @@ public class MainCtrl implements MainCtrlInterface{
     public void handleServerNotFound() {
         websocket.disconnect();
         adminOverviewCtrl.stopPoller();
-        showStartScreen();
+        primaryStage.setTitle(languageConf.get("StartScreen.title"));
+        startScreenCtrl.reset();
+        primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
     }
 }
