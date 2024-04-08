@@ -6,6 +6,7 @@ import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Transaction;
 import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
@@ -40,7 +41,7 @@ public class OpenDebtsPageCtrl {
     private final MainCtrl mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
     private Map<Map.Entry<Participant, Participant>, Double>
-            participantToParticipantMap = new HashMap<>();
+            partToPartMap = new HashMap<>();
 
 
     /**
@@ -67,7 +68,7 @@ public class OpenDebtsPageCtrl {
      * @param event the event
      */
     public void displayOpenDebtsPage(Event event) {
-        System.out.println(event.getTransactions());
+
         this.event = event;
         Map<String, Double> map = new HashMap<>();
         Map<Map.Entry<Participant, Participant>, Double> debtMap = new HashMap<>();
@@ -86,13 +87,17 @@ public class OpenDebtsPageCtrl {
             for (Participant p : e.getExpenseParticipants()) {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
                 map.put(p.getName(), map.get(p.getName()) + cost);
-                if (!e.getExpenseAuthor().equals(p))
-                    debtMap.put(Map.entry(e.getExpenseAuthor(), p), cost);
+                if (e.getExpenseAuthor().equals(p)) continue;
+                if(!debtMap.containsKey(Map.entry(e.getExpenseAuthor(), p))){
+                    debtMap.put(Map.entry(e.getExpenseAuthor(), p), 0.0);
+                }
+                debtMap.put(Map.entry(e.getExpenseAuthor(), p),
+                        cost + debtMap.get(Map.entry(e.getExpenseAuthor(), p)));
             }
             sum += e.getAmount();
         }
 
-        participantToParticipantMap = debtMap;
+        partToPartMap = debtMap;
         populateExpense(selectedParticipantName);
 
         includingChoiceBox.setOnAction(e -> {
@@ -116,35 +121,31 @@ public class OpenDebtsPageCtrl {
         totalSumExp.setText("Total sum of all expenses in this event: " + sum);
     }
 
+
     public void populateExpense(String name) {
-        final String template = "OpenDebtsListItem.template";
+        Participant participant = null;
         boolean flag = false;
         for (Participant p : event.getParticipants()) {
             if (p.getName().equals(name)) {
                 flag = true;
+                participant = p;
                 break;
             }
         }
         allDebtsPane.getChildren().clear();
-        if (!flag) {
-            event.getTransactions().stream().distinct().forEach(
-                    x -> allDebtsPane.getChildren().add(
-                            new OpenDebtsListItem(
-                                    template,
-                                    x.getGiver(),
-                                    x.getReceiver(),
-                                    x.getAmount(),
-                                    languageConf)));
-        } else {
-            event.getTransactions().stream().distinct().filter(
-                    x -> x.getGiver().getName().equals(name)).forEach(
-                    x -> allDebtsPane.getChildren().add(
-                            new OpenDebtsListItem(
-                                    template,
-                                    x.getGiver(),
-                                    x.getReceiver(),
-                                    x.getAmount(),
-                                    languageConf)));
+        for (Map.Entry<Participant, Participant> m : partToPartMap.keySet()) {
+
+            double cost = partToPartMap.get(m) - event.getTransactions().stream().filter(
+                    x -> x.getGiver().equals(m.getValue()) && x.getReceiver().equals(m.getKey())).
+                    mapToDouble(Transaction::getAmount).sum();
+
+            if (!flag || m.getKey().equals(participant) || m.getValue().equals(participant)) {
+                allDebtsPane.getChildren().add(new OpenDebtsListItem(
+                        "OpenDebtsListItem.template", m.getKey(),
+                        m.getValue(),
+                        cost,
+                        languageConf));
+            }
         }
     }
 

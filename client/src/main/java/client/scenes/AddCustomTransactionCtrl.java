@@ -115,7 +115,6 @@ public class AddCustomTransactionCtrl {
         Transaction transaction = new Transaction(giver, receiver,
                 Double.parseDouble(amountField.getText()));
         int status = server.addTransaction(event.getId(), transaction);
-        //event.addTransaction(transaction);
         if(status / 100 != 2) {
             System.out.println("server error: " + status);
         }

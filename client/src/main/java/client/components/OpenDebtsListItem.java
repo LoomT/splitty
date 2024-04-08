@@ -16,8 +16,8 @@ public class OpenDebtsListItem extends HBox {
     @FXML
     private Label participantLabel;
 
-    public OpenDebtsListItem(String template, Participant debtor,
-                             Participant lender,
+    public OpenDebtsListItem(String template, Participant lender,
+                             Participant debtor,
                              double amount,
                              LanguageConf languageConf) {
 
