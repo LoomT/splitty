@@ -3,6 +3,7 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -17,6 +18,9 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
+import java.net.ConnectException;
+import java.text.DecimalFormat;
+import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,6 +28,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static client.utils.CommonFunctions.lengthListener;
+import static commons.WebsocketActions.ADD_TAG;
 
 public class AddExpenseCtrl {
 
@@ -61,25 +68,56 @@ public class AddExpenseCtrl {
     private Button add;
     @FXML
     private Button addTag;
+    @FXML
+    private Label warningLabel;
 
-    private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
+    private final ServerUtils server;
+    private final Websocket websocket;
     private final LanguageConf languageConf;
 
     /**
-     * @param server   server utils instance
      * @param mainCtrl main control instance
+     * @param server   server utils instance
+     * @param websocket websocket client
      * @param languageConf language config
      */
     @Inject
     public AddExpenseCtrl(
-            ServerUtils server,
             MainCtrlInterface mainCtrl,
+            ServerUtils server,
+            Websocket websocket,
             LanguageConf languageConf
     ) {
-        this.server = server;
         this.mainCtrl = mainCtrl;
+        this.server = server;
+        this.websocket = websocket;
         this.languageConf = languageConf;
+    }
+
+    /**
+     * Runs when app starts
+     * Sets a listener for amount field which only let input double amounts
+     */
+    public void initialize() {
+        DecimalFormat format = new DecimalFormat( "#.0" );
+
+        // only lets the users type decimal numbers
+        amount.setTextFormatter(new TextFormatter<>(c -> {
+            if(c.getControlNewText().isEmpty())
+                return c;
+
+            ParsePosition parsePosition = new ParsePosition( 0);
+            Object object = format.parse(c.getControlNewText(), parsePosition);
+
+            if(object == null || parsePosition.getIndex() < c.getControlNewText().length()) {
+                return null;
+            } else {
+                return c;
+            }
+        }));
+
+        lengthListener(purpose, warningLabel, 20, languageConf.get("AddExp.charLimit"));
     }
 
     /**
@@ -88,13 +126,14 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        warningLabel.setVisible(false);
         blockDate();
         setupDateListener();
         date.setDayCellFactory(param -> new DateCell() {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+                setDisable(empty || date.isAfter(LocalDate.now()));
             }
         });
         equalSplit.setSelected(false);
@@ -166,7 +205,7 @@ public class AddExpenseCtrl {
             @Override
             public void updateItem(LocalDate date, boolean empty) {
                 super.updateItem(date, empty);
-                setDisable(empty || date.compareTo(LocalDate.now()) > 0 );
+                setDisable(empty || date.isAfter(LocalDate.now()));
             }
         });
     }
@@ -174,41 +213,20 @@ public class AddExpenseCtrl {
 
     /**
      * behaviour for the edit button
-     * @param ev
-     * @param ex
+     * @param ev event
+     * @param ex expense
      */
     public void editButton(Event ev, Expense ex) {
-        String expParticipant = expenseAuthor.getValue();
-        String expPurpose = purpose.getText();
-        Double expAmount = Double.parseDouble(amount.getText());
-        String expCurrency = currency.getValue();
-        LocalDate temp = date.getValue();
-        LocalDateTime localDateTime = temp.atStartOfDay();
-        Date expDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
-        List<Participant> expParticipants = getExpenseParticipants(ev);
-
-        String expType = type.getValue();
-
-        for (Participant p : ex.getExpenseParticipants()) {
-            if (p.getName().equals(expParticipant)) {
-                ex.setExpenseAuthor(p);
-                break;
-            }
-        }
-        //ex.setExpenseAuthor(new Participant(expParticipant));
-        ex.setPurpose(expPurpose);
-        ex.setAmount(expAmount);
-        ex.setCurrency(expCurrency);
-        ex.setDate(expDate);
-        ex.setExpenseParticipants(expParticipants);
-        ex.setType(expType);
-
-        if (expParticipants.isEmpty()) {
-            alertSelectPart();
+        Expense expense = makeExpense(ev);
+        if(expense == null) return;
+        expense.setEventID(expense.getEventID());
+        expense.setId(expense.getId());
+        try {
+            server.updateExpense(ex.getId(), ev.getId(), ex);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
             return;
         }
-
-        server.updateExpense(ex.getId(), ev.getId(), ex);
         mainCtrl.goBackToEventPage(ev);
     }
 
@@ -252,10 +270,6 @@ public class AddExpenseCtrl {
         }
     }
 
-
-
-
-
     /**
      * @param event
      * Fill the choices for the author of the expense.
@@ -292,6 +306,19 @@ public class AddExpenseCtrl {
      * @param ev current event
      */
     public void handleAddButton(Event ev) {
+        Expense expense = makeExpense(ev);
+        if(expense == null) return;
+        try {
+            server.createExpense(ev.getId(), expense);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
+        resetExpenseFields();
+        mainCtrl.goBackToEventPage(ev);
+    }
+
+    private Expense makeExpense(Event ev) {
         if (expenseAuthor.getValue() == null ||
                 purpose.getText().isEmpty() ||
                 amount.getText().isEmpty() ||
@@ -300,40 +327,40 @@ public class AddExpenseCtrl {
                 date.getValue() == null ||
                 type.getValue() == null) {
             alertAllFields();
-        } else {
-            try {
-                List<Participant> participants = getExpenseParticipants(ev);
-                double expAmount = Double.parseDouble(amount.getText());
-                LocalDate expDate = date.getValue();
-                LocalDateTime localDateTime = expDate.atStartOfDay();
-                Date expenseDate = Date.from(localDateTime.
-                        atZone(ZoneId.systemDefault()).toInstant());
-                String expPurpose = purpose.getText();
-                String selectedParticipantName = expenseAuthor.getValue();
-                Participant selectedParticipant = ev.getParticipants().stream()
-                        .filter(participant -> participant.getName().
-                                equals(selectedParticipantName))
-                        .findFirst().orElse(null);
-                if (selectedParticipant != null) {
-                    String expCurrency = currency.getValue();
-                    //expPart.add(selectedParticipant);
-
-                    String expType = type.getValue();
-                    Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
-                            expCurrency, participants, expType);
-                    expense.setDate(expenseDate);
-                    server.createExpense(ev.getId(), expense);
-                    resetExpenseFields();
-                    mainCtrl.goBackToEventPage(ev);
-                }
-            } catch (NumberFormatException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(languageConf.get("AddExp.invamount"));
-                alert.setHeaderText(null);
-                alert.setContentText(languageConf.get("AddExp.invamountmess"));
-                alert.showAndWait();
-            }
+            return null;
         }
+        try {
+            List<Participant> participants = getExpenseParticipants(ev);
+            double expAmount = Double.parseDouble(amount.getText());
+            if(expAmount <= 0) throw new NumberFormatException();
+
+            LocalDate expDate = date.getValue();
+            LocalDateTime localDateTime = expDate.atStartOfDay();
+            Date expenseDate = Date.from(localDateTime.
+                    atZone(ZoneId.systemDefault()).toInstant());
+            String expPurpose = purpose.getText();
+            String selectedParticipantName = expenseAuthor.getValue();
+            Participant selectedParticipant = ev.getParticipants().stream()
+                    .filter(participant -> participant.getName().
+                            equals(selectedParticipantName))
+                    .findFirst().orElseThrow();
+
+            String expCurrency = currency.getValue();
+
+            String expType = type.getValue();
+            Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+                    expCurrency, participants, expType);
+            expense.setDate(expenseDate);
+            return expense;
+
+        } catch (NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(languageConf.get("AddExp.invamount"));
+            alert.setHeaderText(null);
+            alert.setContentText(languageConf.get("AddExp.invamountmess"));
+            alert.showAndWait();
+        }
+        return null;
     }
 
     /**
@@ -384,6 +411,13 @@ public class AddExpenseCtrl {
         }
         type.setCellFactory(createTypeListCellFactory(ev));
         type.setButtonCell(createTypeListCell(ev));
+        websocket.on(ADD_TAG, tag -> {
+            String typeName = ((Tag) tag).getName();
+            if (!type.getItems().contains(typeName)) {
+                type.getItems().add(typeName);
+            }
+        });
+
     }
 
     private Callback<ListView<String>, ListCell<String>> createTypeListCellFactory(Event ev) {

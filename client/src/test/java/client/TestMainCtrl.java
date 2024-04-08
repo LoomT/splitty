@@ -115,19 +115,6 @@ public class TestMainCtrl implements MainCtrlInterface {
     }
 
     /**
-     * Show error popup for general usage
-     *
-     * @param code        Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
-     *                    Check ErrorPopupCtrl for more detailed documentation
-     * @param stringToken String token to be used as a variable in the error text
-     * @param intToken    int token to be used as a variable in the error text
-     */
-    @Override
-    public void showErrorPopup(String code, String stringToken, int intToken) {
-
-    }
-
-    /**
      * Opens the system file chooser to save something
      *
      * @param fileChooser file chooser
@@ -180,5 +167,14 @@ public class TestMainCtrl implements MainCtrlInterface {
     public void handleEditExpense(Expense exp, Event ev) {
         currentScene = "AddExpensePage";
         scenes.add("AddExpensePage");
+    }
+
+    /**
+     * Disconnects from the server and shows an error
+     */
+    @Override
+    public void handleServerNotFound() {
+        currentScene = "StartScreen";
+        scenes.add("StartScreen");
     }
 }
