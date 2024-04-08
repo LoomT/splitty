@@ -18,7 +18,7 @@ import java.util.Objects;
  *  getter setter equals hashcode toString methods
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id", scope = Tag.class)
+        property = "id", scope = Participant.class)
 @Entity
 @IdClass(EventWeakKey.class)
 public class Participant implements Cloneable {

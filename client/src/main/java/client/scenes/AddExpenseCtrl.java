@@ -126,9 +126,7 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
-//        if (!event.getTags().contains(noneTag)) {
-//            event.getTags().addFirst(noneTag);
-//        }
+        type.getSelectionModel().clearSelection();
         warningLabel.setVisible(false);
         blockDate();
         setupDateListener();
@@ -144,6 +142,7 @@ public class AddExpenseCtrl {
         equalSplit.setDisable(false);
         populateAuthorChoiceBox(event);
         populateTypeBox(event);
+        type.getSelectionModel().clearSelection();
         purpose.clear();
         amount.clear();
         populateCurrencyChoiceBox();
@@ -167,9 +166,7 @@ public class AddExpenseCtrl {
                 editButton(event, exp);
             }
         });
-        abort.setOnAction(x -> {
-            handleAbortButton(event);
-        });
+        abort.setOnAction(x -> handleAbortButton(event));
         addTag.setOnAction(x -> {
             handeAddTagButton(event);
             populateTypeBox(event);
@@ -178,7 +175,7 @@ public class AddExpenseCtrl {
 
     /**
      * behaviour for add tag button
-     * @param ev
+     * @param ev the current event
      */
     public void handeAddTagButton(Event ev) {
         mainCtrl.showAddTagPage(ev);
@@ -453,17 +450,12 @@ public class AddExpenseCtrl {
             protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
-                    if (item.getName().equals("None")) {
-                        setText(item.getName());
-                        setGraphic(null);
-                    } else {
-                        Tag tag = findTagById(item.getId(), ev.getTags());
-                        if (tag != null) {
-                            Label label = createLabelWithColor(item.getName(),
-                                    hexToColor(tag.getColor()));
-                            label.setUserData(tag.getId());
-                            setGraphic(label);
-                        }
+                    Tag tag = findTagById(item.getId(), ev.getTags());
+                    if (tag != null) {
+                        Label label = createLabelWithColor(item.getName(),
+                                hexToColor(tag.getColor()));
+                        label.setUserData(tag.getId());
+                        setGraphic(label);
                     }
                 } else {
                     Label noneLabel = new Label("None");
@@ -496,7 +488,7 @@ public class AddExpenseCtrl {
 
     /**
      * convert from color to string
-     * @param color
+     * @param color the color of the tag
      * @return the String color
      */
     private String toHexString(Color color) {
@@ -508,7 +500,7 @@ public class AddExpenseCtrl {
 
     /**
      * convert from string to color
-     * @param hexCode
+     * @param hexCode the hexcode of the colour
      * @return the Color color
      */
     public static Color hexToColor(String hexCode) {
@@ -535,16 +527,6 @@ public class AddExpenseCtrl {
             CheckBox checkBox = new CheckBox(participant.getName());
             checkBox.getStyleClass().add("textFont");
             checkBox.setStyle("-fx-label-padding: 0 10 0 3");
-//            checkBox.setOnAction(e -> {
-//                if (checkBox.isSelected()) {
-//                    expPart.add(participant);
-//                    selectedPart.getAndIncrement();
-//                } else {
-//                    expPart.remove(participant);
-//                    selectedPart.getAndDecrement();
-//                }
-//                //updateEqualSplitCheckbox();
-//            });
 
             expenseParticipants.getChildren().add(checkBox);
         }
@@ -575,12 +557,11 @@ public class AddExpenseCtrl {
         expenseAuthor.getSelectionModel().clearSelection();
         equalSplit.setSelected(false);
         partialSplit.setSelected(false);
-        type.getSelectionModel().clearSelection();
     }
 
     /**
      * setter for the expense author field
-     * @param author
+     * @param author the author of the expense
      */
     public void setExpenseAuthor(String author) {
         expenseAuthor.setValue(author);
@@ -588,7 +569,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the purposeText field
-     * @param purposeText
+     * @param purposeText the purpose of the expense
      */
     public void setPurpose(String purposeText) {
         purpose.setText(purposeText);
@@ -596,7 +577,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the amountText field
-     * @param amountText
+     * @param amountText the amount that was paid
      */
     public void setAmount(String amountText) {
         amount.setText(amountText);
@@ -604,7 +585,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the currencyText field
-     * @param currencyText
+     * @param currencyText the text for the currency
      */
     public void setCurrency(String currencyText) {
         currency.setValue(currencyText);
@@ -612,7 +593,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the expenseDate field
-     * @param expenseDate
+     * @param expenseDate the date of the expense
      */
     public void setDate(LocalDate expenseDate) {
         date.setValue(expenseDate);
@@ -620,7 +601,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the typeText field
-     * @param tag
+     * @param tag the tag of the current expense
      */
     public void setType(Tag tag) {
         type.setValue(tag);
@@ -628,7 +609,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for button text
-     * @param s
+     * @param s the text for the add/save button
      */
     public void setButton(String s) {
         add.setText(s);
@@ -637,8 +618,8 @@ public class AddExpenseCtrl {
 
     /**
      * Method to set the checkboxes regarding the way in which an expense is split.
-     * @param exp
-     * @param event
+     * @param exp the current expense
+     * @param event the current event
      */
     public void setSplitCheckboxes(Expense exp, Event event) {
         List<Participant> temp = exp.getExpenseParticipants();

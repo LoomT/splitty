@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id", scope = Participant.class)
+        property = "id", scope = Tag.class)
 @Entity
 @IdClass(EventWeakKey.class)
 public class Tag implements Cloneable{
