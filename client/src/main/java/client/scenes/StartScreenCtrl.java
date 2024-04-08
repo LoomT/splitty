@@ -6,6 +6,7 @@ import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
@@ -16,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,8 @@ public class StartScreenCtrl {
 
     @FXML
     private ComboBox<String> languageChoiceBox;
+    @FXML
+    private ComboBox<String> currencyChoiceBox;
 
     @FXML
     private VBox eventList;
@@ -48,6 +52,7 @@ public class StartScreenCtrl {
     private Label createEventError;
 
     private final UserConfig userConfig;
+    private final CurrencyConverter convert;
 
     /**
      * start screen controller constructor
@@ -56,19 +61,22 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
+     * @param convert      currency converter
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig
+            UserConfig userConfig,
+            CurrencyConverter convert
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
+        this.convert = convert;
     }
 
     /**
@@ -93,6 +101,22 @@ public class StartScreenCtrl {
         });
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
+
+        currencyChoiceBox.getItems().addAll(convert.getCurrencies());
+        if(!userConfig.getCurrency().equals("None")) {
+            currencyChoiceBox.setValue(userConfig.getCurrency());
+        }
+        currencyChoiceBox.setOnAction(event -> {
+            try {
+                userConfig.setCurrency(currencyChoiceBox.getValue());
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(languageConf.get("unexpectedError"));
+                alert.setContentText(languageConf.get("UserConfig.IOError"));
+                java.awt.Toolkit.getDefaultToolkit().beep();
+                alert.showAndWait();
+            }
+        });
     }
 
     /**
