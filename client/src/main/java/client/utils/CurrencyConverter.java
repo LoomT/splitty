@@ -1,5 +1,7 @@
 package client.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.inject.Inject;
 
 import java.io.*;
@@ -14,22 +16,17 @@ import java.util.*;
  */
 public class CurrencyConverter {
 
-    private static CurrencyConverter currencyConverter;
-    private static Map<String, Double> currencyMap;
-    private String base;
-    private double conversionRate;
-    private String path;
-    @Inject
-    private ServerUtils server;
+    private final File rates;
+    private final Set<String> currencies;
+    private final ServerUtils server;
 
 
     /**
      * @param server ServerUtils for testing
      */
-    private CurrencyConverter(String base, double conversionRate, String path, ServerUtils server) {
-        this.base = base;
-        this.conversionRate = conversionRate;
-        this.path = path;
+    public CurrencyConverter(ServerUtils server, InputStream currencyStream, File rates) throws IOException {
+        this.rates = rates;
+        currencies = new ObjectMapper().reader().forType(Set.class).readValue(currencyStream);
         this.server = server;
         try (Reader fileReader = new FileReader(path)) {
             currencyMap = initializeCurrencyMap(fileReader);
@@ -45,7 +42,6 @@ public class CurrencyConverter {
         String path = Objects.requireNonNull(CurrencyConverter.
                 class.getClassLoader().getResource("client/currencies.properties")).getPath();
         this.path = path;
-        this.base = "EUR";
         try {
             this.server = new ServerUtilsImpl(new UserConfig(
                     new FileIO(Objects.requireNonNull(CurrencyConverter.
