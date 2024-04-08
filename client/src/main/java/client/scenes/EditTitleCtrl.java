@@ -12,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
@@ -116,7 +115,6 @@ public class EditTitleCtrl {
         warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
         nameTextField.textProperty().setValue("");
         stage.show();

@@ -470,7 +470,6 @@ public class TestServerUtils implements ServerUtils {
         calls.add("updateEventTitle");
         if(event.getTitle() == null
                 || event.getId() == null
-                || event.getId().length() != 5
                 || event.getTitle().length() > 100
                 || event.getTitle().isEmpty()){
             statuses.add(400);
