@@ -36,6 +36,8 @@ public class CurrencyController {
             }
             ObjectReader reader = new ObjectMapper().reader().forType(Map.class);
             Map<String, Object> map = reader.readValue(response.body());
+
+            @SuppressWarnings("unchecked")
             Map<String, Double> rates = (Map<String, Double>) map.get("rates");
             return ResponseEntity.ok(rates);
         } catch (Exception e) {
