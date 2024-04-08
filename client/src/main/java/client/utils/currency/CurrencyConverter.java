@@ -2,7 +2,6 @@ package client.utils.currency;
 
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
-import client.utils.UserConfig;
 import jakarta.inject.Inject;
 import javafx.scene.control.Alert;
 
@@ -24,41 +23,45 @@ public class CurrencyConverter {
     private final FileManager fileManager;
     private final List<String> currencies;
     private final ServerUtils server;
-    private final UserConfig userConfig;
     private final LanguageConf languageConf;
 
     /**
      * @param server ServerUtils for testing
      * @param fileManager file manager for managing historical rates
-     * @param userConfig user config for preferred currency
      * @param languageConf language config for errors
      */
     @Inject
-    public CurrencyConverter(ServerUtils server, FileManager fileManager,
-                             UserConfig userConfig, LanguageConf languageConf) {
+    public CurrencyConverter(ServerUtils server,
+                             FileManager fileManager,
+                              LanguageConf languageConf) {
         this.fileManager = fileManager;
         this.currencies = fileManager.getAvailableCurrencies();
         this.server = server;
-        this.userConfig = userConfig;
         this.languageConf = languageConf;
     }
 
     /**
-     * @param currency currency code to convert from
-     * @param amount amount in that currency
+     * @param from currency code to convert from
+     * @param to currency to convert to
+     * @param amount amount of from currency
      * @param time date at which to convert
      * @return converted amount
      */
-    public double convertToPreferred(String currency, double amount, Instant time)
+    public double convert(String from, String to, double amount, Instant time)
             throws IOException {
-        String date = DateTimeFormatter.ISO_DATE.format(time.atZone(ZoneOffset.UTC).toLocalDate());
         try {
+            String date = DateTimeFormatter.ISO_DATE
+                    .format(time.atZone(ZoneOffset.UTC).toLocalDate());
             Map<String, Double> rates = fileManager.get(date);
             if(rates == null) {
                 rates = server.getExchangeRates(date); // fetch rates from server
+                if(rates.containsKey("status")) {
+                    System.out.println("status: " + rates.get("status"));
+                    return 0;
+                }
                 fileManager.add(rates, date); // cache the rates
             }
-            return amount / rates.get(currency) * rates.get(userConfig.getCurrency());
+            return amount / rates.get(from.toUpperCase()) * rates.get(to.toUpperCase());
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     languageConf.get("Currency.IOError"));

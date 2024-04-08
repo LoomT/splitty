@@ -406,12 +406,19 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public Map<String, Double> getExchangeRates(String date) throws ConnectException {
         try {
-            return ClientBuilder.newClient(new ClientConfig())
+            Response response =  ClientBuilder.newClient(new ClientConfig())
                     .target(server)
                     .path("api/currency/" + date)
                     .request(APPLICATION_JSON)
-                    .accept(APPLICATION_JSON)
-                    .get(new GenericType<>() {});
+                    .accept(APPLICATION_JSON).buildGet().invoke();
+
+            System.out.println(response.getStatus());
+            if(response.getStatus() != Response.Status.OK.getStatusCode()) {
+                return Map.of("status", Double.parseDouble(String.valueOf(response.getStatus())));
+            }
+            Map<String, Double> map = response.readEntity(new GenericType<>(){});
+            response.close();
+            return map;
 
         } catch (ProcessingException e) {
             if(e.getMessage().contains("Connection refused"))
