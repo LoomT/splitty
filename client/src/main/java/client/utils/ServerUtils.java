@@ -8,6 +8,7 @@ import commons.Tag;
 import java.net.ConnectException;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 public interface ServerUtils {
 
@@ -153,6 +154,6 @@ public interface ServerUtils {
      * @param calendar date of last usage
      * @return string representation of the exchange rates
      */
-    String getExchangeRates(Calendar calendar) throws ConnectException;
+    Map<String, Double> getExchangeRates(Calendar calendar) throws ConnectException;
 }
 

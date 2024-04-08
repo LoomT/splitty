@@ -509,22 +509,9 @@ public class TestServerUtils implements ServerUtils {
      * @return mocked version of exchange rate api
      */
     @Override
-    public String getExchangeRates(Calendar calendar){
+    public Map<String, Double> getExchangeRates(Calendar calendar){
         calls.add("getExchangeRates");
         //string to mimic real api response from openExchangeRates so all the methods work correctly
-        return """
-                {
-                 {
-                 "disclaimer": "Usage subject to terms: https://not-a-real-website.org/terms",
-                 "license": "https://not-a-real-website.org/license",
-                 "timestamp": 1711807220,
-                 "base": "USD",
-                 "rates": {
-                 "USD": 1,
-                 "EUR": 2,
-                 "CHF": 3,
-                 "GBP": 4
-                 }
-                }""";
+        return Map.of("USD", 1d, "EUR", 2d, "JPY", 100d);
     }
 }
