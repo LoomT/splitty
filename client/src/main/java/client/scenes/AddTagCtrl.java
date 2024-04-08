@@ -6,14 +6,20 @@ import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Tag;
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
+import java.net.ConnectException;
 import java.util.List;
+
+import static client.utils.CommonFunctions.lengthListener;
 
 public class AddTagCtrl {
 
@@ -22,18 +28,19 @@ public class AddTagCtrl {
     private final LanguageConf languageConf;
 
     @FXML
-    private Button add;
-
-    @FXML
-    private Button back;
-
-    @FXML
     private ColorPicker cp;
 
     @FXML
     private TextField tagTextField;
+    @FXML
+    private Label warningText;
+    @FXML
+    private Label confirmationLabel;
+    private FadeTransition ft;
 
     private Color selectedColor;
+    private Event event;
+    private Stage stage;
 
     /**
      * @param mainCtrl main controller
@@ -53,30 +60,58 @@ public class AddTagCtrl {
      * initiliaze method
      */
     public void initialize() {
-
+        ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
+        ft.setFromValue(1.0);
+        ft.setToValue(0);
+        ft.setDelay(Duration.millis(1000));
+        ft.setOnFinished(e -> confirmationLabel.setVisible(false));
+        warningText.setVisible(false);
+        lengthListener(tagTextField, warningText, 15, languageConf.get("EditP.nameLimit"));
     }
 
     /**
      * display the add tag page
-     * @param ev the current event
+     * @param event the current event
+     * @param stage the stage of this scene
      */
-    public void displayAddTagPage(Event ev) {
-        cp.setOnAction(e -> selectedColor = cp.getValue());
-        add.setOnAction(e -> {
-            if (selectedColor == null) {
-                showAlert(languageConf.get("AddTag.colnotsel"),
-                        languageConf.get("AddTag.colnotselmess"));
-            } else if (tagTextField.getText().isEmpty()) {
-                showAlert(languageConf.get("AddTag.emptyname"),
-                        languageConf.get("AddTag.emptynamemess"));
-            } else {
-                addButton(ev);
-            }
-        });
-        back.setOnAction(e -> {
-            mainCtrl.showAddExpensePage(ev);
-            System.out.println(ev.getTags());
-        });
+    public void displayAddTagPage(Event event, Stage stage) {
+        this.event = event;
+        this.stage = stage;
+        confirmationLabel.setVisible(false);
+        warningText.setVisible(false);
+    }
+
+    /**
+     * Back button clicked
+     * Closes the stage
+     */
+    @FXML
+    public void backClicked() {
+        stage.close();
+    }
+
+    /**
+     * Add button clicked
+     */
+    @FXML
+    public void addClicked() {
+        if (selectedColor == null) {
+            showAlert(languageConf.get("AddTag.colnotsel"),
+                    languageConf.get("AddTag.colnotselmess"));
+        } else if (tagTextField.getText().isEmpty()) {
+            showAlert(languageConf.get("AddTag.emptyname"),
+                    languageConf.get("AddTag.emptynamemess"));
+        } else {
+            addButton(event);
+        }
+    }
+
+    /**
+     * Sets colour when colour gets changed
+     */
+    @FXML
+    public void colourChanged() {
+        selectedColor = cp.getValue();
     }
 
     private void showAlert(String title, String message) {
@@ -102,14 +137,22 @@ public class AddTagCtrl {
                     .map(Tag::getName)
                     .toList();
             if (!tagNames.contains(tag.getName())) {
-                server.addTag(event.getId(), tag);
-                tag.setEventID(event.getId());
+                try {
+                    server.addTag(event.getId(), tag);
+                } catch (ConnectException e) {
+                    mainCtrl.handleServerNotFound();
+                    return;
+                }
+                tagTextField.clear();
+                ft.stop();
+                confirmationLabel.setVisible(true);
+                confirmationLabel.setOpacity(1.0);
+                ft.play();
             }
             else {
                 showAlert(languageConf.get("AddTag.alrexist"),
                         languageConf.get("AddTag.alrexistmess"));
             }
-            tagTextField.clear();
         }
     }
 

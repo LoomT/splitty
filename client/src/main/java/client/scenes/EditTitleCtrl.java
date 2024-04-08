@@ -7,14 +7,17 @@ import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.net.ConnectException;
+
+import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.TITLE_CHANGE;
 
 public class EditTitleCtrl {
@@ -29,7 +32,7 @@ public class EditTitleCtrl {
     private Text eventTitle;
 
     @FXML
-    private Text titleError;
+    private Label warningLabel;
 
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
@@ -59,7 +62,8 @@ public class EditTitleCtrl {
      * Initializes the characterLimitError event listener.
      */
     public void initialize(){
-        characterLimitError(nameTextField, titleError, 100);
+        lengthListener(nameTextField, warningLabel, 30,
+                languageConf.get("StartScreen.maxEventNameLength"));
         websocket.on(TITLE_CHANGE, title -> {
             if(event != null)
                 event.setTitle((String) title);
@@ -81,11 +85,19 @@ public class EditTitleCtrl {
      */
     @FXML
     public void saveTitle(){
-        if(nameTextField.getText().isEmpty()
-                || nameTextField.getLength() > 100) return;
+        if(nameTextField.getText().isEmpty()) {
+            warningLabel.setText(languageConf.get("StartScreen.emptyEventName"));
+            warningLabel.setVisible(true);
+        }
 
         event.setTitle(nameTextField.getText());
-        int result = server.updateEventTitle(event);
+        int result;
+        try {
+            result = server.updateEventTitle(event);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
         if(result >= 400)
             System.out.println("An error has occurred");
         else{
@@ -101,6 +113,7 @@ public class EditTitleCtrl {
      */
     public void displayEditEventTitle(Event event, Stage stage){
         this.event = event;
+        warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
@@ -108,41 +121,4 @@ public class EditTitleCtrl {
         nameTextField.textProperty().setValue("");
         stage.show();
     }
-
-    /**
-     * Creates a characterLimitError which showcases an error
-     * iff a character limit has been exceeded.
-     * @param textField textField which is observed
-     * @param errorMessage Text where the message is displayed in the scene
-     * @param limit character limit to not be exceeded
-     */
-    public void characterLimitError(TextField textField, Text errorMessage, int limit){
-        String message = errorMessage.getText();
-        errorMessage.setVisible(false);
-        textField.textProperty().addListener((observableValue, number, t1)->{
-            errorMessage.textProperty().bind(Bindings.concat(
-                    message, String.format(" %d/%d", textField.getText().length(), limit)));
-
-            errorMessage.setVisible(textField.getLength() > limit);
-        });
-    }
-
-    /**
-     * Setter for the event.
-     *
-     * @param event event to set
-     */
-    public void setEvent(Event event) {
-        this.event = event;
-    }
-
-    /**
-     * Getter for the event.
-     *
-     * @return event
-     */
-    public Event getEvent() {
-        return event;
-    }
-
 }

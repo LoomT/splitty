@@ -67,15 +67,6 @@ public interface MainCtrlInterface {
     void showAdminOverview(String password, long timeOut);
 
     /**
-     * Show error popup for general usage
-     * @param stringToken String token to be used as a variable in the error text
-     * @param intToken int token to be used as a variable in the error text
-     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
-     * Check ErrorPopupCtrl for more detailed documentation
-     */
-    void showErrorPopup(String code, String stringToken, int intToken);
-
-    /**
      * Opens the system file chooser to save something
      *
      * @param fileChooser file chooser
@@ -109,4 +100,9 @@ public interface MainCtrlInterface {
      * @param ev The event associated with the expense.
      */
     void handleEditExpense(Expense exp, Event ev);
+
+    /**
+     * Disconnects from the server and shows an error
+     */
+    void handleServerNotFound();
 }

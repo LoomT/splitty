@@ -21,12 +21,15 @@ import commons.Expense;
 import commons.Participant;
 import commons.Tag;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
+import java.net.ConnectException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -55,13 +58,18 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return the found event, null if not found
      */
     @Override
-    public Event getEvent(String id) {
+    public Event getEvent(String id) throws ConnectException {
         try{
             return ClientBuilder.newClient(new ClientConfig())
                     .target(server).path("api/events/" + id)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
                     .get(Event.class);
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         } catch (NotFoundException e) {
             return null;
         }
@@ -72,12 +80,19 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return the created entry in the db
      */
     @Override
-    public Event createEvent(Event event) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("api/events") //
-                .request(APPLICATION_JSON) //
-                .accept(APPLICATION_JSON) //
-                .post(Entity.entity(event, APPLICATION_JSON), Event.class);
+    public Event createEvent(Event event) throws ConnectException {
+        try {
+            return ClientBuilder.newClient(new ClientConfig()) //
+                    .target(server).path("api/events") //
+                    .request(APPLICATION_JSON) //
+                    .accept(APPLICATION_JSON) //
+                    .post(Entity.entity(event, APPLICATION_JSON), Event.class);
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**
@@ -87,12 +102,17 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return status code
      */
     @Override
-    public int deleteEvent(String id) {
+    public int deleteEvent(String id) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("api/events/" + id)
                 .request(APPLICATION_JSON)
                 .delete()) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -104,12 +124,17 @@ public class ServerUtilsImpl implements ServerUtils {
      * 404 if event is not found
      */
     @Override
-    public int createParticipant(String eventId, Participant participant) {
+    public int createParticipant(String eventId, Participant participant) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("api/events/" + eventId + "/participants")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(participant, APPLICATION_JSON))) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -121,13 +146,18 @@ public class ServerUtilsImpl implements ServerUtils {
      * 404 if event is not found
      */
     @Override
-    public int updateParticipant(String eventId, Participant participant) {
+    public int updateParticipant(String eventId, Participant participant) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventId + "/participants/" + participant.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(participant, APPLICATION_JSON))) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -139,13 +169,18 @@ public class ServerUtilsImpl implements ServerUtils {
      * 404 if event is not found
      */
     @Override
-    public int deleteParticipant(String eventId, long participantId) {
+    public int deleteParticipant(String eventId, long participantId) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventId + "/participants/" + participantId)
                 .request(APPLICATION_JSON)
                 .delete()) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -154,13 +189,20 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param eventID ID of the event that contains the expense
      * @return the retrieved expense
      */
-    public Expense getExpense(long id, String eventID) {
-        return ClientBuilder.newClient(new ClientConfig())
-                .target(server)
-                .path("api/events/" + eventID + "/expenses/" + id)
-                .request(APPLICATION_JSON)
-                .accept(APPLICATION_JSON)
-                .get(Expense.class);
+    public Expense getExpense(long id, String eventID) throws ConnectException {
+        try {
+            return ClientBuilder.newClient(new ClientConfig())
+                    .target(server)
+                    .path("api/events/" + eventID + "/expenses/" + id)
+                    .request(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON)
+                    .get(Expense.class);
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**
@@ -168,13 +210,19 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param expense the expense to be created
      * @return status code
      */
-    public int createExpense(String eventID, Expense expense) {
-        return ClientBuilder.newClient(new ClientConfig())
+    public int createExpense(String eventID, Expense expense) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/expenses")
                 .request(APPLICATION_JSON)
-                .post(Entity.entity(expense, APPLICATION_JSON))
-                .getStatus();
+                .post(Entity.entity(expense, APPLICATION_JSON))) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**
@@ -183,13 +231,19 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param expense the updated expense object
      * @return status code
      */
-    public int updateExpense(long id, String eventID, Expense expense) {
-        return ClientBuilder.newClient(new ClientConfig())
+    public int updateExpense(long id, String eventID, Expense expense) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/expenses/" + id)
                 .request(APPLICATION_JSON)
-                .put(Entity.entity(expense, APPLICATION_JSON))
-                .getStatus();
+                .put(Entity.entity(expense, APPLICATION_JSON))) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**
@@ -197,13 +251,19 @@ public class ServerUtilsImpl implements ServerUtils {
      * @param eventID ID of the event containing the expense
      * @return status code
      */
-    public int deleteExpense(long id, String eventID) {
-        return ClientBuilder.newClient(new ClientConfig())
+    public int deleteExpense(long id, String eventID) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/expenses/" + id)
                 .request(APPLICATION_JSON)
-                .delete()
-                .getStatus();
+                .delete()) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**
@@ -212,13 +272,18 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return true iff password is correct
      */
     @Override
-    public boolean verifyPassword(String inputPassword) {
+    public boolean verifyPassword(String inputPassword) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/verify") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(inputPassword, APPLICATION_JSON))) {
             return response.getStatus() == Response.Status.OK.getStatusCode();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -230,13 +295,20 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return all events
      */
     @Override
-    public List<Event> getEvents(String inputPassword) {
-        return ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("admin/events") //
-                .request(APPLICATION_JSON) //
-                .header("Authorization", inputPassword)
-                .accept(APPLICATION_JSON) //
-                .get(new GenericType<>() {});
+    public List<Event> getEvents(String inputPassword) throws ConnectException {
+        try {
+            return ClientBuilder.newClient(new ClientConfig()) //
+                    .target(server).path("admin/events") //
+                    .request(APPLICATION_JSON) //
+                    .header("Authorization", inputPassword)
+                    .accept(APPLICATION_JSON) //
+                    .get(new GenericType<>() {});
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**
@@ -244,7 +316,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return HTTP response - 204 if there is an update and 408 if not
      */
     @Override
-    public int pollEvents(String inputPassword, Long timeOut) {
+    public int pollEvents(String inputPassword, Long timeOut) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
                 .target(server).path("admin/events/poll") //
                 .request(APPLICATION_JSON) //
@@ -253,6 +325,13 @@ public class ServerUtilsImpl implements ServerUtils {
                 .accept(APPLICATION_JSON) //
                 .get()) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else if(e.getMessage().contains("Connection reset"))
+                throw new ConnectException();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -265,7 +344,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return imported event
      */
     @Override
-    public int importEvent(String password, Event event) {
+    public int importEvent(String password, Event event) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server).path("admin/events")
                 .request(APPLICATION_JSON)
@@ -273,6 +352,11 @@ public class ServerUtilsImpl implements ServerUtils {
                 .accept(APPLICATION_JSON)
                 .post(Entity.entity(event, APPLICATION_JSON))) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 
@@ -283,15 +367,18 @@ public class ServerUtilsImpl implements ServerUtils {
      * 404 if event is not found
      */
     @Override
-    public int updateEventTitle(Event event) {
+    public int updateEventTitle(Event event) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + event.getId())
                 .request(APPLICATION_JSON)
-                .put(Entity.entity(event, APPLICATION_JSON)))
-        {
-            System.out.println(response.toString());
+                .put(Entity.entity(event, APPLICATION_JSON))) {
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
 
     }
@@ -302,14 +389,18 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return status code
      */
     @Override
-    public int addTag(String eventID, Tag tag) {
+    public int addTag(String eventID, Tag tag) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(server)
                 .path("api/events/" + eventID + "/tags")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(tag, APPLICATION_JSON))) {
-            System.out.println(response.toString());
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
     }
 

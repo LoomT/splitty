@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.paint.LinearGradient?>
-<?import javafx.scene.paint.Stop?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-
+<?import java.net.URL?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StartScreenCtrl">
     <children>
       <HBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="600.0" styleClass="navbar">
@@ -70,10 +61,7 @@
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>
             </HBox>
-            <Text fx:id="createEventError" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="errorText" text="%StartScreen.wordLimitError" VBox.vgrow="NEVER">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin></Text>
+            <Label fx:id="createEventError" prefHeight="17.0" prefWidth="336.0" styleClass="warningLabel" text="Character limit has been reached." textFill="RED" />
                 <Label alignment="BOTTOM_LEFT" styleClass="labelFont" text="%StartScreen.joinLabel" VBox.vgrow="NEVER" />
             <HBox VBox.vgrow="NEVER">
                <children>
@@ -84,7 +72,7 @@
                   <Insets bottom="5.0" top="5.0" />
                </VBox.margin>
             </HBox>
-            <Text fx:id="joinError" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="errorText" text="%StartScreen.wordLimitError" VBox.vgrow="NEVER" />
+            <Label fx:id="joinError" prefHeight="17.0" prefWidth="336.0" styleClass="warningLabel" text="Character limit has been reached." textFill="RED" />
                 <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="eventCodeScrollPane" VBox.vgrow="ALWAYS">
                     <content>
                         <VBox fx:id="eventList" scaleShape="false" />

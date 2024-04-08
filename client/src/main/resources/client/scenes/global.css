@@ -246,7 +246,15 @@ the buttons have this class by default and the styles get overwritten
 
 }
 
-.eventListItemContainer:hover {
+.eventListItemContainer {
     -fx-border-width: 0 0 1 0;
+    -fx-border-color: -bg;
+}
+
+.eventListItemContainer:focused .textFont{
+    -fx-text-fill: -focus-col;
+}
+
+.eventListItemContainer:hover {
     -fx-border-color: -border-color;
 }

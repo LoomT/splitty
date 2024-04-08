@@ -16,7 +16,6 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
-import client.components.ErrorPopupCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -55,8 +54,6 @@ public class MainCtrl implements MainCtrlInterface{
 
     private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
-    private ErrorPopupCtrl errorPopupCtrl;
-    private Scene errorPopup;
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
 
@@ -111,9 +108,6 @@ public class MainCtrl implements MainCtrlInterface{
         this.editTitleCtrl = pairCollector.editTitlePage().getKey();
         this.titleChanger = new Scene(pairCollector.editTitlePage().getValue());
 
-        this.errorPopupCtrl = pairCollector.errorPopup().getKey();
-        this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
-
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
@@ -131,6 +125,7 @@ public class MainCtrl implements MainCtrlInterface{
     public void showStartScreen() {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
+        startScreenCtrl.reloadEventCodes();
         primaryStage.setScene(startScreen);
     }
 
@@ -151,6 +146,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void showAdminLogin() {
         primaryStage.setTitle(languageConf.get("AdminLogin.title"));
+        adminLoginCtrl.display();
         primaryStage.setScene(adminLogin);
     }
 
@@ -165,6 +161,7 @@ public class MainCtrl implements MainCtrlInterface{
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -203,24 +200,6 @@ public class MainCtrl implements MainCtrlInterface{
         adminOverviewCtrl.loadAllEvents(); // the password needs to be set before this method
         primaryStage.setTitle(languageConf.get("AdminOverview.title"));
         primaryStage.setScene(adminOverview);
-    }
-
-    /**
-     * Show error popup for general usage
-     * @param stringToken String token to be used as a variable in the error text
-     * @param intToken int token to be used as a variable in the error text
-     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
-     * Check ErrorPopupCtrl for more detailed documentation
-     */
-    @Override
-    public void showErrorPopup(String code, String stringToken, int intToken){
-        errorPopupCtrl.generatePopup(code, stringToken, intToken);
-        Stage stage = new Stage();
-        stage.setScene(errorPopup);
-        stage.setResizable(false);
-        stage.setTitle("Error");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
     }
 
     /**
@@ -264,12 +243,13 @@ public class MainCtrl implements MainCtrlInterface{
      */
     @Override
     public void showAddTagPage(Event event) {
-        addTagCtrl.displayAddTagPage(event);
-        primaryStage.setTitle(languageConf.get("AddTag.addtag"));
-        primaryStage.setScene(addTag);
-        primaryStage.setResizable(false);
-        primaryStage.initModality(Modality.APPLICATION_MODAL);
-        primaryStage.show();
+        Stage stage = new Stage();
+        addTagCtrl.displayAddTagPage(event, stage);
+        stage.setTitle(languageConf.get("AddTag.addtag"));
+        stage.setScene(addTag);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
     }
 
     /**
@@ -293,6 +273,18 @@ public class MainCtrl implements MainCtrlInterface{
                 atZone(ZoneId.systemDefault()).toLocalDate());
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
+    }
 
+    /**
+     * Disconnects from the server and shows an error
+     */
+    @Override
+    public void handleServerNotFound() {
+        websocket.disconnect();
+        adminOverviewCtrl.stopPoller();
+        primaryStage.setTitle(languageConf.get("StartScreen.title"));
+        startScreenCtrl.reset();
+        primaryStage.setScene(startScreen);
+        startScreenCtrl.showServerNotFoundError();
     }
 }
