@@ -12,6 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -21,6 +22,7 @@ public class CurrencyController {
      * @param date date of format yyyy-mm-dd
      * @return string representation of exchange rates
      */
+    @SuppressWarnings("unchecked")
     @GetMapping("api/currency/{date}")
     public ResponseEntity<Map<String, Double>> get(@PathVariable String date){
         try (HttpClient httpClient = HttpClient.newHttpClient()) {
@@ -37,9 +39,12 @@ public class CurrencyController {
             ObjectReader reader = new ObjectMapper().reader().forType(Map.class);
             Map<String, Object> map = reader.readValue(response.body());
 
-            @SuppressWarnings("unchecked")
-            Map<String, Double> rates = (Map<String, Double>) map.get("rates");
-            return ResponseEntity.ok(rates);
+            Map<String, Object> rates = (Map<String, Object>) map.get("rates");
+            Map<String, Double> fixedRates = new HashMap<>();
+            for(Map.Entry<String, Object> entry : rates.entrySet()){
+                fixedRates.put(entry.getKey(), Double.valueOf(String.valueOf(entry.getValue())));
+            }
+            return ResponseEntity.ok(fixedRates);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

@@ -27,4 +27,19 @@ class CurrencyControllerTest {
         assertNotNull(rates);
         System.out.println(rates.keySet());
     }
+
+    @Test
+    void testDoubles() {
+        CurrencyController currencyController = new CurrencyController();
+        Date date = new Date();
+        String dateString = DateTimeFormatter.ISO_DATE
+                .format(date.toInstant().atZone(ZoneOffset.UTC).toLocalDate());
+        ResponseEntity<Map<String, Double>> response = currencyController.get(dateString);
+        Map<String, Double> rates = response.getBody();
+        assert rates != null;
+        for(Map.Entry<String, Double> entry : rates.entrySet()) {
+            assertEquals(Double.class, entry.getValue().getClass());
+        }
+    }
+
 }
