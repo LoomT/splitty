@@ -4,6 +4,7 @@ import client.MyFXML;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
+import client.utils.currency.CurrencyConverter;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
@@ -18,41 +19,45 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import utils.FileManagerMock;
 import utils.TestIO;
 import utils.TestServerUtils;
 import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(ApplicationExtension.class)
 public class EventPageCtrlTest {
 
     EventPageCtrl ctrl;
     TestServerUtils server;
+    FileManagerMock fileManager;
 
     @Start
     public void start(Stage stage) throws IOException {
         server = new TestServerUtils();
+        fileManager = new FileManagerMock();
 
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=http://localhost:8080/
                 lang=en
-                recentEventCodes="""));
+                recentEventCodes=
+                currency=EUR"""));
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
         MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new EventPageCtrl(mainCtrl, languageConf, websocket, server),
+                (type) -> new EventPageCtrl(mainCtrl, languageConf, websocket, server,
+                        new CurrencyConverter(server, fileManager, languageConf), userConfig),
                 StandardCharsets.UTF_8);
         Scene scene = new Scene(eventPageLoader.load());
         ctrl = eventPageLoader.getController();
@@ -100,21 +105,8 @@ public class EventPageCtrlTest {
         Participant p = new Participant("name");
         Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
         ex.setDate(new SimpleDateFormat("MM/dd/yy").parse("01/02/2024"));
-        Event e = new Event("test", List.of(p), List.of(ex));
-        Platform.runLater(
-                () -> {
-                    NumberFormat currencyFormatter = switch (ex.getCurrency()) {
-                        case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
-                        case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
-                        case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
-                        case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
-                        default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
-                    };
-
-                    String formattedAmount = currencyFormatter.format(ex.getAmount());
-                    assertEquals("2.1.2024     name paid " + formattedAmount + " for expense", ctrl.toString(ex));
-                }
-        );
+        assertEquals("2024-01-02     name paid \u20ac20.00 for expense", ctrl.toString(ex));
+        assertTrue(server.getCalls().contains("getExchangeRates"));
     }
 
     @Test
