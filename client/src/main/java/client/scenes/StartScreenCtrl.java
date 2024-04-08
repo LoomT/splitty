@@ -6,20 +6,21 @@ import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
-import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
-import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static client.utils.CommonFunctions.lengthListener;
 
 
 public class StartScreenCtrl {
@@ -41,13 +42,12 @@ public class StartScreenCtrl {
     private VBox eventList;
 
     @FXML
-    private Text joinError;
+    private Label joinError;
 
     @FXML
-    private Text createEventError;
+    private Label createEventError;
 
-    private UserConfig userConfig;
-    private Websocket websocket;
+    private final UserConfig userConfig;
 
     /**
      * start screen controller constructor
@@ -56,23 +56,19 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
-     * @param websocket the ws instance
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig,
-            Websocket websocket
+            UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.websocket = websocket;
-
     }
 
     /**
@@ -87,17 +83,23 @@ public class StartScreenCtrl {
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
-        reloadEventCodes();
-        wordLimitError(code, joinError, 5);
-        wordLimitError(title, createEventError,100);
-
+        joinError.setVisible(false);
+        createEventError.setVisible(false);
+        code.textProperty().addListener((observable, oldValue, newValue) -> {
+            joinError.setVisible(false);
+            String filteredValue = newValue.replaceAll("[^a-zA-Z]", "");
+            if(filteredValue.length() > 5) filteredValue = filteredValue.substring(0, 5);
+            code.setText(filteredValue.toUpperCase());
+        });
+        lengthListener(title, createEventError, 30,
+                languageConf.get("StartScreen.maxEventNameLength"));
     }
 
     /**
      * Reloads the event codes from the user config and updates the event list
      *
      */
-    private void reloadEventCodes() {
+    public void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
 
@@ -126,8 +128,9 @@ public class StartScreenCtrl {
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+                break;
             }
         }
     }
@@ -140,53 +143,30 @@ public class StartScreenCtrl {
     public void reset() {
         title.setText("");
         code.setText("");
-        reloadEventCodes();
+        joinError.setVisible(false);
+        createEventError.setVisible(false);
     }
-
-    /**
-     *
-     * @param textField
-     * @param errorMessage
-     * @param limit
-     */
-    public void wordLimitError(TextField textField, Text errorMessage, int limit){
-        String message = errorMessage.getText();
-        errorMessage.setFill(Color.RED);
-        errorMessage.setVisible(false);
-        textField.textProperty().addListener((observableValue, number, t1)->{
-            errorMessage.setVisible(true);
-            errorMessage.textProperty().bind(Bindings.concat(
-                    message, String.format(" %d/%d", textField.getText().length(), limit)));
-
-            errorMessage.setVisible(textField.getLength() > limit);
-        });
-    }
-
-
 
     /**
      * Creates and joins the event with provided title
      */
     public void create() {
-        String token;
         if (title.getText().isEmpty()){
-            System.out.println("Empty Title Error");
-            token = "StartScreen.emptyEventToken";
-            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
-            return;
-        }
-        else if(title.getText().length() > 100){
-            System.out.println("Character Limit Error");
-            token = "StartScreen.eventWordLimitToken";
-            mainCtrl.showErrorPopup("characterLimitError", token ,100);
+            createEventError.setText(languageConf.get("StartScreen.emptyEventName"));
+            createEventError.setVisible(true);
             return;
         }
         try {
             Event createdEvent = server.createEvent(new Event(title.getText()));
             mainCtrl.showEventPage(createdEvent);
-
         } catch (WebApplicationException e) {
-            System.out.println("Something went wrong while creating an event");
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("restartTheAppMessage"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+        } catch (ConnectException e) {
+            showServerNotFoundError();
         }
     }
 
@@ -195,39 +175,22 @@ public class StartScreenCtrl {
      * Tries to join the inputted event
      */
     public void join() {
-        String token;
-        if (code.getText().isEmpty()){
-            token = "StartScreen.joinEmptyToken";
-            System.out.println("Empty Field Error");
-            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
-            return;
-        }
-        if(code.getText().length() > 5){
-            token = "StartScreen.joinWordLimitToken";
-            System.out.println("Character Limit Error");
-            mainCtrl.showErrorPopup("characterLimitError", token, 5);
-            return;
-        }
-        if(code.getText().length() != 5){
-            token = "StartScreen.joinInvalidToken";
-            System.out.println("Join Code Error");
-            mainCtrl.showErrorPopup("invalidInputError", token, 5);
+        if(code.getText().isEmpty() || code.getText().length() != 5){
+            joinError.setText(languageConf.get("StartScreen.invalidJoinCode"));
+            joinError.setVisible(true);
             return;
         }
         try {
             Event joinedEvent = server.getEvent(code.getText());
             if(joinedEvent == null) {
-                System.out.println("Event not found");
-                // Show visually that event was not found
-                // a full error pop up might be too annoying in this case
+                joinError.setText(languageConf.get("StartScreen.eventNotFoundMessage"));
+                joinError.setVisible(true);
                 return;
             }
             mainCtrl.showEventPage(joinedEvent);
-        } catch (Exception e) {
-            throw e;
+        } catch (ConnectException e) {
+            showServerNotFoundError();
         }
-
-
     }
 
 
@@ -236,5 +199,16 @@ public class StartScreenCtrl {
      */
     public void showAdminLogin() {
         mainCtrl.showAdminLogin();
+    }
+
+    /**
+     * Shows the error if the server is unreachable for some reason
+     */
+    public void showServerNotFoundError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                languageConf.get("StartScreen.serverUnavailableErrorMessage"));
+        alert.setHeaderText(languageConf.get("StartScreen.serverUnavailableErrorHeader"));
+        alert.show();
+        java.awt.Toolkit.getDefaultToolkit().beep();
     }
 }

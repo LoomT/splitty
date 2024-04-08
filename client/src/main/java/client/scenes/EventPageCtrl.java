@@ -27,6 +27,7 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -279,7 +280,11 @@ public class EventPageCtrl {
                     mainCtrl.handleEditExpense(e, event);
                 },
                 () -> {
-                    server.deleteExpense(e.getId(), event.getId());
+                    try {
+                        server.deleteExpense(e.getId(), event.getId());
+                    } catch (ConnectException ex) {
+                        mainCtrl.handleServerNotFound();
+                    }
                 }
             );
             expenseVbox.getChildren().add(ei);
@@ -313,7 +318,6 @@ public class EventPageCtrl {
             private final Button removeButton = new Button("\u274C");
             private final HBox buttonBox = new HBox();
             private final StackPane stackPane = new StackPane();
-
             {
                 stackPane.setAlignment(Pos.CENTER_LEFT);
                 buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -328,7 +332,11 @@ public class EventPageCtrl {
                 removeButton.setOnAction(event -> {
                     int index = getIndex();
                     Expense expense = expenses.get(index);
-                    server.deleteExpense(expense.getId(), ev.getId());
+                    try {
+                        server.deleteExpense(expense.getId(), ev.getId());
+                    } catch (ConnectException e) {
+                        mainCtrl.handleServerNotFound();
+                    }
                 });
             }
 
@@ -433,7 +441,7 @@ public class EventPageCtrl {
     }
 
     /**
-     *
+     * Displays edit title pop-up
      */
     public void changeTitle() {
         mainCtrl.showEditTitle(this.event);
