@@ -6,7 +6,6 @@ import commons.Participant;
 import commons.Tag;
 
 import java.net.ConnectException;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -151,9 +150,9 @@ public interface ServerUtils {
     int addTag(String eventID, Tag tag) throws ConnectException;
 
     /**
-     * @param calendar date of last usage
-     * @return string representation of the exchange rates
+     * @param date date of wanted exchange rates
+     * @return map of the exchange rates
      */
-    Map<String, Double> getExchangeRates(Calendar calendar) throws ConnectException;
+    Map<String, Double> getExchangeRates(String date) throws ConnectException;
 }
 

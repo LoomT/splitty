@@ -495,8 +495,8 @@ public class TestServerUtils implements ServerUtils {
 
     /**
      * test for add tag
-     * @param eventID
-     * @param tag
+     * @param eventID event id
+     * @param tag tag
      * @return
      */
     @Override
@@ -509,7 +509,7 @@ public class TestServerUtils implements ServerUtils {
      * @return mocked version of exchange rate api
      */
     @Override
-    public Map<String, Double> getExchangeRates(Calendar calendar){
+    public Map<String, Double> getExchangeRates(String date){
         calls.add("getExchangeRates");
         //string to mimic real api response from openExchangeRates so all the methods work correctly
         return Map.of("USD", 1d, "EUR", 2d, "JPY", 100d);

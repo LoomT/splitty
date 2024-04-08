@@ -30,9 +30,6 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 import java.net.ConnectException;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -407,13 +404,11 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return map representation of the exchange rates
      */
     @Override
-    public Map<String, Double> getExchangeRates(Calendar date) throws ConnectException {
+    public Map<String, Double> getExchangeRates(String date) throws ConnectException {
         try {
-            String dateString = DateTimeFormatter.ISO_DATE
-                .format(date.toInstant().atZone(ZoneOffset.UTC).toLocalDate());
             return ClientBuilder.newClient(new ClientConfig())
                     .target(server)
-                    .path("api/currency/" + dateString)
+                    .path("api/currency/" + date)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
                     .get(new GenericType<>() {});
