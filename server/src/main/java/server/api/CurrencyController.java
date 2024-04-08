@@ -3,23 +3,15 @@ package server.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import commons.Event;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Currency;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -37,7 +29,8 @@ public class CurrencyController {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url + date + end)).GET().build();
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response =
+                    httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if(response.statusCode() != 200){
                 return ResponseEntity.status(response.statusCode()).build();
             }
