@@ -229,10 +229,10 @@ public class AddExpenseCtrl {
     public void editButton(Event ev, Expense ex) {
         Expense expense = makeExpense(ev);
         if(expense == null) return;
-        expense.setEventID(expense.getEventID());
-        expense.setId(expense.getId());
+        expense.setEventID(ex.getEventID());
+        expense.setId(ex.getId());
         try {
-            server.updateExpense(ex.getId(), ev.getId(), ex);
+            server.updateExpense(ex.getId(), ev.getId(), expense);
         } catch (ConnectException e) {
             mainCtrl.handleServerNotFound();
             return;
