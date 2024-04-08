@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.ADD_TAG;
 
 public class AddExpenseCtrl {
@@ -67,6 +68,8 @@ public class AddExpenseCtrl {
     private Button add;
     @FXML
     private Button addTag;
+    @FXML
+    private Label warningLabel;
 
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
@@ -113,6 +116,8 @@ public class AddExpenseCtrl {
                 return c;
             }
         }));
+
+        lengthListener(purpose, warningLabel, 30, languageConf.get("AddExp.charLimit"));
     }
 
     /**
@@ -121,6 +126,7 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        warningLabel.setVisible(false);
         blockDate();
         setupDateListener();
         date.setDayCellFactory(param -> new DateCell() {
