@@ -1,10 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
@@ -46,7 +43,7 @@ public class AddExpenseCtrl {
     private TextField amount;
 
     @FXML
-    private ChoiceBox<String> currency;
+    private ComboBox<CommonFunctions.HideableItem<String>> currency;
 
     @FXML
     private DatePicker date;
@@ -126,7 +123,8 @@ public class AddExpenseCtrl {
                 return c;
             }
         }));
-
+        CommonFunctions
+                .comboBoxAutoCompletionSupport(converter.getCurrencies(), currency);
         lengthListener(purpose, warningLabel, 20, languageConf.get("AddExp.charLimit"));
     }
 
@@ -153,7 +151,7 @@ public class AddExpenseCtrl {
         populateTypeBox(event);
         purpose.clear();
         amount.clear();
-        populateCurrencyChoiceBox();
+        setPreferredCurrency();
         date.setValue(LocalDate.now());
         populateSplitPeople(event);
         disablePartialSplitCheckboxes(true);
@@ -298,15 +296,12 @@ public class AddExpenseCtrl {
     }
 
     /**
-     * Fill the choices with currency.
+     * Set the preferred currency
      */
-    public void populateCurrencyChoiceBox() {
-        currency.getItems().clear();
-        List<String> currencies = converter.getCurrencies();
-        currency.getItems().addAll(currencies);
+    public void setPreferredCurrency() {
         String cur = userConfig.getCurrency();
         if(!cur.equals("None"))
-            currency.setValue(cur);
+            currency.setValue(new CommonFunctions.HideableItem<>(cur));
     }
 
 
@@ -332,6 +327,7 @@ public class AddExpenseCtrl {
                 purpose.getText().isEmpty() ||
                 amount.getText().isEmpty() ||
                 currency.getValue() == null ||
+                currency.getValue().toString() == null ||
                 (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
                 date.getValue() == null ||
                 type.getValue() == null) {
@@ -358,7 +354,7 @@ public class AddExpenseCtrl {
                             equals(selectedParticipantName))
                     .findFirst().orElseThrow();
 
-            String expCurrency = currency.getValue();
+            String expCurrency = currency.getValue().toString();
 
             String expType = type.getValue();
             Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
@@ -595,7 +591,7 @@ public class AddExpenseCtrl {
      * @param currencyText
      */
     public void setCurrency(String currencyText) {
-        currency.setValue(currencyText);
+        currency.setValue(new CommonFunctions.HideableItem<>(currencyText.toUpperCase()));
     }
 
     /**

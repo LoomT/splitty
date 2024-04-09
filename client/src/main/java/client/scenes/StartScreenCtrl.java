@@ -3,6 +3,7 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -40,7 +41,7 @@ public class StartScreenCtrl {
     @FXML
     private ComboBox<String> languageChoiceBox;
     @FXML
-    private ComboBox<String> currencyChoiceBox;
+    private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
 
     @FXML
     private VBox eventList;
@@ -52,7 +53,7 @@ public class StartScreenCtrl {
     private Label createEventError;
 
     private final UserConfig userConfig;
-    private final CurrencyConverter convert;
+    private final CurrencyConverter converter;
 
     /**
      * start screen controller constructor
@@ -61,7 +62,7 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
-     * @param convert      currency converter
+     * @param converter      currency converter
      */
     @Inject
     public StartScreenCtrl(
@@ -69,14 +70,14 @@ public class StartScreenCtrl {
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             UserConfig userConfig,
-            CurrencyConverter convert
+            CurrencyConverter converter
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.convert = convert;
+        this.converter = converter;
     }
 
     /**
@@ -88,9 +89,8 @@ public class StartScreenCtrl {
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
         languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
         languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
-        languageChoiceBox.setOnAction(event -> {
-            languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
-        });
+        languageChoiceBox.setOnAction(event ->
+                languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue()));
         joinError.setVisible(false);
         createEventError.setVisible(false);
         code.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -102,13 +102,19 @@ public class StartScreenCtrl {
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
 
-        currencyChoiceBox.getItems().addAll(convert.getCurrencies());
+        CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
+                currencyChoiceBox);
         if(!userConfig.getCurrency().equals("None")) {
-            currencyChoiceBox.setValue(userConfig.getCurrency());
+            currencyChoiceBox.setValue(
+                    new CommonFunctions.HideableItem<>(userConfig.getCurrency()));
         }
         currencyChoiceBox.setOnAction(event -> {
             try {
-                userConfig.setCurrency(currencyChoiceBox.getValue());
+                if(currencyChoiceBox.getValue() != null &&
+                        currencyChoiceBox.getValue().toString().length() == 3) {
+
+                    userConfig.setCurrency(currencyChoiceBox.getValue().toString());
+                }
             } catch (IOException e) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setHeaderText(languageConf.get("unexpectedError"));
@@ -117,6 +123,8 @@ public class StartScreenCtrl {
                 alert.showAndWait();
             }
         });
+
+
     }
 
     /**
@@ -139,16 +147,12 @@ public class StartScreenCtrl {
                 EventListItem eventListItem = new EventListItem(
                         event.getTitle(),
                         eventCode,
-                        () -> {
-                            eventList.getChildren().remove(
-                                    list.get(
-                                            recentEventCodes.indexOf(eventCode)
-                                    )
-                            );
-                        },
-                        (String c) -> {
-                            code.setText(c);
-                        }
+                        () -> eventList.getChildren().remove(
+                                list.get(
+                                        recentEventCodes.indexOf(eventCode)
+                                )
+                        ),
+                        code::setText
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
