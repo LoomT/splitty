@@ -3,11 +3,9 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
@@ -18,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -211,6 +208,10 @@ public class StartScreenCtrl {
         java.awt.Toolkit.getDefaultToolkit().beep();
     }
 
+    /**
+     * Open options when options button is clicked
+     */
+    @FXML
     public void optionsClicked() {
         mainCtrl.openOptions();
     }

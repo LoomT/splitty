@@ -155,6 +155,12 @@ public interface ServerUtils {
      */
     Map<String, Double> getExchangeRates(String date) throws ConnectException;
 
+    /**
+     * Pings the server to check if the url is correct
+     *
+     * @param url url to check
+     * @return true if server responds
+     */
     boolean ping(String url);
 }
 

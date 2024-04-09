@@ -18,9 +18,6 @@ package client;
 import com.google.inject.Injector;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.ColorAdjust;
 import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
@@ -31,6 +28,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
+
+import static client.utils.CommonFunctions.getHighContrastEffect;
 
 public class MyFXML {
 
@@ -48,32 +47,19 @@ public class MyFXML {
      *
      * @param c unused obj
      * @param resources the resources for the module
+     * @param isHighContrast for enabling high contrast
      * @param parts path parts
      * @param <T> class
      * @return fxml controller and scene pair
      */
-    public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources, boolean isHighContrast, String... parts) {
+    public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources,
+                                    boolean isHighContrast, String... parts) {
         try {
             var loader = new FXMLLoader(getLocation(parts), resources, null,
                     new MyFactory(), StandardCharsets.UTF_8);
             Parent parent = loader.load();
 
-            ColorAdjust ca = new ColorAdjust();
-            ca.setBrightness(-0.4);
-            ca.setContrast(1);
-
-            Blend b = new Blend();
-            b.setMode(BlendMode.COLOR_BURN);
-            b.setOpacity(.8);
-
-
-
-
-            b.setTopInput(ca);
-//            ca.setInput(b);
-
-
-            if (isHighContrast) parent.setEffect(b);
+            if (isHighContrast) parent.setEffect(getHighContrastEffect());
 
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);

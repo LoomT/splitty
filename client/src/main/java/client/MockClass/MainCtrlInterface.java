@@ -106,5 +106,9 @@ public interface MainCtrlInterface {
      */
     void handleServerNotFound();
 
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
     void openOptions();
 }

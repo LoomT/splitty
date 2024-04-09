@@ -145,7 +145,12 @@ public class MainCtrl implements MainCtrlInterface{
     public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
         editTitleCtrl.displayEditEventTitle(event, stage);
+        stage.show();
     }
 
     /**
@@ -296,6 +301,10 @@ public class MainCtrl implements MainCtrlInterface{
         startScreenCtrl.showServerNotFoundError();
     }
 
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
     @Override
     public void openOptions() {
         Stage stage = new Stage();

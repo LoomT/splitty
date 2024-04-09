@@ -11,6 +11,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.input.KeyEvent;
 
 import java.util.List;
@@ -181,5 +184,21 @@ public class CommonFunctions {
                 }
             });
         });
+    }
+
+    /**
+     * @return a blend for high contrast
+     */
+    public static Blend getHighContrastEffect() {
+        ColorAdjust ca = new ColorAdjust();
+        ca.setBrightness(-0.4);
+        ca.setContrast(1);
+
+        Blend b = new Blend();
+        b.setMode(BlendMode.COLOR_BURN);
+        b.setOpacity(.8);
+
+        b.setTopInput(ca);
+        return b;
     }
 }

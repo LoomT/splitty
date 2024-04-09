@@ -12,7 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
@@ -40,6 +39,7 @@ public class EditTitleCtrl {
     private final LanguageConf languageConf;
 
     private Event event;
+    private Stage stage;
 
     /**
      * start screen controller constructor
@@ -76,7 +76,6 @@ public class EditTitleCtrl {
      */
     @FXML
     public void cancelTitle(){
-        Stage stage = (Stage) saveButton.getScene().getWindow();
         stage.close();
     }
 
@@ -114,14 +113,9 @@ public class EditTitleCtrl {
      */
     public void displayEditEventTitle(Event event, Stage stage){
         this.event = event;
+        this.stage = stage;
         warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
-        stage.setResizable(false);
-        try{
-            stage.initModality(Modality.APPLICATION_MODAL);
-        }catch (Exception ignore){}
-        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
         nameTextField.textProperty().setValue("");
-        stage.show();
     }
 }

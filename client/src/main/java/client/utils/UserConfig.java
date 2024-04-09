@@ -41,6 +41,10 @@ public class UserConfig {
         return configProperties.getProperty("serverURL", "http://localhost:8080/");
     }
 
+    /**
+     * @param url server URL
+     * @throws IOException if config file can not be accessed
+     */
     public void setURL(String url) throws IOException {
         configProperties.setProperty("serverURL", url);
         try (BufferedWriter writer = new BufferedWriter(io.write())) {
@@ -151,16 +155,29 @@ public class UserConfig {
         }
     }
 
+    /**
+     * @return true if high contrast is enabled
+     */
     public boolean getHighContrast() {
         return Boolean.parseBoolean(configProperties.getProperty("highContrast", "false"));
     }
 
+    /**
+     * Does not persist the contrast, reloads the fxml files with the new setting
+     *
+     * @param highContrast high contrast bool
+     */
     public void setHighContrast(boolean highContrast) {
         configProperties.setProperty("highContrast", highContrast ? "true" : "false");
 
         callback.run();
     }
 
+    /**
+     * Persists the currently set contrast option
+     *
+     * @throws IOException if config file can not be accessed
+     */
     public void persistContrast() throws IOException {
         try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed high contrast to "
@@ -169,6 +186,9 @@ public class UserConfig {
         }
     }
 
+    /**
+     * @param function to callback when contrast changes
+     */
     public void onContrastChange(Runnable function) {
         callback = function;
     }

@@ -1,6 +1,5 @@
 package client.scenes;
 
-import client.MockClass.MainCtrlInterface;
 import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -8,18 +7,14 @@ import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
 import jakarta.inject.Inject;
 import javafx.animation.FadeTransition;
-import javafx.animation.Transition;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.effect.Blend;
-import javafx.scene.effect.BlendMode;
-import javafx.scene.effect.ColorAdjust;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+
+import static client.utils.CommonFunctions.getHighContrastEffect;
 
 public class OptionsCtrl {
 
@@ -35,10 +30,16 @@ public class OptionsCtrl {
     private ToggleButton contrastToggle;
     @FXML
     private Label confirmationLabel;
-    Stage stage;
-    FadeTransition ft;
-    boolean lastContrast = false;
+    private Stage stage;
+    private FadeTransition ft;
+    private boolean lastContrast;
 
+    /**
+     * @param userConfig user configuration
+     * @param languageConf language configuration
+     * @param converter currency converter
+     * @param server server utils
+     */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
                        CurrencyConverter converter, ServerUtils server) {
@@ -48,6 +49,9 @@ public class OptionsCtrl {
         this.server = server;
     }
 
+    /**
+     * Initialize all fields and some nodes
+     */
     public void initialize() {
         CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
                 currencyChoiceBox);
@@ -68,32 +72,30 @@ public class OptionsCtrl {
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
     }
 
+    /**
+     * Initializes the stage and lastContrast properties
+     *
+     * @param stage stage this scene is in
+     */
     public void display(Stage stage) {
         this.stage = stage;
         lastContrast = userConfig.getHighContrast();
     }
 
+    /**
+     * Sets the contrast immediately
+     */
     @FXML
     public void contrastClicked() {
-        ColorAdjust ca = new ColorAdjust();
-        ca.setBrightness(-0.4);
-        ca.setContrast(1);
-
-        Blend b = new Blend();
-        b.setMode(BlendMode.COLOR_BURN);
-        b.setOpacity(.8);
-
-
-
-
-        b.setTopInput(ca);
-//            ca.setInput(b);
-
-        if (contrastToggle.isSelected()) stage.getScene().getRoot().setEffect(b);
+        if (contrastToggle.isSelected())
+            stage.getScene().getRoot().setEffect(getHighContrastEffect());
         else stage.getScene().getRoot().setEffect(null);
         userConfig.setHighContrast(contrastToggle.isSelected());
     }
 
+    /**
+     * Saves user selected settings in the config and informs the user
+     */
     @FXML
     public void saveClicked() {
         String serverURL = serverField.getText();
@@ -118,6 +120,9 @@ public class OptionsCtrl {
         ft.play();
     }
 
+    /**
+     * Reset the fields and close the options
+     */
     @FXML
     public void cancelClicked() {
         serverField.setText(userConfig.getUrl());
@@ -127,9 +132,14 @@ public class OptionsCtrl {
                         .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
         currencyChoiceBox.setValue(item);
         contrastToggle.setSelected(lastContrast);
+        userConfig.setHighContrast(lastContrast);
         stage.close();
     }
 
+    /**
+     * Ping the server with the URL in the text field
+     * and display a message based on the result
+     */
     @FXML
     public void checkClicked() {
         serverField.setDisable(true);
@@ -137,9 +147,9 @@ public class OptionsCtrl {
         serverField.setDisable(false);
         ft.stop();
         if(result) {
-            confirmationLabel.setText("Server is up!");
+            confirmationLabel.setText("Server found successfully!");
         } else {
-            confirmationLabel.setText("Server is down!");
+            confirmationLabel.setText("The URL might be incorrect or the server is down");
         }
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
