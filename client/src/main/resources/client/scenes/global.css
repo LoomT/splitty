@@ -199,6 +199,12 @@ the buttons have this class by default and the styles get overwritten
     -fx-cursor: hand;
 }
 
+.selectedTabButton {
+    -fx-background-color: -secondary-hover;
+    -fx-border-color: -secondary-hover;
+    -fx-cursor: default;
+}
+
 
 
 .tabButton:hover {
