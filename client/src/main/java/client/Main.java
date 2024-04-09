@@ -20,7 +20,10 @@ import client.scenes.*;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
 import javafx.application.Application;
+import javafx.scene.effect.ColorAdjust;
 import javafx.stage.Stage;
+
+import java.util.Objects;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -36,7 +39,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch();
     }
 
@@ -64,42 +67,45 @@ public class Main extends Application {
      * @param primaryStage the primary stage
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {  // Load all the FXML here:
+        boolean isHighContrast = false;
         var start = FXML.load(
                 StartScreenCtrl.class,
                 languageConf.getLanguageResources(),
+                isHighContrast,
                 "client", "scenes", "StartScreen.fxml"
         );
+
         var adminLogin = FXML.load(
                 AdminLoginCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AdminLogin.fxml"
         );
         var eventPage = FXML.load(
                 EventPageCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "EventPage.fxml"
         );
         eventPage.getKey().initialize();
         var editParticipants = FXML.load(
                 EditParticipantsCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "EditParticipants.fxml"
         );
         var adminOverview = FXML.load(
                 AdminOverviewCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AdminOverview.fxml"
         );
         var addExpense = FXML.load(
-                AddExpenseCtrl.class, languageConf.getLanguageResources(),
+                AddExpenseCtrl.class, languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddExpense.fxml"
         );
         var titleChanger = FXML.load(
-                EditTitleCtrl.class, languageConf.getLanguageResources(),
+                EditTitleCtrl.class, languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "EditTitle.fxml"
         );
         var addTag = FXML.load(
-                AddTagCtrl.class, languageConf.getLanguageResources(),
+                AddTagCtrl.class, languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddTag.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
