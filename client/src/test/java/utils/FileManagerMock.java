@@ -2,22 +2,20 @@ package utils;
 
 import client.utils.currency.FileManager;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class FileManagerMock implements FileManager {
     private final Map<String, Map<String, Double>> cache;
-    private final Set<String> currencies;
+    private final List<String> currencies;
 
     /**
      * Construct mock file manager
      */
     public FileManagerMock() {
         cache = new HashMap<>();
-        currencies = Set.of("EUR", "GBP", "USD", "CHF", "JPY");
+        currencies = List.of("EUR", "GBP", "USD", "CHF", "JPY");
     }
 
     /**
@@ -27,8 +25,8 @@ public class FileManagerMock implements FileManager {
      * @param date  date of them, yyyy-mm-dd format
      */
     @Override
-    public void add(Map<String, Double> rates, String date) throws IOException {
-        if(!cache.containsKey(date)) return;
+    public void add(Map<String, Double> rates, String date) {
+        if(cache.containsKey(date)) return;
         cache.put(date, rates);
     }
 
@@ -37,7 +35,7 @@ public class FileManagerMock implements FileManager {
      * @return rates, null if not found
      */
     @Override
-    public Map<String, Double> get(String date) throws IOException {
+    public Map<String, Double> get(String date) {
         return cache.get(date);
     }
 
@@ -46,7 +44,7 @@ public class FileManagerMock implements FileManager {
      */
     @Override
     public List<String> getAvailableCurrencies() {
-        return List.of();
+        return currencies;
     }
 
     /**
