@@ -32,6 +32,8 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
+import static commons.WebsocketActions.*;
+
 public class StatisticsCtrl {
 
     @FXML
@@ -116,6 +118,18 @@ public class StatisticsCtrl {
         initCost(event);
         back.setOnAction(e -> {
             mainCtrl.goBackToEventPage(event);
+        });
+        websocket.on(ADD_EXPENSE, e -> {
+            initPieChart(event);
+            initCost(event);
+        });
+        websocket.on(REMOVE_EXPENSE, e -> {
+            initPieChart(event);
+            initCost(event);
+        });
+        websocket.on(UPDATE_EXPENSE, e -> {
+            initPieChart(event);
+            initCost(event);
         });
     }
 
