@@ -34,16 +34,15 @@ public class FlagListCell extends javafx.scene.control.ListCell<String> {
         if (empty || language == null) {
             setGraphic(null);
         } else {
-            // Check if the item is the special "Download Template" option
             final String downloadTemplateOption = "Download Template";
             if (language.equals(downloadTemplateOption)) {
-                // Set the image for the download option
                 Image downloadImage = new Image(
-                        Objects.requireNonNull(getClass().getResourceAsStream("/flags/download_icon.png")));
+                        Objects.requireNonNull(getClass()
+                                .getResourceAsStream(
+                                        "/flags/download_icon.png")));
 
                 imageView.setImage(downloadImage);
             } else {
-                // Proceed with setting the flag image based on the language
                 Image flagImage = new Image(languageConf.get("flag", language));
                 imageView.setImage(flagImage);
             }

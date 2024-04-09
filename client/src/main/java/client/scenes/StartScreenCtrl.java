@@ -114,7 +114,9 @@ public class StartScreenCtrl {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialFileName("template.properties");
 
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Properties files (*.properties)", "*.properties");
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Properties files (*.properties)",
+                        "*.properties");
         fileChooser.getExtensionFilters().add(extFilter);
 
         File file = mainCtrl.showSaveFileDialog(fileChooser);
@@ -136,7 +138,8 @@ public class StartScreenCtrl {
             }
             System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
         } catch (IOException e) {
-            System.err.println("An error occurred while writing the template file: " + e.getMessage());
+            System.err.println("An error occurred while writing the template file: "
+                    + e.getMessage());
         }
 
     }
