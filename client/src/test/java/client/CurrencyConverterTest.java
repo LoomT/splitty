@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import utils.TestIO;
 import utils.TestServerUtils;
+import utils.TestWebsocket;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -25,7 +26,7 @@ class CurrencyConverterTest {
     //ServerUtilsImpl realTest = new ServerUtilsImpl(new UserConfig(new FileIO(URI.create("config.properties").toURL())));
 
     CurrencyConverterTest() {
-        serverUtils = new TestServerUtils();
+        serverUtils = new TestServerUtils(new TestWebsocket());
     }
 
     @BeforeEach

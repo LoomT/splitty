@@ -88,6 +88,7 @@ public class EditTitleCtrl {
         if(nameTextField.getText().isEmpty()) {
             warningLabel.setText(languageConf.get("StartScreen.emptyEventName"));
             warningLabel.setVisible(true);
+            return;
         }
 
         event.setTitle(nameTextField.getText());
@@ -116,7 +117,9 @@ public class EditTitleCtrl {
         warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
-        stage.initModality(Modality.APPLICATION_MODAL);
+        try{
+            stage.initModality(Modality.APPLICATION_MODAL);
+        }catch (Exception ignore){}
         stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
         nameTextField.textProperty().setValue("");
         stage.show();

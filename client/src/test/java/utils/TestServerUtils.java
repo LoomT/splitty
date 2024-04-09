@@ -16,14 +16,15 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
-    private TestWebsocket websocket;
+    private final TestWebsocket websocket;
     private boolean polled;
 
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
+     * @param websocket the websocket to use
      */
-    public TestServerUtils() {
+    public TestServerUtils(TestWebsocket websocket) {
         events = new ArrayList<>();
         counter = 1;
         lastChange = new Date();
@@ -31,7 +32,7 @@ public class TestServerUtils implements ServerUtils {
         statuses = new ArrayList<>();
         polled = false;
         concurrentStatuses = new ConcurrentSkipListSet<>();
-        websocket = new TestWebsocket();
+        this.websocket = websocket;
     }
 
     /**
@@ -469,7 +470,6 @@ public class TestServerUtils implements ServerUtils {
         calls.add("updateEventTitle");
         if(event.getTitle() == null
                 || event.getId() == null
-                || event.getId().length() != 5
                 || event.getTitle().length() > 100
                 || event.getTitle().isEmpty()){
             statuses.add(400);
