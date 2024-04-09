@@ -6,6 +6,7 @@ import jakarta.inject.Inject;
 import javafx.scene.control.Alert;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -62,6 +63,8 @@ public class CurrencyConverter {
                 fileManager.add(rates, date); // cache the rates
             }
             return amount / rates.get(from.toUpperCase()) * rates.get(to.toUpperCase());
+        } catch (ConnectException e) {
+            throw e;
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     languageConf.get("Currency.IOError"));

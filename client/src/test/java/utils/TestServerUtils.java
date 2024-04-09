@@ -516,7 +516,8 @@ public class TestServerUtils implements ServerUtils {
         Map<String, Double> map = new HashMap<>(Map.of(
                 "USD", 1d, "EUR", 2d, "JPY", 100d, "GBP", 1.5d, "CHF", 0.9d));
         for (Map.Entry<String, Double> entry : map.entrySet()) {
-            entry.setValue(entry.getValue() * (((double) Objects.hash(date, count++) / Integer.MAX_VALUE) / 20d + 1));
+            entry.setValue(entry.getValue() *
+                    (((double) Objects.hash(date, count++) / Integer.MAX_VALUE) / 20d + 1));
         }
         return map;
     }

@@ -392,7 +392,7 @@ public class EventPageCtrl {
      * @param exp the expense
      * @return human-readable form
      */
-    public String toString(Expense exp) {;
+    public String toString(Expense exp) {
         String date = DateTimeFormatter.ISO_LOCAL_DATE
                 .format(exp.getDate().toInstant()
                         .atZone(TimeZone.getDefault().toZoneId()));
@@ -406,6 +406,9 @@ public class EventPageCtrl {
                 currency = userConfig.getCurrency().toUpperCase();
             }
 
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return "connection issue";
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     languageConf.get("Currency.IOError"));
