@@ -57,6 +57,11 @@ public class EventPageCtrl {
     private int selectedTab = 0;
 
     @FXML
+    private Button editParticipantsButton;
+    @FXML
+    private Button backButton;
+
+    @FXML
     private ChoiceBox<String> participantChoiceBox;
     @FXML
     private Button addExpenseButton;
@@ -95,9 +100,9 @@ public class EventPageCtrl {
     @Inject
     public EventPageCtrl(
             MainCtrlInterface mainCtrl,
-        LanguageConf languageConf,
-        Websocket websocket,
-        ServerUtils server
+            LanguageConf languageConf,
+            Websocket websocket,
+            ServerUtils server
     ) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
@@ -114,7 +119,8 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
-        editTitleButton.setText("\uD83D\uDD89");
+
+        addIconsToButtons();
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
         if (e.getParticipants().isEmpty()) {
@@ -150,6 +156,26 @@ public class EventPageCtrl {
 
         copiedToClipboardMsg.setVisible(false);
         inviteCode.setText(String.format(languageConf.get("EventPage.inviteCode"), event.getId()));
+    }
+
+    private void addIconsToButtons() {
+        editTitleButton.setText("\uD83D\uDD89");
+
+        String addExText = addExpenseButton.getText();
+        if (!addExText.startsWith("\u2795")) {
+            addExpenseButton.setText("\u2795 " + addExText);
+        }
+
+        String editPText = editParticipantsButton.getText();
+        if (!editPText.startsWith("\uD83D")) {
+            editParticipantsButton.setText("\uD83D\uDD89 " + editPText);
+        }
+
+        String backBText = backButton.getText();
+        if (!backBText.startsWith("\u2190")) {
+            backButton.setText("\u2190 " + backBText);
+        }
+
     }
 
     /**
@@ -280,21 +306,21 @@ public class EventPageCtrl {
             Expense e = expList.get(i);
             String partString = "Included participants: " +
                     buildParticipantsList(e.getExpenseParticipants(),
-                    event.getParticipants());
+                            event.getParticipants());
 
             ExpenseItem ei = new ExpenseItem(
-                toString(e),
-                partString,
-                () -> {
-                    mainCtrl.handleEditExpense(e, event);
-                },
-                () -> {
-                    try {
-                        server.deleteExpense(e.getId(), event.getId());
-                    } catch (ConnectException ex) {
-                        mainCtrl.handleServerNotFound();
+                    toString(e),
+                    partString,
+                    () -> {
+                        mainCtrl.handleEditExpense(e, event);
+                    },
+                    () -> {
+                        try {
+                            server.deleteExpense(e.getId(), event.getId());
+                        } catch (ConnectException ex) {
+                            mainCtrl.handleServerNotFound();
+                        }
                     }
-                }
             );
             expenseVbox.getChildren().add(ei);
         }
@@ -327,6 +353,7 @@ public class EventPageCtrl {
             private final Button removeButton = new Button("\u274C");
             private final HBox buttonBox = new HBox();
             private final StackPane stackPane = new StackPane();
+
             {
                 stackPane.setAlignment(Pos.CENTER_LEFT);
                 buttonBox.setAlignment(Pos.CENTER_RIGHT);
@@ -348,7 +375,6 @@ public class EventPageCtrl {
                     }
                 });
             }
-
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
