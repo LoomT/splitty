@@ -13,10 +13,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
@@ -41,6 +38,8 @@ public class AdminOverviewCtrl {
 
     @FXML
     private ChoiceBox<String> orderByChoiceBox;
+    @FXML
+    private Button backButton;
 
     @FXML
     private CheckBox reverseOrderCheckBox;
@@ -90,6 +89,7 @@ public class AdminOverviewCtrl {
     }
 
     private void orderAndDisplayEvents() {
+        addIconsToButtons();
         switch (orderByChoiceBox.getSelectionModel().getSelectedIndex()) {
             case 0: // Order by creation date
                 allEvents.sort(Comparator.comparing(Event::getCreationDate).reversed());
@@ -122,6 +122,18 @@ public class AdminOverviewCtrl {
                     }
                     );
             eventList.getChildren().add(item);
+        }
+    }
+
+    private void addIconsToButtons() {
+//        String saveText = saveButton.getText();
+//        if (!saveText.startsWith("\uD83D\uDDAB")) {
+//            saveButton.setText("\uD83D\uDDAB " + saveText);
+//        }
+
+        String backBText = backButton.getText();
+        if (!backBText.startsWith("\u2190")) {
+            backButton.setText("\u2190 " + backBText);
         }
     }
 

@@ -30,7 +30,7 @@
             <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
          </padding>
         </HBox>
-          <Button layoutX="14.0" layoutY="89.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EditP.back" />
+          <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EditP.back" />
       <VBox layoutX="105.0" layoutY="89.0" prefHeight="272.0" prefWidth="390.0" styleClass="container">
          <children>
             <HBox alignment="CENTER_LEFT" prefWidth="200.0">
@@ -91,6 +91,6 @@
       </VBox>
     </children>
     <stylesheets>
-        <URL value="@client/scenes/global.css" />
+        <URL value="@/client/scenes/global.css" />
     </stylesheets>
 </AnchorPane>

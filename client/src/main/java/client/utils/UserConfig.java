@@ -126,4 +126,21 @@ public class UserConfig {
             System.out.println("Something went wrong while writing to the config file.");
         }
     }
+
+    /**
+     * @return currently set preferred currency
+     */
+    public String getCurrency() {
+        return configProperties.getProperty("currency", "USD");
+    }
+
+    /**
+     * @param currency newly set preferred currency
+     */
+    public void setCurrency(String currency) throws IOException {
+        configProperties.setProperty("currency", currency);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed currency to " + currency);
+        }
+    }
 }

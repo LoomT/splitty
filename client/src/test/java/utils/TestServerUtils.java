@@ -16,14 +16,15 @@ public class TestServerUtils implements ServerUtils {
     private final List<String> calls;
     private final Set<Integer> concurrentStatuses;
     private final List<Integer> statuses;
-    private TestWebsocket websocket;
+    private final TestWebsocket websocket;
     private boolean polled;
 
     /**
      * constructor
      * sets the counter for setting ids to 1 and the date to current time
+     * @param websocket the websocket to use
      */
-    public TestServerUtils() {
+    public TestServerUtils(TestWebsocket websocket) {
         events = new ArrayList<>();
         counter = 1;
         lastChange = new Date();
@@ -31,7 +32,7 @@ public class TestServerUtils implements ServerUtils {
         statuses = new ArrayList<>();
         polled = false;
         concurrentStatuses = new ConcurrentSkipListSet<>();
-        websocket = new TestWebsocket();
+        this.websocket = websocket;
     }
 
     /**
@@ -252,9 +253,9 @@ public class TestServerUtils implements ServerUtils {
         if(expense == null) return true;
         if(!event.getParticipants().contains(expense.getExpenseAuthor())) return true;
         if(!event.getParticipants().containsAll(expense.getExpenseParticipants())) return true;
-        return expense.getCurrency() != null && expense.getCurrency().length() == 3
-                && expense.getPurpose() != null && !expense.getPurpose().isEmpty()
-                && expense.getDate() != null;
+        return expense.getCurrency() == null || expense.getCurrency().length() != 3
+                || expense.getPurpose() == null || expense.getPurpose().isEmpty()
+                || expense.getDate() == null;
     }
 
     /**
@@ -469,7 +470,6 @@ public class TestServerUtils implements ServerUtils {
         calls.add("updateEventTitle");
         if(event.getTitle() == null
                 || event.getId() == null
-                || event.getId().length() != 5
                 || event.getTitle().length() > 100
                 || event.getTitle().isEmpty()){
             statuses.add(400);
@@ -495,36 +495,31 @@ public class TestServerUtils implements ServerUtils {
 
     /**
      * test for add tag
-     * @param eventID
-     * @param tag
+     * @param eventID event id
+     * @param tag tag
      * @return
      */
     @Override
     public int addTag(String eventID, Tag tag) {
+        calls.add("addTag");
         assertTrue(true);
         return 204;
     }
 
     /**
+     * Has an up to 5% variance for different dates
      * @return mocked version of exchange rate api
      */
     @Override
-    public String getExchangeRates(Calendar calendar){
+    public Map<String, Double> getExchangeRates(String date){
         calls.add("getExchangeRates");
-        //string to mimic real api response from openExchangeRates so all the methods work correctly
-        return """
-                {
-                 {
-                 "disclaimer": "Usage subject to terms: https://not-a-real-website.org/terms",
-                 "license": "https://not-a-real-website.org/license",
-                 "timestamp": 1711807220,
-                 "base": "USD",
-                 "rates": {
-                 "USD": 1,
-                 "EUR": 2,
-                 "CHF": 3,
-                 "GBP": 4
-                 }
-                }""";
+        int count = 0;
+        Map<String, Double> map = new HashMap<>(Map.of(
+                "USD", 1d, "EUR", 2d, "JPY", 100d, "GBP", 1.5d, "CHF", 0.9d));
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            entry.setValue(entry.getValue() *
+                    (((double) Objects.hash(date, count++) / Integer.MAX_VALUE) / 20d + 1));
+        }
+        return map;
     }
 }
