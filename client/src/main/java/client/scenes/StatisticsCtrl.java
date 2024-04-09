@@ -10,6 +10,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Tag;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
@@ -44,6 +45,8 @@ public class StatisticsCtrl {
     private Button back;
     @FXML
     private VBox legend;
+    @FXML
+    private Button editTags;
 
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
@@ -116,6 +119,9 @@ public class StatisticsCtrl {
         initCost(event);
         back.setOnAction(e -> {
             mainCtrl.goBackToEventPage(event);
+        });
+        editTags.setOnAction(e -> {
+            mainCtrl.showTagPage(event);
         });
     }
 
@@ -196,6 +202,12 @@ public class StatisticsCtrl {
             if (slice.getName().startsWith(tag.getName())) {
                 slice.setName(tagInfo);
                 slice.setPieValue(currCost);
+//                if (!slice.getNode().getStyle().equals(tag.getColor())) {
+//                    applyTagColor(slice, tag.getColor());
+//                }
+
+                applyTagColor(slice, tag.getColor());
+
                 found = true;
                 break;
             }
@@ -345,15 +357,31 @@ public class StatisticsCtrl {
      * @return the Color variable
      */
     public static Color hexToColor(String hexCode) {
-        if (!hexCode.startsWith("#")) {
-            hexCode = "#" + hexCode;
+        if (hexCode == null || hexCode.isEmpty() || hexCode.equals("0x")) {
+            // Handle invalid or empty color code
+            return Color.BLACK; // Or any other default color
         }
 
-        int red = Integer.parseInt(hexCode.substring(1, 3), 16);
-        int green = Integer.parseInt(hexCode.substring(3, 5), 16);
-        int blue = Integer.parseInt(hexCode.substring(5, 7), 16);
+        // Remove "#" or "0x" prefix if present
+        hexCode = hexCode.replace("#", "").replace("0x", "");
 
-        return Color.rgb(red, green, blue);
+        // Validate hexadecimal format
+        if (!hexCode.matches("[0-9a-fA-F]+")) {
+            // Handle invalid format
+            return Color.BLACK; // Or any other default color
+        }
+
+        // Parse the hexadecimal color code
+        try {
+            int red = Integer.parseInt(hexCode.substring(0, 2), 16);
+            int green = Integer.parseInt(hexCode.substring(2, 4), 16);
+            int blue = Integer.parseInt(hexCode.substring(4, 6), 16);
+
+            return Color.rgb(red, green, blue);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            // Handle parsing errors
+            return Color.BLACK; // Or any other default color
+        }
     }
 
     /**

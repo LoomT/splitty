@@ -106,12 +106,16 @@ public class Main extends Application {
         var statistics = FXML.load(
                 StatisticsCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "Statistics.fxml");
-        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
+        var tagPage = FXML.load(
+                TagPageCtrl.class, languageConf.getLanguageResources(),
+                "client", "scenes", "TagPage.fxml"
+        );
+                var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag, statistics)
+                adminOverview, addExpense, titleChanger, addTag, statistics, tagPage)
         );
     }
 }

@@ -398,6 +398,22 @@ public class ServerUtilsImpl implements ServerUtils {
         }
     }
 
+    @Override
+    public int updateTag(long id, String eventID, Tag tag) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/tags/" + id)
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(tag, APPLICATION_JSON))) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
+    }
+
     /**
      * @param date date for which to fetch rates
      *

@@ -186,4 +186,9 @@ public class TestMainCtrl implements MainCtrlInterface {
     public void showStatisticsPage(Event event) {
 
     }
+
+    @Override
+    public void showTagPage(Event event) {
+
+    }
 }

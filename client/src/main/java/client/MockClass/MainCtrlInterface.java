@@ -3,6 +3,7 @@ package client.MockClass;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
+import commons.Tag;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -111,4 +112,6 @@ public interface MainCtrlInterface {
      * @param event the current event
      */
     void showStatisticsPage(Event event);
+
+    void showTagPage(Event event);
 }

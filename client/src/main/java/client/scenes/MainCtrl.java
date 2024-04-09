@@ -60,8 +60,8 @@ public class MainCtrl implements MainCtrlInterface{
     private Scene addTag;
     private StatisticsCtrl statisticsCtrl;
     private Scene statistics;
-
-
+    private TagPageCtrl tagPageCtrl;
+    private Scene tagPage;
 
     /**
      * @param websocket the websocket instance
@@ -119,6 +119,9 @@ public class MainCtrl implements MainCtrlInterface{
 
         this.statisticsCtrl = pairCollector.statisticsPage().getKey();
         this.statistics = new Scene(pairCollector.statisticsPage().getValue());
+
+        this.tagPageCtrl = pairCollector.tagPage().getKey();
+        this.tagPage = new Scene(pairCollector.tagPage().getValue());
 
         //showOverview();
         showStartScreen();
@@ -308,5 +311,12 @@ public class MainCtrl implements MainCtrlInterface{
         statisticsCtrl.displayStatisticsPage(event);
         primaryStage.setTitle("Statistics");
         primaryStage.setScene(statistics);
+    }
+
+    @Override
+    public void showTagPage(Event event) {
+        tagPageCtrl.displayTagPage(event);
+        primaryStage.setTitle("Tags overview");
+        primaryStage.setScene(tagPage);
     }
 }

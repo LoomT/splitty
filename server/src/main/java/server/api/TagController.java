@@ -1,8 +1,6 @@
 package server.api;
 
-import commons.Event;
-import commons.Tag;
-import commons.WebsocketActions;
+import commons.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -60,6 +58,30 @@ public class TagController {
                     Map.of("action", WebsocketActions.ADD_TAG,
                             "type", Tag.class.getTypeName()));
             return ResponseEntity.ok(saved);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Tag> updateTag(@PathVariable long id,
+                                         @RequestBody Tag updatedTag,
+                                         @PathVariable String eventID) {
+        try {
+            if (updatedTag == null || !updatedTag.getEventID().equals(eventID)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if(!tagRepo.existsById(new EventWeakKey(eventID, id)))
+                return ResponseEntity.notFound().build();
+
+            tagRepo.save(updatedTag);
+            update(eventID);
+            simp.convertAndSend("/event/" + eventID, updatedTag,
+                    Map.of("action", WebsocketActions.UPDATE_TAG,
+                            "type", Tag.class.getTypeName()));
+            return ResponseEntity.noContent().build();
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

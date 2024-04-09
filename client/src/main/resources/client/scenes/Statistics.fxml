@@ -12,5 +12,6 @@
       <Text fx:id="cost" layoutX="275.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
       <Button fx:id="back" layoutX="9.0" layoutY="361.0" mnemonicParsing="false" text="%Statistics.back" />
       <VBox fx:id="legend" layoutX="504.0" layoutY="50.0" prefHeight="200.0" prefWidth="89.0" />
+      <Button fx:id="editTags" layoutX="8.0" layoutY="57.0" mnemonicParsing="false" text="%Statistics.editTags" />
    </children>
 </AnchorPane>
