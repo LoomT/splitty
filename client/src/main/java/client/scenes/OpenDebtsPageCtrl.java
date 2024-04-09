@@ -140,22 +140,34 @@ public class OpenDebtsPageCtrl {
         for (Participant receiver : partToPartMap.keySet()) {
             for(Participant giver : partToPartMap.get(receiver).keySet()){
                 double cost = partToPartMap.get(receiver).get(giver) - event.getTransactions().stream()
-                        .filter(x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver)).
-                        mapToDouble(Transaction::getAmount).sum();
-                if (cost == 0
+                        .distinct().filter(x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver))
+                        .mapToDouble(Transaction::getAmount).sum() +
+                        event.getTransactions().stream()
+                        .distinct().filter(x -> x.getGiver().equals(receiver) && x.getReceiver().equals(giver))
+                        .mapToDouble(Transaction::getAmount).sum();
+
+                System.out.println(receiver.getName() + " " + giver.getName() + " " +
+                        (cost + " " + event.getTransactions().stream()
+                        .distinct().filter(
+                                x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver)).
+                        mapToDouble(Transaction::getAmount).sum()));
+
+                if (cost <= 0
                         || (flag
                         && giver.equals(participant)
                         && receiver.equals(participant))) {
                     continue;
                 }
                 if(partToPartMap.get(giver) == null || partToPartMap.get(giver).get(receiver) == null){
+                    System.out.println("t1");
                     allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
-                            giver, cost, languageConf));
+                            giver, cost, event, languageConf, server));
                 }
-                else if(partToPartMap.get(receiver).get(giver) - partToPartMap.get(giver).get(receiver) > 0){
-                    cost =  partToPartMap.get(receiver).get(giver) - partToPartMap.get(giver).get(receiver);
+                else if(cost - partToPartMap.get(giver).get(receiver) > 0){
+                    cost -= partToPartMap.get(giver).get(receiver);
                     allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
-                            giver, cost, languageConf));
+                            giver, cost, event, languageConf, server));
+                    System.out.println("t2 " + cost + " " + partToPartMap.get(giver).get(receiver));
                 }
 
             }

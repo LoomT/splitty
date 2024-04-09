@@ -30,7 +30,7 @@
             <Insets left="5.0" right="5.0" />
          </HBox.margin>
       </Button>
-      <Button mnemonicParsing="false" prefHeight="25.0" prefWidth="143.0" text="%OpenDebtsListItem.markReceived" />
+      <Button mnemonicParsing="false" onAction="#settleDebt" prefHeight="25.0" prefWidth="143.0" text="%OpenDebtsListItem.markReceived" />
    </children>
    <padding>
       <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
