@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
@@ -87,6 +88,7 @@ public class EditTitleCtrl {
         if(nameTextField.getText().isEmpty()) {
             warningLabel.setText(languageConf.get("StartScreen.emptyEventName"));
             warningLabel.setVisible(true);
+            return;
         }
 
         event.setTitle(nameTextField.getText());
@@ -115,6 +117,9 @@ public class EditTitleCtrl {
         warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
         stage.setResizable(false);
+        try{
+            stage.initModality(Modality.APPLICATION_MODAL);
+        }catch (Exception ignore){}
         stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
         nameTextField.textProperty().setValue("");
         stage.show();

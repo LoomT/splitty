@@ -139,13 +139,14 @@ public class EditTitleCtrlTest {
     public void emptyTitleTest(FxRobot robot) {
         Platform.runLater(() -> {
             server.getCalls().clear();
+            server.getStatuses().clear();
             websocket.resetTriggers();
             ctrl.displayEditEventTitle(event, stage);
             robot.clickOn("#saveButton");
         });
         waitForFxEvents();
-        assertTrue(server.getCalls().contains("updateEventTitle"));
-        assertTrue(server.getStatuses().contains(400));
+        assertFalse(server.getCalls().contains("updateEventTitle"));
+        assertTrue(server.getStatuses().isEmpty());
         assertFalse(websocket.hasActionBeenTriggered(WebsocketActions.TITLE_CHANGE));
         assertFalse(websocket.hasPayloadBeenSent("newTitle"));
         assertTrue(robot.lookup("#warningLabel").queryAs(Label.class).isVisible());
