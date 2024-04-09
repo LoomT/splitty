@@ -17,7 +17,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -388,8 +387,13 @@ public class AdminOverviewCtrl{
      * go to event listed that is focused on in the eventList
      */
     private void goToEventListed(){
+        System.out.println(eventList.getAlignment());
+
+                /*
         int index = eventList.getSelectionModel().getSelectedIndex();
         if(index == -1) index = 0;
         ((EventListItemAdmin)eventList.getItems().get(index)).goToEvent();
+
+                 */
     }
 }

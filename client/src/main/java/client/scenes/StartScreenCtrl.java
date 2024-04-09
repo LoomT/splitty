@@ -300,9 +300,13 @@ public class StartScreenCtrl {
     }
 
     private void goToEventListed(){
+
+        /*
         int index = eventList.getChildren().getSelectedIndex();
         if(index == -1) index = 0;
         ((EventListItem)eventList.getItems().get(index)).goToEvent();
+
+         */
     }
 
     /**

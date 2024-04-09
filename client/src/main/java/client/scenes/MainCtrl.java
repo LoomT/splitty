@@ -141,7 +141,7 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.initializeShortcuts(addExpense);
         adminLoginCtrl.initializeShortcuts(adminLogin);
         adminOverviewCtrl.initializeShortcuts(adminOverview);
-        editTitleCtrl.initializeShortcuts(editTitle);
+        editTitleCtrl.initializeShortcuts(titleChanger);
 
     }
 
