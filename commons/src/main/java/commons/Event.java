@@ -52,6 +52,10 @@ public class Event implements Cloneable {
     @Column(nullable = false)
     private Date lastActivity;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
+    private List<Tag> tags;
+
     /**
      * No-Argument Constructor
      * Required by JPA
@@ -231,6 +235,22 @@ public class Event implements Cloneable {
      */
     public boolean hasExpense(Expense expense){
         return expenses.contains(expense);
+    }
+
+    /**
+     * getter for tags
+     * @return the list of tags correlated with that event
+     */
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    /**
+     * setter for tags
+     * @param tags tags of the event
+     */
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     /**

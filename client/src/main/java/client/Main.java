@@ -15,12 +15,12 @@
  */
 package client;
 
-import client.components.ErrorPopupCtrl;
+import client.MockClass.MainCtrlInterface;
 import client.scenes.*;
 import client.utils.LanguageConf;
-import client.utils.UserConfig;
 import com.google.inject.Injector;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import static com.google.inject.Guice.createInjector;
@@ -30,7 +30,6 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-    private static final UserConfig userConfig = INJECTOR.getInstance(UserConfig.class);
     private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
@@ -82,7 +81,6 @@ public class Main extends Application {
                 "client", "scenes", "EventPage.fxml"
         );
         eventPage.getKey().initialize();
-
         var editParticipants = FXML.load(
                 EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(),
@@ -93,26 +91,24 @@ public class Main extends Application {
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
-        var errorPopup = FXML.load(
-                ErrorPopupCtrl.class,
-                languageConf.getLanguageResources(),
-                "client", "scenes", "ErrorPopup.fxml"
-        );
         var addExpense = FXML.load(
-                AddExpenseCtrl.class,
-                languageConf.getLanguageResources(),
+                AddExpenseCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
-
         var titleChanger = FXML.load(
-                EditTitleCtrl.class,
-                languageConf.getLanguageResources(),
+                EditTitleCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
         );
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        var addTag = FXML.load(
+                AddTagCtrl.class, languageConf.getLanguageResources(),
+                "client", "scenes", "AddTag.fxml"
+        );
+        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger)
+                adminOverview, addExpense, titleChanger, addTag)
         );
     }
 }

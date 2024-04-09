@@ -1,5 +1,7 @@
 package client.scenes;
 
+import client.components.Confirmation;
+import client.MockClass.MainCtrlInterface;
 import client.components.EventListItemAdmin;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -17,28 +19,34 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.util.ArrayList;
+import java.net.ConnectException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class AdminOverviewCtrl{
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
 
     private final UserConfig userConfig;
     private File initialDirectory;
 
     @FXML
-    private ListView<EventListItemAdmin> eventList;
+    private VBox eventList;
     private String password;
 
     @FXML
     private ChoiceBox<String> orderByChoiceBox;
+
+    @FXML
+    private Button backButton;
 
     @FXML
     private CheckBox reverseOrderCheckBox;
@@ -59,7 +67,7 @@ public class AdminOverviewCtrl{
     @Inject
     public AdminOverviewCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             UserConfig userConfig,
             LanguageConf languageConf
     ) {
@@ -88,8 +96,7 @@ public class AdminOverviewCtrl{
     }
 
     private void orderAndDisplayEvents() {
-        List<EventListItemAdmin> list = new ArrayList<>();
-
+        addIconsToButtons();
         switch (orderByChoiceBox.getSelectionModel().getSelectedIndex()) {
             case 0: // Order by creation date
                 allEvents.sort(Comparator.comparing(Event::getCreationDate).reversed());
@@ -108,31 +115,69 @@ public class AdminOverviewCtrl{
         if (reverseOrderCheckBox.isSelected()) allEvents = allEvents.reversed();
 
 
-        eventList.getItems().clear();
+        eventList.getChildren().clear();
 
         for (Event event : allEvents) {
-            final EventListItemAdmin item =
-                    new EventListItemAdmin(
-                            event.getTitle(),
-                            event.getId(),
-                            () -> {
-                                int status = server.deleteEvent(event.getId());
-                                if(status != 204) {
-                                    System.out.println("Server did not delete the event " + status);
-                                    // TODO maybe trow an error message or smth
-                                } else {
-                                    allEvents.remove(event);
-                                    loadAllEvents();
-                                }
-                            },
-                            () -> eventExportHandler(event),
-                            () -> {
-                                stopPoller();
-                                mainCtrl.showEventPage(event);
-                            }
-                            );
-            eventList.getItems().add(item);
+            final EventListItemAdmin item = new EventListItemAdmin(
+                    event.getTitle(),
+                    event.getId(),
+                    () -> deleteEventButton(event),
+                    () -> eventExportHandler(event),
+                    () -> {
+                        stopPoller();
+                        mainCtrl.showEventPage(event);
+                    }
+                    );
+            eventList.getChildren().add(item);
+        }
+    }
 
+    private void addIconsToButtons() {
+//        String saveText = saveButton.getText();
+//        if (!saveText.startsWith("\uD83D\uDDAB")) {
+//            saveButton.setText("\uD83D\uDDAB " + saveText);
+//        }
+
+        String backBText = backButton.getText();
+        if (!backBText.startsWith("\u2190")) {
+            backButton.setText("\u2190 " + backBText);
+        }
+    }
+
+    /**
+     * Deletes the event from the server and refreshes the list
+     *
+     * @param event event to delete
+     */
+    private void deleteEventButton(Event event) {
+        Confirmation confirmation =
+                new Confirmation(String.format
+                        (languageConf.get("AdminOverview.deleteEventConfirmationMessage"),
+                                event.getId()),
+                        languageConf.get("Confirmation.confirmation"),
+                        languageConf);
+        Optional<ButtonType> button = confirmation.showAndWait();
+        if(button.isEmpty() || button.get().equals(ButtonType.CANCEL))
+            return;
+        int status;
+        try {
+            status = server.deleteEvent(event.getId());
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
+        if(status != 204) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AdminOverview.deleteEventError"));
+            alert.setHeaderText(String
+                    .format(languageConf
+                                    .get("AdminOverview.unexpectedServerResponse"),
+                            status));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+        } else {
+            allEvents.remove(event);
+            loadAllEvents();
         }
     }
 
@@ -165,7 +210,12 @@ public class AdminOverviewCtrl{
      * Reload the events with events from the server
      */
     public void loadAllEvents() {
-        allEvents = server.getEvents(password);
+        try {
+            allEvents = server.getEvents(password);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
         orderAndDisplayEvents();
     }
 
@@ -198,7 +248,7 @@ public class AdminOverviewCtrl{
 
         File file = mainCtrl.showSaveFileDialog(fileChooser);
         if (file == null) {
-            System.out.println("No file selected");
+            // no file selected
             return;
         }
         // Save the file directory the file was saved in
@@ -213,7 +263,11 @@ public class AdminOverviewCtrl{
             String json = ow.writeValueAsString(event);
             writer.write(json);
         } catch (IOException e) {
-            System.out.println("Failed to save the event");
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AdminOverview.writeError"));
+            alert.setHeaderText(languageConf.get("AdminOverview.exportError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
         }
     }
 
@@ -227,7 +281,7 @@ public class AdminOverviewCtrl{
         List<File> files = mainCtrl.showOpenMultipleFileDialog(fileChooser);
 
         if(files == null) {
-            System.out.println("No files selected");
+            // no file selected
             return;
         }
         // Get distinct parent directory of opened files
@@ -247,16 +301,26 @@ public class AdminOverviewCtrl{
                 int status = server.importEvent(password, event);
                 switch (status) {
                     case 400 -> {
-                        System.out.println("Missing participants from the participant list");
-                        // TODO display an error message that the JSON file is incorrect
+                        Alert alert = new Alert(Alert.AlertType.ERROR,
+                                languageConf.get("AdminOverview.missingParticipantError"));
+                        alert.setHeaderText(languageConf.get("AdminOverview.importError"));
+                        java.awt.Toolkit.getDefaultToolkit().beep();
+                        alert.showAndWait();
                     }
                     case 409 -> {
-                        System.out.println("Event already exists in the database");
-                        // TODO maybe show this error to the client in the UI
+                        Alert alert = new Alert(Alert.AlertType.WARNING,
+                                languageConf.get("AdminOverview.eventConflictError"));
+                        alert.setHeaderText(languageConf.get("AdminOverview.importError"));
+                        java.awt.Toolkit.getDefaultToolkit().beep();
+                        alert.showAndWait();
                     }
                 }
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        languageConf.get("AdminOverview.readError"));
+                alert.setHeaderText(languageConf.get("AdminOverview.importError"));
+                java.awt.Toolkit.getDefaultToolkit().beep();
+                alert.showAndWait();
             }
         }
         loadAllEvents();
@@ -268,24 +332,29 @@ public class AdminOverviewCtrl{
      */
     public void initPoller(Long timeOut) {
         if(poller != null && poller.isAlive()) {
-            System.out.println("tried to init poller while still alive");
             return;
         }
         poller = new Thread(() -> {
             while(!Thread.currentThread().isInterrupted()) {
-                int status = server.pollEvents(password, timeOut);
-                if(status == 204 && poller.isAlive())
+                int status;
+                try {
+                    status = server.pollEvents(password, timeOut);
+                } catch (ConnectException e) {
+                    Platform.runLater(mainCtrl::handleServerNotFound);
+                    return;
+                }
+                if(status == 204)
                     Platform.runLater(this::loadAllEvents);
                 else if(status != 408) {
                     Platform.runLater(() -> {
-                        // TODO translate
-                        Alert alert = new Alert(Alert.AlertType.ERROR,
-                                "Long polling error " + status);
-                        alert.showAndWait();
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setHeaderText(languageConf.get("unexpectedError"));
+                        java.awt.Toolkit.getDefaultToolkit().beep();
+                        alert.show();
                         stopPoller();
                         mainCtrl.showAdminLogin();
                     });
-                    poller.interrupt();
+                    return;
                 }
             }});
         poller.start();
@@ -295,7 +364,8 @@ public class AdminOverviewCtrl{
      * Stop the long poller
      */
     public void stopPoller() {
-        poller.interrupt();
+        if(poller != null && !poller.isInterrupted())
+            poller.interrupt();
     }
 
     /**

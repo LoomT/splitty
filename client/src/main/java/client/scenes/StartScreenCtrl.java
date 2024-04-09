@@ -1,29 +1,40 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.*;
+import client.utils.CommonFunctions;
+import client.utils.LanguageConf;
+import client.utils.ServerUtils;
+import client.utils.UserConfig;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.beans.binding.Bindings;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import java.io.File;
+import java.net.ConnectException;
+import java.util.*;
+
+import static client.utils.CommonFunctions.lengthListener;
 
 
 public class StartScreenCtrl {
 
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
 
     @FXML
@@ -34,18 +45,20 @@ public class StartScreenCtrl {
 
     @FXML
     private ComboBox<String> languageChoiceBox;
+    @FXML
+    private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
 
     @FXML
-    private ListView eventList;
+    private VBox eventList;
 
     @FXML
-    private Text joinError;
+    private Label joinError;
 
     @FXML
-    private Text createEventError;
+    private Label createEventError;
 
-    private UserConfig userConfig;
-    private Websocket websocket;
+    private final UserConfig userConfig;
+    private final CurrencyConverter converter;
 
     /**
      * start screen controller constructor
@@ -54,23 +67,22 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
-     * @param websocket the ws instance
+     * @param converter      currency converter
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             UserConfig userConfig,
-            Websocket websocket
+            CurrencyConverter converter
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.websocket = websocket;
-
+        this.converter = converter;
     }
 
     /**
@@ -78,30 +90,118 @@ public class StartScreenCtrl {
      */
     @FXML
     private void initialize() {
+        languageChoiceBoxInitializer();
+        joinError.setVisible(false);
+        createEventError.setVisible(false);
+        code.textProperty().addListener((observable, oldValue, newValue) -> {
+            joinError.setVisible(false);
+            String filteredValue = newValue.replaceAll("[^a-zA-Z]", "");
+            if(filteredValue.length() > 5) filteredValue = filteredValue.substring(0, 5);
+            code.setText(filteredValue.toUpperCase());
+        });
+        lengthListener(title, createEventError, 30,
+                languageConf.get("StartScreen.maxEventNameLength"));
+
+        CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
+                currencyChoiceBox);
+        String cur = userConfig.getCurrency();
+        if(!cur.equals("None")) {
+            CommonFunctions.HideableItem<String> item =
+                    currencyChoiceBox.getItems().stream()
+                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
+            currencyChoiceBox.setValue(item);
+        }
+        currencyChoiceBox.setOnAction(event -> {
+            try {
+                if(currencyChoiceBox.getValue() != null &&
+                        currencyChoiceBox.getValue().toString().length() == 3) {
+
+                    userConfig.setCurrency(currencyChoiceBox.getValue().toString());
+                }
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(languageConf.get("unexpectedError"));
+                alert.setContentText(languageConf.get("UserConfig.IOError"));
+                java.awt.Toolkit.getDefaultToolkit().beep();
+                alert.showAndWait();
+            }
+        });
+
+
+    }
+
+    /**
+     * Initializes the language choice box
+     */
+    private void languageChoiceBoxInitializer() {
         languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+        final String downloadTemplateOption = "Download Template";
+        languageChoiceBox.getItems().add(downloadTemplateOption);
         languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
         languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
         languageChoiceBox.setOnAction(event -> {
-            languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
+            String selectedOption = languageChoiceBox.getValue();
+            if (selectedOption.equals(downloadTemplateOption)) {
+
+                downloadTemplate();
+                languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+            } else {
+
+                languageConf.changeCurrentLocaleTo(selectedOption);
+            }
         });
-        reloadEventCodes();
-        wordLimitError(code, joinError, 5);
-        wordLimitError(title, createEventError,100);
+    }
+
+
+    /**
+     *
+     * Downloads the template
+     */
+    private void downloadTemplate() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("template.properties");
+
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Properties files (*.properties)",
+                        "*.properties");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = mainCtrl.showSaveFileDialog(fileChooser);
+        if (file == null) {
+
+            return;
+        }
+        ResourceBundle bundle = ResourceBundle.getBundle("languages", Locale.of("template"));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            List<String> keyList = new ArrayList<>();
+            Enumeration<String> keys = bundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                keyList.add(key);
+            }
+            keyList.sort(String::compareTo);
+            for (String key : keyList) {
+                writer.write(key + "=" + bundle.getString(key) + "\n");
+            }
+            System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing the template file: "
+                    + e.getMessage());
+        }
 
     }
+
 
     /**
      * Reloads the event codes from the user config and updates the event list
      *
      */
-    private void reloadEventCodes() {
+    public void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
 
-        eventList.getItems().clear();
-
-        //eventList.getChildren().clear();
+        eventList.getChildren().clear();
 
         for (String eventCode : recentEventCodes) {
             try {
@@ -113,7 +213,7 @@ public class StartScreenCtrl {
                 EventListItem eventListItem = new EventListItem(
                         event.getTitle(),
                         eventCode,
-                        () -> eventList.getItems().remove(
+                        () -> eventList.getChildren().remove(
                                 list.get(
                                         recentEventCodes.indexOf(eventCode)
                                 )
@@ -124,9 +224,10 @@ public class StartScreenCtrl {
                         }
                 );
                 list.add(eventListItem);
-                eventList.getItems().add(eventListItem);
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                eventList.getChildren().add(eventListItem);
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+                break;
             }
         }
     }
@@ -139,54 +240,30 @@ public class StartScreenCtrl {
     public void reset() {
         title.setText("");
         code.setText("");
-        reloadEventCodes();
+        joinError.setVisible(false);
+        createEventError.setVisible(false);
     }
-
-    /**
-     *
-     * @param textField
-     * @param errorMessage
-     * @param limit
-     */
-    public void wordLimitError(TextField textField, Text errorMessage, int limit){
-        String message = errorMessage.getText();
-        errorMessage.setFill(Color.RED);
-        errorMessage.setVisible(false);
-        textField.textProperty().addListener((observableValue, number, t1)->{
-            errorMessage.setVisible(true);
-            errorMessage.textProperty().bind(Bindings.concat(
-                    message, String.format(" %d/%d", textField.getText().length(), limit)));
-
-            errorMessage.setVisible(textField.getLength() > limit);
-        });
-    }
-
-
 
     /**
      * Creates and joins the event with provided title
      */
     public void create() {
-        websocket.resetAllActions();
-        String token;
         if (title.getText().isEmpty()){
-            System.out.println("Empty Title Error");
-            token = "StartScreen.emptyEventToken";
-            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
-            return;
-        }
-        else if(title.getText().length() > 100){
-            System.out.println("Character Limit Error");
-            token = "StartScreen.eventWordLimitToken";
-            mainCtrl.showErrorPopup("characterLimitError", token ,100);
+            createEventError.setText(languageConf.get("StartScreen.emptyEventName"));
+            createEventError.setVisible(true);
             return;
         }
         try {
             Event createdEvent = server.createEvent(new Event(title.getText()));
             mainCtrl.showEventPage(createdEvent);
-
         } catch (WebApplicationException e) {
-            System.out.println("Something went wrong while creating an event");
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("restartTheAppMessage"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+        } catch (ConnectException e) {
+            showServerNotFoundError();
         }
     }
 
@@ -195,43 +272,25 @@ public class StartScreenCtrl {
      * Tries to join the inputted event
      */
     public void join() {
-        websocket.resetAllActions();
-        String token;
-        if (code.getText().isEmpty()){
-            token = "StartScreen.joinEmptyToken";
-            System.out.println("Empty Field Error");
-            mainCtrl.showErrorPopup("emptyFieldError", token, 0);
-            return;
-        }
-        if(code.getText().length() > 5){
-            token = "StartScreen.joinWordLimitToken";
-            System.out.println("Character Limit Error");
-            mainCtrl.showErrorPopup("characterLimitError", token, 5);
-            return;
-        }
-        if(code.getText().length() != 5){
-            token = "StartScreen.joinInvalidToken";
-            System.out.println("Join Code Error");
-            mainCtrl.showErrorPopup("invalidInputError", token, 5);
+        if(code.getText().isEmpty() || code.getText().length() != 5){
+            joinError.setText(languageConf.get("StartScreen.invalidJoinCode"));
+            joinError.setVisible(true);
             return;
         }
         try {
             Event joinedEvent = server.getEvent(code.getText());
             if(joinedEvent == null) {
-                System.out.println("Event not found");
-                // Show visually that event was not found
-                // a full error pop up might be too annoying in this case
+                joinError.setText(languageConf.get("StartScreen.eventNotFoundMessage"));
+                joinError.setVisible(true);
                 return;
             }
             mainCtrl.showEventPage(joinedEvent);
-        } catch (Exception e) {
-            throw e;
-            //System.out.println("Something went wrong while joining an event");
+        } catch (ConnectException e) {
+            showServerNotFoundError();
         }
 
 
     }
-
 
     /**
      * Display admin login
@@ -241,7 +300,7 @@ public class StartScreenCtrl {
     }
 
     private void goToEventListed(){
-        int index = eventList.getSelectionModel().getSelectedIndex();
+        int index = eventList.getChildren().getSelectedIndex();
         if(index == -1) index = 0;
         ((EventListItem)eventList.getItems().get(index)).goToEvent();
     }
@@ -259,5 +318,16 @@ public class StartScreenCtrl {
         MainCtrl.checkKey(scene, this::goToEventListed, eventList, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
                 languageChoiceBox, KeyCode.ENTER);
+    }
+
+    /**
+     * Shows the error if the server is unreachable for some reason
+     */
+    public void showServerNotFoundError() {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                languageConf.get("StartScreen.serverUnavailableErrorMessage"));
+        alert.setHeaderText(languageConf.get("StartScreen.serverUnavailableErrorHeader"));
+        alert.show();
+        java.awt.Toolkit.getDefaultToolkit().beep();
     }
 }
