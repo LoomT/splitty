@@ -141,6 +141,7 @@ public class MainCtrl implements MainCtrlInterface{
     public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
         editTitleCtrl.displayEditEventTitle(event, stage);
     }
 
@@ -253,6 +254,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setScene(addTag);
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.show();
     }
 
