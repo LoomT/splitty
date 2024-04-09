@@ -141,6 +141,7 @@ public class StartScreenCtrl {
             if (selectedOption.equals(downloadTemplateOption)) {
 
                 downloadTemplate();
+                languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
             } else {
 
                 languageConf.changeCurrentLocaleTo(selectedOption);
