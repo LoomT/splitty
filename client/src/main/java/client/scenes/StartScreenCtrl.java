@@ -40,8 +40,6 @@ public class StartScreenCtrl {
 
     @FXML
     private ComboBox<String> languageChoiceBox;
-    @FXML
-    private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
 
     @FXML
     private VBox eventList;
@@ -53,7 +51,6 @@ public class StartScreenCtrl {
     private Label createEventError;
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
 
     /**
      * start screen controller constructor
@@ -62,22 +59,19 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
-     * @param converter      currency converter
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig,
-            CurrencyConverter converter
+            UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.converter = converter;
     }
 
     /**
@@ -101,32 +95,6 @@ public class StartScreenCtrl {
         });
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
-
-        CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
-                currencyChoiceBox);
-        String cur = userConfig.getCurrency();
-        if(!cur.equals("None")) {
-            CommonFunctions.HideableItem<String> item =
-                    currencyChoiceBox.getItems().stream()
-                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
-            currencyChoiceBox.setValue(item);
-        }
-        currencyChoiceBox.setOnAction(event -> {
-            try {
-                if(currencyChoiceBox.getValue() != null &&
-                        currencyChoiceBox.getValue().toString().length() == 3) {
-
-                    userConfig.setCurrency(currencyChoiceBox.getValue().toString());
-                }
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.setContentText(languageConf.get("UserConfig.IOError"));
-                java.awt.Toolkit.getDefaultToolkit().beep();
-                alert.showAndWait();
-            }
-        });
-
 
     }
 
@@ -241,5 +209,9 @@ public class StartScreenCtrl {
         alert.setHeaderText(languageConf.get("StartScreen.serverUnavailableErrorHeader"));
         alert.show();
         java.awt.Toolkit.getDefaultToolkit().beep();
+    }
+
+    public void optionsClicked() {
+        mainCtrl.openOptions();
     }
 }
