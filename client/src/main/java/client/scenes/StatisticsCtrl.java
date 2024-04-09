@@ -345,29 +345,19 @@ public class StatisticsCtrl {
      */
     public static Color hexToColor(String hexCode) {
         if (hexCode == null || hexCode.isEmpty() || hexCode.equals("0x")) {
-            // Handle invalid or empty color code
-            return Color.BLACK; // Or any other default color
+            return Color.BLACK;
         }
-
-        // Remove "#" or "0x" prefix if present
         hexCode = hexCode.replace("#", "").replace("0x", "");
-
-        // Validate hexadecimal format
         if (!hexCode.matches("[0-9a-fA-F]+")) {
-            // Handle invalid format
-            return Color.BLACK; // Or any other default color
+            return Color.BLACK;
         }
-
-        // Parse the hexadecimal color code
         try {
             int red = Integer.parseInt(hexCode.substring(0, 2), 16);
             int green = Integer.parseInt(hexCode.substring(2, 4), 16);
             int blue = Integer.parseInt(hexCode.substring(4, 6), 16);
-
             return Color.rgb(red, green, blue);
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            // Handle parsing errors
-            return Color.BLACK; // Or any other default color
+            return Color.BLACK;
         }
     }
 
