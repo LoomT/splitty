@@ -104,9 +104,12 @@ public class StartScreenCtrl {
 
         CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
                 currencyChoiceBox);
-        if(!userConfig.getCurrency().equals("None")) {
-            currencyChoiceBox.setValue(
-                    new CommonFunctions.HideableItem<>(userConfig.getCurrency()));
+        String cur = userConfig.getCurrency();
+        if(!cur.equals("None")) {
+            CommonFunctions.HideableItem<String> item =
+                    currencyChoiceBox.getItems().stream()
+                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
+            currencyChoiceBox.setValue(item);
         }
         currencyChoiceBox.setOnAction(event -> {
             try {

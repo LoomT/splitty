@@ -300,8 +300,12 @@ public class AddExpenseCtrl {
      */
     public void setPreferredCurrency() {
         String cur = userConfig.getCurrency();
-        if(!cur.equals("None"))
-            currency.setValue(new CommonFunctions.HideableItem<>(cur));
+        if(!cur.equals("None")) {
+            CommonFunctions.HideableItem<String> item =
+                    currency.getItems().stream()
+                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
+            currency.setValue(item);
+        }
     }
 
 
@@ -554,7 +558,6 @@ public class AddExpenseCtrl {
     private void resetExpenseFields() {
         purpose.clear();
         amount.clear();
-        currency.getSelectionModel().clearSelection();
         date.setValue(LocalDate.now());
         expenseAuthor.getSelectionModel().clearSelection();
         equalSplit.setSelected(false);

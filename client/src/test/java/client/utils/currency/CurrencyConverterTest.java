@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import utils.FileManagerMock;
 import utils.TestIO;
 import utils.TestServerUtils;
+import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -23,7 +24,7 @@ class CurrencyConverterTest {
 
     @BeforeEach
     void setup() throws IOException {
-        server = new TestServerUtils();
+        server = new TestServerUtils(new TestWebsocket());
         fileManager = new FileManagerMock();
         UserConfig userConfig = new UserConfig(new TestIO("""
                                 serverURL=http://localhost:8080/
