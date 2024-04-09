@@ -226,8 +226,9 @@ public class EventPageCtrl {
         );
         websocket.on(WebsocketActions.ADD_TRANSACTION,
                 transaction -> {
-                    if (event.getTransactions().contains((Transaction) transaction))
+                    if (event.getTransactions().contains((Transaction) transaction)){
                         return;
+                    }
                     event.addTransaction((Transaction) transaction);
                     mainCtrl.updateOpenDebtsPage(event);
                 });
@@ -383,7 +384,6 @@ public class EventPageCtrl {
                 stackPane.getChildren().addAll(new Text(), buttonBox);
                 editButton.setOnAction(event -> {
                     int index = getIndex();
-                    System.out.println(index);
                     Expense expense = expenses.get(index);
                     mainCtrl.handleEditExpense(expense, ev);
                 });

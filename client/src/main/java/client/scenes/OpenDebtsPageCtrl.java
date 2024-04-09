@@ -132,10 +132,7 @@ public class OpenDebtsPageCtrl {
                 double cost = debtMap.get(receiver).get(giver)
                         - event.getTransactions().stream().distinct().
                         filter(x -> x.getGiver().equals(giver) && x.getReceiver().
-                                equals(receiver)).mapToDouble(Transaction::getAmount).sum()
-                        + event.getTransactions().stream().distinct().filter(
-                                x -> x.getGiver().equals(receiver)
-                        && x.getReceiver().equals(giver)).mapToDouble(Transaction::getAmount).sum();
+                                equals(receiver)).mapToDouble(Transaction::getAmount).sum();
                 debtMap.get(receiver).put(giver, cost);
             }
         }
@@ -151,14 +148,10 @@ public class OpenDebtsPageCtrl {
      */
     public void minCashFlow(Map<Participant, Map<Participant, Double>> debtMap, Event event){
         Map<Participant, Double> map = new HashMap<>();
+        event.getParticipants().forEach(p -> map.put(p, 0.0));
         for(Participant p : event.getParticipants()){
             for (Participant i : event.getParticipants()){
                 if(p.equals(i)) continue;
-                map.putIfAbsent(p, 0.0);
-                debtMap.putIfAbsent(i, new HashMap<>());
-                debtMap.putIfAbsent(p, new HashMap<>());
-                debtMap.get(i).putIfAbsent(p, 0.0);
-                debtMap.get(p).putIfAbsent(i, 0.0);
                 map.put(p, map.get(p) + debtMap.get(i).get(p) - debtMap.get(p).get(i));
             }
         }
