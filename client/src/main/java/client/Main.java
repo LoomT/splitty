@@ -15,12 +15,11 @@
  */
 package client;
 
-import client.components.ErrorPopupCtrl;
 import client.scenes.*;
 import client.utils.LanguageConf;
-import client.utils.UserConfig;
 import com.google.inject.Injector;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import static com.google.inject.Guice.createInjector;
@@ -30,7 +29,6 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-    private static final UserConfig userConfig = INJECTOR.getInstance(UserConfig.class);
     private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
@@ -66,39 +64,47 @@ public class Main extends Application {
      * @param primaryStage the primary stage
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {  // Load all the FXML here:
-        var start = FXML.load(StartScreenCtrl.class,
+        var start = FXML.load(
+                StartScreenCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "StartScreen.fxml"
         );
-        var adminLogin = FXML.load(AdminLoginCtrl.class,
+        var adminLogin = FXML.load(
+                AdminLoginCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminLogin.fxml"
         );
-        var eventPage = FXML.load(EventPageCtrl.class,
+        var eventPage = FXML.load(
+                EventPageCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EventPage.fxml"
         );
-        var editParticipants = FXML.load(EditParticipantsCtrl.class,
+        eventPage.getKey().initialize();
+        var editParticipants = FXML.load(
+                EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "EditParticipants.fxml"
         );
-        var adminOverview = FXML.load(AdminOverviewCtrl.class,
+        var adminOverview = FXML.load(
+                AdminOverviewCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AdminOverview.fxml"
         );
-        var errorPopup = FXML.load(ErrorPopupCtrl.class,
-                languageConf.getLanguageResources(),
-                "client", "scenes", "ErrorPopup.fxml"
-        );
-        var addExpense = FXML.load(AddExpenseCtrl.class,
-                languageConf.getLanguageResources(),
+        var addExpense = FXML.load(
+                AddExpenseCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "AddExpense.fxml"
         );
-
-        var titleChanger = FXML.load(EditTitleCtrl.class,
-                languageConf.getLanguageResources(),
+        var titleChanger = FXML.load(
+                EditTitleCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "EditTitle.fxml"
         );
+        var addTag = FXML.load(
+                AddTagCtrl.class, languageConf.getLanguageResources(),
+                "client", "scenes", "AddTag.fxml"
+        );
+
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
         var addCustomTransaction = FXML.load(AddCustomTransactionCtrl.class,
                 languageConf.getLanguageResources(),
                 "client", "scenes", "AddCustomTransaction.fxml"
@@ -109,10 +115,10 @@ public class Main extends Application {
         );
 
         var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, errorPopup, titleChanger,
-                addCustomTransaction, openDebtsPage)
-        );
+                adminOverview, addExpense, titleChanger, addTag,
+                addCustomTransaction, openDebtsPage));
     }
 }

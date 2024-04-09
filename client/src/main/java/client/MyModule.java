@@ -16,7 +16,13 @@
 package client;
 
 import client.scenes.*;
+import client.MockClass.MainCtrlInterface;
+import client.scenes.MainCtrl;
+import client.scenes.StartScreenCtrl;
 import client.utils.*;
+import client.utils.currency.CurrencyConverter;
+import client.utils.currency.FileManager;
+import client.utils.currency.FileManagerImpl;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Scopes;
@@ -30,7 +36,7 @@ public class MyModule implements Module {
      */
     @Override
     public void configure(Binder binder) {
-        binder.bind(MainCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(MainCtrlInterface.class).to(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddCustomTransactionCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddExpenseCtrl.class).in(Scopes.SINGLETON);
@@ -44,6 +50,7 @@ public class MyModule implements Module {
         binder.bind(IOInterface.class).toInstance(new FileIO(UserConfig.class.getClassLoader()
                 .getResource("client/config.properties")));
         binder.bind(Websocket.class).to(WebsocketImpl.class).in(Scopes.SINGLETON);
-
+        binder.bind(FileManager.class).to(FileManagerImpl.class).in(Scopes.SINGLETON);
+        binder.bind(CurrencyConverter.class).in(Scopes.SINGLETON);
     }
 }

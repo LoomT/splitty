@@ -20,6 +20,9 @@ public class EventListItem extends HBox {
 
     private String eventName;
 
+    @FXML
+    private Button deleteButton;
+
     private String id;
     private Runnable onRemoveCallback;
     private Consumer<String> onClickCallback;
@@ -44,7 +47,7 @@ public class EventListItem extends HBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
-
+        deleteButton.setText("\u274C");
         this.eventName = eventName;
         this.id = id;
         this.onRemoveCallback = onRemove;

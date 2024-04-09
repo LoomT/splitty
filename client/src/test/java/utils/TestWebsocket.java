@@ -1,13 +1,12 @@
 package utils;
 
-import commons.Event;
 import client.utils.Websocket;
+import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.Set;
+
+import java.util.*;
 import java.util.function.Consumer;
 
 public class TestWebsocket implements Websocket {
@@ -15,6 +14,9 @@ public class TestWebsocket implements Websocket {
     private String eventID;
     private boolean connected = false;
     private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+
+    private final List<WebsocketActions> triggeredActions = new ArrayList<>();
+    private final List<Object> payloads = new ArrayList<>();
 
 
     /**
@@ -142,7 +144,7 @@ public class TestWebsocket implements Websocket {
 
         this.resetAction(WebsocketActions.UPDATE_EXPENSE);
         this.resetAction(WebsocketActions.ADD_EXPENSE);
-        this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
+        this.resetAction(WebsocketActions.REMOVE_EXPENSE);
 
         this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
@@ -207,23 +209,6 @@ public class TestWebsocket implements Websocket {
         functions.clear();
     }
 
-
-    /**
-     * Registers all the change listeners on WS if they're not registered already
-     * @param currEvent the event in which we listen on the participant changes
-     * @param updateEventCallback this is called when an Event is updated
-     */
-    @Override
-    public void registerEventChangeListener(Event currEvent, Consumer<Event> updateEventCallback) {
-        this.resetAction(WebsocketActions.TITLE_CHANGE);
-
-        this.on(WebsocketActions.TITLE_CHANGE, (Object e)->{
-            String title = (String) e;
-            currEvent.setTitle(title);
-            updateEventCallback.accept(currEvent);
-        });
-    }
-
     /**
      * simulateAction is used to simulate an action from the server.
      * It triggers all registered consumers for the specified action.
@@ -232,6 +217,8 @@ public class TestWebsocket implements Websocket {
      * @param payload The payload to pass to the consumers for this action.
      */
     public void simulateAction(WebsocketActions action, Object payload) {
+        triggeredActions.add(action);
+        payloads.add(payload);
         Set<Consumer<Object>> consumers = functions.get(action);
         if (consumers != null && !consumers.isEmpty()) {
             for (Consumer<Object> consumer : consumers) {
@@ -260,4 +247,45 @@ public class TestWebsocket implements Websocket {
     public String getEventID() {
         return eventID;
     }
+
+
+    /**
+     * Checks if a specific action has been triggered
+     *
+     * @param action The action to check for
+     * @return true if the action has been triggered, false otherwise
+     */
+    public boolean hasActionBeenTriggered(WebsocketActions action) {
+        return triggeredActions.contains(action);
+    }
+
+    /**
+     * Checks if a specific payload has been sent
+     *
+     * @param expectedPayload The payload to check for
+     * @return true if the payload has been sent, false otherwise
+     */
+    public boolean hasPayloadBeenSent(Object expectedPayload) {
+        return payloads.stream().anyMatch(payload -> payload.equals(expectedPayload));
+    }
+
+
+    /**
+     * Returns list of payloads
+     *
+     * @return list of payloads
+     */
+    public List<Object> getPayloads() {
+        return payloads;
+    }
+
+    /**
+     * Resets the list of triggered actions and payloads
+     */
+
+    public void resetTriggers() {
+        triggeredActions.clear();
+        payloads.clear();
+    }
 }
+

@@ -1,135 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="501.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddExpenseCtrl">
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.net.URL?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddExpenseCtrl">
     <children>
-        <Pane layoutX="3.0" layoutY="8.0" prefHeight="56.0" prefWidth="600.0" style="-fx-background-color: #ddd;">
-            <children>
-                <Text fill="#281111" layoutX="8.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.addeditexp">
+      <HBox prefWidth="600.0" styleClass="navbar">
+         <children>
+                <Text fill="#281111" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="titleFont" text="%AddExp.addeditexp">
                     <font>
                         <Font name="System Bold" size="33.0" />
                     </font>
                 </Text>
-            </children>
-        </Pane>
-        <VBox layoutX="154.0" layoutY="94.0" prefHeight="267.0" prefWidth="298.0">
+
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+      </HBox>
+        <VBox layoutX="120.0" layoutY="84.0" prefHeight="302.0" prefWidth="360.0" styleClass="container">
+
             <children>
-                <HBox prefHeight="38.0" prefWidth="298.0">
-                    <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.whopaid">
+            <GridPane prefHeight="163.0" prefWidth="447.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="176.00003662109376" minWidth="10.0" prefWidth="141.60001220703126" />
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="190.40000762939454" minWidth="10.0" prefWidth="163.19998779296876" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.whopaid">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
                         </Text>
-                        <ChoiceBox fx:id="expenseAuthor" prefHeight="26.0" prefWidth="121.0" style="-fx-translate-x: 20;">
+                        <ChoiceBox fx:id="expenseAuthor" maxWidth="1.7976931348623157E308" styleClass="sbutton" GridPane.columnIndex="1">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>
                         </ChoiceBox>
-                    </children>
-                </HBox>
-                <HBox prefHeight="35.0" prefWidth="298.0">
-                    <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.whatfor">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.whatfor" GridPane.rowIndex="1">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
                         </Text>
-                        <TextField fx:id="purpose" style="-fx-translate-x: 27;">
+                        <TextField fx:id="purpose" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="1">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>
                         </TextField>
-                    </children>
-                </HBox>
-                <HBox prefHeight="36.0" prefWidth="298.0">
-                    <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.howmuch">
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.howmuch" GridPane.rowIndex="2">
                             <font>
                                 <Font name="System Bold" size="20.0" />
                             </font>
                         </Text>
-                        <TextField fx:id="amount" prefHeight="26.0" prefWidth="91.0" style="-fx-translate-x: 10;">
-                            <opaqueInsets>
-                                <Insets />
-                            </opaqueInsets>
-                        </TextField>
-                        <ChoiceBox fx:id="currency" prefHeight="26.0" prefWidth="48.0" style="-fx-translate-x: 25;" />
-                    </children>
-                </HBox>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.when">
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                     <children>
+                              <TextField fx:id="amount" prefHeight="27.0" styleClass="ntextfield">
+                                  <opaqueInsets>
+                                      <Insets />
+                                  </opaqueInsets>
+                           <HBox.margin>
+                              <Insets right="5.0" />
+                           </HBox.margin>
+                              </TextField>
+                        <ComboBox fx:id="currency" minWidth="-Infinity" prefHeight="27.0" prefWidth="70.0" styleClass="sbutton" />
+                     </children>
+                  </HBox>
+                      <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.when" GridPane.rowIndex="3">
+                          <font>
+                              <Font name="System Bold" size="20.0" />
+                          </font>
+                      </Text>
+                      <DatePicker fx:id="date" prefHeight="27.0" prefWidth="200.0" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                      <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.expensetype" GridPane.rowIndex="4">
+                          <font>
+                              <Font name="System Bold" size="20.0" />
+                          </font>
+                      </Text>
+                      <ComboBox fx:id="type" maxWidth="1.7976931348623157E308" prefHeight="27.0" styleClass="sbutton" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+               </children>
+            </GridPane>
+                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.howtosplit">
                     <font>
                         <Font name="System Bold" size="20.0" />
                     </font>
                 </Text>
-                <DatePicker fx:id="date" prefHeight="26.0" prefWidth="163.0" style="-fx-translate-x: 110; -fx-translate-y: -27;" />
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-translate-y: -15;" text="%AddExp.howtosplit">
-                    <font>
-                        <Font name="System Bold" size="20.0" />
-                    </font>
-                </Text>
-                <HBox prefHeight="28.0" prefWidth="144.0">
-                    <children>
-                        <CheckBox fx:id="equalSplit" mnemonicParsing="false" text="%AddExp.equalsplit">
-                            <font>
-                                <Font name="System Bold" size="15.0" />
-                            </font>
-                        </CheckBox>
-                    </children>
-                </HBox>
-                <HBox prefHeight="27.0" prefWidth="298.0">
-                    <children>
-                        <CheckBox fx:id="partialSplit" mnemonicParsing="false" text="%AddExp.partialsplit">
-                            <font>
-                                <Font name="System Bold" size="15.0" />
-                            </font>
-                        </CheckBox>
-                    </children>
-                </HBox>
+                  <CheckBox fx:id="equalSplit" mnemonicParsing="false" styleClass="textFont" text="%AddExp.equalsplit">
+                      <font>
+                          <Font name="System Bold" size="15.0" />
+                      </font>
+                  </CheckBox>
+                  <CheckBox fx:id="partialSplit" mnemonicParsing="false" styleClass="textFont" text="%AddExp.partialsplit">
+                      <font>
+                          <Font name="System Bold" size="15.0" />
+                      </font>
+                  </CheckBox>
+              <TextFlow fx:id="expenseParticipants" prefHeight="64.0" prefWidth="108.0">
+                  <children>
+                      <CheckBox mnemonicParsing="false" styleClass="textFont" text="Chris" />
+                      <CheckBox mnemonicParsing="false" styleClass="textFont" text="John" />
+                  </children>
+              </TextFlow>
+              <HBox prefHeight="28.0" prefWidth="200.0">
+                  <children>
+                  <Button fx:id="addTag" minWidth="-Infinity" mnemonicParsing="false" styleClass="sbutton" text="%AddTag.addtag">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
+                      <Button fx:id="add" minWidth="-Infinity" mnemonicParsing="false" styleClass="pbutton" text="%AddExp.add">
+                          <font>
+                              <Font size="15.0" />
+                          </font>
+                      </Button>
+                  <Region minWidth="-Infinity" prefHeight="200.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+                  <Label fx:id="warningLabel" maxHeight="1.7976931348623157E308" styleClass="warningLabel" text="%AddExp.charLimit" textFill="RED" HBox.hgrow="ALWAYS" />
+                  </children>
+              </HBox>
             </children>
         </VBox>
-        <TextFlow fx:id="expenseParticipants" layoutX="154.0" layoutY="331.0" prefHeight="64.0" prefWidth="108.0" style="-fx-border-color: #000; -fx-translate-x: 20;">
-            <children>
-                <CheckBox mnemonicParsing="false" style="-fx-translate-y: 20; -fx-translate-x: 15;" text="Chris" />
-                <CheckBox mnemonicParsing="false" style="-fx-translate-x: -37;" text="John" />
-            </children>
-        </TextFlow>
-        <HBox layoutX="154.0" layoutY="417.0" prefHeight="36.0" prefWidth="298.0">
-            <children>
-                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="%AddExp.expensetype">
-                    <font>
-                        <Font name="System Bold" size="20.0" />
-                    </font>
-                </Text>
-                <ChoiceBox fx:id="type" prefHeight="26.0" prefWidth="134.0" style="-fx-translate-x: 30;" />
-            </children>
-        </HBox>
-        <HBox layoutX="252.0" layoutY="453.0" prefHeight="28.0" prefWidth="200.0">
-            <children>
-                <Button fx:id="abort" mnemonicParsing="false" style="-fx-translate-x: 40;" text="%AddExp.abort">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                </Button>
-                <Button fx:id="add" mnemonicParsing="false" style="-fx-translate-x: 50;" text="%AddExp.add">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                </Button>
-            </children>
-        </HBox>
+          <Button fx:id="abort" layoutX="14.0" layoutY="84.0" mnemonicParsing="false" styleClass="sbutton" text="%AddExp.abort">
+              <font>
+                  <Font size="15.0" />
+              </font>
+          </Button>
     </children>
+    <stylesheets>
+        <URL value="@/client/scenes/global.css" />
+    </stylesheets>
 </AnchorPane>

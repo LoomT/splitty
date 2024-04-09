@@ -1,6 +1,6 @@
 package client.scenes;
 
-import client.MockClass.EditParticipantInterface;
+import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -8,17 +8,19 @@ import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
+import java.net.ConnectException;
 import java.util.Optional;
 
+import static client.utils.CommonFunctions.lengthListener;
+import static commons.WebsocketActions.TITLE_CHANGE;
 import static java.lang.String.format;
 
 
-public class EditParticipantsCtrl implements EditParticipantInterface {
+public class EditParticipantsCtrl {
     @FXML
     private Text eventTitle;
     @FXML
@@ -38,11 +40,13 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
     @FXML
     private Button deletePartButton;
     @FXML
-    private Label participantEditWarning;
+    private Label warningLabel;
+    @FXML
+    private Button backButton;
 
     private Event event;
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -55,7 +59,7 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
     @Inject
     public EditParticipantsCtrl(
             ServerUtils server,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             Websocket websocket
     ) {
@@ -69,19 +73,17 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
      * Initialize listeners
      */
     public void initialize() {
-        nameField.textProperty().addListener(this::nameFieldChanged);
-    }
-
-    /**
-     * Resets the style of the name text field when text changes
-     *
-     * @param observableValue string visible to user
-     * @param oldString old text
-     * @param newString new text
-     */
-    private void nameFieldChanged(ObservableValue<? extends String> observableValue,
-                                  String oldString, String newString) {
-        if (!oldString.equals(newString)) nameField.setStyle("");
+        lengthListener(nameField, warningLabel, 30, languageConf.get("EditP.nameLimit"));
+        nameField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(oldValue.length() != newValue.length()) {
+                nameField.setStyle("");
+            }
+        });
+        websocket.on(TITLE_CHANGE, title -> {
+            if(event != null)
+                event.setTitle((String) title);
+            eventTitle.setText((String) title);
+        });
     }
 
     /**
@@ -92,6 +94,7 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        addIconsToButtons();
 
         resetFields();
 
@@ -135,6 +138,17 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
 
     }
 
+    private void addIconsToButtons() {
+//        String saveText = saveButton.getText();
+//        if (!saveText.startsWith("\uD83D\uDDAB")) {
+//            saveButton.setText("\uD83D\uDDAB " + saveText);
+//        }
+
+        String backBText = backButton.getText();
+        if (!backBText.startsWith("\u2190")) {
+            backButton.setText("\u2190 " + backBText);
+        }
+    }
     /**
      * Reset all fields
      */
@@ -146,7 +160,7 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
         beneficiaryField.setText("");
         ibanField.setText("");
         bicField.setText("");
-        participantEditWarning.setVisible(false);
+        warningLabel.setVisible(false);
         nameField.setStyle("");
     }
 
@@ -173,7 +187,11 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
                 languageConf.get("Confirmation.areYouSure"), languageConf);
         Optional<ButtonType> result = confirmation.showAndWait();
         if(result.isPresent() && result.get() == ButtonType.YES) {
-            server.deleteParticipant(eventID, part.getId());
+            try {
+                server.deleteParticipant(eventID, part.getId());
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         }
     }
 
@@ -193,8 +211,8 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
 
         if (index < 0) return;
         if(name.isEmpty()) {
-            participantEditWarning.setVisible(true);
-            participantEditWarning.setText(languageConf.get("EditP.nameMissing"));
+            warningLabel.setVisible(true);
+            warningLabel.setText(languageConf.get("EditP.nameMissing"));
             nameField.setStyle("-fx-border-color: red;");
             return;
         }
@@ -206,7 +224,11 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
             }
             Participant newP = new Participant(name, email, beneficiary, iban);
 
-            server.createParticipant(event.getId(), newP);
+            try {
+                server.createParticipant(event.getId(), newP);
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         } else {
             Participant currP = event.getParticipants().get(index - 1);
             if(event.getParticipants().stream()
@@ -219,7 +241,11 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
             currP.setEmailAddress(email);
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
-            server.updateParticipant(event.getId(), currP);
+            try {
+                server.updateParticipant(event.getId(), currP);
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         }
     }
 
@@ -227,8 +253,8 @@ public class EditParticipantsCtrl implements EditParticipantInterface {
      * Inform user that a participant with the same name already exists
      */
     private void informNameExists() {
-        participantEditWarning.setVisible(true);
-        participantEditWarning.setText(languageConf.get("EditP.nameExists"));
+        warningLabel.setVisible(true);
+        warningLabel.setText(languageConf.get("EditP.nameExists"));
         nameField.setStyle("""
                         -fx-border-color: red;
                         -fx-text-inner-color: red""");

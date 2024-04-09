@@ -55,6 +55,10 @@ public class Event implements Cloneable {
     @JoinColumn(name = "event_id", updatable = false, insertable = false)
     private List<Transaction> transactions;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
+    private List<Tag> tags;
+
     /**
      * No-Argument Constructor
      * Required by JPA
@@ -256,6 +260,22 @@ public class Event implements Cloneable {
      */
     public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
+    }
+
+    /**
+     * getter for tags
+     * @return the list of tags correlated with that event
+     */
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    /**
+     * setter for tags
+     * @param tags tags of the event
+     */
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 
     /**
