@@ -21,14 +21,15 @@ public class FileManagerImpl implements FileManager{
      */
     public FileManagerImpl() {
         try {
-            URL path = FileManager.class.getClassLoader().getResource("client/currencies.txt");
+            URL path = FileManager.class.getClassLoader()
+                    .getResource("client/rates/currencies.txt");
             if(path == null) {
-                throw new FileNotFoundException("Resource not found: currencies.txt");
+                throw new FileNotFoundException("Resource not found: client/rates/currencies.txt");
             }
             currencies = new File(path.getFile());
-            rateDir = new File(currencies.getParentFile(), "rates");
+            rateDir = new File(currencies.getParentFile().toString());
             if(!currencies.exists() || !rateDir.exists()) {
-                throw new FileNotFoundException("Resource not found: rates");
+                throw new FileNotFoundException("Resource not found: client/rates");
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
