@@ -144,7 +144,7 @@ public class TestWebsocket implements Websocket {
 
         this.resetAction(WebsocketActions.UPDATE_EXPENSE);
         this.resetAction(WebsocketActions.ADD_EXPENSE);
-        this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
+        this.resetAction(WebsocketActions.REMOVE_EXPENSE);
 
         this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
