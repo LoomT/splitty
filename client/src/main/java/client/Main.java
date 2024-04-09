@@ -21,6 +21,7 @@ import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import com.google.inject.Injector;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import static com.google.inject.Guice.createInjector;
@@ -108,6 +109,7 @@ public class Main extends Application {
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, titleChanger, addTag, options)

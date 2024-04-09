@@ -4,6 +4,7 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
@@ -17,6 +18,8 @@ public class AdminLoginCtrl {
     private Label warningLabel;
     @FXML
     private TextField passwordTextField;
+    @FXML
+    private Button backButton;
 
     /**
      * adminLogin screen controller constructor
@@ -30,11 +33,24 @@ public class AdminLoginCtrl {
         this.mainCtrl = mainCtrl;
     }
 
+    private void addIconsToButtons() {
+//        String saveText = saveButton.getText();
+//        if (!saveText.startsWith("\uD83D\uDDAB")) {
+//            saveButton.setText("\uD83D\uDDAB " + saveText);
+//        }
+
+        String backBText = backButton.getText();
+        if (!backBText.startsWith("\u2190")) {
+            backButton.setText("\u2190 " + backBText);
+        }
+    }
+
     /**
      * Runs when the app first starts
      */
     public void initialize() {
         warningLabel.setVisible(false);
+        addIconsToButtons();
     }
 
     /**

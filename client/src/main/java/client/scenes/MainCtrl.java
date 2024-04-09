@@ -116,9 +116,6 @@ public class MainCtrl implements MainCtrlInterface{
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
-        this.optionsCtrl = pairCollector.options().getKey();
-        this.options = new Scene(pairCollector.options().getValue());
-
         //showOverview();
         showStartScreen();
         primaryStage.show();
@@ -145,6 +142,7 @@ public class MainCtrl implements MainCtrlInterface{
     public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
         stage.setResizable(false);
@@ -262,6 +260,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setScene(addTag);
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.initOwner(primaryStage);
         stage.show();
     }
@@ -315,6 +314,7 @@ public class MainCtrl implements MainCtrlInterface{
         optionsCtrl.display(stage);
         stage.setResizable(false);
         stage.initOwner(primaryStage);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.show();
     }
 }

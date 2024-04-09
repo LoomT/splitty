@@ -207,13 +207,13 @@ public class TestWebsocket implements Websocket {
      * @param payload The payload to pass to the consumers for this action.
      */
     public void simulateAction(WebsocketActions action, Object payload) {
+        triggeredActions.add(action);
+        payloads.add(payload);
         Set<Consumer<Object>> consumers = functions.get(action);
         if (consumers != null && !consumers.isEmpty()) {
             for (Consumer<Object> consumer : consumers) {
                 consumer.accept(payload);
             }
-            triggeredActions.add(action);
-            payloads.add(payload);
         } else {
             System.out.println("No listener for action: " + action);
         }
@@ -259,6 +259,16 @@ public class TestWebsocket implements Websocket {
         return payloads.stream().anyMatch(payload -> payload.equals(expectedPayload));
     }
 
+
+    /**
+     * Returns list of payloads
+     *
+     * @return list of payloads
+     */
+    public List<Object> getPayloads() {
+        return payloads;
+    }
+
     /**
      * Resets the list of triggered actions and payloads
      */
@@ -268,3 +278,4 @@ public class TestWebsocket implements Websocket {
         payloads.clear();
     }
 }
+

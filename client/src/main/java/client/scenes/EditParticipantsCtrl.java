@@ -41,6 +41,8 @@ public class EditParticipantsCtrl {
     private Button deletePartButton;
     @FXML
     private Label warningLabel;
+    @FXML
+    private Button backButton;
 
     private Event event;
     private final ServerUtils server;
@@ -92,6 +94,7 @@ public class EditParticipantsCtrl {
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
+        addIconsToButtons();
 
         resetFields();
 
@@ -135,6 +138,17 @@ public class EditParticipantsCtrl {
 
     }
 
+    private void addIconsToButtons() {
+//        String saveText = saveButton.getText();
+//        if (!saveText.startsWith("\uD83D\uDDAB")) {
+//            saveButton.setText("\uD83D\uDDAB " + saveText);
+//        }
+
+        String backBText = backButton.getText();
+        if (!backBText.startsWith("\u2190")) {
+            backButton.setText("\u2190 " + backBText);
+        }
+    }
     /**
      * Reset all fields
      */
