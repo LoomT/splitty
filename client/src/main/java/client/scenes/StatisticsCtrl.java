@@ -161,7 +161,7 @@ public class StatisticsCtrl {
         }
         String preferedCurrency = userConfig.getCurrency();
         String form = getCurrencySymbol(totalCost, preferedCurrency);
-        cost.setText("Total cost: " + form);
+        cost.setText(languageConf.get("Statistics.totalCost") + form);
         return totalCost;
     }
 

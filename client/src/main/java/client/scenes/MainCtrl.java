@@ -183,6 +183,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -301,12 +302,13 @@ public class MainCtrl implements MainCtrlInterface{
 
     /**
      * display the statistics page
-     * @param event
+     * @param event event to display
      */
     @Override
     public void showStatisticsPage(Event event) {
         statisticsCtrl.displayStatisticsPage(event);
-        primaryStage.setTitle("Statistics");
+        primaryStage.setTitle(languageConf.get("Statistics.title"));
+        statistics.setCursor(Cursor.DEFAULT);
         primaryStage.setScene(statistics);
     }
 }
