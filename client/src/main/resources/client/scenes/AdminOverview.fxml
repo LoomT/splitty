@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -38,7 +39,11 @@
                <ChoiceBox id="orderDropdownBtn" fx:id="orderByChoiceBox" layoutX="220.0" layoutY="38.0" prefWidth="150.0" styleClass="sbutton" />
             </children>
          </Pane>
-         <VBox id="eventList" fx:id="eventList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
+         <ScrollPane id="eventList" hbarPolicy="NEVER" prefHeight="185.0" prefWidth="370.0" GridPane.rowIndex="1">
+             <content>
+                 <VBox fx:id="eventList" scaleShape="false" />
+             </content>
+         </ScrollPane>
       </children>
    </GridPane>
     <stylesheets>

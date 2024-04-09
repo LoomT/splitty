@@ -5,7 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
-<fx:root alignment="CENTER_LEFT" onMouseClicked="#onEventClicked" prefHeight="35.0" prefWidth="355.0" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="CENTER_LEFT" focusTraversable="true" onMouseClicked="#onEventClicked" prefHeight="35.0" prefWidth="355.0" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="javafx.scene.layout.HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="eventTitleLabel" prefHeight="17.0" prefWidth="199.0" text="Label" HBox.hgrow="ALWAYS">
          <HBox.margin>

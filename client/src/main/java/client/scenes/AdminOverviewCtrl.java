@@ -380,20 +380,5 @@ public class AdminOverviewCtrl{
         MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
         MainCtrl.checkKey(scene, () -> this.orderByChoiceBox.show(),
                 orderByChoiceBox, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, this::goToEventListed, eventList, KeyCode.ENTER);
-    }
-
-    /**
-     * go to event listed that is focused on in the eventList
-     */
-    private void goToEventListed(){
-        System.out.println(eventList.getAlignment());
-
-                /*
-        int index = eventList.getSelectionModel().getSelectedIndex();
-        if(index == -1) index = 0;
-        ((EventListItemAdmin)eventList.getItems().get(index)).goToEvent();
-
-                 */
     }
 }

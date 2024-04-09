@@ -299,16 +299,6 @@ public class StartScreenCtrl {
         mainCtrl.showAdminLogin();
     }
 
-    private void goToEventListed(){
-
-        /*
-        int index = eventList.getChildren().getSelectedIndex();
-        if(index == -1) index = 0;
-        ((EventListItem)eventList.getItems().get(index)).goToEvent();
-
-         */
-    }
-
     /**
      * Initializes the shortcuts for StartScreen:
      *      Enter: create/join an event if the focus is on the respective textFields.
@@ -319,7 +309,6 @@ public class StartScreenCtrl {
     public void initializeShortcuts(Scene scene){
         MainCtrl.checkKey(scene, this::join, code, KeyCode.ENTER);
         MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, this::goToEventListed, eventList, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
                 languageChoiceBox, KeyCode.ENTER);
     }

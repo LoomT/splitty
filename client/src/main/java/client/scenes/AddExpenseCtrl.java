@@ -72,8 +72,7 @@ public class AddExpenseCtrl {
     @FXML
     private Label warningLabel;
 
-    Event event;
-
+    private Event event;
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
     private final Websocket websocket;
