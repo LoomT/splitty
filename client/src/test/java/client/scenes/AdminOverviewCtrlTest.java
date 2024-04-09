@@ -19,6 +19,7 @@ import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 import utils.TestIO;
 import utils.TestServerUtils;
+import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -33,13 +34,13 @@ public class AdminOverviewCtrlTest {
     Scene scene;
     @Start
     public void start(Stage stage) throws IOException {
-        server = new TestServerUtils();
+        server = new TestServerUtils(new TestWebsocket());
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=http://localhost:8080/
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
+        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
 
         var adminOverviewLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AdminOverview.fxml"),

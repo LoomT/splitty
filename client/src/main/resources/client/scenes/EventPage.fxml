@@ -117,6 +117,6 @@
       <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
    </children>
    <stylesheets>
-      <URL value="@client/scenes/global.css" />
+      <URL value="@/client/scenes/global.css" />
    </stylesheets>
 </AnchorPane>
