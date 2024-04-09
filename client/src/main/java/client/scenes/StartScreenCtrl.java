@@ -10,10 +10,9 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.net.ConnectException;
@@ -83,6 +82,10 @@ public class StartScreenCtrl {
         languageChoiceBox.setOnAction(event -> {
             languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
         });
+        String addDownloadOption = "dT";
+        languageChoiceBox.getItems().add(addDownloadOption);
+
+
         joinError.setVisible(false);
         createEventError.setVisible(false);
         code.textProperty().addListener((observable, oldValue, newValue) -> {
