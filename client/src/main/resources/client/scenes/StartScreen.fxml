@@ -38,7 +38,11 @@
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin></Button>
-                    <ComboBox fx:id="languageChoiceBox" prefWidth="70.0" styleClass="sbutton" />
+                    <ComboBox fx:id="currencyChoiceBox" prefWidth="70.0" styleClass="sbutton">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin></ComboBox>
+                  <ComboBox fx:id="languageChoiceBox" prefWidth="70.0" styleClass="sbutton" />
                </children>
             </HBox>
          </children>
