@@ -86,22 +86,7 @@ public class StartScreenCtrl {
      */
     @FXML
     private void initialize() {
-        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
-        languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
-        final String downloadTemplateOption = "Download Template";
-        languageChoiceBox.getItems().add(downloadTemplateOption);
-        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
-        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
-        languageChoiceBox.setOnAction(event -> {
-            String selectedOption = languageChoiceBox.getValue();
-            if (selectedOption.equals(downloadTemplateOption)) {
-
-                downloadTemplate();
-            } else {
-
-                languageConf.changeCurrentLocaleTo(selectedOption);
-            }
-        });
+        languageChoiceBoxInitializer();
         joinError.setVisible(false);
         createEventError.setVisible(false);
         code.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -139,6 +124,28 @@ public class StartScreenCtrl {
         });
 
 
+    }
+
+    /**
+     * Initializes the language choice box
+     */
+    private void languageChoiceBoxInitializer() {
+        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+        languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+        final String downloadTemplateOption = "Download Template";
+        languageChoiceBox.getItems().add(downloadTemplateOption);
+        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
+        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
+        languageChoiceBox.setOnAction(event -> {
+            String selectedOption = languageChoiceBox.getValue();
+            if (selectedOption.equals(downloadTemplateOption)) {
+
+                downloadTemplate();
+            } else {
+
+                languageConf.changeCurrentLocaleTo(selectedOption);
+            }
+        });
     }
 
 
