@@ -102,11 +102,16 @@ public class Main extends Application {
                 AddTagCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "AddTag.fxml"
         );
+        var statistics = FXML.load(
+                StatisticsCtrl.class, languageConf.getLanguageResources(),
+                "client", "scenes", "Statistics.fxml");
+
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag)
+                adminOverview, addExpense, titleChanger, addTag,
+                statistics)
         );
     }
 }

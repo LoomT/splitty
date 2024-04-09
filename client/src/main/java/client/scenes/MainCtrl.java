@@ -56,6 +56,8 @@ public class MainCtrl implements MainCtrlInterface{
     private Scene titleChanger;
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
+    private StatisticsCtrl statisticsCtrl;
+    private Scene statistics;
 
 
 
@@ -110,6 +112,9 @@ public class MainCtrl implements MainCtrlInterface{
 
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
+
+        this.statisticsCtrl = pairCollector.statisticsPage().getKey();
+        this.statistics = new Scene(pairCollector.statisticsPage().getValue());
 
         //showOverview();
         showStartScreen();
@@ -286,5 +291,12 @@ public class MainCtrl implements MainCtrlInterface{
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
+    }
+
+    @Override
+    public void showStatisticsPage(Event event) {
+        statisticsCtrl.displayStatisticsPage(event);
+        primaryStage.setTitle("Statistics");
+        primaryStage.setScene(statistics);
     }
 }

@@ -348,6 +348,7 @@ public class AddExpenseCtrl {
             String expCurrency = currency.getValue();
 
             Tag expType = type.getValue();
+            System.out.println("\n\n\n" + expType + "\n\n\n");
             Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
@@ -468,12 +469,17 @@ public class AddExpenseCtrl {
     private Label createLabelWithColor(String text, Color backgroundColor) {
         Label label = new Label(text);
         if (backgroundColor != null && !text.isEmpty()) {
+            String textColor = brightness(backgroundColor) > 0.5 ? "#000000" : "#FFFFFF"; // Choose black or white text based on brightness
             label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
-                    + "; -fx-padding: 5px; -fx-text-fill: white;");
+                    + "; -fx-padding: 5px; -fx-text-fill: " + textColor + ";");
         }
         double textWidth = new Text(text).getLayoutBounds().getWidth();
         label.setMinWidth(textWidth + 10);
         return label;
+    }
+
+    private double brightness(Color color) {
+        return (0.21 * color.getRed() + 0.72 * color.getGreen() + 0.07 * color.getBlue());
     }
 
     private Tag findTagById(long id, List<Tag> tags) {

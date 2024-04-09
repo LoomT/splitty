@@ -105,4 +105,6 @@ public interface MainCtrlInterface {
      * Disconnects from the server and shows an error
      */
     void handleServerNotFound();
+
+    void showStatisticsPage(Event event);
 }
