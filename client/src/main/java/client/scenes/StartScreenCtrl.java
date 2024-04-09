@@ -3,9 +3,11 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
@@ -16,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,8 @@ public class StartScreenCtrl {
 
     @FXML
     private ComboBox<String> languageChoiceBox;
+    @FXML
+    private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
 
     @FXML
     private VBox eventList;
@@ -48,6 +53,7 @@ public class StartScreenCtrl {
     private Label createEventError;
 
     private final UserConfig userConfig;
+    private final CurrencyConverter converter;
 
     /**
      * start screen controller constructor
@@ -56,19 +62,22 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
+     * @param converter      currency converter
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig
+            UserConfig userConfig,
+            CurrencyConverter converter
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
+        this.converter = converter;
     }
 
     /**
@@ -80,9 +89,8 @@ public class StartScreenCtrl {
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
         languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
         languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
-        languageChoiceBox.setOnAction(event -> {
-            languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
-        });
+        languageChoiceBox.setOnAction(event ->
+                languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue()));
         joinError.setVisible(false);
         createEventError.setVisible(false);
         code.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -93,6 +101,33 @@ public class StartScreenCtrl {
         });
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
+
+        CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
+                currencyChoiceBox);
+        String cur = userConfig.getCurrency();
+        if(!cur.equals("None")) {
+            CommonFunctions.HideableItem<String> item =
+                    currencyChoiceBox.getItems().stream()
+                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
+            currencyChoiceBox.setValue(item);
+        }
+        currencyChoiceBox.setOnAction(event -> {
+            try {
+                if(currencyChoiceBox.getValue() != null &&
+                        currencyChoiceBox.getValue().toString().length() == 3) {
+
+                    userConfig.setCurrency(currencyChoiceBox.getValue().toString());
+                }
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(languageConf.get("unexpectedError"));
+                alert.setContentText(languageConf.get("UserConfig.IOError"));
+                java.awt.Toolkit.getDefaultToolkit().beep();
+                alert.showAndWait();
+            }
+        });
+
+
     }
 
     /**
@@ -115,16 +150,12 @@ public class StartScreenCtrl {
                 EventListItem eventListItem = new EventListItem(
                         event.getTitle(),
                         eventCode,
-                        () -> {
-                            eventList.getChildren().remove(
-                                    list.get(
-                                            recentEventCodes.indexOf(eventCode)
-                                    )
-                            );
-                        },
-                        (String c) -> {
-                            code.setText(c);
-                        }
+                        () -> eventList.getChildren().remove(
+                                list.get(
+                                        recentEventCodes.indexOf(eventCode)
+                                )
+                        ),
+                        code::setText
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);

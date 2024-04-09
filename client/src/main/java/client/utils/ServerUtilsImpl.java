@@ -30,14 +30,8 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientConfig;
 
 import java.net.ConnectException;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -405,27 +399,32 @@ public class ServerUtilsImpl implements ServerUtils {
     }
 
     /**
-     * @return string representation of the current exchange rates
+     * @param date date for which to fetch rates
+     *
+     * @return map representation of the exchange rates
      */
     @Override
-    public String getExchangeRates(Calendar calendar){
-        if(calendar != null) {
-            Calendar currentTime = new GregorianCalendar();
-            calendar.add(Calendar.HOUR, 1);
-            if (calendar.after(currentTime)) {
-                return null;
-            }
-        }
-        HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(
-                URI.create(server + "api/currency")).GET().build();
-
-        HttpResponse response;
+    public Map<String, Double> getExchangeRates(String date) throws ConnectException {
         try {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+            Response response =  ClientBuilder.newClient(new ClientConfig())
+                    .target(server)
+                    .path("api/currency/" + date)
+                    .request(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON).buildGet().invoke();
+
+            System.out.println(response.getStatus());
+            if(response.getStatus() != Response.Status.OK.getStatusCode()) {
+                return Map.of("status", Double.parseDouble(String.valueOf(response.getStatus())));
+            }
+            Map<String, Double> map = response.readEntity(new GenericType<>(){});
+            response.close();
+            return map;
+
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
-        return response.body().toString();
     }
 }
