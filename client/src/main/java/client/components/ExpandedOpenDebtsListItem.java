@@ -1,7 +1,6 @@
 package client.components;
 
 import client.MockClass.MainCtrlInterface;
-import client.scenes.MainCtrl;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import commons.Event;

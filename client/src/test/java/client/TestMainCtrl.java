@@ -4,6 +4,7 @@ import client.MockClass.MainCtrlInterface;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
+import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -194,6 +195,24 @@ public class TestMainCtrl implements MainCtrlInterface {
      */
     @Override
     public void updateOpenDebtsPage(Event event) {
+        //TODO
+    }
+
+    /**
+     *
+     * @param event event customTransaction is connected to
+     */
+    @Override
+    public void showAddCustomTransaction(Event event) {
+        //TODO
+    }
+
+    /**
+     *
+     * @param openDebtListItem openDebtListItem to resize
+     */
+    @Override
+    public void resizeOpenDebtItem(Node openDebtListItem) {
         //TODO
     }
 }

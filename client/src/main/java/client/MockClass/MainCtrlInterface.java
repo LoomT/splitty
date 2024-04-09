@@ -1,6 +1,5 @@
 package client.MockClass;
 
-import client.components.ShrunkOpenDebtsListItem;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;

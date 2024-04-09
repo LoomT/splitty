@@ -5,24 +5,18 @@ import client.components.ExpandedOpenDebtsListItem;
 import client.components.ShrunkOpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
-import client.utils.Websocket;
 import commons.*;
 import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.*;
 
 public class OpenDebtsPageCtrl {
-
-    @FXML
-    private Button backButton;
 
     @FXML
     private PieChart shareChart = new PieChart();
@@ -33,17 +27,11 @@ public class OpenDebtsPageCtrl {
     @FXML
     private VBox allDebtsPane;
 
-    @FXML
-    private ChoiceBox<String> includingChoiceBox;
-
     private final LanguageConf languageConf;
     private Event event;
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
-    private Map<Participant, Map<Participant, Double>>
-            partToPartMap = new HashMap<>();
-    private Websocket websocket;
 
 
     /**
@@ -52,19 +40,15 @@ public class OpenDebtsPageCtrl {
      * @param serverUtils  the server utils
      * @param mainCtrl     the main controller
      * @param languageConf language conf of the user
-     * @param websocket    websocket
      */
     @Inject
     public OpenDebtsPageCtrl(
             ServerUtils serverUtils,
             MainCtrlInterface mainCtrl,
-            LanguageConf languageConf,
-            Websocket websocket
-    ) {
+            LanguageConf languageConf) {
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
-        this.websocket = websocket;
     }
 
     /**
@@ -76,7 +60,7 @@ public class OpenDebtsPageCtrl {
 
         this.event = event;
         Map<String, Double> map = new HashMap<>();
-        partToPartMap = new HashMap<>();
+        Map<Participant, Map<Participant, Double>> partToPartMap = new HashMap<>();
 
         for(Participant p1 : event.getParticipants()){
             partToPartMap.put(p1, new HashMap<>());
@@ -119,9 +103,7 @@ public class OpenDebtsPageCtrl {
                 graphMap.put(p.getName(), graphMap.get(p.getName()) + cost);
                 if (e.getExpenseAuthor().equals(p)) continue;
 
-                debtMap.putIfAbsent(e.getExpenseAuthor(), new HashMap<>());
                 Map<Participant, Double> temp = debtMap.get(e.getExpenseAuthor());
-                temp.putIfAbsent(p, 0.0);
 
                 temp.put(p, temp.get(p) + cost);
             }
