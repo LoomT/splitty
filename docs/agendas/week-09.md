@@ -1,11 +1,11 @@
-| Key           | Value           |
-|---------------|-----------------|
-| Date:         | 02/04/2024      |
-| Time:         | 13:45           |
-| Location:     | Flux Hall B     |
-| Chair:        | Kajus Kuncaitis |
-| Minute Taker: | Liam Forster    |
-| Attendees:    | to be filled in |
+| Key           | Value            |
+|---------------|------------------|
+| Date:         | 02/04/2024       |
+| Time:         | 13:45            |
+| Location:     | Flux Hall B      |
+| Chair:        | Kajus Kuncaitis  |
+| Minute Taker: | Liam Forster     |
+| Attendees:    | Everyone present |
 ### Agenda Items:
 - #### Introduction (3 min)
     - Opening by chair (1 min)
@@ -32,3 +32,38 @@
     - Closure (1 min)
 
 Total time: 45 min + 5 min elbow room
+
+### Notes
+##### Progress update since last week
+- The application is almost finished.
+- Open Debts functionality is nearly done.
+- Bogdan is working on statistics.
+- Thomas was working on API Testing
+- Adam was working on UI and Design.
+- Kajus worked on transactions, user feedback and currencies.
+- Liam worked on the Open Debts page and testing.
+- Güney worked on the Open Debts page and keyboard navigation.
+
+##### Feedback from the TA
+This is the feedback we received after showcasing our product to the TA:
+- There should be feedback for the user for key actions, like adding a participant
+and deleting stuff.
+- Multimodal representations should be made (e.g. icons)
+- Make the language template downloadable
+- Make sure to check out all the requirements step by step (follow rubrics)
+- Feedback regarding self-reflection assignment: 
+Make sure you explain in detail, someone else has to understand your thoughts and
+the entirety of the situation. Follow the template and the rubrics carefully.
+- Product Pitch and Oral Examination tips:
+Questions can regard the entire project. Make sure you understand every aspect. 
+Defend your design choices. Expect curveballs from the lecturer.
+
+##### Continuation
+Priorities:
+- Open Debts functionality
+- Usability of the project
+- Using the feedback of the TA
+- Maybe give the program a logo
+- More test coverage
+
+Live coding session 09/04/2024 after the meeting.
