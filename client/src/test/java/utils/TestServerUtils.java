@@ -533,7 +533,7 @@ public class TestServerUtils implements ServerUtils {
     @Override
     public boolean ping(String url) {
         calls.add("ping");
-        goodPing = url.equals("//localhost:8080/");
+        goodPing = url.equals("localhost:8080");
         return goodPing;
     }
 

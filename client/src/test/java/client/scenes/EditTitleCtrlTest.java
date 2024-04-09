@@ -83,7 +83,9 @@ public class EditTitleCtrlTest {
         event = server.createEvent(event);
         waitForFxEvents();
         stage.setScene(scene);
-
+        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        stage.setResizable(false);
+        stage.show();
 
     }
 
