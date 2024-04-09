@@ -111,8 +111,7 @@ public class Main extends Application {
         primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag,
-                statistics)
+                adminOverview, addExpense, titleChanger, addTag, statistics)
         );
     }
 }

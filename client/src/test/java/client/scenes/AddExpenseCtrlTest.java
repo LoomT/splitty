@@ -171,7 +171,8 @@ public class AddExpenseCtrlTest {
     @Order(4)
     public void handleEditButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
-            Expense expense = new Expense(event.getParticipants().getFirst(), "testPurpose", 10, "EUR", event.getParticipants(), "food");
+            Tag tag = new Tag("food", "FF0000");
+            Expense expense = new Expense(event.getParticipants().getFirst(), "testPurpose", 10, "EUR", event.getParticipants(), tag);
             server.createExpense(event.getId(), expense);
             int expenseID = (int) server.getEvent(event.getId()).getExpenses().getFirst().getId();
             expense.setId(expenseID);
