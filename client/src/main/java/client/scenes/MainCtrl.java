@@ -15,11 +15,11 @@
  */
 package client.scenes;
 
-import client.MockClass.*;
-import client.components.ErrorPopupCtrl;
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -33,9 +33,10 @@ import java.io.File;
 import java.time.ZoneId;
 import java.util.List;
 
-public class MainCtrl {
+public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
+    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -48,8 +49,7 @@ public class MainCtrl {
 
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
-
-    private EditParticipantInterface editParticipantsCtrl;
+    private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
 
     private AddExpenseCtrl addExpenseCtrl;
@@ -61,11 +61,11 @@ public class MainCtrl {
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
-    private EditEventTitleInterface editTitleCtrl;
+    private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
 
-    private ErrorPopupCtrl errorPopupCtrl;
-    private Scene errorPopup;
+    private AddTagCtrl addTagCtrl;
+    private Scene addTag;
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
     private Scene addCustomTransaction;
 
@@ -74,13 +74,15 @@ public class MainCtrl {
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
+     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig) {
+                    UserConfig userConfig, CurrencyConverter converter) {
         this.websocket = websocket;
         this.languageConf = languageConf;
         this.userConfig = userConfig;
+        this.converter = converter;
     }
 
     /**
@@ -89,6 +91,7 @@ public class MainCtrl {
      * @param primaryStage         stage
      * @param pairCollector        collector for all of pairs
      */
+    @Override
     public void initialize(
             Stage primaryStage,
             PairCollector pairCollector
@@ -120,8 +123,8 @@ public class MainCtrl {
         this.editTitleCtrl = pairCollector.editTitlePage().getKey();
         this.titleChanger = new Scene(pairCollector.editTitlePage().getValue());
 
-        this.errorPopupCtrl = pairCollector.errorPopup().getKey();
-        this.errorPopup = new Scene(pairCollector.errorPopup().getValue());
+        this.addTagCtrl = pairCollector.addTagPage().getKey();
+        this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
         this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
         this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
@@ -135,9 +138,11 @@ public class MainCtrl {
     /**
      * Display start screen
      */
+    @Override
     public void showStartScreen() {
         primaryStage.setTitle(languageConf.get("StartScreen.title"));
         startScreenCtrl.reset();
+        startScreenCtrl.reloadEventCodes();
         primaryStage.setScene(startScreen);
     }
 
@@ -145,25 +150,21 @@ public class MainCtrl {
      * Shows the change
      * @param event current event
      */
+    @Override
     public void showEditTitle(Event event){
         Stage stage = new Stage();
         stage.setScene(titleChanger);
-        editTitleCtrl.displayEditEventTitle(eventPageCtrl, event, stage);
-    }
-
-    /**
-     * Changes the title in the editEventTitle
-     * @param title title of the event to be changed to
-     */
-    public void updateEditTitle(String title){
-        editTitleCtrl.changeTitle(title);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        editTitleCtrl.displayEditEventTitle(event, stage);
     }
 
     /**
      * Display admin login
      */
+    @Override
     public void showAdminLogin() {
         primaryStage.setTitle(languageConf.get("AdminLogin.title"));
+        adminLoginCtrl.display();
         primaryStage.setScene(adminLogin);
     }
 
@@ -172,11 +173,13 @@ public class MainCtrl {
      *
      * @param eventToShow the event to display
      */
+    @Override
     public void showEventPage(Event eventToShow) {
         userConfig.setMostRecentEventCode(eventToShow.getId());
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -185,6 +188,7 @@ public class MainCtrl {
      * page from the participant/expense editors
      * @param event the event to show
      */
+    @Override
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
         primaryStage.setScene(eventPage);
@@ -195,6 +199,7 @@ public class MainCtrl {
      *
      * @param eventToShow the event to show the participant editor for
      */
+    @Override
     public void showEditParticipantsPage(Event eventToShow) {
         editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
         primaryStage.setTitle(languageConf.get("EditP.editParticipants"));
@@ -202,19 +207,11 @@ public class MainCtrl {
     }
 
     /**
-     * edits the EditParticipantPage without opening it.
-     *
-     * @param eventToShow the event to update.
-     */
-    public void updateEditParticipantsPage(Event eventToShow) {
-        editParticipantsCtrl.displayEditParticipantsPage(eventToShow);
-    }
-
-    /**
      * shows the admin overview
      * @param password admin password
      * @param timeOut time out time in ms
      */
+    @Override
     public void showAdminOverview(String password, long timeOut) {
         adminOverviewCtrl.setPassword(password);
         adminOverviewCtrl.initPoller(timeOut); // 5 sec time out
@@ -224,28 +221,12 @@ public class MainCtrl {
     }
 
     /**
-     * Show error popup for general usage
-     * @param stringToken String token to be used as a variable in the error text
-     * @param intToken int token to be used as a variable in the error text
-     * @param code Error code of the error as found in ErrorCode enum in ErrorPopupCtrl
-     * Check ErrorPopupCtrl for more detailed documentation
-     */
-    public void showErrorPopup(String code, String stringToken, int intToken){
-        errorPopupCtrl.generatePopup(code, stringToken, intToken);
-        Stage stage = new Stage();
-        stage.setScene(errorPopup);
-        stage.setResizable(false);
-        stage.setTitle("Error");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
-    }
-
-    /**
      * Opens the system file chooser to save something
      *
      * @param fileChooser file chooser
      * @return opened file
      */
+    @Override
     public File showSaveFileDialog(FileChooser fileChooser) {
         return fileChooser.showSaveDialog(primaryStage);
     }
@@ -256,6 +237,7 @@ public class MainCtrl {
      * @param fileChooser file chooser
      * @return selected files
      */
+    @Override
     public List<File> showOpenMultipleFileDialog(FileChooser fileChooser) {
         return fileChooser.showOpenMultipleDialog(primaryStage);
     }
@@ -264,11 +246,29 @@ public class MainCtrl {
      * shows the add/edit expense page
      * @param eventToShow the event to show the participant editor for
      */
+    @Override
     public void showAddExpensePage(Event eventToShow) {
         addExpenseCtrl.displayAddExpensePage(eventToShow, null);
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
+        primaryStage.setResizable(false);
+    }
+
+    /**
+     * show the add tag page
+     * @param event event to show
+     */
+    @Override
+    public void showAddTagPage(Event event) {
+        Stage stage = new Stage();
+        addTagCtrl.displayAddTagPage(event, stage);
+        stage.setTitle(languageConf.get("AddTag.addtag"));
+        stage.setScene(addTag);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.show();
     }
 
     /**
@@ -276,6 +276,7 @@ public class MainCtrl {
      * @param exp The expense to edit.
      * @param ev The event associated with the expense.
      */
+    @Override
     public void handleEditExpense(Expense exp, Event ev) {
 
         addExpenseCtrl.displayAddExpensePage(ev, exp);
@@ -291,23 +292,19 @@ public class MainCtrl {
                 atZone(ZoneId.systemDefault()).toLocalDate());
         addExpenseCtrl.setType(exp.getType());
         addExpenseCtrl.setSplitCheckboxes(exp, ev);
-
     }
 
     /**
-     * Set editTitleCtrl for testing purposes
-     * @param editTitleCtrl new EditTitleCtrl
+     * Disconnects from the server and shows an error
      */
-    public void setEditTitleCtrl(EditEventTitleInterface editTitleCtrl) {
-        this.editTitleCtrl = editTitleCtrl;
-    }
-
-    /**
-     * Set editParticipantCtrl for testing purposes
-     * @param editParticipantCtrl new editParticipantCtrl
-     */
-    public void setEditParticipantsCtrl(EditParticipantMock editParticipantCtrl){
-        this.editParticipantsCtrl = editParticipantCtrl;
+    @Override
+    public void handleServerNotFound() {
+        websocket.disconnect();
+        adminOverviewCtrl.stopPoller();
+        primaryStage.setTitle(languageConf.get("StartScreen.title"));
+        startScreenCtrl.reset();
+        primaryStage.setScene(startScreen);
+        startScreenCtrl.showServerNotFoundError();
     }
 
     /**

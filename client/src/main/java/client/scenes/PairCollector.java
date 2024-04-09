@@ -1,6 +1,5 @@
 package client.scenes;
 
-import client.components.ErrorPopupCtrl;
 import javafx.scene.Parent;
 import javafx.util.Pair;
 
@@ -10,8 +9,8 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<EditParticipantsCtrl, Parent> editParticipantsPage,
                             Pair<AdminOverviewCtrl, Parent> adminOverview,
                             Pair<AddExpenseCtrl, Parent> addExpensePage,
-                            Pair<ErrorPopupCtrl, Parent> errorPopup,
                             Pair<EditTitleCtrl, Parent> editTitlePage,
                             Pair<AddCustomTransactionCtrl, Parent> addCustomTransaction,
-                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage) {
+                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage,
+                            Pair<AddTagCtrl, Parent> addTagPage) {
 }

@@ -4,8 +4,11 @@ import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.Transaction;
+import commons.Tag;
 
+import java.net.ConnectException;
 import java.util.List;
+import java.util.Map;
 
 public interface ServerUtils {
 
@@ -13,13 +16,13 @@ public interface ServerUtils {
      * @param id the id of the event to get
      * @return the found event, null if not found
      */
-    Event getEvent(String id);
+    Event getEvent(String id) throws ConnectException;
 
     /**
      * @param event the new event to be created
      * @return the created entry in the db
      */
-    Event createEvent(Event event);
+    Event createEvent(Event event) throws ConnectException;
 
     /**
      * Sends a delete request for event
@@ -27,7 +30,7 @@ public interface ServerUtils {
      * @param id event id
      * @return status code
      */
-    int deleteEvent(String id);
+    int deleteEvent(String id) throws ConnectException;
 
     /**
      * @param eventId     tbe event in which the participant should be created
@@ -36,7 +39,7 @@ public interface ServerUtils {
      * 400 if the participant is badly formatted,
      * 404 if event is not found
      */
-    int createParticipant(String eventId, Participant participant);
+    int createParticipant(String eventId, Participant participant) throws ConnectException;
 
     /**
      * @param eventId     the event in which the participant should be updated
@@ -45,7 +48,7 @@ public interface ServerUtils {
      * 400 if the participant is badly formatted,
      * 404 if event or participant is not found
      */
-    int updateParticipant(String eventId, Participant participant);
+    int updateParticipant(String eventId, Participant participant) throws ConnectException;
 
     /**
      * @param eventId         the event in which the participant should be deleted
@@ -53,7 +56,7 @@ public interface ServerUtils {
      * @return 204 for success,
      * 404 if event or participant is not found
      */
-    int deleteParticipant(String eventId, long participantId);
+    int deleteParticipant(String eventId, long participantId) throws ConnectException;
 
 
     /**
@@ -62,7 +65,7 @@ public interface ServerUtils {
      * @return the retrieved expense
      */
 
-    Expense getExpense(long id, String eventID);
+    Expense getExpense(long id, String eventID) throws ConnectException;
 
     /**
      * @param eventID ID of the event to which the expense belongs
@@ -72,7 +75,7 @@ public interface ServerUtils {
      * 404 if event is not found
      */
 
-    int createExpense(String eventID, Expense expense);
+    int createExpense(String eventID, Expense expense) throws ConnectException;
 
 
     /**
@@ -84,7 +87,7 @@ public interface ServerUtils {
      * 404 if event or expense is not found
      */
 
-    int updateExpense(long id, String eventID, Expense expense);
+    int updateExpense(long id, String eventID, Expense expense) throws ConnectException;
 
     /**
      * @param id id of the expense to delete
@@ -93,7 +96,7 @@ public interface ServerUtils {
      * 404 if event or expense is not found
      */
 
-    int deleteExpense(long id, String eventID);
+    int deleteExpense(long id, String eventID) throws ConnectException;
 
     /**
      * Verify the input password
@@ -101,7 +104,7 @@ public interface ServerUtils {
      * @param inputPassword the password to verify
      * @return true iff password is correct
      */
-    boolean verifyPassword(String inputPassword);
+    boolean verifyPassword(String inputPassword) throws ConnectException;
 
     /**
 
@@ -110,7 +113,7 @@ public interface ServerUtils {
      * @param inputPassword the admin password
      * @return all events
      */
-    List<Event> getEvents(String inputPassword);
+    List<Event> getEvents(String inputPassword) throws ConnectException;
 
     /**
      * @param inputPassword the admin password
@@ -118,7 +121,7 @@ public interface ServerUtils {
      * @return 204 if there is a change in the database, 408 if time-outed
      */
 
-    int pollEvents(String inputPassword, Long timeOut);
+    int pollEvents(String inputPassword, Long timeOut) throws ConnectException;
 
     /**
      * Sends an API call to add the event
@@ -129,7 +132,7 @@ public interface ServerUtils {
      * @return imported event
      */
 
-    int importEvent(String password, Event event);
+    int importEvent(String password, Event event) throws ConnectException;
 
     /**
      * Sends an API call to change an event
@@ -137,13 +140,27 @@ public interface ServerUtils {
      * @param event event to change
      * @return updated event
      */
-    int updateEventTitle(Event event);
+    int updateEventTitle(Event event) throws ConnectException;
 
     /**
      * @param eventID event id
      * @param transaction transaction to save
      * @return status code
      */
-    int addTransaction(String eventID, Transaction transaction);
+    int addTransaction(String eventID, Transaction transaction) throws ConnectException;
+
+    /**
+     * send an API call to add a tag
+     * @param eventID event id
+     * @param tag tag to add
+     * @return added tag
+     */
+    int addTag(String eventID, Tag tag) throws ConnectException;
+
+    /**
+     * @param date date of wanted exchange rates
+     * @return map of the exchange rates
+     */
+    Map<String, Double> getExchangeRates(String date) throws ConnectException;
 }
 

@@ -55,6 +55,10 @@ public class Event implements Cloneable {
     @JoinColumn(name = "event_id", updatable = false, insertable = false)
     private List<Transaction> transactions;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
+    private List<Tag> tags;
+
     /**
      * No-Argument Constructor
      * Required by JPA
@@ -259,6 +263,22 @@ public class Event implements Cloneable {
     }
 
     /**
+     * getter for tags
+     * @return the list of tags correlated with that event
+     */
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    /**
+     * setter for tags
+     * @param tags tags of the event
+     */
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
+    }
+
+    /**
      * Equals method that checks whether two instances are equal
      * Does not take the unique eventID into consideration
      *
@@ -275,7 +295,8 @@ public class Event implements Cloneable {
                 && Objects.equals(expenses, event.expenses)
                 && Objects.equals(creationDate, event.creationDate)
                 && Objects.equals(lastActivity, event.lastActivity)
-                && Objects.equals(transactions, event.transactions);
+                && Objects.equals(transactions, event.transactions)
+                && Objects.equals(tags, event.tags);
     }
 
     /**
@@ -286,7 +307,7 @@ public class Event implements Cloneable {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, participants, expenses,
-                creationDate, lastActivity, transactions);
+                creationDate, lastActivity, transactions, tags);
     }
 
     /**
@@ -302,6 +323,7 @@ public class Event implements Cloneable {
                 ", creationDate=" + creationDate +
                 ", lastActivity=" + lastActivity +
                 ", transactions=" + transactions +
+                ", tags=" + tags +
                 '}';
     }
 
@@ -344,6 +366,9 @@ public class Event implements Cloneable {
                         .filter(p -> p.getId() == cloneTransaction.getReceiver().getId())
                         .findAny().orElseThrow());
                 clone.transactions.add(cloneTransaction);
+            }
+            for (Tag t : this.tags) {
+                clone.tags.add(t.clone());
             }
             clone.creationDate = (Date) this.creationDate.clone();
             clone.lastActivity = (Date) this.lastActivity.clone();
