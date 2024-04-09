@@ -30,6 +30,8 @@ public class OptionsCtrl {
     private ToggleButton contrastToggle;
     @FXML
     private Label confirmationLabel;
+    @FXML
+    private ProgressIndicator loadIndicator;
     private Stage stage;
     private FadeTransition ft;
     private boolean lastContrast;
@@ -63,6 +65,8 @@ public class OptionsCtrl {
             currencyChoiceBox.setValue(item);
         }
         contrastToggle.setSelected(userConfig.getHighContrast());
+        contrastToggle.setText(userConfig.getHighContrast() ?
+                languageConf.get("Options.on") : languageConf.get("Options.off"));
         serverField.setText(userConfig.getUrl());
         confirmationLabel.setVisible(false);
         ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
@@ -70,6 +74,7 @@ public class OptionsCtrl {
         ft.setToValue(0);
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
+        loadIndicator.setVisible(false);
     }
 
     /**
@@ -91,6 +96,8 @@ public class OptionsCtrl {
             stage.getScene().getRoot().setEffect(getHighContrastEffect());
         else stage.getScene().getRoot().setEffect(null);
         userConfig.setHighContrast(contrastToggle.isSelected());
+        contrastToggle.setText(userConfig.getHighContrast() ?
+                languageConf.get("Options.on") : languageConf.get("Options.off"));
     }
 
     /**
@@ -104,6 +111,7 @@ public class OptionsCtrl {
             if(currency.length() == 3) {
                 userConfig.setCurrency(currency);
             }
+            lastContrast = userConfig.getHighContrast();
             userConfig.persistContrast();
             userConfig.setURL(serverURL);
         } catch (IOException e) {
@@ -114,7 +122,7 @@ public class OptionsCtrl {
             alert.showAndWait();
         }
         ft.stop();
-        confirmationLabel.setText("Settings saved successfully!");
+        confirmationLabel.setText(languageConf.get("Options.saved"));
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
@@ -132,6 +140,8 @@ public class OptionsCtrl {
                         .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
         currencyChoiceBox.setValue(item);
         contrastToggle.setSelected(lastContrast);
+        contrastToggle.setText(userConfig.getHighContrast() ?
+                languageConf.get("Options.on") : languageConf.get("Options.off"));
         userConfig.setHighContrast(lastContrast);
         stage.close();
     }
@@ -142,14 +152,17 @@ public class OptionsCtrl {
      */
     @FXML
     public void checkClicked() {
+        loadIndicator.setVisible(true);
         serverField.setDisable(true);
+        confirmationLabel.setVisible(false);
         boolean result = server.ping(serverField.getText());
         serverField.setDisable(false);
+        loadIndicator.setVisible(false);
         ft.stop();
         if(result) {
-            confirmationLabel.setText("Server found successfully!");
+            confirmationLabel.setText(languageConf.get("Options.serverUp"));
         } else {
-            confirmationLabel.setText("The URL might be incorrect or the server is down");
+            confirmationLabel.setText(languageConf.get("Options.serverDown"));
         }
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);

@@ -262,6 +262,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setScene(addTag);
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(primaryStage);
         stage.show();
     }
 

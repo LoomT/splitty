@@ -33,10 +33,10 @@ import static client.utils.CommonFunctions.getHighContrastEffect;
 
 public class MyFXML {
 
-    private Injector injector;
+    private final Injector injector;
 
     /**
-     * @param injector
+     * @param injector injector of the app
      */
     public MyFXML(Injector injector) {
         this.injector = injector;
