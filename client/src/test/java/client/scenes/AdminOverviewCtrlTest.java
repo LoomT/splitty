@@ -9,7 +9,6 @@ import commons.Participant;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,6 +32,7 @@ public class AdminOverviewCtrlTest {
     AdminOverviewCtrl ctrl;
     TestServerUtils server;
     Scene scene;
+
     @Start
     public void start(Stage stage) throws IOException {
         server = new TestServerUtils(new TestWebsocket());
@@ -69,10 +69,11 @@ public class AdminOverviewCtrlTest {
     }
 
     @Test
-    void refreshNotClicked() {
+    void refreshNotClicked(FxRobot robot) {
         assertEquals(server.getStatuses().getFirst(), 200);
         assertEquals(server.getStatuses().size(), 1);
     }
+
     @Test
     void refreshClicked(FxRobot robot) {
         robot.clickOn("#refreshBtn");
@@ -82,23 +83,26 @@ public class AdminOverviewCtrlTest {
 
     @Test
     void autoRefresh(FxRobot robot) throws InterruptedException {
-        assertEquals(0, robot.fromAll().lookup("#eventList").queryListView().getItems().size());
+        assertEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
         server.createEvent(new Event("title"));
         Thread.sleep(1000);
-        assertEquals(1, robot.fromAll().lookup("#eventList").queryListView().getItems().size());
+        assertEquals(1, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
     }
+
     @Test
     void reverseOrder(FxRobot robot) throws InterruptedException {
         server.createEvent(new Event("old"));
         Thread.sleep(50);
         server.createEvent(new Event("new"));
         robot.clickOn("#refreshBtn");
-        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
-        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("2", "1"), inCreation);
+        List<String> inOrder = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("2", "1"), inOrder);
         robot.clickOn("#reverseBtn");
-        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
-        List<String> reverseOrder = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        List<String> reverseOrder = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
         assertEquals(List.of("1", "2"), reverseOrder);
     }
 
@@ -108,9 +112,10 @@ public class AdminOverviewCtrlTest {
         Thread.sleep(50);
         server.createEvent(new Event("new"));
         robot.clickOn("#refreshBtn");
-        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
-        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("2", "1"), inCreation);
+        List<String> inOrder = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("2", "1"), inOrder);
     }
 
     @Test
@@ -121,14 +126,16 @@ public class AdminOverviewCtrlTest {
         Thread.sleep(50);
         server.createParticipant(event.getId(), new Participant("Bob"));
         robot.clickOn("#refreshBtn");
-        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
-        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        List<String> inCreation = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
         assertEquals(List.of("2", "1"), inCreation);
         ChoiceBox<String> choiceBox = robot.fromAll().lookup("#orderDropdownBtn").query();
         robot.clickOn(choiceBox);
         robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
-        List<String> inActivity = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        List<String> inActivity = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
         assertEquals(List.of("1", "2"), inActivity);
     }
 
@@ -139,15 +146,17 @@ public class AdminOverviewCtrlTest {
         server.createEvent(new Event("2"));
         server.createParticipant(event.getId(), new Participant("Bob"));
         robot.clickOn("#refreshBtn");
-        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
-        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        List<String> inCreation = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
         assertEquals(List.of("2", "1"), inCreation);
         ChoiceBox<String> choiceBox = robot.fromAll().lookup("#orderDropdownBtn").query();
         robot.clickOn(choiceBox);
         robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
-        List<String> inName = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("1", "2"), inName);
+        List<String> inActivity = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("1", "2"), inActivity);
     }
 
     @Test
@@ -157,14 +166,16 @@ public class AdminOverviewCtrlTest {
         server.createEvent(new Event("2"));
         server.createParticipant(event.getId(), new Participant("Bob"));
         robot.clickOn("#refreshBtn");
-        ListView<EventListItemAdmin> listView = robot.fromAll().lookup("#eventList").query();
-        List<String> inCreation = listView.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
+        List<String> inCreation = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
         assertEquals(List.of("2", "1"), inCreation);
         ChoiceBox<String> choiceBox = robot.fromAll().lookup("#orderDropdownBtn").query();
         robot.clickOn(choiceBox);
         robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        ListView<EventListItemAdmin> listView2 = robot.fromAll().lookup("#eventList").query();
-        List<String> inParticipant = listView2.getItems().stream().map(i -> i.getEventCodeLabel().getText()).toList();
-        assertEquals(List.of("1", "2"), inParticipant);
+        List<String> inActivity = robot.fromAll().lookup(".eventListItemContainer")
+                .queryAll().stream().map(e -> ((EventListItemAdmin) e)
+                        .getEventCodeLabel().getText()).toList();
+        assertEquals(List.of("1", "2"), inActivity);
     }
 }
