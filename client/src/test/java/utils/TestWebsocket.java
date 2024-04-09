@@ -15,6 +15,11 @@ public class TestWebsocket implements Websocket {
 
     private String eventID;
     private boolean connected = false;
+
+    public EnumMap<WebsocketActions, Set<Consumer<Object>>> getFunctions() {
+        return functions;
+    }
+
     private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
 
 

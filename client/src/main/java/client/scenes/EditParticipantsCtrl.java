@@ -42,6 +42,13 @@ public class EditParticipantsCtrl {
     @FXML
     private Label warningLabel;
 
+    /**
+     * @return the event
+     */
+    public Event getEvent() {
+        return event;
+    }
+
     private Event event;
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
