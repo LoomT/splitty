@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +28,7 @@ public class FileManagerImpl implements FileManager{
             if(path == null) {
                 throw new FileNotFoundException("Resource not found: client/rates/currencies.txt");
             }
-            currencies = new File(path.getFile());
+            currencies = new File(URLDecoder.decode(path.getFile(), StandardCharsets.UTF_8));
             rateDir = new File(currencies.getParentFile().toString());
             if(!currencies.exists() || !rateDir.exists()) {
                 throw new FileNotFoundException("Resource not found: client/rates");
