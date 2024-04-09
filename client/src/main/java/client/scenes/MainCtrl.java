@@ -312,7 +312,7 @@ public class MainCtrl implements MainCtrlInterface{
         Stage stage = new Stage();
         stage.setScene(options);
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle("Options");
+        stage.setTitle(languageConf.get("Options.title"));
         optionsCtrl.display(stage);
         stage.setResizable(false);
         stage.initOwner(primaryStage);
