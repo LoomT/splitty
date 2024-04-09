@@ -30,12 +30,13 @@
                   <Button mnemonicParsing="false" onAction="#settleDebt" prefHeight="25.0" prefWidth="143.0" text="%OpenDebtsListItem.markReceived" />
                </children>
             </HBox>
-            <VBox prefHeight="100.0" prefWidth="436.0" spacing="7.5" style="-fx-background-color: ff;" GridPane.rowIndex="2">
+            <VBox prefHeight="100.0" prefWidth="436.0" spacing="4.0" style="-fx-background-color: ff;" GridPane.rowIndex="2">
                <children>
                   <Text fx:id="availability" strokeType="OUTSIDE" strokeWidth="0.0" text="availability" />
-                  <Text fx:id="accountHolder" strokeType="OUTSIDE" strokeWidth="0.0" text="accountHolder" />
+                  <Text fx:id="accountHolder" strokeType="OUTSIDE" strokeWidth="0.0" text="accountHolder:" />
                   <Text fx:id="iban" strokeType="OUTSIDE" strokeWidth="0.0" text="IBAN" />
                   <Text fx:id="bic" strokeType="OUTSIDE" strokeWidth="0.0" text="BIC" />
+                  <Text fx:id="email" strokeType="OUTSIDE" strokeWidth="0.0" text="email" />
                </children>
             </VBox>
             <Line endX="233.57859802246094" endY="0.41506439447402954" startX="-100.0" GridPane.rowIndex="1" />

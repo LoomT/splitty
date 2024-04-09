@@ -77,21 +77,22 @@ public class EventPageCtrl {
     public Event getEvent() {
         return event;
     }
+
     private List<Expense> fromExpenses;
     private List<Expense> includingExpenses;
 
     /**
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
-     * @param websocket the websocket instance
-     * @param server server to be ysed
+     * @param websocket    the websocket instance
+     * @param server       server to be ysed
      */
     @Inject
     public EventPageCtrl(
-        MainCtrl mainCtrl,
-        LanguageConf languageConf,
-        Websocket websocket,
-        ServerUtils server
+            MainCtrl mainCtrl,
+            LanguageConf languageConf,
+            Websocket websocket,
+            ServerUtils server
     ) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
@@ -164,7 +165,7 @@ public class EventPageCtrl {
     }
 
     /**
-     *Registers websocket handlers
+     * Registers websocket handlers
      */
     private void handleWS() {
         websocket.registerParticipantChangeListener(
@@ -184,12 +185,18 @@ public class EventPageCtrl {
                 this::displayEvent
         );
         websocket.on(WebsocketActions.ADD_TRANSACTION,
-                transaction -> {event.addTransaction((Transaction) transaction);
-                mainCtrl.updateOpenDebtsPage(event);});
+                transaction -> {
+                    if (event.getTransactions().contains((Transaction) transaction))
+                        return;
+                    event.addTransaction((Transaction) transaction);
+                    mainCtrl.updateOpenDebtsPage(event);
+                });
 
         websocket.on(WebsocketActions.REMOVE_TRANSACTION,
-                id -> {event.getTransactions().removeIf(t -> t.getId() == (Long) id);
-                mainCtrl.updateOpenDebtsPage(event);});
+                id -> {
+                    event.getTransactions().removeIf(t -> t.getId() == (Long) id);
+                    mainCtrl.updateOpenDebtsPage(event);
+                });
     }
 
 
@@ -222,6 +229,7 @@ public class EventPageCtrl {
 
     /**
      * display the expenses
+     *
      * @param e event
      */
     public void displayExpenses(Event e) {
@@ -253,7 +261,8 @@ public class EventPageCtrl {
 
     /**
      * actions for when the tab selection is changed
-     * @param e event
+     *
+     * @param e                       event
      * @param selectedParticipantName selected participant name
      */
     @FXML
@@ -281,9 +290,10 @@ public class EventPageCtrl {
 
     /**
      * create the specific displayed expenses for a listview
+     *
      * @param expenses expenses from which to create the list view
-     * @param lv list view
-     * @param ev event
+     * @param lv       list view
+     * @param ev       event
      */
     public void createExpenses(List<Expense> expenses, ListView<String> lv, Event ev) {
         lv.setCellFactory(param -> new ListCell<>() {
@@ -328,7 +338,6 @@ public class EventPageCtrl {
     }
 
 
-
     private String buildParticipantsList(List<Participant> participants,
                                          List<Participant> allParticipants) {
         StringBuilder participantsList = new StringBuilder();
@@ -349,6 +358,7 @@ public class EventPageCtrl {
 
     /**
      * return form for displaying the expenses in the event page
+     *
      * @param exp the expense
      * @return human-readable form
      */
@@ -378,6 +388,7 @@ public class EventPageCtrl {
 
     /**
      * return all expenses
+     *
      * @param ev event
      * @return all expenses
      */
@@ -387,7 +398,8 @@ public class EventPageCtrl {
 
     /**
      * return all expenses from a certain person
-     * @param ev event
+     *
+     * @param ev   event
      * @param name name of participant
      * @return all expenses from a certain person
      */
@@ -405,13 +417,14 @@ public class EventPageCtrl {
     /**
      *
      */
-    public void changeTitle(){
+    public void changeTitle() {
         mainCtrl.showEditTitle(this.event);
     }
 
     /**
      * return all expenses including a certain person
-     * @param ev event
+     *
+     * @param ev   event
      * @param name name of participant
      * @return all expenses including a certain person
      */
@@ -431,7 +444,8 @@ public class EventPageCtrl {
     }
 
     /**
-     *extract the selected name from the choice box
+     * extract the selected name from the choice box
+     *
      * @return the name
      */
     public String extractSelectedName() {
@@ -453,6 +467,7 @@ public class EventPageCtrl {
         copiedToClipboardMsg.setOpacity(1.0);
         ft.play();
     }
+
     /**
      * Show the openDebts page with the current event
      */

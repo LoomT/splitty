@@ -17,7 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class OpenDebtsPageCtrl {
 
@@ -76,24 +75,10 @@ public class OpenDebtsPageCtrl {
 
         this.event = event;
         Map<String, Double> map = new HashMap<>();
+        partToPartMap = new HashMap<>();
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
-        double sum = calculateParticipants(map, partToPartMap);
-
-        includingChoiceBox.getItems().clear();
-        includingChoiceBox.getItems().add(languageConf.get("OpenDebtsPage.allParticipants"));
-        includingChoiceBox.getItems().addAll(
-                event.getParticipants().stream().map(Participant::getName).toList()
-        );
-        includingChoiceBox.setValue(languageConf.get("OpenDebtsPage.allParticipants"));
-        includingChoiceBox.setOnAction(e -> {
-            if (includingChoiceBox.getSelectionModel().getSelectedItem() == null)
-                return;
-            if(includingChoiceBox.getSelectionModel().getSelectedIndex() == 0)
-                populateExpense(null);
-            else
-                populateExpense(includingChoiceBox.getSelectionModel().getSelectedItem());
-        });
-        populateExpense(null);
+        allDebtsPane.getChildren().clear();
+        double sum = initializePage(map, partToPartMap);
 
         if (map.equals(participantDebtMap)) return;
         participantDebtMap = map;
@@ -109,80 +94,105 @@ public class OpenDebtsPageCtrl {
         totalSumExp.setText("Total sum of all expenses in this event: " + sum);
     }
 
-    public double calculateParticipants(Map<String, Double> map,
-                                      Map<Participant, Map<Participant, Double>> debtMap){
+    /**
+     * Initializes the graph and the open debts
+     * @param graphMap map to be used to populate the graph
+     * @param debtMap map to be used to populate the debts
+     * @return sum of all the expenses
+     */
+    public double initializePage(Map<String, Double> graphMap,
+                                 Map<Participant, Map<Participant, Double>> debtMap) {
         double sum = 0;
         for (Expense e : event.getExpenses()) {
             for (Participant p : e.getExpenseParticipants()) {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
-                map.put(p.getName(), map.get(p.getName()) + cost);
+                graphMap.put(p.getName(), graphMap.get(p.getName()) + cost);
                 if (e.getExpenseAuthor().equals(p)) continue;
 
                 debtMap.putIfAbsent(e.getExpenseAuthor(), new HashMap<>());
                 Map<Participant, Double> temp = debtMap.get(e.getExpenseAuthor());
                 temp.putIfAbsent(p, 0.0);
+
                 temp.put(p, temp.get(p) + cost);
             }
             sum += e.getAmount();
         }
+        for (Participant receiver : debtMap.keySet()) {
+            for (Participant giver : debtMap.get(receiver).keySet()) {
+                double cost = debtMap.get(receiver).get(giver)
+                        - event.getTransactions().stream().distinct().
+                        filter(x -> x.getGiver().equals(giver) && x.getReceiver().
+                                equals(receiver)).mapToDouble(Transaction::getAmount).sum()
+                        + event.getTransactions().stream().distinct().filter(
+                                x -> x.getGiver().equals(receiver)
+                        && x.getReceiver().equals(giver)).mapToDouble(Transaction::getAmount).sum();
+                debtMap.get(receiver).put(giver, cost);
+            }
+        }
+        minCashFlow(debtMap, event);
         return sum;
     }
 
-
-    public void populateExpense(String name) {
-        Participant participant = null;
-        if(name != null){
-            participant = event.getParticipants().stream().filter(
-                    p -> p.getName().equals(name)).toList().getFirst();
-        }
-
-        allDebtsPane.getChildren().clear();
-        for (Participant receiver : partToPartMap.keySet()) {
-            for(Participant giver : partToPartMap.get(receiver).keySet()){
-                if((giver.equals(participant)
-                        || receiver.equals(participant))){
-                    System.out.println("test");
-                    continue;
-                }
-                double cost = partToPartMap.get(receiver).get(giver) - event.getTransactions().stream()
-                        .distinct().filter(x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver))
-                        .mapToDouble(Transaction::getAmount).sum() + event.getTransactions().stream()
-                        .distinct().filter(x -> x.getGiver().equals(receiver) && x.getReceiver().equals(giver))
-                        .mapToDouble(Transaction::getAmount).sum();
-
-                if (cost <= 0
-                        || (giver.equals(participant)
-                        && receiver.equals(participant))) {
-                    continue;
-                }
-
-                if(partToPartMap.get(giver) == null || partToPartMap.get(giver).get(receiver) == null){
-                    allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(receiver,
-                            giver, cost, event, languageConf, server, mainCtrl));
-                }
-                else if(cost - partToPartMap.get(giver).get(receiver) > 0){
-                    cost -= partToPartMap.get(giver).get(receiver);
-                    allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(receiver,
-                            giver, cost, event, languageConf, server, mainCtrl));
-                }
-
+    /**
+     * Given a set of debts with Map<Participant, Map<Participant,Double>> calculates the
+     * minimum cash flow to settle all debts.
+     * @param debtMap Map of all the debts using an adjacency map data structure
+     * @param event event that the debts occur in
+     */
+    public void minCashFlow(Map<Participant, Map<Participant, Double>> debtMap, Event event){
+        Map<Participant, Double> map = new HashMap<>();
+        for(Participant p : event.getParticipants()){
+            for (Participant i : event.getParticipants()){
+                if(p.equals(i)) continue;
+                map.putIfAbsent(p, 0.0);
+                debtMap.putIfAbsent(i, new HashMap<>());
+                debtMap.putIfAbsent(p, new HashMap<>());
+                debtMap.get(i).putIfAbsent(p, 0.0);
+                debtMap.get(p).putIfAbsent(i, 0.0);
+                map.put(p, map.get(p) + debtMap.get(i).get(p) - debtMap.get(p).get(i));
             }
         }
+        recursionCalculate(map);
     }
 
-    public void resizeOpenDebtItem(Node item){
+    /**
+     * Recursively calculates the minimum amount of transactions needed to settle
+     * all debts with a maximum on n-1 where n is the number of participants.
+     * Works via finding the maximum debit and credit and decrementing them
+     * from each other until they are both zero.
+     * @param debtMap map of all the participants and minimum cash flows that conclude all debts
+     */
+    public void recursionCalculate(Map<Participant, Double> debtMap){
+        Participant maxCredit = getMax(debtMap);
+        Participant maxDebit = getMin(debtMap);
+        if(debtMap.get(maxDebit) == 0 && debtMap.get(maxCredit) == 0)
+            return;
+        double min = Math.min(-debtMap.get(maxDebit), debtMap.get(maxCredit));
+        debtMap.put(maxCredit, debtMap.get(maxCredit)-min);
+        debtMap.put(maxDebit, debtMap.get(maxDebit)+min);
+        recursionCalculate(debtMap);
+
+        allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(maxDebit,
+                maxCredit, min, event, languageConf, server, mainCtrl));
+    }
+
+    /**
+     * resizes the debtItems depending on their size.
+     * @param item OpenDebts item to be resized
+     */
+    public void resizeOpenDebtItem(Node item) {
         int index = -1;
         List<Node> list = allDebtsPane.getChildren();
-        for(int i = 0; i<list.size(); i++){
-            if(item.equals(list.get(i))){
+        for (int i = 0; i < list.size(); i++) {
+            if (item.equals(list.get(i))) {
                 index = i;
             }
         }
-        if(index == -1){ //TODO
+        if (index == -1) { //TODO
             //System.out.println("An error");
             return;
         }
-        if(item.getClass() == ShrunkOpenDebtsListItem.class){
+        if (item.getClass() == ShrunkOpenDebtsListItem.class) {
             ShrunkOpenDebtsListItem oldItem = (ShrunkOpenDebtsListItem) list.get(index);
             list.set(index, new ExpandedOpenDebtsListItem(oldItem.getLender(),
                     oldItem.getDebtor(),
@@ -191,8 +201,7 @@ public class OpenDebtsPageCtrl {
                     languageConf,
                     server,
                     mainCtrl));
-        }
-        else{
+        } else {
             ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
             allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(oldItem.getLender(),
                     oldItem.getDebtor(),
@@ -219,4 +228,33 @@ public class OpenDebtsPageCtrl {
     public void addCustomTransactionClicked() {
         mainCtrl.showAddCustomTransaction(event);
     }
+
+    /**
+     * Finds the maximum value from the map and returns the key
+     * @param debtMap map to be searched
+     * @return the Participant key with the maximum value
+     */
+    public static Participant getMax(Map<Participant, Double> debtMap){
+        Participant result = null;
+        for(Participant p : debtMap.keySet()){
+            if(result == null) result = p;
+            else if(debtMap.get(p) > debtMap.get(result)) result = p;
+        }
+        return result;
+    }
+
+    /**
+     * Finds the minimum value from the map and returns the key
+     * @param debtMap map to be searched
+     * @return the Participant key with the minimum value
+     */
+    public static Participant getMin(Map<Participant, Double> debtMap){
+        Participant result = null;
+        for(Participant p : debtMap.keySet()){
+            if(result == null) result = p;
+            else if(debtMap.get(p) < debtMap.get(result)) result = p;
+        }
+        return result;
+    }
+
 }
