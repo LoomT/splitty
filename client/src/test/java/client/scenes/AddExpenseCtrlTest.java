@@ -26,7 +26,10 @@ import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
@@ -138,10 +141,13 @@ public class AddExpenseCtrlTest {
     @Order(3)
     public void handleAddButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
+
             server.getCalls().clear();
             server.getStatuses().clear();
             websocket.resetTriggers();
+
             ctrl.displayAddExpensePage(event, null);
+
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
             robot.lookup("#amount").queryAs(TextField.class).setText("10");
@@ -154,17 +160,26 @@ public class AddExpenseCtrlTest {
         });
         waitForFxEvents();
         assertEquals(server.getCalls().getFirst(), "createExpense");
-        System.out.println(server.getStatuses().getFirst());
-        //assertTrue(websocket.hasPayloadBeenSent(new Expense()));
+        assertEquals(server.getStatuses().getFirst(), 204);
+        assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.ADD_EXPENSE));
+        assertNotNull(websocket.getPayloads().getFirst());
+        assertTrue(websocket.getPayloads().getFirst().getClass().equals(Expense.class));
+
+
     }
 
     @Test
     @Order(4)
     public void handleEditButtonTest(FxRobot robot) {
         Platform.runLater(() -> {
+            Expense expense = new Expense(event.getParticipants().getFirst(), "testPurpose", 10, "EUR", event.getParticipants(), "food");
+            server.createExpense(event.getId(), expense);
+            int expenseID = (int) server.getEvent(event.getId()).getExpenses().getFirst().getId();
+            expense.setId(expenseID);
+            expense.setEventID(event.getId());
             server.getCalls().clear();
             server.getStatuses().clear();
-            Expense expense = new Expense(event.getParticipants().getFirst(), "testPurpose", 10, "EUR", event.getParticipants(), "food");
+            websocket.resetTriggers();
             ctrl.displayAddExpensePage(event, expense);
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(1);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
@@ -178,6 +193,11 @@ public class AddExpenseCtrlTest {
         });
         waitForFxEvents();
         assertEquals(server.getCalls().getFirst(), "updateExpense");
+        assertEquals(server.getStatuses().getFirst(), 204);
+        assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.UPDATE_EXPENSE));
+        assertNotNull(websocket.getPayloads().getFirst());
+        assertEquals(websocket.getPayloads().getFirst().getClass(), Expense.class);
+
     }
 
     @Test
@@ -191,6 +211,7 @@ public class AddExpenseCtrlTest {
         });
         waitForFxEvents();
         assertEquals(mainCtrl.getScenes().getFirst(), "AddTagPage");
+
     }
 
     @Test
@@ -212,6 +233,7 @@ public class AddExpenseCtrlTest {
         Platform.runLater(() -> {
             server.getCalls().clear();
             server.getStatuses().clear();
+            websocket.resetTriggers();
             ctrl.displayAddExpensePage(event, null);
             robot.clickOn("#partialSplit");
             TextFlow textFlow = robot.lookup("#expenseParticipants").queryAs(TextFlow.class);
@@ -227,6 +249,10 @@ public class AddExpenseCtrlTest {
         });
         waitForFxEvents();
         assertEquals(server.getCalls().getFirst(), "createExpense");
+        assertEquals(server.getStatuses().getFirst(), 204);
+        assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.ADD_EXPENSE));
+        assertNotNull(websocket.getPayloads().getFirst());
+        assertEquals(websocket.getPayloads().getFirst().getClass(), Expense.class);
     }
 
     @Test

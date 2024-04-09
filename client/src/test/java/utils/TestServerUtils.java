@@ -253,9 +253,9 @@ public class TestServerUtils implements ServerUtils {
         if(expense == null) return true;
         if(!event.getParticipants().contains(expense.getExpenseAuthor())) return true;
         if(!event.getParticipants().containsAll(expense.getExpenseParticipants())) return true;
-        return expense.getCurrency() != null && expense.getCurrency().length() == 3
-                && expense.getPurpose() != null && !expense.getPurpose().isEmpty()
-                && expense.getDate() != null;
+        return expense.getCurrency() == null || expense.getCurrency().length() != 3
+                || expense.getPurpose() == null || expense.getPurpose().isEmpty()
+                || expense.getDate() == null;
     }
 
     /**
