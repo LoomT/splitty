@@ -57,7 +57,10 @@ public class Main extends Application {
             // When the language is changed, this function is run
             loadLanguageResourcesAndStart(primaryStage);
         });
-
+        userConfig.onContrastChange(() -> {
+            // When the language is changed, this function is run
+            loadLanguageResourcesAndStart(primaryStage);
+        });
         loadLanguageResourcesAndStart(primaryStage);
     }
 
@@ -69,7 +72,7 @@ public class Main extends Application {
      * @param primaryStage the primary stage
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {  // Load all the FXML here:
-        boolean isHighContrast = false;
+        boolean isHighContrast = userConfig.getHighContrast();
         var start = FXML.load(
                 StartScreenCtrl.class,
                 languageConf.getLanguageResources(),

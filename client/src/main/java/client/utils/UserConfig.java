@@ -18,6 +18,7 @@ import java.util.Scanner;
 public class UserConfig {
     private final Properties configProperties;
     private final IOInterface io;
+    private Runnable callback;
 
     /**
      * The constructor which initializes properties from file, and opens a writer to the file
@@ -40,6 +41,12 @@ public class UserConfig {
         return configProperties.getProperty("serverURL", "http://localhost:8080/");
     }
 
+    public void setURL(String url) throws IOException {
+        configProperties.setProperty("serverURL", url);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed server to " + url);
+        }
+    }
     /**
      * Returns previously set locale from the config
      *
@@ -142,5 +149,27 @@ public class UserConfig {
         try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed currency to " + currency);
         }
+    }
+
+    public boolean getHighContrast() {
+        return Boolean.parseBoolean(configProperties.getProperty("highContrast", "false"));
+    }
+
+    public void setHighContrast(boolean highContrast) {
+        configProperties.setProperty("highContrast", highContrast ? "true" : "false");
+
+        callback.run();
+    }
+
+    public void persistContrast() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed high contrast to "
+                    + (Boolean.parseBoolean(configProperties.get("highContrast")
+                    .toString()) ? "true" : "false"));
+        }
+    }
+
+    public void onContrastChange(Runnable function) {
+        callback = function;
     }
 }
