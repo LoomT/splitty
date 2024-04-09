@@ -15,6 +15,7 @@
  */
 package client;
 
+import client.MockClass.MainCtrlInterface;
 import client.scenes.*;
 import client.utils.LanguageConf;
 import com.google.inject.Injector;
@@ -103,7 +104,6 @@ public class Main extends Application {
                 "client", "scenes", "AddTag.fxml"
         );
 
-        primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
         var addCustomTransaction = FXML.load(AddCustomTransactionCtrl.class,
                 languageConf.getLanguageResources(),
@@ -114,7 +114,9 @@ public class Main extends Application {
                 "client", "scenes", "OpenDebtsPage.fxml"
         );
 
-        var mainCtrl = INJECTOR.getInstance(MainCtrl.class);
+        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
 
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,

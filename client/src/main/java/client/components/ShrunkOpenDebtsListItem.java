@@ -1,5 +1,6 @@
 package client.components;
 
+import client.MockClass.MainCtrlInterface;
 import client.scenes.MainCtrl;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -22,7 +23,7 @@ public class ShrunkOpenDebtsListItem extends HBox {
     private final Participant debtor;
     private final double amount;
     private final Event event;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
 
     /**
      * Constructor for ExpandedOpenDebtsListItem
@@ -40,7 +41,7 @@ public class ShrunkOpenDebtsListItem extends HBox {
                                    Event event,
                                    LanguageConf languageConf,
                                    ServerUtils server,
-                                   MainCtrl mainCtrl) {
+                                   MainCtrlInterface mainCtrl) {
         this.lender = lender;
         this.debtor = debtor;
         this.amount = amount;

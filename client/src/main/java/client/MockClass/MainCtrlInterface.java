@@ -1,8 +1,10 @@
 package client.MockClass;
 
+import client.components.ShrunkOpenDebtsListItem;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
+import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -117,4 +119,16 @@ public interface MainCtrlInterface {
      * @param event event linked to the page
      */
     void updateOpenDebtsPage(Event event);
+
+    /**
+     * Shows addCustomTransaction scene
+     * @param event event customTransaction is connected to
+     */
+    void showAddCustomTransaction(Event event);
+
+    /**
+     * resizes openDebtListItem based on its current size
+     * @param openDebtListItem openDebtListItem to resize
+     */
+    void resizeOpenDebtItem(Node openDebtListItem);
 }

@@ -1,5 +1,6 @@
 package client.components;
 
+import client.MockClass.MainCtrlInterface;
 import client.scenes.MainCtrl;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -15,15 +16,15 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-public class ExpandedOpenDebtsListItem extends HBox{
+public class ExpandedOpenDebtsListItem extends HBox {
     @FXML
     private Label participantLabel;
     @FXML
-    private Text  availability;
+    private Text availability;
     @FXML
-    private Text  accountHolder;
+    private Text accountHolder;
     @FXML
-    private Text  iban;
+    private Text iban;
     @FXML
     private Text bic;
     private final ServerUtils server;
@@ -31,25 +32,26 @@ public class ExpandedOpenDebtsListItem extends HBox{
     private final Participant debtor;
     private final double amount;
     private final Event event;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
 
     /**
      * Constructor for ExpandedOpenDebtsListItem
-     * @param lender lender of the debt
-     * @param debtor debtor of the debt
-     * @param amount amount owed
-     * @param event Event the debt is in
+     *
+     * @param lender       lender of the debt
+     * @param debtor       debtor of the debt
+     * @param amount       amount owed
+     * @param event        Event the debt is in
      * @param languageConf languageConf of the page
-     * @param server server the client is connected to
-     * @param mainCtrl main Controller of the client
+     * @param server       server the client is connected to
+     * @param mainCtrl     main Controller of the client
      */
     public ExpandedOpenDebtsListItem(Participant lender,
-                             Participant debtor,
-                             double amount,
-                             Event event,
-                             LanguageConf languageConf,
-                             ServerUtils server,
-                             MainCtrl mainCtrl) {
+                                     Participant debtor,
+                                     double amount,
+                                     Event event,
+                                     LanguageConf languageConf,
+                                     ServerUtils server,
+                                     MainCtrlInterface mainCtrl) {
         this.lender = lender;
         this.debtor = debtor;
         this.amount = amount;
@@ -79,34 +81,34 @@ public class ExpandedOpenDebtsListItem extends HBox{
     /**
      * contracts the item
      */
-    public void onEventClicked(){
+    public void onEventClicked() {
         mainCtrl.resizeOpenDebtItem(this);
     }
 
     /**
      * initializes the expanded Bank account information fields
+     *
      * @param languageConf languageConf of the page
      */
-    public void initializeFields(LanguageConf languageConf){
-        if((debtor.getBeneficiary() == null
+    public void initializeFields(LanguageConf languageConf) {
+        if ((debtor.getBeneficiary() == null
                 && debtor.getAccountNumber() == null)
                 || (debtor.getAccountNumber().isEmpty()
-                && debtor.getBeneficiary().isEmpty())){
+                && debtor.getBeneficiary().isEmpty())) {
             availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountEmpty"));
             return;
         }
 
-        if(debtor.getBeneficiary() != null && !debtor.getBeneficiary().isEmpty()){
+        if (debtor.getBeneficiary() != null && !debtor.getBeneficiary().isEmpty()) {
             availability.setText(languageConf.get(
                     "ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
             accountHolder.setText("Beneficiary:" + debtor.getBeneficiary());
-            if(debtor.getAccountNumber() != null && !debtor.getAccountNumber().isEmpty()){
+            if (debtor.getAccountNumber() != null && !debtor.getAccountNumber().isEmpty()) {
                 availability.setText(languageConf.get(
                         "ExpandedOpenDebtsListItem.bankAccountFull"));
                 iban.setText("IBAN: " + debtor.getAccountNumber());
             }
-        }
-        else{
+        } else {
             availability.setText(languageConf.get(
                     "ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
             iban.setText("IBAN: " + debtor.getAccountNumber());
@@ -116,10 +118,10 @@ public class ExpandedOpenDebtsListItem extends HBox{
     /**
      * Settles the debt displayed in the item
      */
-    public void settleDebt(){
+    public void settleDebt() {
         Transaction transaction = new Transaction(debtor, lender, amount);
         int status = server.addTransaction(event.getId(), transaction);
-        if(status / 100 != 2) {
+        if (status / 100 != 2) {
             System.out.println("server error: " + status);
         }
     }
@@ -127,20 +129,25 @@ public class ExpandedOpenDebtsListItem extends HBox{
 
     /**
      * getter for lender
+     *
      * @return lender
      */
     public Participant getLender() {
         return lender;
     }
+
     /**
      * getter for debtor
+     *
      * @return debtor
      */
     public Participant getDebtor() {
         return debtor;
     }
+
     /**
      * getter for amount
+     *
      * @return amount
      */
     public double getAmount() {

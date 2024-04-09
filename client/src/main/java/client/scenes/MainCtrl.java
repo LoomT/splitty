@@ -135,7 +135,6 @@ public class MainCtrl implements MainCtrlInterface{
         showStartScreen();
         primaryStage.show();
 
-
     }
 
     /**

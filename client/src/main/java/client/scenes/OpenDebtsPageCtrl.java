@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.ExpandedOpenDebtsListItem;
 import client.components.ShrunkOpenDebtsListItem;
 import client.utils.LanguageConf;
@@ -38,7 +39,7 @@ public class OpenDebtsPageCtrl {
     private final LanguageConf languageConf;
     private Event event;
     private final ServerUtils server;
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
     private Map<Participant, Map<Participant, Double>>
             partToPartMap = new HashMap<>();
@@ -56,7 +57,7 @@ public class OpenDebtsPageCtrl {
     @Inject
     public OpenDebtsPageCtrl(
             ServerUtils serverUtils,
-            MainCtrl mainCtrl,
+            MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
             Websocket websocket
     ) {
@@ -76,7 +77,16 @@ public class OpenDebtsPageCtrl {
         this.event = event;
         Map<String, Double> map = new HashMap<>();
         partToPartMap = new HashMap<>();
+
+        for(Participant p1 : event.getParticipants()){
+            partToPartMap.put(p1, new HashMap<>());
+            for(Participant p2 : event.getParticipants()){
+                partToPartMap.get(p1).put(p2, 0.0);
+            }
+        }
+
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
+        if(event.getExpenses().isEmpty()) return;
         allDebtsPane.getChildren().clear();
         double sum = initializePage(map, partToPartMap);
 
