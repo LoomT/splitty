@@ -18,6 +18,9 @@ package client;
 import com.google.inject.Injector;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.ColorAdjust;
 import javafx.util.Builder;
 import javafx.util.BuilderFactory;
 import javafx.util.Callback;
@@ -49,11 +52,29 @@ public class MyFXML {
      * @param <T> class
      * @return fxml controller and scene pair
      */
-    public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources, String... parts) {
+    public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources, boolean isHighContrast, String... parts) {
         try {
             var loader = new FXMLLoader(getLocation(parts), resources, null,
                     new MyFactory(), StandardCharsets.UTF_8);
             Parent parent = loader.load();
+
+            ColorAdjust ca = new ColorAdjust();
+            ca.setBrightness(-0.4);
+            ca.setContrast(1);
+
+            Blend b = new Blend();
+            b.setMode(BlendMode.COLOR_BURN);
+            b.setOpacity(.8);
+
+
+
+
+            b.setTopInput(ca);
+//            ca.setInput(b);
+
+
+            if (isHighContrast) parent.setEffect(b);
+
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);
         } catch (IOException e) {
