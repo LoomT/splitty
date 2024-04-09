@@ -4,7 +4,9 @@ import client.MockClass.MainCtrlInterface;
 import client.components.ExpenseItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.UserConfig;
 import client.utils.Websocket;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -27,12 +29,12 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static commons.WebsocketActions.ADD_TAG;
 import static commons.WebsocketActions.TITLE_CHANGE;
@@ -74,6 +76,8 @@ public class EventPageCtrl {
     private int selectedParticipantId;
 
     private final Websocket websocket;
+    private final CurrencyConverter converter;
+    private final UserConfig userConfig;
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
@@ -91,19 +95,19 @@ public class EventPageCtrl {
      * @param languageConf the language config instance
      * @param websocket    the websocket instance
      * @param server       server to be ysed
+     * @param converter currency converter
+     * @param userConfig user config
      */
     @Inject
-    public EventPageCtrl(
-            MainCtrlInterface mainCtrl,
-        LanguageConf languageConf,
-        Websocket websocket,
-        ServerUtils server
-    ) {
+    public EventPageCtrl(MainCtrlInterface mainCtrl, LanguageConf languageConf,
+                         Websocket websocket, ServerUtils server, CurrencyConverter converter,
+                         UserConfig userConfig) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
-
         this.server = server;
         this.websocket = websocket;
+        this.converter = converter;
+        this.userConfig = userConfig;
     }
 
     /**
@@ -398,26 +402,37 @@ public class EventPageCtrl {
      * @return human-readable form
      */
     public String toString(Expense exp) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(exp.getDate());
-        System.out.println(calendar.toString());
-        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int year = calendar.get(Calendar.YEAR);
+        String date = DateTimeFormatter.ISO_LOCAL_DATE
+                .format(exp.getDate().toInstant()
+                        .atZone(TimeZone.getDefault().toZoneId()));
 
-        NumberFormat currencyFormatter = switch (exp.getCurrency()) {
-            case "USD" -> NumberFormat.getCurrencyInstance(Locale.US);
-            case "EUR" -> NumberFormat.getCurrencyInstance(Locale.GERMANY);
-            case "GBP" -> NumberFormat.getCurrencyInstance(Locale.UK);
-            case "JPY" -> NumberFormat.getCurrencyInstance(Locale.JAPAN);
-            default -> NumberFormat.getCurrencyInstance(Locale.getDefault());
-        };
+        double amount = exp.getAmount();
+        String currency = exp.getCurrency().toUpperCase();
+        try {
+            if(!userConfig.getCurrency().equals("NONE")) {
+                amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                        amount, exp.getDate().toInstant());
+                currency = userConfig.getCurrency().toUpperCase();
+            }
 
-        String formattedAmount = currencyFormatter.format(exp.getAmount());
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return "connection issue";
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("Currency.IOError"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            alert.showAndWait();
+            return "broke";
+        }
+        NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
+        formater.setMaximumFractionDigits(2);
+        formater.setCurrency(Currency.getInstance(currency));
+        String formattedAmount = formater.format(amount);
 
-        return dayOfMonth + "." + month + "." + year + "     " +
-                exp.getExpenseAuthor().getName() + " " + languageConf.get("AddExp.paid") +
-                " " + formattedAmount + " " + languageConf.get("AddExp.for") + " " +
+        return date + "     " + exp.getExpenseAuthor().getName() + " " +
+                languageConf.get("AddExp.paid") + " " + formattedAmount +
+                " " + languageConf.get("AddExp.for") + " " +
                 exp.getPurpose();
     }
 

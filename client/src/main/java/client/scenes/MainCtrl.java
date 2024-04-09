@@ -19,6 +19,7 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -35,6 +36,7 @@ import java.util.List;
 public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
+    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -65,13 +67,15 @@ public class MainCtrl implements MainCtrlInterface{
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
+     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig) {
+                    UserConfig userConfig, CurrencyConverter converter) {
         this.websocket = websocket;
         this.languageConf = languageConf;
         this.userConfig = userConfig;
+        this.converter = converter;
     }
 
     /**
