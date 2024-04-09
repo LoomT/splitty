@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.components.ExpandedOpenDebtsListItem;
 import client.components.OpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -8,6 +9,7 @@ import commons.*;
 import jakarta.inject.Inject;
 
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
@@ -128,17 +130,25 @@ public class OpenDebtsPageCtrl {
 
     public void populateExpense(String name) {
         Participant participant = null;
-        boolean flag = false;
+        boolean everyoneSelectedFlag = true;
         for (Participant p : event.getParticipants()) {
             if (p.getName().equals(name)) {
-                flag = true;
+                everyoneSelectedFlag = false;
                 participant = p;
+                System.out.println("found: " + p.getName());
                 break;
             }
         }
         allDebtsPane.getChildren().clear();
         for (Participant receiver : partToPartMap.keySet()) {
             for(Participant giver : partToPartMap.get(receiver).keySet()){
+                if(!everyoneSelectedFlag
+                        && (giver.equals(participant)
+                        || receiver.equals(participant))){
+                    continue;
+                }
+
+
                 double cost = partToPartMap.get(receiver).get(giver) - event.getTransactions().stream()
                         .distinct().filter(x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver))
                         .mapToDouble(Transaction::getAmount).sum() +
@@ -153,20 +163,20 @@ public class OpenDebtsPageCtrl {
                         mapToDouble(Transaction::getAmount).sum()));
 
                 if (cost <= 0
-                        || (flag
-                        && giver.equals(participant)
+                        || (giver.equals(participant)
                         && receiver.equals(participant))) {
                     continue;
                 }
+
                 if(partToPartMap.get(giver) == null || partToPartMap.get(giver).get(receiver) == null){
                     System.out.println("t1");
                     allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
-                            giver, cost, event, languageConf, server));
+                            giver, cost, event, languageConf, server, mainCtrl));
                 }
                 else if(cost - partToPartMap.get(giver).get(receiver) > 0){
                     cost -= partToPartMap.get(giver).get(receiver);
                     allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
-                            giver, cost, event, languageConf, server));
+                            giver, cost, event, languageConf, server, mainCtrl));
                     System.out.println("t2 " + cost + " " + partToPartMap.get(giver).get(receiver));
                 }
 
@@ -174,20 +184,39 @@ public class OpenDebtsPageCtrl {
         }
     }
 
-    /*
-
-    if(cost != 0
-                    && (!flag
-                    || m.getKey().equals(participant)
-                    || m.getValue().equals(participant)))
-
-    allDebtsPane.getChildren().add(new OpenDebtsListItem(
-                        "OpenDebtsListItem.template", m.getKey(),
-                        m.getValue(),
-                        cost,
-                        languageConf));
-     */
-
+    public void resizeOpenDebtItem(Node item){
+        int index = -1;
+        List<Node> list = allDebtsPane.getChildren();
+        for(int i = 0; i<list.size(); i++){
+            if(item.equals(list.get(i))){
+                index = i;
+            }
+        }
+        if(index == -1){ //TODO
+            //System.out.println("An error");
+            return;
+        }
+        if(item.getClass() == OpenDebtsListItem.class){
+            OpenDebtsListItem oldItem = (OpenDebtsListItem) list.get(index);
+            list.set(index, new ExpandedOpenDebtsListItem(oldItem.getLender(),
+                    oldItem.getDebtor(),
+                    oldItem.getAmount(),
+                    event,
+                    languageConf,
+                    server,
+                    mainCtrl));
+        }
+        else{
+            ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
+            allDebtsPane.getChildren().set(index, new OpenDebtsListItem(oldItem.getLender(),
+                    oldItem.getDebtor(),
+                    oldItem.getAmount(),
+                    event,
+                    languageConf,
+                    server,
+                    mainCtrl));
+        }
+    }
 
     /**
      * Handles the back button click event functionality

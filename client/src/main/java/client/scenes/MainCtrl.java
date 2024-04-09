@@ -17,6 +17,7 @@ package client.scenes;
 
 import client.MockClass.*;
 import client.components.ErrorPopupCtrl;
+import client.components.OpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -24,6 +25,7 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -325,6 +327,10 @@ public class MainCtrl {
      */
     public void updateOpenDebtsPage(Event eventToShow) {
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+    }
+
+    public void resizeOpenDebtItem(Node item){
+        openDebtsPageCtrl.resizeOpenDebtItem(item);
     }
 
     /**

@@ -5,31 +5,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.text.Font?>
 
 <fx:root alignment="CENTER_LEFT" onMouseClicked="#onEventClicked" prefHeight="35.0" prefWidth="355.0" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="participantLabel" prefHeight="17.0" prefWidth="199.0" text="Label" HBox.hgrow="ALWAYS">
+      <Label fx:id="participantLabel" prefHeight="17.0" prefWidth="200.0" text="Label" HBox.hgrow="ALWAYS">
          <HBox.margin>
             <Insets right="10.0" />
          </HBox.margin>
-         <font>
-            <Font size="8.0" />
-         </font>
       </Label>
-      <Button id="email" mnemonicParsing="false" text="X">
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-         <HBox.margin>
-            <Insets left="5.0" right="5.0" />
-         </HBox.margin>
-      </Button>
-      <Button id="bankAccount" mnemonicParsing="false" text="V">
-         <HBox.margin>
-            <Insets left="5.0" right="5.0" />
-         </HBox.margin>
-      </Button>
       <Button mnemonicParsing="false" onAction="#settleDebt" prefHeight="25.0" prefWidth="143.0" text="%OpenDebtsListItem.markReceived" />
    </children>
    <padding>

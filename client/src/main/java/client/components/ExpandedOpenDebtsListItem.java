@@ -10,16 +10,22 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-import static com.google.inject.Guice.createInjector;
-
-public class OpenDebtsListItem extends HBox {
-    private final LanguageConf languageConf;
+public class ExpandedOpenDebtsListItem extends HBox{
     @FXML
     private Label participantLabel;
+    @FXML
+    private Text  availability;
+    @FXML
+    private Text  accountHolder;
+    @FXML
+    private Text  iban;
+    @FXML
+    private Text bic;
     ServerUtils server;
     Participant lender;
     Participant debtor;
@@ -27,7 +33,7 @@ public class OpenDebtsListItem extends HBox {
     Event event;
     MainCtrl mainCtrl;
 
-    public OpenDebtsListItem(Participant lender,
+    public ExpandedOpenDebtsListItem(Participant lender,
                              Participant debtor,
                              double amount,
                              Event event,
@@ -39,19 +45,20 @@ public class OpenDebtsListItem extends HBox {
         this.amount = amount;
         this.event = event;
         this.mainCtrl = mainCtrl;
-        this.languageConf = languageConf;
         this.server = server;
         FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource("/client/components/OpenDebtsListItem.fxml")
+                getClass().getResource("/client/components/ExpandedOpenDebtsListItem.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);
         fxmlLoader.setResources(languageConf.getLanguageResources());
         try {
             fxmlLoader.load();
+            initializeFields(languageConf);
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+
         DecimalFormat numberFormat = new DecimalFormat("#.00");
         String template = languageConf.get("OpenDebtsListItem.template");
         String text = String.format(template, debtor.getName(),
@@ -63,6 +70,28 @@ public class OpenDebtsListItem extends HBox {
         mainCtrl.resizeOpenDebtItem(this);
     }
 
+    public void initializeFields(LanguageConf languageConf){
+        if((debtor.getBeneficiary() == null
+                && debtor.getAccountNumber() == null)
+                || (debtor.getAccountNumber().isEmpty()
+                && debtor.getBeneficiary().isEmpty())){
+            availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountEmpty"));
+            return;
+        }
+
+        if(debtor.getBeneficiary() != null && !debtor.getBeneficiary().isEmpty()){
+            availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
+            accountHolder.setText("Beneficiary:" + debtor.getBeneficiary());
+            if(debtor.getAccountNumber() != null && !debtor.getAccountNumber().isEmpty()){
+                availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountFull"));
+                iban.setText("IBAN: " + debtor.getAccountNumber());
+            }
+        }
+        else{
+            availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
+            iban.setText("IBAN: " + debtor.getAccountNumber());
+        }
+    }
 
     public void settleDebt(){
         Transaction transaction = new Transaction(debtor, lender, amount);
@@ -71,6 +100,7 @@ public class OpenDebtsListItem extends HBox {
             System.out.println("server error: " + status);
         }
     }
+
 
     /**
      * getter for lender
