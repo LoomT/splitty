@@ -39,10 +39,12 @@ public class EventPageCtrlTest {
     EventPageCtrl ctrl;
     TestServerUtils server;
     FileManagerMock fileManager;
+    TestWebsocket websocket;
 
     @Start
     public void start(Stage stage) throws IOException {
-        server = new TestServerUtils();
+        websocket = new TestWebsocket();
+        server = new TestServerUtils(websocket);
         fileManager = new FileManagerMock();
 
         UserConfig userConfig = new UserConfig(new TestIO("""
