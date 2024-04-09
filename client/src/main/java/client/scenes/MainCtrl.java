@@ -58,7 +58,8 @@ public class MainCtrl implements MainCtrlInterface{
     private Scene titleChanger;
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
-
+    private OptionsCtrl optionsCtrl;
+    private Scene options;
 
 
     /**
@@ -114,6 +115,9 @@ public class MainCtrl implements MainCtrlInterface{
 
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
+
+        this.optionsCtrl = pairCollector.options().getKey();
+        this.options = new Scene(pairCollector.options().getValue());
 
         //showOverview();
         showStartScreen();
@@ -290,5 +294,17 @@ public class MainCtrl implements MainCtrlInterface{
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
+    }
+
+    @Override
+    public void openOptions() {
+        Stage stage = new Stage();
+        stage.setScene(options);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle("Options");
+        optionsCtrl.display(stage);
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
+        stage.show();
     }
 }

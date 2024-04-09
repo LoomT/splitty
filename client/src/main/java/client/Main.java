@@ -18,6 +18,7 @@ package client;
 import client.MockClass.MainCtrlInterface;
 import client.scenes.*;
 import client.utils.LanguageConf;
+import client.utils.UserConfig;
 import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.scene.effect.ColorAdjust;
@@ -33,6 +34,7 @@ public class Main extends Application {
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
     private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
+    private static final UserConfig userConfig = INJECTOR.getInstance(UserConfig.class);
 
     /**
      * Main class
@@ -108,11 +110,15 @@ public class Main extends Application {
                 AddTagCtrl.class, languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddTag.fxml"
         );
+        var options = FXML.load(
+                OptionsCtrl.class, languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "Options.fxml"
+        );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag)
+                adminOverview, addExpense, titleChanger, addTag, options)
         );
     }
 }
