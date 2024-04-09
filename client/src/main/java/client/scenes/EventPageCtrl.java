@@ -246,6 +246,9 @@ public class EventPageCtrl {
     private void allTabClicked() {
         selectedTab = 0;
         populateExpenses();
+        allTab.getStyleClass().add("selectedTabButton");
+        fromTab.getStyleClass().remove("selectedTabButton");
+        includingTab.getStyleClass().remove("selectedTabButton");
 
     }
 
@@ -253,6 +256,9 @@ public class EventPageCtrl {
     private void fromTabClicked() {
         selectedTab = 1;
         populateExpenses();
+        allTab.getStyleClass().remove("selectedTabButton");
+        fromTab.getStyleClass().add("selectedTabButton");
+        includingTab.getStyleClass().remove("selectedTabButton");
 
     }
 
@@ -260,6 +266,9 @@ public class EventPageCtrl {
     private void includingTabClicked() {
         selectedTab = 2;
         populateExpenses();
+        allTab.getStyleClass().remove("selectedTabButton");
+        fromTab.getStyleClass().remove("selectedTabButton");
+        includingTab.getStyleClass().add("selectedTabButton");
     }
 
     private void populateExpenses() {

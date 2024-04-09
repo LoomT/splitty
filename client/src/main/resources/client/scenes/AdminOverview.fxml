@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+
+<?import java.net.URL?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AdminOverviewCtrl">
-    <Button layoutX="20" layoutY="10" mnemonicParsing="false" onAction="#backButtonClicked" text="%AdminOverview.backBtn" />
-    <Button id="refreshBtn" layoutX="100" layoutY="10" mnemonicParsing="false" onAction="#refreshButtonClicked" text="%AdminOverview.refreshBtn" />
-   <Button id="importBtn" layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#importButtonClicked" text="%AdminOverview.importBtn" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0" />
+    <Button layoutX="20" layoutY="10" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%AdminOverview.backBtn" />
+    <Button id="refreshBtn" layoutX="71.0" layoutY="10.0" mnemonicParsing="false" onAction="#refreshButtonClicked" styleClass="sbutton" text="%AdminOverview.refreshBtn" />
+   <Button id="importBtn" layoutX="534.0" layoutY="10.0" mnemonicParsing="false" onAction="#importButtonClicked" styleClass="sbutton" text="%AdminOverview.importBtn" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="10.0" />
    <GridPane layoutX="123.0" layoutY="68.0" prefHeight="264.0" prefWidth="370.0">
      <columnConstraints>
        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="355.0" />
@@ -18,14 +29,14 @@
       <children>
          <Pane prefHeight="200.0" prefWidth="200.0">
             <children>
-               <Label layoutY="5.0" prefHeight="41.0" prefWidth="233.0" text="%AdminOverview.allEvents">
+               <Label layoutY="5.0" prefHeight="41.0" prefWidth="233.0" styleClass="headerFont" text="%AdminOverview.allEvents">
                   <font>
                      <Font size="15.0" />
                   </font>
                </Label>
-               <CheckBox id="reverseBtn" fx:id="reverseOrderCheckBox" layoutY="42.0" mnemonicParsing="false" text="%AdminOverview.reverseOrder" />
-               <Label layoutX="220.0" layoutY="17.0" text="%AdminOverview.orderBy" />
-               <ChoiceBox id="orderDropdownBtn" fx:id="orderByChoiceBox" layoutX="220.0" layoutY="38.0" prefWidth="150.0" />
+               <CheckBox id="reverseBtn" fx:id="reverseOrderCheckBox" layoutY="42.0" mnemonicParsing="false" styleClass="textFont" text="%AdminOverview.reverseOrder" />
+               <Label layoutX="220.0" layoutY="17.0" styleClass="textFont" text="%AdminOverview.orderBy" />
+               <ChoiceBox id="orderDropdownBtn" fx:id="orderByChoiceBox" layoutX="220.0" layoutY="38.0" prefWidth="150.0" styleClass="sbutton" />
             </children>
          </Pane>
          <ScrollPane id="eventList" hbarPolicy="NEVER" prefHeight="185.0" prefWidth="370.0" GridPane.rowIndex="1">
@@ -35,4 +46,7 @@
          </ScrollPane>
       </children>
    </GridPane>
+    <stylesheets>
+        <URL value="@client/scenes/global.css" />
+    </stylesheets>
 </AnchorPane>
