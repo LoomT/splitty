@@ -2,7 +2,6 @@ package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
-import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import client.utils.Websocket;
 import client.utils.currency.CurrencyConverter;
@@ -27,9 +26,7 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
 import java.util.Locale;
 
 import static commons.WebsocketActions.*;
@@ -48,17 +45,13 @@ public class StatisticsCtrl {
     private VBox legend;
 
     private final MainCtrlInterface mainCtrl;
-    private final ServerUtils server;
     private final Websocket websocket;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
 
-    private List<Tag> displayedTags = new ArrayList<>();
-
     /**
      * @param mainCtrl main control instance
-     * @param server   server utils instance
      * @param websocket websocket client
      * @param languageConf language config
      * @param converter currency converter
@@ -67,14 +60,12 @@ public class StatisticsCtrl {
     @Inject
     public StatisticsCtrl(
             MainCtrlInterface mainCtrl,
-            ServerUtils server,
             Websocket websocket,
             LanguageConf languageConf,
             CurrencyConverter converter,
             UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
-        this.server = server;
         this.websocket = websocket;
         this.languageConf = languageConf;
         this.converter = converter;
@@ -123,11 +114,12 @@ public class StatisticsCtrl {
             initPieChart(event);
             initCost(event);
         });
-        websocket.on(REMOVE_EXPENSE, e -> {
+        websocket.on(UPDATE_EXPENSE, e -> {
             initPieChart(event);
             initCost(event);
         });
-        websocket.on(UPDATE_EXPENSE, e -> {
+        websocket.on(REMOVE_EXPENSE, e -> {
+            System.out.println((long) e);
             initPieChart(event);
             initCost(event);
         });
@@ -187,6 +179,8 @@ public class StatisticsCtrl {
                 double currCost = getAmount(event, tag);
                 if (currCost > 0) {
                     updateOrAddTagSlice(tag, currCost, totalCost);
+                } else {
+                    pc.getData().removeIf(slice -> slice.getName().startsWith(tag.getName()));
                 }
             }
         }
@@ -290,15 +284,17 @@ public class StatisticsCtrl {
      * @param totalCost the total cost of the event
      */
     private void updateNoTagSlice(Event event, double totalCost) {
-        for (PieChart.Data slice : pc.getData()) {
-            if (slice.getName().contains("No tag")) {
-                double costExpensesNoTag = calculateExpensesNoTag(event);
-                String text = configureNoTag(costExpensesNoTag, totalCost);
-                slice.setName(text);
-                slice.setPieValue(costExpensesNoTag);
-                break;
+        double costExpensesNoTag = calculateExpensesNoTag(event);
+        if(costExpensesNoTag > 0)
+            for (PieChart.Data slice : pc.getData()) {
+                if (slice.getName().contains("No tag")) {
+                    String text = configureNoTag(costExpensesNoTag, totalCost);
+                    slice.setName(text);
+                    slice.setPieValue(costExpensesNoTag);
+                    break;
+                }
             }
-        }
+        else pc.getData().removeIf(slice -> slice.getName().contains("No tag"));
     }
 
     /**
