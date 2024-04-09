@@ -311,6 +311,8 @@ public class StartScreenCtrl {
         MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
                 languageChoiceBox, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
+                currencyChoiceBox, KeyCode.ENTER);
     }
 
     /**
