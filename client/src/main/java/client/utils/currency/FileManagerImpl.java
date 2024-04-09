@@ -32,7 +32,7 @@ public class FileManagerImpl implements FileManager{
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
-                    "Currency folders not found.\nIf the error persists, try reinstalling the app");
+                    e.getMessage() + ".\nIf the error persists, try reinstalling the app");
             alert.setHeaderText("Unexpected error");
             java.awt.Toolkit.getDefaultToolkit().beep();
             alert.showAndWait();
