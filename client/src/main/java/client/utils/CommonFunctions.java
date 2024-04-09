@@ -122,7 +122,6 @@ public class CommonFunctions {
 
             comboBox.setEditable(true);
             comboBox.getEditor().clear();
-            comboBox.getEditor().setText(event.getText());
         });
         comboBox.showingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) {
@@ -161,20 +160,24 @@ public class CommonFunctions {
                                            ObservableList<HideableItem<T>> hideableHideableItems) {
         comboBox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
             if(!comboBox.isShowing()) return;
-            if(newValue.length() > 3) comboBox.getEditor().setText(newValue.substring(0, 3));
-
+            if(newValue.length() > 3) {
+                comboBox.getEditor().setText(newValue.substring(0, 3));
+                return;
+            }
+            final String filteredValue = newValue.replaceAll("[^a-zA-Z]", "");
+            comboBox.getEditor().setText(filteredValue);
 
             Platform.runLater(() -> {
                 if(comboBox.getSelectionModel().getSelectedItem() == null) {
                     hideableHideableItems.forEach(item ->
                             item.setHidden(!item.getObject().toString()
-                                    .toLowerCase().contains(newValue.toLowerCase())));
+                                    .toLowerCase().contains(filteredValue.toLowerCase())));
                 }
                 else {
                     boolean validText = false;
 
                     for(HideableItem<T> hideableItem : hideableHideableItems) {
-                        if(hideableItem.getObject().toString().equals(newValue)) {
+                        if(hideableItem.getObject().toString().equals(filteredValue)) {
                             validText = true;
                             break;
                         }
