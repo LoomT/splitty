@@ -5,13 +5,13 @@ import client.MyFXML;
 import client.TestMainCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
+import client.utils.currency.CurrencyConverter;
 import commons.*;
 import commons.Tag;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.*;
@@ -20,16 +20,14 @@ import org.mockito.Mockito;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import utils.FileManagerMock;
 import utils.TestIO;
 import utils.TestServerUtils;
 import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
@@ -64,11 +62,12 @@ public class AddExpenseCtrlTest {
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         mainCtrl = new TestMainCtrl();
+        CurrencyConverter currencyConverter = new CurrencyConverter(server, new FileManagerMock(), languageConf);
 
         var addExpenseLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AddExpense.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new AddExpenseCtrl(mainCtrl,server, websocket, languageConf),
+                (type) -> new AddExpenseCtrl(mainCtrl,server, websocket, languageConf, currencyConverter, userConfig),
                 StandardCharsets.UTF_8);
         scene = new Scene(addExpenseLoader.load());
         ctrl = addExpenseLoader.getController();
@@ -112,7 +111,7 @@ public class AddExpenseCtrlTest {
             assertFalse(robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getItems().isEmpty());
             assertTrue(robot.lookup("#purpose").queryAs(TextField.class).getText().isEmpty());
             assertTrue(robot.lookup("#amount").queryAs(TextField.class).getText().isEmpty());
-            assertFalse(robot.lookup("#currency").queryAs(ChoiceBox.class).getItems().isEmpty());
+            assertFalse(robot.lookup("#currency").queryAs(ComboBox.class).getItems().isEmpty());
             assertFalse(robot.lookup("#date").queryAs(DatePicker.class).getValue().toString().isEmpty());
             assertFalse(robot.lookup("#type").queryAs(ComboBox.class).getItems().isEmpty());
             assertFalse(robot.lookup("#expenseParticipants").queryAs(TextFlow.class).getChildren().isEmpty());
@@ -151,7 +150,7 @@ public class AddExpenseCtrlTest {
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
             robot.lookup("#amount").queryAs(TextField.class).setText("10");
-            robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#currency").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
             robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.lookup("#equalSplit").queryAs(CheckBox.class).setSelected(true);
@@ -184,7 +183,7 @@ public class AddExpenseCtrlTest {
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(1);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
             robot.lookup("#amount").queryAs(TextField.class).setText("200");
-            robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(3);
+            robot.lookup("#currency").queryAs(ComboBox.class).getSelectionModel().select(3);
             robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
             robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.clickOn("#equalSplit");
@@ -242,7 +241,7 @@ public class AddExpenseCtrlTest {
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
             robot.lookup("#amount").queryAs(TextField.class).setText("10");
-            robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#currency").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
             robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.clickOn("#add");
@@ -264,7 +263,7 @@ public class AddExpenseCtrlTest {
             robot.lookup("#amount").queryAs(TextField.class).setText("abc");
             robot.lookup("#expenseAuthor").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#purpose").queryAs(TextField.class).setText("test");
-            robot.lookup("#currency").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#currency").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
             robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.clickOn("#equalSplit");
