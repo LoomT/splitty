@@ -14,32 +14,38 @@ import javafx.scene.layout.HBox;
 import java.io.IOException;
 import java.text.DecimalFormat;
 
-import static com.google.inject.Guice.createInjector;
-
-public class OpenDebtsListItem extends HBox {
-    private final LanguageConf languageConf;
+public class ShrunkOpenDebtsListItem extends HBox {
     @FXML
     private Label participantLabel;
-    ServerUtils server;
-    Participant lender;
-    Participant debtor;
-    double amount;
-    Event event;
-    MainCtrl mainCtrl;
+    private final ServerUtils server;
+    private final Participant lender;
+    private final Participant debtor;
+    private final double amount;
+    private final Event event;
+    private final MainCtrl mainCtrl;
 
-    public OpenDebtsListItem(Participant lender,
-                             Participant debtor,
-                             double amount,
-                             Event event,
-                             LanguageConf languageConf,
-                             ServerUtils server,
-                             MainCtrl mainCtrl) {
+    /**
+     * Constructor for ExpandedOpenDebtsListItem
+     * @param lender lender of the debt
+     * @param debtor debtor of the debt
+     * @param amount amount owed
+     * @param event Event the debt is in
+     * @param languageConf languageConf of the page
+     * @param server server the client is connected to
+     * @param mainCtrl main Controller of the client
+     */
+    public ShrunkOpenDebtsListItem(Participant lender,
+                                   Participant debtor,
+                                   double amount,
+                                   Event event,
+                                   LanguageConf languageConf,
+                                   ServerUtils server,
+                                   MainCtrl mainCtrl) {
         this.lender = lender;
         this.debtor = debtor;
         this.amount = amount;
         this.event = event;
         this.mainCtrl = mainCtrl;
-        this.languageConf = languageConf;
         this.server = server;
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass().getResource("/client/components/OpenDebtsListItem.fxml")
@@ -59,11 +65,17 @@ public class OpenDebtsListItem extends HBox {
         participantLabel.setText(text);
     }
 
+    /**
+     * expands the item to show BankAccount information
+     */
     public void onEventClicked(){
         mainCtrl.resizeOpenDebtItem(this);
     }
 
 
+    /**
+     * Settles the debt displayed in the item
+     */
     public void settleDebt(){
         Transaction transaction = new Transaction(debtor, lender, amount);
         int status = server.addTransaction(event.getId(), transaction);

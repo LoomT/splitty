@@ -26,13 +26,23 @@ public class ExpandedOpenDebtsListItem extends HBox{
     private Text  iban;
     @FXML
     private Text bic;
-    ServerUtils server;
-    Participant lender;
-    Participant debtor;
-    double amount;
-    Event event;
-    MainCtrl mainCtrl;
+    private final ServerUtils server;
+    private final Participant lender;
+    private final Participant debtor;
+    private final double amount;
+    private final Event event;
+    private final MainCtrl mainCtrl;
 
+    /**
+     * Constructor for ExpandedOpenDebtsListItem
+     * @param lender lender of the debt
+     * @param debtor debtor of the debt
+     * @param amount amount owed
+     * @param event Event the debt is in
+     * @param languageConf languageConf of the page
+     * @param server server the client is connected to
+     * @param mainCtrl main Controller of the client
+     */
     public ExpandedOpenDebtsListItem(Participant lender,
                              Participant debtor,
                              double amount,
@@ -66,10 +76,17 @@ public class ExpandedOpenDebtsListItem extends HBox{
         participantLabel.setText(text);
     }
 
+    /**
+     * contracts the item
+     */
     public void onEventClicked(){
         mainCtrl.resizeOpenDebtItem(this);
     }
 
+    /**
+     * initializes the expanded Bank account information fields
+     * @param languageConf languageConf of the page
+     */
     public void initializeFields(LanguageConf languageConf){
         if((debtor.getBeneficiary() == null
                 && debtor.getAccountNumber() == null)
@@ -80,19 +97,25 @@ public class ExpandedOpenDebtsListItem extends HBox{
         }
 
         if(debtor.getBeneficiary() != null && !debtor.getBeneficiary().isEmpty()){
-            availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
+            availability.setText(languageConf.get(
+                    "ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
             accountHolder.setText("Beneficiary:" + debtor.getBeneficiary());
             if(debtor.getAccountNumber() != null && !debtor.getAccountNumber().isEmpty()){
-                availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountFull"));
+                availability.setText(languageConf.get(
+                        "ExpandedOpenDebtsListItem.bankAccountFull"));
                 iban.setText("IBAN: " + debtor.getAccountNumber());
             }
         }
         else{
-            availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
+            availability.setText(languageConf.get(
+                    "ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
             iban.setText("IBAN: " + debtor.getAccountNumber());
         }
     }
 
+    /**
+     * Settles the debt displayed in the item
+     */
     public void settleDebt(){
         Transaction transaction = new Transaction(debtor, lender, amount);
         int status = server.addTransaction(event.getId(), transaction);

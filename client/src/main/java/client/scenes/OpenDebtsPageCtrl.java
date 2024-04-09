@@ -1,7 +1,7 @@
 package client.scenes;
 
 import client.components.ExpandedOpenDebtsListItem;
-import client.components.OpenDebtsListItem;
+import client.components.ShrunkOpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -17,6 +17,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class OpenDebtsPageCtrl {
 
@@ -36,7 +37,6 @@ public class OpenDebtsPageCtrl {
     private ChoiceBox<String> includingChoiceBox;
 
     private final LanguageConf languageConf;
-    private String selectedParticipantName;
     private Event event;
     private final ServerUtils server;
     private final MainCtrl mainCtrl;
@@ -64,7 +64,6 @@ public class OpenDebtsPageCtrl {
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
-        this.selectedParticipantName = languageConf.get("OpenDebtsPage.allParticipants");
         this.websocket = websocket;
     }
 
@@ -77,18 +76,42 @@ public class OpenDebtsPageCtrl {
 
         this.event = event;
         Map<String, Double> map = new HashMap<>();
-        Map<Participant, Map<Participant, Double>> debtMap = new HashMap<>();
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
-        double sum = 0;
+        double sum = calculateParticipants(map, partToPartMap);
 
         includingChoiceBox.getItems().clear();
-        includingChoiceBox.setValue(languageConf.get("OpenDebtsPage.allParticipants"));
         includingChoiceBox.getItems().add(languageConf.get("OpenDebtsPage.allParticipants"));
         includingChoiceBox.getItems().addAll(
                 event.getParticipants().stream().map(Participant::getName).toList()
         );
-        selectedParticipantName = languageConf.get("OpenDebtsPage.allParticipants");
+        includingChoiceBox.setValue(languageConf.get("OpenDebtsPage.allParticipants"));
+        includingChoiceBox.setOnAction(e -> {
+            if (includingChoiceBox.getSelectionModel().getSelectedItem() == null)
+                return;
+            if(includingChoiceBox.getSelectionModel().getSelectedIndex() == 0)
+                populateExpense(null);
+            else
+                populateExpense(includingChoiceBox.getSelectionModel().getSelectedItem());
+        });
+        populateExpense(null);
 
+        if (map.equals(participantDebtMap)) return;
+        participantDebtMap = map;
+
+        this.shareChart.getData().clear();
+        for (String s : map.keySet()) {
+            this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
+        }
+
+        for (PieChart.Data data : shareChart.getData()) {
+            data.setName(data.getName() + ": " + data.getPieValue());
+        }
+        totalSumExp.setText("Total sum of all expenses in this event: " + sum);
+    }
+
+    public double calculateParticipants(Map<String, Double> map,
+                                      Map<Participant, Map<Participant, Double>> debtMap){
+        double sum = 0;
         for (Expense e : event.getExpenses()) {
             for (Participant p : e.getExpenseParticipants()) {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
@@ -102,65 +125,30 @@ public class OpenDebtsPageCtrl {
             }
             sum += e.getAmount();
         }
-
-        partToPartMap = debtMap;
-        populateExpense(selectedParticipantName);
-
-        includingChoiceBox.setOnAction(e -> {
-            if (includingChoiceBox.getSelectionModel().getSelectedItem() != null)
-                selectedParticipantName = includingChoiceBox.getSelectionModel().getSelectedItem();
-            populateExpense(selectedParticipantName);
-        });
-
-        if (map.equals(participantDebtMap)) return;
-        participantDebtMap = map;
-
-        this.shareChart.getData().clear();
-        for (String s : map.keySet()) {
-            this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
-        }
-
-
-        for (PieChart.Data data : shareChart.getData()) {
-            data.setName(data.getName() + ": " + data.getPieValue());
-        }
-        totalSumExp.setText("Total sum of all expenses in this event: " + sum);
+        return sum;
     }
 
 
     public void populateExpense(String name) {
         Participant participant = null;
-        boolean everyoneSelectedFlag = true;
-        for (Participant p : event.getParticipants()) {
-            if (p.getName().equals(name)) {
-                everyoneSelectedFlag = false;
-                participant = p;
-                System.out.println("found: " + p.getName());
-                break;
-            }
+        if(name != null){
+            participant = event.getParticipants().stream().filter(
+                    p -> p.getName().equals(name)).toList().getFirst();
         }
+
         allDebtsPane.getChildren().clear();
         for (Participant receiver : partToPartMap.keySet()) {
             for(Participant giver : partToPartMap.get(receiver).keySet()){
-                if(!everyoneSelectedFlag
-                        && (giver.equals(participant)
+                if((giver.equals(participant)
                         || receiver.equals(participant))){
+                    System.out.println("test");
                     continue;
                 }
-
-
                 double cost = partToPartMap.get(receiver).get(giver) - event.getTransactions().stream()
                         .distinct().filter(x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver))
-                        .mapToDouble(Transaction::getAmount).sum() +
-                        event.getTransactions().stream()
+                        .mapToDouble(Transaction::getAmount).sum() + event.getTransactions().stream()
                         .distinct().filter(x -> x.getGiver().equals(receiver) && x.getReceiver().equals(giver))
                         .mapToDouble(Transaction::getAmount).sum();
-
-                System.out.println(receiver.getName() + " " + giver.getName() + " " +
-                        (cost + " " + event.getTransactions().stream()
-                        .distinct().filter(
-                                x -> x.getGiver().equals(giver) && x.getReceiver().equals(receiver)).
-                        mapToDouble(Transaction::getAmount).sum()));
 
                 if (cost <= 0
                         || (giver.equals(participant)
@@ -169,15 +157,13 @@ public class OpenDebtsPageCtrl {
                 }
 
                 if(partToPartMap.get(giver) == null || partToPartMap.get(giver).get(receiver) == null){
-                    System.out.println("t1");
-                    allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
+                    allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(receiver,
                             giver, cost, event, languageConf, server, mainCtrl));
                 }
                 else if(cost - partToPartMap.get(giver).get(receiver) > 0){
                     cost -= partToPartMap.get(giver).get(receiver);
-                    allDebtsPane.getChildren().add(new OpenDebtsListItem(receiver,
+                    allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(receiver,
                             giver, cost, event, languageConf, server, mainCtrl));
-                    System.out.println("t2 " + cost + " " + partToPartMap.get(giver).get(receiver));
                 }
 
             }
@@ -196,8 +182,8 @@ public class OpenDebtsPageCtrl {
             //System.out.println("An error");
             return;
         }
-        if(item.getClass() == OpenDebtsListItem.class){
-            OpenDebtsListItem oldItem = (OpenDebtsListItem) list.get(index);
+        if(item.getClass() == ShrunkOpenDebtsListItem.class){
+            ShrunkOpenDebtsListItem oldItem = (ShrunkOpenDebtsListItem) list.get(index);
             list.set(index, new ExpandedOpenDebtsListItem(oldItem.getLender(),
                     oldItem.getDebtor(),
                     oldItem.getAmount(),
@@ -208,7 +194,7 @@ public class OpenDebtsPageCtrl {
         }
         else{
             ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
-            allDebtsPane.getChildren().set(index, new OpenDebtsListItem(oldItem.getLender(),
+            allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(oldItem.getLender(),
                     oldItem.getDebtor(),
                     oldItem.getAmount(),
                     event,

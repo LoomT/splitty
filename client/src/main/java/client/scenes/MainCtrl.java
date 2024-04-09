@@ -17,7 +17,6 @@ package client.scenes;
 
 import client.MockClass.*;
 import client.components.ErrorPopupCtrl;
-import client.components.OpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -329,6 +328,10 @@ public class MainCtrl {
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
     }
 
+    /**
+     * expands/contracts the openDebtsListItem according to its status.
+     * @param item item that was clicked on
+     */
     public void resizeOpenDebtItem(Node item){
         openDebtsPageCtrl.resizeOpenDebtItem(item);
     }
