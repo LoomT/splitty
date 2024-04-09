@@ -27,7 +27,7 @@ class CurrencyConverterTest {
         server = new TestServerUtils(new TestWebsocket());
         fileManager = new FileManagerMock();
         UserConfig userConfig = new UserConfig(new TestIO("""
-                                serverURL=http://localhost:8080/
+                                serverURL=localhost:8080
                                 lang=en
                                 recentEventCodes=
                                 currency=EUR"""));

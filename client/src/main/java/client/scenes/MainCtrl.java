@@ -116,7 +116,9 @@ public class MainCtrl implements MainCtrlInterface{
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
-        //showOverview();
+        this.optionsCtrl = pairCollector.options().getKey();
+        this.options = new Scene(pairCollector.options().getValue());
+
         showStartScreen();
         primaryStage.show();
 

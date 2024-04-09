@@ -1,7 +1,6 @@
 package client.scenes;
 
 import client.MyFXML;
-import client.TestMainCtrl;
 import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
@@ -45,9 +44,8 @@ class OptionsCtrlTest {
         this.stage = stage;
         TestWebsocket websocket = new TestWebsocket();
         server = new TestServerUtils(websocket);
-        TestMainCtrl mainCtrl = new TestMainCtrl();
         testIO = new TestIO("""
-                serverURL=//localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes=
                 currency=EUR
@@ -166,7 +164,7 @@ class OptionsCtrlTest {
             ctrl.cancelClicked();
         });
         waitForFxEvents();
-        assertEquals("//localhost:8080/", userConfig.getUrl());
+        assertEquals("localhost:8080", userConfig.getUrl());
     }
 
     @SuppressWarnings("unchecked")

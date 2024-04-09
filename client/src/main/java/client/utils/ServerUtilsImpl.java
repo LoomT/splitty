@@ -48,7 +48,7 @@ public class ServerUtilsImpl implements ServerUtils {
     }
 
     private String getPath() {
-        return "http:" + userConfig.getUrl();
+        return "http://" + userConfig.getUrl() + "/";
     }
 
     /**
@@ -56,18 +56,13 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return the found event, null if not found
      */
     @Override
-    public Event getEvent(String id) throws ConnectException {
+    public Event getEvent(String id) {
         try{
             return ClientBuilder.newClient(new ClientConfig())
                     .target(getPath()).path("api/events/" + id)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
                     .get(Event.class);
-        } catch (ProcessingException e) {
-            if(e.getMessage().contains("Connection refused"))
-                throw (ConnectException) e.getCause();
-            else
-                throw new WebApplicationException();
         } catch (NotFoundException e) {
             System.out.println(e.getMessage());
             return null;
@@ -443,7 +438,7 @@ public class ServerUtilsImpl implements ServerUtils {
     public boolean ping(String url) {
         try {
             Response response = ClientBuilder.newClient(new ClientConfig())
-                    .target("http:" + url)
+                    .target("http://" + url + "/")
                     .path("ping")
                     .request().get();
             return response.getStatus() == Response.Status.NO_CONTENT.getStatusCode();

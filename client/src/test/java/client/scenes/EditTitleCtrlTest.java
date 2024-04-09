@@ -65,7 +65,7 @@ public class EditTitleCtrlTest {
         mainCtrl = new TestMainCtrl();
 
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes="""));
 

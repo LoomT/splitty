@@ -38,7 +38,7 @@ public class UserConfig {
      * @return the server URL
      */
     public String getUrl() {
-        return configProperties.getProperty("serverURL", "http://localhost:8080/");
+        return configProperties.getProperty("serverURL", "localhost:8080");
     }
 
     /**

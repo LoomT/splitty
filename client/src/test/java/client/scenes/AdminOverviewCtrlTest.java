@@ -36,7 +36,7 @@ public class AdminOverviewCtrlTest {
     public void start(Stage stage) throws IOException {
         server = new TestServerUtils(new TestWebsocket());
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);

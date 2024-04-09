@@ -54,7 +54,7 @@ public class WebsocketImpl implements Websocket {
         if (stompSession != null && stompSession.isConnected()) return;
         try {
             stompSession = stompClient.connectAsync(
-                    "ws:" + userConfig.getUrl() + "ws", sessionHandler).get();
+                    "ws://" + userConfig.getUrl() + "/ws", sessionHandler).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Could not connect to server", e);
         }

@@ -10,14 +10,17 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
-import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.net.ConnectException;
 import java.util.*;
 
@@ -183,7 +186,7 @@ public class StartScreenCtrl {
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
-            } catch (ConnectException e) {
+            } catch (Exception e) {
                 mainCtrl.handleServerNotFound();
                 break;
             }
@@ -243,7 +246,7 @@ public class StartScreenCtrl {
                 return;
             }
             mainCtrl.showEventPage(joinedEvent);
-        } catch (ConnectException e) {
+        } catch (Exception e) {
             showServerNotFoundError();
         }
     }

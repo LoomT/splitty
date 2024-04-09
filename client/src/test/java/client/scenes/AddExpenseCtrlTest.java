@@ -6,8 +6,8 @@ import client.TestMainCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
-import commons.*;
 import commons.Tag;
+import commons.*;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -57,7 +57,7 @@ public class AddExpenseCtrlTest {
         websocket = new TestWebsocket();
         server = new TestServerUtils(websocket);
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
