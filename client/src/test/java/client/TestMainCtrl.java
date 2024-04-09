@@ -177,4 +177,13 @@ public class TestMainCtrl implements MainCtrlInterface {
         currentScene = "StartScreen";
         scenes.add("StartScreen");
     }
+
+    /**
+     * display the statistics page
+     * @param event
+     */
+    @Override
+    public void showStatisticsPage(Event event) {
+
+    }
 }

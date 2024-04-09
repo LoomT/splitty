@@ -126,7 +126,7 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
-        type.getSelectionModel().clearSelection();
+        //type.getSelectionModel().clearSelection();
         warningLabel.setVisible(false);
         blockDate();
         setupDateListener();
@@ -403,6 +403,7 @@ public class AddExpenseCtrl {
      */
     public void populateTypeBox(Event ev) {
         setupTypeComboBox(ev);
+        type.setValue(type.getItems().getFirst());
     }
 
     private void setupTypeComboBox(Event ev) {
@@ -421,6 +422,11 @@ public class AddExpenseCtrl {
 
     }
 
+    /** set the label for when displaying the option
+     *
+     * @param ev the current event
+     * @return callback
+     */
     private Callback<ListView<Tag>, ListCell<Tag>> createTypeListCellFactory(Event ev) {
         return param -> new ListCell<>() {
             @Override
@@ -445,6 +451,11 @@ public class AddExpenseCtrl {
         };
     }
 
+    /**
+     * set the label after choosing an option
+     * @param ev the current event
+     * @return callback
+     */
     private ListCell<Tag> createTypeListCell(Event ev) {
         return new ListCell<>() {
             @Override
@@ -466,10 +477,16 @@ public class AddExpenseCtrl {
         };
     }
 
+    /**
+     * colour the background of the tag
+     * @param text the text
+     * @param backgroundColor the color
+     * @return the styled label
+     */
     private Label createLabelWithColor(String text, Color backgroundColor) {
         Label label = new Label(text);
         if (backgroundColor != null && !text.isEmpty()) {
-            String textColor = brightness(backgroundColor) > 0.5 ? "#000000" : "#FFFFFF"; // Choose black or white text based on brightness
+            String textColor = brightness(backgroundColor) > 0.5 ? "#000000" : "#FFFFFF";
             label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
                     + "; -fx-padding: 5px; -fx-text-fill: " + textColor + ";");
         }
@@ -478,10 +495,21 @@ public class AddExpenseCtrl {
         return label;
     }
 
+    /**
+     * compute brightness of the colour
+     * @param color the color
+     * @return a double
+     */
     private double brightness(Color color) {
         return (0.21 * color.getRed() + 0.72 * color.getGreen() + 0.07 * color.getBlue());
     }
 
+    /**
+     * find the tag
+     * @param id the id of the tag
+     * @param tags the list of tags
+     * @return the tag
+     */
     private Tag findTagById(long id, List<Tag> tags) {
         for (Tag tag : tags) {
             if (tag.getId() == id) {

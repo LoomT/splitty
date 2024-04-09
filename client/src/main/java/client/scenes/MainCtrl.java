@@ -293,6 +293,10 @@ public class MainCtrl implements MainCtrlInterface{
         startScreenCtrl.showServerNotFoundError();
     }
 
+    /**
+     * display the statistics page
+     * @param event
+     */
     @Override
     public void showStatisticsPage(Event event) {
         statisticsCtrl.displayStatisticsPage(event);

@@ -105,7 +105,6 @@ public class Main extends Application {
         var statistics = FXML.load(
                 StatisticsCtrl.class, languageConf.getLanguageResources(),
                 "client", "scenes", "Statistics.fxml");
-
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         mainCtrl.initialize(primaryStage, new PairCollector(start,

@@ -106,5 +106,9 @@ public interface MainCtrlInterface {
      */
     void handleServerNotFound();
 
+    /**
+     * display the statistics page
+     * @param event the current event
+     */
     void showStatisticsPage(Event event);
 }

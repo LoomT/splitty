@@ -3,12 +3,14 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StatisticsCtrl">
    <children>
-      <PieChart fx:id="pc" layoutX="51.0" layoutY="50.0" prefHeight="337.0" prefWidth="535.0" title="%EventPage.statistics" />
+      <PieChart fx:id="pc" layoutX="8.0" layoutY="50.0" prefHeight="337.0" prefWidth="535.0" title="%EventPage.statistics" />
       <Text fx:id="cost" layoutX="275.0" layoutY="35.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
       <Button fx:id="back" layoutX="9.0" layoutY="361.0" mnemonicParsing="false" text="%Statistics.back" />
+      <VBox fx:id="legend" layoutX="504.0" layoutY="50.0" prefHeight="200.0" prefWidth="89.0" />
    </children>
 </AnchorPane>

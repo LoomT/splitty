@@ -13,7 +13,6 @@ import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -504,6 +503,9 @@ public class EventPageCtrl {
         ft.play();
     }
 
+    /**
+     * display the statistics page when the button is clicked
+     */
     public void statisticsClicked() {
         mainCtrl.showStatisticsPage(event);
     }
