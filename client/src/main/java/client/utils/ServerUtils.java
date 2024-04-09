@@ -154,5 +154,7 @@ public interface ServerUtils {
      * @return map of the exchange rates
      */
     Map<String, Double> getExchangeRates(String date) throws ConnectException;
+
+    boolean ping(String url);
 }
 

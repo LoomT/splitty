@@ -427,4 +427,17 @@ public class ServerUtilsImpl implements ServerUtils {
                 throw new WebApplicationException();
         }
     }
+
+    @Override
+    public boolean ping(String url) {
+        try {
+            Response response = ClientBuilder.newClient(new ClientConfig())
+                    .target("http:" + url)
+                    .path("ping")
+                    .request().get();
+            return response.getStatus() == Response.Status.NO_CONTENT.getStatusCode();
+        } catch (ProcessingException e) {
+            return false;
+        }
+    }
 }
