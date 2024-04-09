@@ -11,13 +11,15 @@ import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static client.utils.CommonFunctions.lengthListener;
 
@@ -77,15 +79,20 @@ public class StartScreenCtrl {
     private void initialize() {
         languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
         languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+        final String downloadTemplateOption = "Download Template";
+        languageChoiceBox.getItems().add(downloadTemplateOption);
         languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
         languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
         languageChoiceBox.setOnAction(event -> {
-            languageConf.changeCurrentLocaleTo(languageChoiceBox.getValue());
+            String selectedOption = languageChoiceBox.getValue();
+            if (selectedOption.equals(downloadTemplateOption)) {
+
+                downloadTemplate();
+            } else {
+
+                languageConf.changeCurrentLocaleTo(selectedOption);
+            }
         });
-        String addDownloadOption = "dT";
-        languageChoiceBox.getItems().add(addDownloadOption);
-
-
         joinError.setVisible(false);
         createEventError.setVisible(false);
         code.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -97,6 +104,43 @@ public class StartScreenCtrl {
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
     }
+
+
+    /**
+     *
+     * Downloads the template
+     */
+    private void downloadTemplate() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("template.properties");
+
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Properties files (*.properties)", "*.properties");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = mainCtrl.showSaveFileDialog(fileChooser);
+        if (file == null) {
+
+            return;
+        }
+        ResourceBundle bundle = ResourceBundle.getBundle("languages", Locale.of("template"));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            List<String> keyList = new ArrayList<>();
+            Enumeration<String> keys = bundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                keyList.add(key);
+            }
+            keyList.sort(String::compareTo);
+            for (String key : keyList) {
+                writer.write(key + "=" + bundle.getString(key) + "\n");
+            }
+            System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing the template file: " + e.getMessage());
+        }
+
+    }
+
 
     /**
      * Reloads the event codes from the user config and updates the event list
