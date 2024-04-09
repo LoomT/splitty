@@ -117,7 +117,6 @@ public class EventPageCtrl {
         editTitleButton.setText("\uD83D\uDD89");
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
-        allTab.getStyleClass().add("selectedTabButton");
         if (e.getParticipants().isEmpty()) {
             noParticipantsExist();
         } else {
