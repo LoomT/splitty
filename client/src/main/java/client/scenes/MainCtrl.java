@@ -19,7 +19,6 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;

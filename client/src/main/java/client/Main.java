@@ -107,8 +107,8 @@ public class Main extends Application {
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "Options.fxml"
         );
-        var statistics = FXML.load(
-                StatisticsCtrl.class, languageConf.getLanguageResources(),
+        var statistics = FXML.load(StatisticsCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "Statistics.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
