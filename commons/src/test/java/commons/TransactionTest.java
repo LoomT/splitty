@@ -79,7 +79,7 @@ class TransactionTest {
 
     @Test
     void testHashCode() {
-        Transaction t2 = new Transaction(giver, receiver, 50, "EUR");
+        Transaction t2 = new Transaction(giver, receiver, 50, "EUR", t.getDate());
         assertEquals(t.hashCode(), t2.hashCode());
     }
     @Test
