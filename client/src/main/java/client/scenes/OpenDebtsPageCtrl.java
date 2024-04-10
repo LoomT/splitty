@@ -5,15 +5,18 @@ import client.components.ExpandedOpenDebtsListItem;
 import client.components.ShrunkOpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.UserConfig;
 import client.utils.Websocket;
+import client.utils.currency.CurrencyConverter;
 import commons.*;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.chart.PieChart;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 
+import java.io.IOException;
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +25,8 @@ import static commons.WebsocketActions.*;
 
 public class OpenDebtsPageCtrl {
 
-    @FXML
-    private PieChart shareChart = new PieChart();
-
-    @FXML
-    private Text totalSumExp;
+//    @FXML
+//    private PieChart shareChart = new PieChart();
 
     @FXML
     private VBox allDebtsPane;
@@ -37,7 +37,9 @@ public class OpenDebtsPageCtrl {
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
     private final Websocket websocket;
-    private Map<String, Double> participantDebtMap = new HashMap<>();
+    private final CurrencyConverter converter;
+    private final UserConfig userConfig;
+    private Map<String, Double> participantDebtMap;
 
 
     /**
@@ -47,17 +49,24 @@ public class OpenDebtsPageCtrl {
      * @param mainCtrl     the main controller
      * @param languageConf language conf of the user
      * @param websocket    websocket
+     * @param converter currency converter
+     * @param userConfig user config
      */
     @Inject
     public OpenDebtsPageCtrl(
             ServerUtils serverUtils,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            Websocket websocket) {
+            Websocket websocket,
+            CurrencyConverter converter,
+            UserConfig userConfig) {
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.websocket = websocket;
+        this.converter = converter;
+        this.userConfig = userConfig;
+        participantDebtMap = new HashMap<>();
     }
 
     /**
@@ -76,7 +85,6 @@ public class OpenDebtsPageCtrl {
         websocket.on(WebsocketActions.REMOVE_TRANSACTION,
                 id -> {
                     event.getTransactions().removeIf(t -> t.getId() == (Long) id);
-                    System.out.println("Transaction removed");
                     displayOpenDebtsPage(event);
                 });
     }
@@ -91,10 +99,7 @@ public class OpenDebtsPageCtrl {
         this.event = event;
         websocket.on(ADD_EXPENSE, (exp) -> displayOpenDebtsPage(event));
         websocket.on(UPDATE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
-        websocket.on(REMOVE_EXPENSE, (exp) -> {
-            System.out.println("Removed expense");
-            displayOpenDebtsPage(event);
-        });
+        websocket.on(REMOVE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
         websocket.on(ADD_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         websocket.on(UPDATE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         websocket.on(REMOVE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
@@ -116,15 +121,14 @@ public class OpenDebtsPageCtrl {
         if (map.equals(participantDebtMap)) return;
         participantDebtMap = map;
 
-        this.shareChart.getData().clear();
-        for (String s : map.keySet()) {
-            this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
-        }
-
-        for (PieChart.Data data : shareChart.getData()) {
-            data.setName(data.getName() + ": " + data.getPieValue());
-        }
-        totalSumExp.setText("Total sum of all expenses in this event: " + sum);
+//        this.shareChart.getData().clear();
+//        for (String s : map.keySet()) {
+//            this.shareChart.getData().add(new PieChart.Data(s, map.get(s)));
+//        }
+//
+//        for (PieChart.Data data : shareChart.getData()) {
+//            data.setName(data.getName() + ": " + data.getPieValue());
+//        }
     }
 
     /**
@@ -138,8 +142,20 @@ public class OpenDebtsPageCtrl {
                                  Map<Participant, Map<Participant, Double>> debtMap) {
         double sum = 0;
         for (Expense e : event.getExpenses()) {
+            double converted;
+            try {
+                converted = converter.convert(e.getCurrency(),
+                        userConfig.getCurrency(), e.getAmount(), e.getDate().toInstant());
+            } catch (IOException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        languageConf.get("Currency.IOError"));
+                alert.setHeaderText(languageConf.get("unexpectedError"));
+                java.awt.Toolkit.getDefaultToolkit().beep();
+                alert.showAndWait();
+                return 0;
+            }
             for (Participant p : e.getExpenseParticipants()) {
-                double cost = e.getAmount() / e.getExpenseParticipants().size();
+                double cost = converted / e.getExpenseParticipants().size();
                 graphMap.put(p.getName(), graphMap.get(p.getName()) + cost);
                 if (e.getExpenseAuthor().equals(p)) continue;
 
@@ -147,14 +163,28 @@ public class OpenDebtsPageCtrl {
 
                 temp.put(p, temp.get(p) + cost);
             }
-            sum += e.getAmount();
+            sum += converted;
         }
         for (Participant receiver : debtMap.keySet()) {
             for (Participant giver : debtMap.get(receiver).keySet()) {
                 double cost = debtMap.get(receiver).get(giver)
-                        - event.getTransactions().stream().distinct().
+                        - event.getTransactions().stream().
                         filter(x -> x.getGiver().equals(giver) && x.getReceiver().
-                                equals(receiver)).mapToDouble(Transaction::getAmount).sum();
+                                equals(receiver))
+                        .mapToDouble(t -> {
+                            try {
+                                return converter.convert(t.getCurrency(), userConfig.getCurrency(),
+                                        t.getAmount(), t.getDate().toInstant());
+                            } catch (IOException e) {
+                                Alert alert = new Alert(Alert.AlertType.ERROR,
+                                        languageConf.get("Currency.IOError"));
+                                alert.setHeaderText(languageConf.get("unexpectedError"));
+                                java.awt.Toolkit.getDefaultToolkit().beep();
+                                alert.showAndWait();
+                                return t.getAmount();
+                            }
+                        })
+                        .sum();
                 debtMap.get(receiver).put(giver, cost);
             }
         }
@@ -206,8 +236,10 @@ public class OpenDebtsPageCtrl {
         debtMap.put(maxDebit, debtMap.get(maxDebit) + min);
         recursionCalculate(debtMap);
 
-        allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(maxDebit,
-                maxCredit, min, event, languageConf, server, mainCtrl));
+        allDebtsPane.getChildren().add(
+                new ShrunkOpenDebtsListItem(
+                        new Transaction(maxDebit, maxCredit, min, userConfig.getCurrency()),
+                        languageConf, this::resizeOpenDebtItem, this::settleDebtClicked));
     }
 
     /**
@@ -224,27 +256,38 @@ public class OpenDebtsPageCtrl {
             }
         }
         if (index == -1) { //TODO
-            //System.out.println("An error");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            alert.showAndWait();
             return;
         }
         if (item.getClass() == ShrunkOpenDebtsListItem.class) {
             ShrunkOpenDebtsListItem oldItem = (ShrunkOpenDebtsListItem) list.get(index);
-            list.set(index, new ExpandedOpenDebtsListItem(oldItem.getLender(),
-                    oldItem.getDebtor(),
-                    oldItem.getAmount(),
-                    event,
-                    languageConf,
-                    server,
-                    mainCtrl));
+            list.set(index, new ExpandedOpenDebtsListItem(oldItem.getTransaction(),
+                    languageConf, this::resizeOpenDebtItem, this::settleDebtClicked));
         } else {
             ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
-            allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(oldItem.getLender(),
-                    oldItem.getDebtor(),
-                    oldItem.getAmount(),
-                    event,
-                    languageConf,
-                    server,
-                    mainCtrl));
+            allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(
+                    oldItem.getTransaction(),
+                    languageConf, this::resizeOpenDebtItem, this::settleDebtClicked));
+        }
+    }
+
+    /**
+     * Commits the transaction
+     *
+     * @param transaction transaction to settle
+     */
+    public void settleDebtClicked(Transaction transaction) {
+        int status = 0;
+        try {
+            status = server.addTransaction(event.getId(), transaction);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
+        if(status / 100 != 2) {
+            System.out.println("server error: " + status);
         }
     }
 
@@ -262,6 +305,22 @@ public class OpenDebtsPageCtrl {
     @FXML
     public void addCustomTransactionClicked() {
         mainCtrl.showAddCustomTransaction(event);
+    }
+
+    /**
+     * open debts tab clicked
+     */
+    @FXML
+    public void openDebtsClicked() {
+
+    }
+
+    /**
+     * settled debts tab clicked
+     */
+    @FXML
+    public void settledDebtsClicked() {
+
     }
 
     /**

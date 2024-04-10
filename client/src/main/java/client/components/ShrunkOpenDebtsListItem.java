@@ -1,51 +1,41 @@
 package client.components;
 
-import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import commons.Event;
-import commons.Participant;
+import commons.Transaction;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Currency;
+import java.util.Locale;
+import java.util.function.Consumer;
 
 public class ShrunkOpenDebtsListItem extends HBox {
     @FXML
     private Label participantLabel;
-    private final ServerUtils server;
-    private final Participant lender;
-    private final Participant debtor;
-    private final double amount;
-    private final Event event;
-    private final MainCtrlInterface mainCtrl;
+    private final Transaction transaction;
+    private final Consumer<ShrunkOpenDebtsListItem> callBackExpand;
+    private final Consumer<Transaction> callBackSettle;
 
     /**
-     * Constructor for ExpandedOpenDebtsListItem
-     * @param lender lender of the debt
-     * @param debtor debtor of the debt
-     * @param amount amount owed
-     * @param event Event the debt is in
+     * Constructor for ShrunkOpenDebtsListItem
+     *
+     * @param transaction pre-made transaction
      * @param languageConf languageConf of the page
-     * @param server server the client is connected to
-     * @param mainCtrl main Controller of the client
+     * @param callBackExpand shrink when this component is clicked
+     * @param callBackSettle settle when clicked
      */
-    public ShrunkOpenDebtsListItem(Participant lender,
-                                   Participant debtor,
-                                   double amount,
-                                   Event event,
+    public ShrunkOpenDebtsListItem(Transaction transaction,
                                    LanguageConf languageConf,
-                                   ServerUtils server,
-                                   MainCtrlInterface mainCtrl) {
-        this.lender = lender;
-        this.debtor = debtor;
-        this.amount = amount;
-        this.event = event;
-        this.mainCtrl = mainCtrl;
-        this.server = server;
+                                   Consumer<ShrunkOpenDebtsListItem> callBackExpand,
+                                   Consumer<Transaction> callBackSettle) {
+        this.transaction = transaction;
+        this.callBackExpand = callBackExpand;
+        this.callBackSettle = callBackSettle;
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass().getResource("/client/components/OpenDebtsListItem.fxml")
         );
@@ -55,12 +45,21 @@ public class ShrunkOpenDebtsListItem extends HBox {
         try {
             fxmlLoader.load();
         } catch (IOException exception) {
-            throw new RuntimeException(exception);
+            Alert alert = new Alert(Alert.AlertType.ERROR, languageConf.get("Component.IOError"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+            return;
         }
-        DecimalFormat numberFormat = new DecimalFormat("#.00");
+
         String template = languageConf.get("OpenDebtsListItem.template");
-        String text = String.format(template, debtor.getName(),
-                lender.getName(), numberFormat.format(amount));
+        NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
+        formater.setMaximumFractionDigits(2);
+        formater.setCurrency(Currency.getInstance(transaction.getCurrency()));
+        String formattedAmount = formater.format(transaction.getAmount());
+        System.out.println(formattedAmount);
+        String text = String.format(template, transaction.getReceiver().getName(),
+                transaction.getGiver().getName(), formattedAmount);
         participantLabel.setText(text);
     }
 
@@ -68,7 +67,7 @@ public class ShrunkOpenDebtsListItem extends HBox {
      * expands the item to show BankAccount information
      */
     public void onEventClicked(){
-        mainCtrl.resizeOpenDebtItem(this);
+        callBackExpand.accept(this);
     }
 
 
@@ -76,28 +75,13 @@ public class ShrunkOpenDebtsListItem extends HBox {
      * Settles the debt displayed in the item
      */
     public void settleDebt(){
-        mainCtrl.settleDebt(debtor, lender, amount, event, server);
+        callBackSettle.accept(transaction);
     }
 
     /**
-     * getter for lender
-     * @return lender
+     * @return pre-made transaction
      */
-    public Participant getLender() {
-        return lender;
-    }
-    /**
-     * getter for debtor
-     * @return debtor
-     */
-    public Participant getDebtor() {
-        return debtor;
-    }
-    /**
-     * getter for amount
-     * @return amount
-     */
-    public double getAmount() {
-        return amount;
+    public Transaction getTransaction() {
+        return transaction;
     }
 }

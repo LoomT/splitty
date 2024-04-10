@@ -1,11 +1,8 @@
 package client.MockClass;
 
 import client.scenes.PairCollector;
-import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
-import commons.Participant;
-import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -126,23 +123,4 @@ public interface MainCtrlInterface {
      * @param event event customTransaction is connected to
      */
     void showAddCustomTransaction(Event event);
-
-    /**
-     * resizes openDebtListItem based on its current size
-     * @param openDebtListItem openDebtListItem to resize
-     */
-    void resizeOpenDebtItem(Node openDebtListItem);
-
-    /**
-     * Settles the debt displayed in the item
-     * @param receiver receiver of the transaction
-     * @param giver giver of the transaction
-     * @param amount amount given in the transaction
-     * @param event event the transaction is bound to
-     * @param server server to update transactions in.
-     */
-    void settleDebt(Participant receiver, Participant giver,
-                    double amount,
-                    Event event,
-                    ServerUtils server);
 }

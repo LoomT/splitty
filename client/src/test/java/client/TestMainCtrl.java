@@ -2,11 +2,8 @@ package client;
 
 import client.MockClass.MainCtrlInterface;
 import client.scenes.PairCollector;
-import client.utils.ServerUtils;
 import commons.Event;
 import commons.Expense;
-import commons.Participant;
-import javafx.scene.Node;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -209,28 +206,5 @@ public class TestMainCtrl implements MainCtrlInterface {
     @Override
     public void showAddCustomTransaction(Event event) {
         scenes.add("AddCustomTransaction");
-    }
-
-    /**
-     *
-     * @param openDebtListItem openDebtListItem to resize
-     */
-    @Override
-    public void resizeOpenDebtItem(Node openDebtListItem) {
-        //TODO
-    }
-
-    /**
-     * settlesDebt
-     * @param receiver receiver of the transaction
-     * @param giver giver of the transaction
-     * @param amount amount given in the transaction
-     * @param event event the transaction is bound to
-     * @param server server to update transactions in.
-     */
-    @Override
-    public void settleDebt(Participant receiver, Participant giver,
-                           double amount, Event event, ServerUtils server) {
-        //TODO
     }
 }

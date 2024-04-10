@@ -17,17 +17,13 @@ package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
-import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
-import commons.Participant;
-import commons.Transaction;
 import javafx.event.EventTarget;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -36,7 +32,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.net.ConnectException;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -409,15 +404,6 @@ public class MainCtrl implements MainCtrlInterface{
         primaryStage.setScene(openDebtsPage);
     }
 
-
-    /**
-     * expands/contracts the openDebtsListItem according to its status.
-     * @param item item that was clicked on
-     */
-    public void resizeOpenDebtItem(Node item){
-        openDebtsPageCtrl.resizeOpenDebtItem(item);
-    }
-
     /**
      * Display a window for adding a custom transaction
      * @param event event to load
@@ -430,34 +416,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setScene(addCustomTransaction);
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(primaryStage);
         stage.show();
-    }
-
-    /**
-     *
-     */
-
-    /**
-     * Settles the debt displayed in the item
-     * @param receiver receiver of the transaction
-     * @param giver giver of the transaction
-     * @param amount amount given in the transaction
-     * @param event event the transaction is bound to
-     * @param server server to update transactions in.
-     */
-    public void settleDebt(Participant giver, Participant receiver,
-                           double amount,
-                           Event event,
-                           ServerUtils server){
-        Transaction transaction = new Transaction(giver, receiver, amount);
-        int status;
-        try {
-            status = server.addTransaction(event.getId(), transaction);
-        } catch (ConnectException e) { //TODO add an error Popup
-            throw new RuntimeException(e);
-        }
-        if (status / 100 != 2) {
-            System.out.println("server error: " + status);
-        }
     }
 }
