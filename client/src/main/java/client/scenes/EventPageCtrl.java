@@ -36,8 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
 
-import static commons.WebsocketActions.ADD_TAG;
-import static commons.WebsocketActions.TITLE_CHANGE;
+import static commons.WebsocketActions.*;
 
 
 public class EventPageCtrl {
@@ -200,6 +199,14 @@ public class EventPageCtrl {
             if (!event.getTags().contains((Tag) tag)) {
                 event.getTags().add((Tag) tag);
             }
+        });
+        websocket.on(ADD_TRANSACTION, transaction -> {
+            if (!event.getTransactions().contains((Transaction) transaction)) {
+                event.getTransactions().add((Transaction) transaction);
+            }
+        });
+        websocket.on(REMOVE_TRANSACTION, id -> {
+            event.getTransactions().removeIf(t -> t.getId() == (long) id);
         });
     }
 

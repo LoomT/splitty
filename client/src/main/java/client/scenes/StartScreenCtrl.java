@@ -152,8 +152,10 @@ public class StartScreenCtrl {
             }
             System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
         } catch (IOException e) {
-            System.err.println("An error occurred while writing the template file: "
-                    + e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR, languageConf.get("StartScreen.IOError"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
         }
 
     }
