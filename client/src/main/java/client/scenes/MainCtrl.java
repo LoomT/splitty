@@ -313,6 +313,7 @@ public class MainCtrl implements MainCtrlInterface{
      * Shows the open debts page
      * @param eventToShow the event to show the open debts for
      */
+    @Override
     public void showDebtsPage(Event eventToShow) {
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
         primaryStage.setScene(openDebtsPage);
@@ -338,6 +339,7 @@ public class MainCtrl implements MainCtrlInterface{
      * Display a window for adding a custom transaction
      * @param event event to load
      */
+    @Override
     public void showAddCustomTransaction(Event event) {
         Stage stage = new Stage();
         stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));

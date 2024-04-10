@@ -10,9 +10,6 @@ import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.*;
-import commons.Expense;
-import commons.Participant;
-import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -95,9 +92,6 @@ public class EventPageCtrl {
     public Event getEvent() {
         return event;
     }
-
-    private List<Expense> fromExpenses;
-    private List<Expense> includingExpenses;
 
     /**
      * @param mainCtrl     mainCtrl injection
@@ -565,6 +559,7 @@ public class EventPageCtrl {
     /**
      * Show the openDebts page with the current event
      */
+    @FXML
     public void openDebtsPage() {
         mainCtrl.showDebtsPage(event);
     }

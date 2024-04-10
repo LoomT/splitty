@@ -139,6 +139,13 @@ public interface ServerUtils {
     int updateEventTitle(Event event) throws ConnectException;
 
     /**
+     * @param eventID event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    int addTransaction(String eventID, Transaction transaction) throws ConnectException;
+
+    /**
      * send an API call to add a tag
      * @param eventID event id
      * @param tag tag to add
@@ -151,12 +158,5 @@ public interface ServerUtils {
      * @return map of the exchange rates
      */
     Map<String, Double> getExchangeRates(String date) throws ConnectException;
-
-    /**
-     * @param eventID event id
-     * @param transaction transaction to save
-     * @return status code
-     */
-    int addTransaction(String eventID, Transaction transaction);
 }
 

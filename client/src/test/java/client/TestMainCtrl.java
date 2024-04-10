@@ -180,13 +180,24 @@ public class TestMainCtrl implements MainCtrlInterface {
     }
 
     /**
+     * Shows the open debts page
      *
-     * @param event event linked to the page
+     * @param eventToShow the event to show the open debts for
      */
     @Override
-    public void showDebtsPage(Event event) {
+    public void showDebtsPage(Event eventToShow) {
         currentScene = "OpenDebtsPage";
         scenes.add("OpenDebtsPage");
+    }
+
+    /**
+     * Display a window for adding a custom transaction
+     *
+     * @param event event to load
+     */
+    @Override
+    public void showAddCustomTransaction(Event event) {
+        scenes.add("AddCustomTransaction");
     }
 
     /**
@@ -195,15 +206,6 @@ public class TestMainCtrl implements MainCtrlInterface {
      */
     @Override
     public void updateOpenDebtsPage(Event event) {
-        //TODO
-    }
-
-    /**
-     *
-     * @param event event customTransaction is connected to
-     */
-    @Override
-    public void showAddCustomTransaction(Event event) {
         //TODO
     }
 

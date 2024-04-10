@@ -67,6 +67,7 @@ public class Event implements Cloneable {
         this.participants = new ArrayList<>();
         this.expenses = new ArrayList<>();
         this.transactions = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.creationDate = new Date();
         this.lastActivity = new Date();
     }
@@ -295,7 +296,8 @@ public class Event implements Cloneable {
                 && Objects.equals(expenses, event.expenses)
                 && Objects.equals(creationDate, event.creationDate)
                 && Objects.equals(lastActivity, event.lastActivity)
-                && Objects.equals(transactions, event.transactions);
+                && Objects.equals(transactions, event.transactions)
+                && Objects.equals(tags, event.tags);
     }
 
     /**
@@ -306,7 +308,7 @@ public class Event implements Cloneable {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, participants, expenses,
-                creationDate, lastActivity, transactions);
+                creationDate, lastActivity, transactions, tags);
     }
 
     /**
@@ -322,6 +324,7 @@ public class Event implements Cloneable {
                 ", creationDate=" + creationDate +
                 ", lastActivity=" + lastActivity +
                 ", transactions=" + transactions +
+                ", tags=" + tags +
                 '}';
     }
 
@@ -364,6 +367,10 @@ public class Event implements Cloneable {
                         .filter(p -> p.getId() == cloneTransaction.getReceiver().getId())
                         .findAny().orElseThrow());
                 clone.transactions.add(cloneTransaction);
+            }
+            clone.tags = new ArrayList<>();
+            for (Tag t : this.tags) {
+                clone.tags.add(t.clone());
             }
             clone.creationDate = (Date) this.creationDate.clone();
             clone.lastActivity = (Date) this.lastActivity.clone();

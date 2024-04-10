@@ -490,7 +490,6 @@ public class TestServerUtils implements ServerUtils {
         events.add(eventIndex, event);
         statuses.add(204);
         return 204;
-
     }
 
     /**

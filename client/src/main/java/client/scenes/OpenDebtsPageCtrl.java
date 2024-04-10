@@ -29,6 +29,7 @@ public class OpenDebtsPageCtrl {
 
     private final LanguageConf languageConf;
     private Event event;
+
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
