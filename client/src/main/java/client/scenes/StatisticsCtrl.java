@@ -78,18 +78,17 @@ public class StatisticsCtrl {
     public void initialize() {
     }
 
-    private void populateLegend() {
+    private void populateLegend(Event event) {
         legend.getChildren().clear();
 
-        for (PieChart.Data data : pc.getData()) {
-            String[] lines = data.getName().split("\n");
-            String tagName = lines[0];
+        for (Tag tag : event.getTags()) {
+            String tagName = tag.getName();
             if (!tagName.equals("No tag")) {
                 Label label = new Label(tagName);
                 label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
 
                 Shape coloredBox = new Rectangle(10, 10);
-                coloredBox.setFill(Color.web(data.getNode().getStyle().split(": ")[1]));
+                coloredBox.setFill(Color.web(tag.getColor()));
 
                 HBox legendItem = new HBox(10);
                 legendItem.getChildren().addAll(coloredBox, label);
@@ -165,7 +164,7 @@ public class StatisticsCtrl {
         double totalCost = initCost(event);
         updateTagsPieChart(event, totalCost);
         updateNoTagPieChart(event, totalCost);
-        populateLegend();
+        populateLegend(event);
     }
 
     /**
@@ -355,16 +354,23 @@ public class StatisticsCtrl {
      * @return the Color variable
      */
     public static Color hexToColor(String hexCode) {
-        if (!hexCode.startsWith("#")) {
-            hexCode = "#" + hexCode;
+        if (hexCode == null || hexCode.isEmpty() || hexCode.equals("0x")) {
+            return Color.BLACK;
         }
-
-        int red = Integer.parseInt(hexCode.substring(1, 3), 16);
-        int green = Integer.parseInt(hexCode.substring(3, 5), 16);
-        int blue = Integer.parseInt(hexCode.substring(5, 7), 16);
-
-        return Color.rgb(red, green, blue);
+        hexCode = hexCode.replace("#", "").replace("0x", "");
+        if (!hexCode.matches("[0-9a-fA-F]+")) {
+            return Color.BLACK;
+        }
+        try {
+            int red = Integer.parseInt(hexCode.substring(0, 2), 16);
+            int green = Integer.parseInt(hexCode.substring(2, 4), 16);
+            int blue = Integer.parseInt(hexCode.substring(4, 6), 16);
+            return Color.rgb(red, green, blue);
+        } catch (NumberFormatException | IndexOutOfBoundsException e) {
+            return Color.BLACK;
+        }
     }
+
 
     /**
      * handle the currency error
