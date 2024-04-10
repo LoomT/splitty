@@ -298,8 +298,8 @@ public class StatisticsCtrl {
 
     /**
      * configure the no tag slice
-     * @param costExpensesNoTag
-     * @param totalCost
+     * @param costExpensesNoTag cost of untagged expenses
+     * @param totalCost total event cost
      * @return the text for no tag
      */
     public String configureNoTag(double costExpensesNoTag, double totalCost) {
