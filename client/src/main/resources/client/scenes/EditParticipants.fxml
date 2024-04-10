@@ -74,7 +74,7 @@
                      <children>
                         <Label fx:id="warningLabel" styleClass="warningLabel" text="aaaaaaaaaaThe name can only be 30 characters longaaaaaaaaaaaaaaaa" textFill="RED" wrapText="true" />
                         <Region minWidth="0.0" HBox.hgrow="ALWAYS" />
-                          <Button fx:id="deletePartButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#deletePartClicked" styleClass="sbutton" text="%EditP.deletePart" HBox.hgrow="ALWAYS">
+                          <Button id="deletePartButton" fx:id="deletePartButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#deletePartClicked" styleClass="sbutton" text="%EditP.deletePart" HBox.hgrow="ALWAYS">
                            <HBox.margin>
                               <Insets right="10.0" />
                            </HBox.margin>

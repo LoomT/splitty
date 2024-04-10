@@ -116,28 +116,40 @@ public class EditparticipantsCtrlTest {
             });
         });
     }
-
-    @Test
-    public void deleteButtonClickedTest(FxRobot robot) {
-        Platform.runLater(()->{
-
-            Event e = server.createEvent(new Event("testEvent"));
-            ctrl.displayEditParticipantsPage(e);
-            robot.lookup("#nameTextField").queryAs(TextField.class).setText("name2");
-            robot.clickOn("#saveButton");
-            Platform.runLater(()->{
-                try {
-                    robot.sleep(200);
-                    Thread.sleep(200);
-                    System.out.println(ctrl.getEvent());
-                    assertEquals("name2", ctrl.getEvent().getParticipants().get(0).getName());
-
-                    robot.lookup("#partChoiceBox").queryAs(ChoiceBox.class).
-
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-        });
-    }
+// Not sure how to click the confirmation
+//    @Test
+//    public void deleteButtonClickedTest(FxRobot robot) {
+//        Platform.runLater(()->{
+//
+//            Event e = server.createEvent(new Event("testEvent"));
+//            ctrl.displayEditParticipantsPage(e);
+//            robot.lookup("#nameTextField").queryAs(TextField.class).setText("name2");
+//            robot.clickOn("#saveButton");
+//            Platform.runLater(()->{
+//                try {
+//                    robot.sleep(200);
+//                    Thread.sleep(200);
+//                    assertEquals("name2", ctrl.getEvent().getParticipants().get(0).getName());
+//
+//                    robot.lookup("#partChoiceBox").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+//                    robot.clickOn("#deletePartButton");
+//                    robot.sleep(200);
+//                    robot.clickOn("#yesButton");
+//
+//                    Platform.runLater(()-> {
+//                        try {
+//                            robot.sleep(200);
+//                            Thread.sleep(200);
+//                            System.out.println(ctrl.getEvent());
+//                        } catch (InterruptedException ex) {
+//                            throw new RuntimeException(ex);
+//                        }
+//                    });
+//
+//                } catch (InterruptedException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            });
+//        });
+//    }
 }

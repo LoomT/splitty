@@ -121,7 +121,10 @@ public class TestWebsocket implements Websocket {
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);
+            System.out.println("removed part");
+            System.out.println(event);
             deletePartCallback.accept(event);
+
         });
     }
 

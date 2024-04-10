@@ -100,6 +100,8 @@ public class EditParticipantsCtrl {
      */
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
+        System.out.println("display");
+        System.out.println(e);
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
 

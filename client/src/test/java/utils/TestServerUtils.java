@@ -214,6 +214,8 @@ public class TestServerUtils implements ServerUtils {
             expense.getExpenseParticipants().removeIf(p -> p.equals(old));
         }
         event.getParticipants().remove(old);
+        System.out.println("removed");
+        System.out.println(event);
         event.setLastActivity(new Date());
         websocket.simulateAction(WebsocketActions.REMOVE_PARTICIPANT, old);
         lastChange = new Date();
