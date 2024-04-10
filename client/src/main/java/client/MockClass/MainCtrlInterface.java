@@ -111,4 +111,10 @@ public interface MainCtrlInterface {
      * @param event the current event
      */
     void showStatisticsPage(Event event);
+
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    void openOptions();
 }

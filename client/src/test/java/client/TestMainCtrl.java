@@ -186,4 +186,13 @@ public class TestMainCtrl implements MainCtrlInterface {
     public void showStatisticsPage(Event event) {
 
     }
+
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    @Override
+    public void openOptions() {
+        scenes.add("Options");
+    }
 }

@@ -12,4 +12,6 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<EditTitleCtrl, Parent> editTitlePage,
                             Pair<AddTagCtrl, Parent> addTagPage,
                             Pair<StatisticsCtrl, Parent> statisticsPage) {
+                            Pair<AddTagCtrl, Parent> addTagPage,
+                            Pair<OptionsCtrl, Parent> options) {
 }

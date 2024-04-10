@@ -17,9 +17,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -124,7 +126,6 @@ public class EventPageCtrl {
     public void displayEvent(Event e) {
         this.event = e;
         eventTitle.setText(e.getTitle());
-
         addIconsToButtons();
         participantChoiceBox.getItems().clear();
         participantChoiceBox.setValue("");
@@ -543,6 +544,18 @@ public class EventPageCtrl {
         copiedToClipboardMsg.setVisible(true);
         copiedToClipboardMsg.setOpacity(1.0);
         ft.play();
+    }
+    /**
+     * Initializes the shortcuts for EventPage:
+     *      Escape: go back
+     *      Enter: shows participantChoiceBox when focused
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.participantChoiceBox.show(),
+                participantChoiceBox, KeyCode.ENTER);
+
     }
 
     /**

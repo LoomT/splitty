@@ -11,6 +11,9 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.input.KeyEvent;
 
 import java.util.List;
@@ -119,7 +122,6 @@ public class CommonFunctions {
 
             comboBox.setEditable(true);
             comboBox.getEditor().clear();
-            comboBox.getEditor().setText(event.getText());
         });
         comboBox.showingProperty().addListener((observable, oldValue, newValue) -> {
             if(newValue) {
@@ -158,20 +160,24 @@ public class CommonFunctions {
                                            ObservableList<HideableItem<T>> hideableHideableItems) {
         comboBox.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
             if(!comboBox.isShowing()) return;
-            if(newValue.length() > 3) comboBox.getEditor().setText(newValue.substring(0, 3));
-
+            if(newValue.length() > 3) {
+                comboBox.getEditor().setText(newValue.substring(0, 3));
+                return;
+            }
+            final String filteredValue = newValue.replaceAll("[^a-zA-Z]", "");
+            comboBox.getEditor().setText(filteredValue);
 
             Platform.runLater(() -> {
                 if(comboBox.getSelectionModel().getSelectedItem() == null) {
                     hideableHideableItems.forEach(item ->
                             item.setHidden(!item.getObject().toString()
-                                    .toLowerCase().contains(newValue.toLowerCase())));
+                                    .toLowerCase().contains(filteredValue.toLowerCase())));
                 }
                 else {
                     boolean validText = false;
 
                     for(HideableItem<T> hideableItem : hideableHideableItems) {
-                        if(hideableItem.getObject().toString().equals(newValue)) {
+                        if(hideableItem.getObject().toString().equals(filteredValue)) {
                             validText = true;
                             break;
                         }
@@ -181,5 +187,21 @@ public class CommonFunctions {
                 }
             });
         });
+    }
+
+    /**
+     * @return a blend for high contrast
+     */
+    public static Blend getHighContrastEffect() {
+        ColorAdjust ca = new ColorAdjust();
+        ca.setBrightness(-0.4);
+        ca.setContrast(1);
+
+        Blend b = new Blend();
+        b.setMode(BlendMode.COLOR_BURN);
+        b.setOpacity(.8);
+
+        b.setTopInput(ca);
+        return b;
     }
 }

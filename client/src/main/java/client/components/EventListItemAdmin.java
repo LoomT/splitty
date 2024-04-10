@@ -1,9 +1,11 @@
 package client.components;
 
+import client.scenes.MainCtrl;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
@@ -41,6 +43,8 @@ public class EventListItemAdmin extends HBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+
+        MainCtrl.checkKey(this, this::onEventClicked, KeyCode.ENTER);
 
         this.onRemoveCallback = onRemove;
         this.onDownloadClickCallback = onDownload;
