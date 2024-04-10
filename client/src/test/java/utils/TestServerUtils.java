@@ -151,6 +151,7 @@ public class TestServerUtils implements ServerUtils {
         if(clone != null){
             websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
         }
+
         lastChange = new Date();
         statuses.add(204);
         return 204;

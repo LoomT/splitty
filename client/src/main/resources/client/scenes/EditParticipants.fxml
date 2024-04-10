@@ -40,7 +40,7 @@
                         <Insets right="10.0" />
                      </HBox.margin>
                       </Label>
-                      <ChoiceBox fx:id="chooseParticipant" prefWidth="150.0" styleClass="sbutton" />
+                      <ChoiceBox id="partChoiceBox" fx:id="chooseParticipant" prefWidth="150.0" styleClass="sbutton" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" />

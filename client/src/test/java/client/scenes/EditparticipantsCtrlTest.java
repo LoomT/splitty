@@ -3,12 +3,16 @@ package client.scenes;
 import client.MyFXML;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
+import client.utils.currency.CurrencyConverter;
+import client.utils.currency.FileManager;
+import client.utils.currency.FileManagerImpl;
 import commons.Event;
 import commons.Participant;
 import commons.WebsocketActions;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -18,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import utils.FileManagerMock;
 import utils.TestIO;
 import utils.TestServerUtils;
 import utils.TestWebsocket;
@@ -36,14 +41,17 @@ public class EditparticipantsCtrlTest {
 
     @Start
     public void start(Stage stage) throws IOException {
-        server = new TestServerUtils();
+        websocket = new TestWebsocket();
+        server = new TestServerUtils(websocket);
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=http://localhost:8080/
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
-        websocket = new TestWebsocket();
+        FileManagerMock fm = new FileManagerMock();
+        CurrencyConverter cc = new CurrencyConverter(server, fm, languageConf);
+        MainCtrl mainCtrl = new MainCtrl(websocket, languageConf, userConfig, cc);
+
 
         var editParticipantsPageLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/EditParticipants.fxml"),
@@ -94,16 +102,42 @@ public class EditparticipantsCtrlTest {
         Platform.runLater(()->{
             Event e = server.createEvent(new Event("testEvent"));
             ctrl.displayEditParticipantsPage(e);
-            robot.sleep(200);
             robot.lookup("#nameTextField").queryAs(TextField.class).setText("name2");
-            System.out.println(websocket.getFunctions());
             robot.clickOn("#saveButton");
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-            System.out.println(server.getEvents());
+            Platform.runLater(()->{
+                try {
+                    robot.sleep(200);
+                    Thread.sleep(200);
+                    assertEquals("name2", ctrl.getEvent().getParticipants().get(0).getName());
+
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+        });
+    }
+
+    @Test
+    public void deleteButtonClickedTest(FxRobot robot) {
+        Platform.runLater(()->{
+
+            Event e = server.createEvent(new Event("testEvent"));
+            ctrl.displayEditParticipantsPage(e);
+            robot.lookup("#nameTextField").queryAs(TextField.class).setText("name2");
+            robot.clickOn("#saveButton");
+            Platform.runLater(()->{
+                try {
+                    robot.sleep(200);
+                    Thread.sleep(200);
+                    System.out.println(ctrl.getEvent());
+                    assertEquals("name2", ctrl.getEvent().getParticipants().get(0).getName());
+
+                    robot.lookup("#partChoiceBox").queryAs(ChoiceBox.class).
+
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
         });
     }
 }
