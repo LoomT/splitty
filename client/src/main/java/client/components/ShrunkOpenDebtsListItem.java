@@ -5,7 +5,6 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import commons.Event;
 import commons.Participant;
-import commons.Transaction;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
@@ -77,11 +76,7 @@ public class ShrunkOpenDebtsListItem extends HBox {
      * Settles the debt displayed in the item
      */
     public void settleDebt(){
-        Transaction transaction = new Transaction(debtor, lender, amount);
-        int status = server.addTransaction(event.getId(), transaction);
-        if(status / 100 != 2) {
-            System.out.println("server error: " + status);
-        }
+        mainCtrl.settleDebt(debtor, lender, amount, event, server);
     }
 
     /**
