@@ -1,34 +1,36 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.UserConfig;
+import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import commons.Transaction;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 public class AddCustomTransactionCtrl {
-    private final MainCtrl mainCtrl;
+    private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
     private final LanguageConf languageConf;
+    private final CurrencyConverter converter;
+    private final UserConfig userConfig;
     @FXML
     private ChoiceBox<String> chooseReceiver;
     @FXML
     private ChoiceBox<String> chooseGiver;
     @FXML
-    private ChoiceBox<String> chooseCurrency;
+    private ComboBox<CommonFunctions.HideableItem<String>> chooseCurrency;
     @FXML
     private TextField amountField;
 
@@ -39,13 +41,18 @@ public class AddCustomTransactionCtrl {
      * @param mainCtrl main controller
      * @param server server utils
      * @param languageConf language config
+     * @param converter currency converter
+     * @param userConfig user config
      */
     @Inject
-    public AddCustomTransactionCtrl(MainCtrl mainCtrl, ServerUtils server,
-                                    LanguageConf languageConf) {
+    public AddCustomTransactionCtrl(MainCtrlInterface mainCtrl, ServerUtils server,
+                                    LanguageConf languageConf,
+                                    CurrencyConverter converter, UserConfig userConfig) {
         this.mainCtrl = mainCtrl;
         this.server = server;
         this.languageConf = languageConf;
+        this.converter = converter;
+        this.userConfig = userConfig;
     }
 
     /**
@@ -53,8 +60,15 @@ public class AddCustomTransactionCtrl {
      * Adds all currency options to the choice box
      */
     public void initialize() {
-        chooseCurrency.getItems().addAll(List.of("EUR", "USD", "YEN", "GBP"));
-        chooseCurrency.setValue("EUR"); //TODO set the preferred currency here
+        CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
+                chooseCurrency);
+        String cur = userConfig.getCurrency();
+        if(!cur.equals("None")) {
+            CommonFunctions.HideableItem<String> item =
+                    chooseCurrency.getItems().stream()
+                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
+            chooseCurrency.setValue(item);
+        }
         DecimalFormat format = new DecimalFormat( "#.0" );
 
         // only lets the users type decimal numbers
@@ -119,7 +133,9 @@ public class AddCustomTransactionCtrl {
         try {
             status = server.addTransaction(event.getId(), transaction);
         } catch (ConnectException e) {
-            // TODO alert the user
+            backClicked();
+            mainCtrl.handleServerNotFound();
+            return;
         }
         if(status / 100 != 2) {
             System.out.println("server error: " + status);
