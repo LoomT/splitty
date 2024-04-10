@@ -39,7 +39,7 @@ public class Main extends Application {
      *
      * @param args Runtime arguments
      */
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch();
     }
 
@@ -55,7 +55,10 @@ public class Main extends Application {
             // When the language is changed, this function is run
             loadLanguageResourcesAndStart(primaryStage);
         });
-
+        userConfig.onContrastChange(() -> {
+            // When the language is changed, this function is run
+            loadLanguageResourcesAndStart(primaryStage);
+        });
         loadLanguageResourcesAndStart(primaryStage);
     }
 
@@ -67,49 +70,49 @@ public class Main extends Application {
      * @param primaryStage the primary stage
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {  // Load all the FXML here:
-        var start = FXML.load(
-                StartScreenCtrl.class,
-                languageConf.getLanguageResources(),
+        boolean isHighContrast = userConfig.getHighContrast();
+        var start = FXML.load(StartScreenCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "StartScreen.fxml"
         );
-        var adminLogin = FXML.load(
-                AdminLoginCtrl.class,
-                languageConf.getLanguageResources(),
+        var adminLogin = FXML.load(AdminLoginCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AdminLogin.fxml"
         );
-        var eventPage = FXML.load(
-                EventPageCtrl.class,
-                languageConf.getLanguageResources(),
+        var eventPage = FXML.load(EventPageCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "EventPage.fxml"
         );
         var editParticipants = FXML.load(EditParticipantsCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "EditParticipants.fxml"
         );
-        var adminOverview = FXML.load(
-                AdminOverviewCtrl.class,
-                languageConf.getLanguageResources(),
+        var adminOverview = FXML.load(AdminOverviewCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AdminOverview.fxml"
         );
-
         var addExpense = FXML.load(AddExpenseCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddExpense.fxml"
         );
         var titleChanger = FXML.load(EditTitleCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "EditTitle.fxml"
         );
-        var addTag = FXML.load(
-                AddTagCtrl.class, languageConf.getLanguageResources(),
+        var addTag = FXML.load(AddTagCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddTag.fxml"
         );
+        var options = FXML.load(OptionsCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "Options.fxml"
+        );
         var addCustomTransaction = FXML.load(AddCustomTransactionCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddCustomTransaction.fxml"
         );
         var openDebtsPage = FXML.load(OpenDebtsPageCtrl.class,
-                languageConf.getLanguageResources(),
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "OpenDebtsPage.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
@@ -118,7 +121,7 @@ public class Main extends Application {
 
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag,
+                adminOverview, addExpense, titleChanger, addTag, options,
                 addCustomTransaction, openDebtsPage)
         );
     }

@@ -18,6 +18,7 @@ public class TestServerUtils implements ServerUtils {
     private final List<Integer> statuses;
     private final TestWebsocket websocket;
     private boolean polled;
+    private boolean goodPing;
 
     /**
      * constructor
@@ -545,5 +546,25 @@ public class TestServerUtils implements ServerUtils {
                     (((double) Objects.hash(date, count++) / Integer.MAX_VALUE) / 20d + 1));
         }
         return map;
+    }
+
+    /**
+     * Pings the server to check if the url is correct
+     *
+     * @param url url to check
+     * @return true if server responds
+     */
+    @Override
+    public boolean ping(String url) {
+        calls.add("ping");
+        goodPing = url.equals("localhost:8080");
+        return goodPing;
+    }
+
+    /**
+     * @return true if server was found on previous ping
+     */
+    public boolean isGoodPing() {
+        return goodPing;
     }
 }

@@ -182,6 +182,15 @@ public class TestMainCtrl implements MainCtrlInterface {
     }
 
     /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    @Override
+    public void openOptions() {
+        scenes.add("Options");
+    }
+
+    /**
      * Shows the open debts page
      *
      * @param eventToShow the event to show the open debts for

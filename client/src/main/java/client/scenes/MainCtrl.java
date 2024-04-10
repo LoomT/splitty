@@ -20,15 +20,17 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
 import commons.Transaction;
+import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -41,11 +43,11 @@ import java.util.List;
 public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
     private Stage primaryStage;
+
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
 
@@ -73,6 +75,9 @@ public class MainCtrl implements MainCtrlInterface{
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
 
+    private OptionsCtrl optionsCtrl;
+    private Scene options;
+
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
     private Scene addCustomTransaction;
 
@@ -81,16 +86,13 @@ public class MainCtrl implements MainCtrlInterface{
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
-     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig, CurrencyConverter converter) {
+                    UserConfig userConfig) {
         this.websocket = websocket;
         this.languageConf = languageConf;
-        this.userConfig = userConfig;
-        this.converter = converter;
-    }
+        this.userConfig = userConfig;}
 
     /**
      * Initializes the UI
@@ -133,12 +135,73 @@ public class MainCtrl implements MainCtrlInterface{
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
+        this.optionsCtrl = pairCollector.options().getKey();
+        this.options = new Scene(pairCollector.options().getValue());
+
         this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
         this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
 
+        initializeShortcuts();
         showStartScreen();
         primaryStage.show();
 
+    }
+
+    /**
+     * Initializes the shortcuts for all scenes
+     */
+    public void initializeShortcuts(){
+
+        startScreenCtrl.initializeShortcuts(startScreen);
+        eventPageCtrl.initializeShortcuts(eventPage);
+        editParticipantsCtrl.initializeShortcuts(editParticipants);
+        addExpenseCtrl.initializeShortcuts(addExpense);
+        adminLoginCtrl.initializeShortcuts(adminLogin);
+        adminOverviewCtrl.initializeShortcuts(adminOverview);
+        editTitleCtrl.initializeShortcuts(titleChanger);
+        optionsCtrl.initializeShortcuts(options);
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted.
+     * @param target target the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     */
+    public static void checkKey(EventTarget target, Runnable function, KeyCode key) {
+        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                try {
+                    function.run();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                ke.consume(); // <-- stops passing the event to next node
+            }
+        });
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted in a particular field.
+     * @param target target the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     * @param field field that should be in the focus for the function to be executed
+     */
+    public static void checkKey(EventTarget target, Runnable function, Object field, KeyCode key){
+        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                if(ke.getTarget().equals(field)){
+                    System.out.println("Key Pressed: " + ke.getCode());
+                    System.out.println(ke.getTarget());
+                    function.run();
+                    ke.consume(); // <-- stops passing the event to next node
+                }
+            }
+        });
     }
 
     /**
@@ -161,7 +224,12 @@ public class MainCtrl implements MainCtrlInterface{
         Stage stage = new Stage();
         stage.setScene(titleChanger);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
         editTitleCtrl.displayEditEventTitle(event, stage);
+        stage.show();
     }
 
     /**
@@ -274,6 +342,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initOwner(primaryStage);
         stage.show();
     }
 
@@ -311,6 +380,23 @@ public class MainCtrl implements MainCtrlInterface{
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
+    }
+
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    @Override
+    public void openOptions() {
+        Stage stage = new Stage();
+        stage.setScene(options);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("Options.title"));
+        optionsCtrl.display(stage);
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.show();
     }
 
     /**

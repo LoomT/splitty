@@ -110,6 +110,12 @@ public interface MainCtrlInterface {
     void handleServerNotFound();
 
     /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    void openOptions();
+
+    /**
      * shows openDebts Page
      * @param event event linked to the page
      */

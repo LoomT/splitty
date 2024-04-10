@@ -1,9 +1,11 @@
 package client.components;
 
+import client.scenes.MainCtrl;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
@@ -30,9 +32,9 @@ public class EventListItem extends HBox {
 
     /**
      * @param eventName the name to display
-     * @param id the event id to display
-     * @param onRemove the callback to be called when the remove button ic clicked
-     * @param onClick the callback for when the eventcode is clicked
+     * @param id        the event id to display
+     * @param onRemove  the callback to be called when the remove button ic clicked
+     * @param onClick   the callback for when the eventcode is clicked
      */
     public EventListItem(String eventName, String id, Runnable onRemove, Consumer<String> onClick) {
         FXMLLoader fxmlLoader = new FXMLLoader(
@@ -47,13 +49,17 @@ public class EventListItem extends HBox {
         } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
+
+        MainCtrl.checkKey(this, this::eventCodeClicked, KeyCode.ENTER);
+
         deleteButton.setText("\u274C");
         this.eventName = eventName;
         this.id = id;
         this.onRemoveCallback = onRemove;
         this.onClickCallback = onClick;
         eventTitleLabel.setText(eventName);
-        eventCodeLabel.setText(id);    }
+        eventCodeLabel.setText(id);
+    }
 
 
     /**
@@ -68,4 +74,5 @@ public class EventListItem extends HBox {
     private void eventCodeClicked() {
         onClickCallback.accept(this.id);
     }
+
 }

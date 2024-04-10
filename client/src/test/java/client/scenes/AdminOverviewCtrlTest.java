@@ -32,15 +32,16 @@ public class AdminOverviewCtrlTest {
     AdminOverviewCtrl ctrl;
     TestServerUtils server;
     Scene scene;
+
     @Start
     public void start(Stage stage) throws IOException {
         server = new TestServerUtils(new TestWebsocket());
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
+        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
 
         var adminOverviewLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AdminOverview.fxml"),
@@ -72,6 +73,7 @@ public class AdminOverviewCtrlTest {
         assertEquals(server.getStatuses().getFirst(), 200);
         assertEquals(server.getStatuses().size(), 1);
     }
+
     @Test
     void refreshClicked(FxRobot robot) {
         robot.clickOn("#refreshBtn");
@@ -86,6 +88,7 @@ public class AdminOverviewCtrlTest {
         Thread.sleep(1000);
         assertEquals(1, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
     }
+
     @Test
     void reverseOrder(FxRobot robot) throws InterruptedException {
         server.createEvent(new Event("old"));
@@ -175,44 +178,4 @@ public class AdminOverviewCtrlTest {
                         .getEventCodeLabel().getText()).toList();
         assertEquals(List.of("1", "2"), inActivity);
     }
-
-    // not sure how to test concurrency
-//    @Test
-//    void initPollerTimeOut() throws InterruptedException {
-//        Thread.sleep(200);
-//        assertTrue(server.isPolled());
-//        assertTrue(server.getConcurrentStatuses().contains(408));
-//    }
-//
-//    @Test
-//    void initPollerResponse(FxRobot robot) throws InterruptedException {
-//        Thread.sleep(200);
-//        server.createEvent(new Event("title"));
-//        Thread.sleep(500);
-//        System.out.println(server.getConcurrentStatuses());
-//        assertTrue(server.isPolled());
-//        assertNotEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
-//    }
-//
-//    @Test
-//    void initPollerIncorrectPassword(FxRobot robot) throws InterruptedException {
-//        ctrl.setPassword("forgor");
-//        Thread.sleep(600);
-//        server.createEvent(new Event("title"));
-//        Thread.sleep(600);
-//        assertTrue(server.isPolled());
-//        assertTrue(server.getConcurrentStatuses().contains(401));
-//        assertFalse(server.getConcurrentStatuses().contains(204));
-//        assertEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
-//    }
-//
-//    @Test
-//    void stopPoller(FxRobot robot) throws InterruptedException {
-//        ctrl.stopPoller();
-//        Thread.sleep(600);
-//        server.createEvent(new Event("title"));
-//        Thread.sleep(300);
-//        assertTrue(server.isPolled());
-//        assertEquals(0, robot.fromAll().lookup(".eventListItemContainer").queryAll().size());
-//    }
 }

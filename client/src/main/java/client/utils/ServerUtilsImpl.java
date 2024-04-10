@@ -16,11 +16,7 @@
 package client.utils;
 
 import com.google.inject.Inject;
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.Transaction;
-import commons.Tag;
+import commons.*;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
@@ -38,14 +34,18 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class ServerUtilsImpl implements ServerUtils {
 
-    private final String server;
+    private final UserConfig userConfig;
 
     /**
      * @param userConfig user configuration with server url
      */
     @Inject
     public ServerUtilsImpl(UserConfig userConfig) {
-        server = "http:" + userConfig.getUrl();
+        this.userConfig = userConfig;
+    }
+
+    private String getPath() {
+        return "http://" + userConfig.getUrl() + "/";
     }
 
     /**
@@ -53,19 +53,15 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return the found event, null if not found
      */
     @Override
-    public Event getEvent(String id) throws ConnectException {
+    public Event getEvent(String id) {
         try{
             return ClientBuilder.newClient(new ClientConfig())
-                    .target(server).path("api/events/" + id)
+                    .target(getPath()).path("api/events/" + id)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
                     .get(Event.class);
-        } catch (ProcessingException e) {
-            if(e.getMessage().contains("Connection refused"))
-                throw (ConnectException) e.getCause();
-            else
-                throw new WebApplicationException();
         } catch (NotFoundException e) {
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -78,7 +74,7 @@ public class ServerUtilsImpl implements ServerUtils {
     public Event createEvent(Event event) throws ConnectException {
         try {
             return ClientBuilder.newClient(new ClientConfig()) //
-                    .target(server).path("api/events") //
+                    .target(getPath()).path("api/events") //
                     .request(APPLICATION_JSON) //
                     .accept(APPLICATION_JSON) //
                     .post(Entity.entity(event, APPLICATION_JSON), Event.class);
@@ -99,7 +95,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int deleteEvent(String id) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server).path("api/events/" + id)
+                .target(getPath()).path("api/events/" + id)
                 .request(APPLICATION_JSON)
                 .delete()) {
             return response.getStatus();
@@ -121,7 +117,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int createParticipant(String eventId, Participant participant) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server).path("api/events/" + eventId + "/participants")
+                .target(getPath()).path("api/events/" + eventId + "/participants")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(participant, APPLICATION_JSON))) {
             return response.getStatus();
@@ -143,7 +139,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int updateParticipant(String eventId, Participant participant) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventId + "/participants/" + participant.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(participant, APPLICATION_JSON))) {
@@ -166,7 +162,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int deleteParticipant(String eventId, long participantId) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventId + "/participants/" + participantId)
                 .request(APPLICATION_JSON)
                 .delete()) {
@@ -187,7 +183,7 @@ public class ServerUtilsImpl implements ServerUtils {
     public Expense getExpense(long id, String eventID) throws ConnectException {
         try {
             return ClientBuilder.newClient(new ClientConfig())
-                    .target(server)
+                    .target(getPath())
                     .path("api/events/" + eventID + "/expenses/" + id)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON)
@@ -207,7 +203,7 @@ public class ServerUtilsImpl implements ServerUtils {
      */
     public int createExpense(String eventID, Expense expense) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/expenses")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(expense, APPLICATION_JSON))) {
@@ -228,7 +224,7 @@ public class ServerUtilsImpl implements ServerUtils {
      */
     public int updateExpense(long id, String eventID, Expense expense) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/expenses/" + id)
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(expense, APPLICATION_JSON))) {
@@ -248,7 +244,7 @@ public class ServerUtilsImpl implements ServerUtils {
      */
     public int deleteExpense(long id, String eventID) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/expenses/" + id)
                 .request(APPLICATION_JSON)
                 .delete()) {
@@ -269,7 +265,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public boolean verifyPassword(String inputPassword) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("admin/verify") //
+                .target(getPath()).path("admin/verify") //
                 .request(APPLICATION_JSON) //
                 .accept(APPLICATION_JSON) //
                 .post(Entity.entity(inputPassword, APPLICATION_JSON))) {
@@ -293,7 +289,7 @@ public class ServerUtilsImpl implements ServerUtils {
     public List<Event> getEvents(String inputPassword) throws ConnectException {
         try {
             return ClientBuilder.newClient(new ClientConfig()) //
-                    .target(server).path("admin/events") //
+                    .target(getPath()).path("admin/events") //
                     .request(APPLICATION_JSON) //
                     .header("Authorization", inputPassword)
                     .accept(APPLICATION_JSON) //
@@ -313,7 +309,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int pollEvents(String inputPassword, Long timeOut) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig()) //
-                .target(server).path("admin/events/poll") //
+                .target(getPath()).path("admin/events/poll") //
                 .request(APPLICATION_JSON) //
                 .header("Authorization", inputPassword)
                 .header("TimeOut", timeOut)
@@ -341,7 +337,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int importEvent(String password, Event event) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server).path("admin/events")
+                .target(getPath()).path("admin/events")
                 .request(APPLICATION_JSON)
                 .header("Authorization", password)
                 .accept(APPLICATION_JSON)
@@ -364,7 +360,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int updateEventTitle(Event event) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + event.getId())
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(event, APPLICATION_JSON))) {
@@ -385,7 +381,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int addTransaction(String eventID, Transaction transaction) {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/transactions")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(transaction, APPLICATION_JSON))) {
@@ -403,7 +399,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int addTag(String eventID, Tag tag) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/tags")
                 .request(APPLICATION_JSON)
                 .post(Entity.entity(tag, APPLICATION_JSON))) {
@@ -425,7 +421,7 @@ public class ServerUtilsImpl implements ServerUtils {
     public Map<String, Double> getExchangeRates(String date) throws ConnectException {
         try {
             Response response =  ClientBuilder.newClient(new ClientConfig())
-                    .target(server)
+                    .target(getPath())
                     .path("api/currency/" + date)
                     .request(APPLICATION_JSON)
                     .accept(APPLICATION_JSON).buildGet().invoke();
@@ -443,6 +439,25 @@ public class ServerUtilsImpl implements ServerUtils {
                 throw (ConnectException) e.getCause();
             else
                 throw new WebApplicationException();
+        }
+    }
+
+    /**
+     * Pings the server to check if the url is correct
+     *
+     * @param url url to check
+     * @return true if server responds
+     */
+    @Override
+    public boolean ping(String url) {
+        try {
+            Response response = ClientBuilder.newClient(new ClientConfig())
+                    .target("http://" + url + "/")
+                    .path("ping")
+                    .request().get();
+            return response.getStatus() == Response.Status.NO_CONTENT.getStatusCode();
+        } catch (ProcessingException e) {
+            return false;
         }
     }
 }
