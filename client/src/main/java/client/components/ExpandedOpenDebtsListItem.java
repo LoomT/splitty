@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
@@ -22,11 +23,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
     @FXML
     private Text availability;
     @FXML
-    private Text accountHolder;
-    @FXML
-    private Text iban;
-    @FXML
-    private Text bic;
+    private VBox detailContainer;
     private final Transaction transaction;
     private final Consumer<ExpandedOpenDebtsListItem> callBackShrink;
     private final Consumer<Transaction> callBackSettle;
@@ -100,29 +97,43 @@ public class ExpandedOpenDebtsListItem extends HBox {
      */
     public void initializeFields(LanguageConf languageConf) {
         if ((transaction.getReceiver().getBeneficiary() == null
-                && transaction.getReceiver().getAccountNumber() == null)
+                || transaction.getReceiver().getAccountNumber() == null)
                 || (transaction.getReceiver().getAccountNumber().isEmpty()
-                && transaction.getReceiver().getBeneficiary().isEmpty())) {
+                || transaction.getReceiver().getBeneficiary().isEmpty())) {
             availability.setText(languageConf.get("ExpandedOpenDebtsListItem.bankAccountEmpty"));
-            return;
-        }
-
-        if (transaction.getReceiver().getBeneficiary() != null
-                && !transaction.getReceiver().getBeneficiary().isEmpty()) {
-            availability.setText(languageConf.get(
-                    "ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
-            accountHolder.setText("Beneficiary:" + transaction.getReceiver().getBeneficiary());
-            if (transaction.getReceiver().getAccountNumber() != null
-                    && !transaction.getReceiver().getAccountNumber().isEmpty()) {
-                availability.setText(languageConf.get(
-                        "ExpandedOpenDebtsListItem.bankAccountFull"));
-                iban.setText("IBAN: " + transaction.getReceiver().getAccountNumber());
-            }
         } else {
             availability.setText(languageConf.get(
-                    "ExpandedOpenDebtsListItem.bankAccountPartiallyFull"));
-            iban.setText("IBAN: " + transaction.getReceiver().getAccountNumber());
+                    "ExpandedOpenDebtsListItem.bankAccountFull"));
+            Label name = new Label(String.format(
+                    languageConf.get("ExpandedOpenDebtsListItem.beneficiary"),
+                    transaction.getReceiver().getBeneficiary()));
+            name.getStyleClass().add("textFont");
+            detailContainer.getChildren().add(name);
+            Label iban = new Label(String.format(
+                    languageConf.get("ExpandedOpenDebtsListItem.iban"),
+                    transaction.getReceiver().getAccountNumber()));
+            iban.getStyleClass().add("textFont");
+            detailContainer.getChildren().add(iban);
+            if(transaction.getReceiver().getBic() != null
+                    && !transaction.getReceiver().getBic().isEmpty()) {
+                Label label = new Label(String.format(
+                        languageConf.get("ExpandedOpenDebtsListItem.bic"),
+                        transaction.getReceiver().getBic()));
+                label.getStyleClass().add("textFont");
+                detailContainer.getChildren().add(label);
+            }
         }
+        Label label;
+        if(transaction.getReceiver().getEmailAddress() == null
+                || transaction.getReceiver().getEmailAddress().isEmpty()) {
+            label = new Label(languageConf.get("ExpandedOpenDebtsListItem.emailUnavailable"));
+        } else {
+            label = new Label(String.format(
+                    languageConf.get("ExpandedOpenDebtsListItem.emailAvailable"),
+                    transaction.getReceiver().getEmailAddress()));
+        }
+        label.getStyleClass().add("textFont");
+        detailContainer.getChildren().add(label);
     }
 
     /**
