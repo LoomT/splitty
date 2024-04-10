@@ -5,6 +5,7 @@ import client.components.ExpandedOpenDebtsListItem;
 import client.components.ShrunkOpenDebtsListItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
+import client.utils.Websocket;
 import commons.*;
 import jakarta.inject.Inject;
 
@@ -32,6 +33,7 @@ public class OpenDebtsPageCtrl {
 
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
+    private final Websocket websocket;
     private Map<String, Double> participantDebtMap = new HashMap<>();
 
 
@@ -46,10 +48,29 @@ public class OpenDebtsPageCtrl {
     public OpenDebtsPageCtrl(
             ServerUtils serverUtils,
             MainCtrlInterface mainCtrl,
-            LanguageConf languageConf) {
+            LanguageConf languageConf,
+            Websocket websocket) {
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
+        this.websocket = websocket;
+    }
+
+    public void initialize(){
+        websocket.on(WebsocketActions.ADD_TRANSACTION,
+                transaction -> {
+                    if (event.getTransactions().contains((Transaction) transaction)){
+                        return;
+                    }
+                    event.addTransaction((Transaction) transaction);
+                    displayOpenDebtsPage(event);
+                });
+
+        websocket.on(WebsocketActions.REMOVE_TRANSACTION,
+                id -> {
+                    event.getTransactions().removeIf(t -> t.getId() == (Long) id);
+                    displayOpenDebtsPage(event);
+                });
     }
 
     /**

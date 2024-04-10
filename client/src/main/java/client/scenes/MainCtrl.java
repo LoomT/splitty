@@ -323,13 +323,6 @@ public class MainCtrl implements MainCtrlInterface{
         primaryStage.setScene(openDebtsPage);
     }
 
-    /**
-     * Updates the event page
-     * @param eventToShow the event to show the open debts for
-     */
-    public void updateOpenDebtsPage(Event eventToShow) {
-        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
-    }
 
     /**
      * expands/contracts the openDebtsListItem according to its status.

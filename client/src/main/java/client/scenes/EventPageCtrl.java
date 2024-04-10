@@ -218,20 +218,6 @@ public class EventPageCtrl {
                 this::updateExpenses,
                 this::updateExpenses
         );
-        websocket.on(WebsocketActions.ADD_TRANSACTION,
-                transaction -> {
-                    if (event.getTransactions().contains((Transaction) transaction)){
-                        return;
-                    }
-                    event.addTransaction((Transaction) transaction);
-                    mainCtrl.updateOpenDebtsPage(event);
-                });
-
-        websocket.on(WebsocketActions.REMOVE_TRANSACTION,
-                id -> {
-                    event.getTransactions().removeIf(t -> t.getId() == (Long) id);
-                    mainCtrl.updateOpenDebtsPage(event);
-                });
     }
 
 

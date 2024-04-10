@@ -116,12 +116,6 @@ public interface MainCtrlInterface {
     void showDebtsPage(Event event);
 
     /**
-     * updates open debts page
-     * @param event event linked to the page
-     */
-    void updateOpenDebtsPage(Event event);
-
-    /**
      * Shows addCustomTransaction scene
      * @param event event customTransaction is connected to
      */

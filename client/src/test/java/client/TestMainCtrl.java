@@ -204,15 +204,6 @@ public class TestMainCtrl implements MainCtrlInterface {
 
     /**
      *
-     * @param event event linked to the page
-     */
-    @Override
-    public void updateOpenDebtsPage(Event event) {
-        //TODO
-    }
-
-    /**
-     *
      * @param openDebtListItem openDebtListItem to resize
      */
     @Override
