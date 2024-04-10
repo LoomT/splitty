@@ -34,6 +34,7 @@ import java.nio.charset.StandardCharsets;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
+@SuppressWarnings("ALL")
 @ExtendWith(ApplicationExtension.class)
 class AddCustomTransactionCtrlTest {
 
@@ -43,12 +44,12 @@ class AddCustomTransactionCtrlTest {
     Stage stage;
     Event event;
     FileManagerMock fileManager;
+    CurrencyConverter converter;
 
     @Start
     public void start(Stage stage) throws IOException {
         this.stage = stage;
         websocket = new TestWebsocket();
-
         server = new TestServerUtils(websocket);
         fileManager = new FileManagerMock();
         UserConfig userConfig = new UserConfig(new TestIO("""
@@ -56,13 +57,13 @@ class AddCustomTransactionCtrlTest {
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
+        converter = new CurrencyConverter(server, fileManager, languageConf);
 
         var addCustomTransactionLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AddCustomTransaction.fxml"),
                 languageConf.getLanguageResources(), null,
                 (type) -> new AddCustomTransactionCtrl(new TestMainCtrl(), server, languageConf,
-                        new CurrencyConverter(server, fileManager, languageConf), userConfig),
-                StandardCharsets.UTF_8);
+                        converter, userConfig), StandardCharsets.UTF_8);
         Scene scene = new Scene(addCustomTransactionLoader.load());
         ctrl = addCustomTransactionLoader.getController();
 
@@ -105,7 +106,7 @@ class AddCustomTransactionCtrlTest {
             ctrl.display(event, stage);
             robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
-            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("USD"));
             robot.lookup("#amountField").queryAs(TextField.class).setText("1");
             robot.lookup("#save").queryButton().fire();
         });
@@ -113,12 +114,31 @@ class AddCustomTransactionCtrlTest {
         assertTrue(server.getCalls().contains("addTransaction"));
         assertFalse(event.getTransactions().isEmpty());
         Transaction saved = event.getTransactions().getFirst();
-        Transaction expected = new Transaction(event.getParticipants().getFirst(), event.getParticipants().get(1), 1, "EUR");
+        Transaction expected = new Transaction(event.getParticipants().getFirst(),
+                event.getParticipants().get(1), 1, "USD", saved.getDate());
         expected.setEventID(event.getId());
         assertNotEquals(0, saved.getId());
         saved.setId(0);
         assertEquals(expected, saved);
         assertFalse(stage.isShowing());
+    }
+
+    @Test
+    void saveClickedNotBaseCurrency(FxRobot robot) throws IOException {
+        assertTrue(event.getTransactions().isEmpty());
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("EUR"));
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
+        assertTrue(server.getCalls().contains("addTransaction"));
+        Transaction saved = event.getTransactions().getFirst();
+        double expected = converter.convert("EUR", "USD",  1, saved.getDate().toInstant());
+        assertEquals(expected, saved.getAmount());
     }
 
     @Test
@@ -220,7 +240,7 @@ class AddCustomTransactionCtrlTest {
             ctrl.display(event, stage);
             robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
-            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("USD"));
             robot.lookup("#amountField").queryAs(TextField.class).setText("AB");
             robot.lookup("#amountField").queryAs(TextField.class).setText("1");
             ctrl.saveClicked();

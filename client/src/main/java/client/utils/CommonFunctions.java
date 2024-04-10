@@ -86,7 +86,7 @@ public class CommonFunctions {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             HideableItem<?> that = (HideableItem<?>) o;
-            return Objects.equals(object, that.object);
+            return Objects.equals(object.get(), that.object.get());
         }
 
         /**
@@ -94,7 +94,7 @@ public class CommonFunctions {
          */
         @Override
         public int hashCode() {
-            return Objects.hash(object);
+            return Objects.hash(object.get());
         }
     }
 

@@ -46,7 +46,7 @@ public class TransactionControllerTest {
         giver = (Participant) template.getPayload();
         participantController.add(new Participant("receiver"), event.getId());
         receiver = (Participant) template.getPayload();
-        transaction = new Transaction(giver, receiver, 10);
+        transaction = new Transaction(giver, receiver, 10, "EUR");
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TransactionControllerTest {
     @Test
     public void addWithNoParticipants() {
         var response = transactionController.add(event.getId(),
-                new Transaction(null, null, 1));
+                new Transaction(null, null, 1, "EUR"));
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 

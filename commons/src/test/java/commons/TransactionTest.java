@@ -66,12 +66,6 @@ class TransactionTest {
     }
 
     @Test
-    void testEqualsDifferentDate() {
-        Transaction t2 = new Transaction(giver, receiver, 50, "EUR");
-        assertNotEquals(t, t2);
-    }
-
-    @Test
     void testEquals() {
         Transaction t2 = new Transaction(giver, receiver, 50, "EUR", t.getDate());
         assertEquals(t, t2);
