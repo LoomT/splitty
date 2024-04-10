@@ -19,10 +19,10 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
+import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -30,7 +30,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.event.EventTarget;
 
 import java.io.File;
 import java.time.ZoneId;
@@ -39,7 +38,6 @@ import java.util.List;
 public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -67,23 +65,21 @@ public class MainCtrl implements MainCtrlInterface{
 
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
-
+    private OptionsCtrl optionsCtrl;
+    private Scene options;
 
 
     /**
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
-     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig, CurrencyConverter converter) {
+                    UserConfig userConfig) {
         this.websocket = websocket;
         this.languageConf = languageConf;
-        this.userConfig = userConfig;
-        this.converter = converter;
-    }
+        this.userConfig = userConfig;}
 
     /**
      * Initializes the UI
@@ -124,7 +120,9 @@ public class MainCtrl implements MainCtrlInterface{
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
-        //showOverview();
+        this.optionsCtrl = pairCollector.options().getKey();
+        this.options = new Scene(pairCollector.options().getValue());
+
         initializeShortcuts();
         showStartScreen();
         primaryStage.show();
@@ -143,7 +141,7 @@ public class MainCtrl implements MainCtrlInterface{
         adminLoginCtrl.initializeShortcuts(adminLogin);
         adminOverviewCtrl.initializeShortcuts(adminOverview);
         editTitleCtrl.initializeShortcuts(titleChanger);
-
+        optionsCtrl.initializeShortcuts(options);
     }
 
     /**
@@ -208,7 +206,12 @@ public class MainCtrl implements MainCtrlInterface{
         Stage stage = new Stage();
         stage.setScene(titleChanger);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
         editTitleCtrl.displayEditEventTitle(event, stage);
+        stage.show();
     }
 
     /**
@@ -321,6 +324,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initOwner(primaryStage);
         stage.show();
     }
 
@@ -358,5 +362,22 @@ public class MainCtrl implements MainCtrlInterface{
         startScreenCtrl.reset();
         primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
+    }
+
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    @Override
+    public void openOptions() {
+        Stage stage = new Stage();
+        stage.setScene(options);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("Options.title"));
+        optionsCtrl.display(stage);
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.show();
     }
 }

@@ -3,28 +3,26 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
 import client.components.FlagListCell;
-import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import java.io.File;
 import java.net.ConnectException;
 import java.util.*;
 
@@ -45,8 +43,6 @@ public class StartScreenCtrl {
 
     @FXML
     private ComboBox<String> languageChoiceBox;
-    @FXML
-    private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
 
     @FXML
     private VBox eventList;
@@ -58,7 +54,6 @@ public class StartScreenCtrl {
     private Label createEventError;
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
 
     /**
      * start screen controller constructor
@@ -67,22 +62,19 @@ public class StartScreenCtrl {
      * @param mainCtrl     main scene controller
      * @param languageConf language config instance
      * @param userConfig   the user configuration
-     * @param converter      currency converter
      */
     @Inject
     public StartScreenCtrl(
             ServerUtils server,
             MainCtrlInterface mainCtrl,
             LanguageConf languageConf,
-            UserConfig userConfig,
-            CurrencyConverter converter
+            UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
         this.server = server;
 
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.converter = converter;
     }
 
     /**
@@ -101,32 +93,6 @@ public class StartScreenCtrl {
         });
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
-
-        CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
-                currencyChoiceBox);
-        String cur = userConfig.getCurrency();
-        if(!cur.equals("None")) {
-            CommonFunctions.HideableItem<String> item =
-                    currencyChoiceBox.getItems().stream()
-                            .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
-            currencyChoiceBox.setValue(item);
-        }
-        currencyChoiceBox.setOnAction(event -> {
-            try {
-                if(currencyChoiceBox.getValue() != null &&
-                        currencyChoiceBox.getValue().toString().length() == 3) {
-
-                    userConfig.setCurrency(currencyChoiceBox.getValue().toString());
-                }
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.setContentText(languageConf.get("UserConfig.IOError"));
-                java.awt.Toolkit.getDefaultToolkit().beep();
-                alert.showAndWait();
-            }
-        });
-
 
     }
 
@@ -225,7 +191,7 @@ public class StartScreenCtrl {
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
-            } catch (ConnectException e) {
+            } catch (Exception e) {
                 mainCtrl.handleServerNotFound();
                 break;
             }
@@ -285,7 +251,7 @@ public class StartScreenCtrl {
                 return;
             }
             mainCtrl.showEventPage(joinedEvent);
-        } catch (ConnectException e) {
+        } catch (Exception e) {
             showServerNotFoundError();
         }
 
@@ -311,8 +277,6 @@ public class StartScreenCtrl {
         MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
                 languageChoiceBox, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
-                currencyChoiceBox, KeyCode.ENTER);
     }
 
     /**
@@ -324,5 +288,13 @@ public class StartScreenCtrl {
         alert.setHeaderText(languageConf.get("StartScreen.serverUnavailableErrorHeader"));
         alert.show();
         java.awt.Toolkit.getDefaultToolkit().beep();
+    }
+
+    /**
+     * Open options when options button is clicked
+     */
+    @FXML
+    public void optionsClicked() {
+        mainCtrl.openOptions();
     }
 }

@@ -200,16 +200,6 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     * Resets all listeners
-     *
-     */
-
-    @Override
-    public void resetAllActions() {
-        functions.clear();
-    }
-
-    /**
      * simulateAction is used to simulate an action from the server.
      * It triggers all registered consumers for the specified action.
      *
