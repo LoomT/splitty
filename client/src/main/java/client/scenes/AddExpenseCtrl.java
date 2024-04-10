@@ -19,6 +19,7 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -363,9 +364,20 @@ public class AddExpenseCtrl {
                     .findFirst().orElseThrow();
 
             String expCurrency = currency.getValue().toString();
+            double convertedAmount;
+            try {
+                convertedAmount = converter.convert(expCurrency, "USD",
+                        expAmount, expenseDate.toInstant());
+            } catch (IOException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR,
+                        languageConf.get("Currency.IOError"));
+                alert.setHeaderText(languageConf.get("unexpectedError"));
+                alert.showAndWait();
+                return null;
+            }
 
             String expType = type.getValue();
-            Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+            Expense expense = new Expense(selectedParticipant, expPurpose, convertedAmount,
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
             return expense;
@@ -587,10 +599,23 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the amountText field
-     * @param amountText
+     * @param num amount
+     * @param date date
+     * @param currency currency
      */
-    public void setAmount(String amountText) {
-        amount.setText(amountText);
+    public void setAmount(double num, Date date, String currency) {
+        double convertedAmount;
+        try {
+            convertedAmount = converter.convert("USD", currency,
+                    num, date.toInstant());
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("Currency.IOError"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            alert.showAndWait();
+            return;
+        }
+        amount.setText(String.format("%1$,.2f", convertedAmount));
     }
 
     /**
@@ -598,7 +623,8 @@ public class AddExpenseCtrl {
      * @param currencyText
      */
     public void setCurrency(String currencyText) {
-        currency.setValue(new CommonFunctions.HideableItem<>(currencyText.toUpperCase()));
+        currency.setValue(currency.getItems().stream()
+                .filter(h -> h.toString().equals(currencyText)).findFirst().orElse(null));
     }
 
     /**

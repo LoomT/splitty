@@ -37,11 +37,26 @@ public class Transaction implements Cloneable {
      * @param currency selected currency
      */
     public Transaction(Participant giver, Participant receiver, double amount, String currency) {
-        this();
         this.giver = giver;
         this.receiver = receiver;
         this.amount = amount;
         this.currency = currency;
+    }
+
+    /**
+     * @param giver participant that paid
+     * @param receiver participant that received
+     * @param amount amount paid
+     * @param currency selected currency
+     * @param date date for pre-made transactions
+     */
+    public Transaction(Participant giver, Participant receiver,
+                       double amount, String currency, Date date) {
+        this.giver = giver;
+        this.receiver = receiver;
+        this.amount = amount;
+        this.currency = currency;
+        this.date = date;
     }
 
     /**

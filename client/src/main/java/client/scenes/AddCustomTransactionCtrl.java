@@ -14,9 +14,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
+import java.time.Instant;
 import java.util.NoSuchElementException;
 
 public class AddCustomTransactionCtrl {
@@ -127,8 +129,20 @@ public class AddCustomTransactionCtrl {
             backClicked();
             return;
         }
+        double amount = Double.parseDouble(amountField.getText());
+        double convertedAmount;
+        try {
+            convertedAmount = converter.convert(chooseCurrency.getValue().toString(), "USD",
+                    amount, Instant.now());
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("Currency.IOError"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            alert.showAndWait();
+            return;
+        }
         Transaction transaction = new Transaction(giver, receiver,
-                Double.parseDouble(amountField.getText()), chooseCurrency.getValue().toString());
+                convertedAmount, chooseCurrency.getValue().toString());
         int status = 0;
         try {
             status = server.addTransaction(event.getId(), transaction);
