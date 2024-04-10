@@ -3,6 +3,7 @@ package utils;
 import client.utils.ServerUtils;
 import commons.*;
 
+import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -531,6 +532,33 @@ public class TestServerUtils implements ServerUtils {
         statuses.add(200);
         return 200;
     }
+
+    /**
+     * @param transaction transaction to remove
+     * @return status code
+     * @throws ConnectException
+     */
+    @Override
+    public int removeTransaction(Transaction transaction) throws ConnectException {
+        calls.add("removeTransaction");
+        Event event = events.stream().filter(e -> e.getId().equals(transaction.getEventID()))
+                .findFirst().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        };
+        boolean removed = event.getTransactions().removeIf(t -> t.getId() == transaction.getId());
+        if(!removed) {
+            statuses.add(404);
+            return 404;
+        }
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_TRANSACTION, transaction.getId());
+        lastChange = new Date();
+        statuses.add(204);
+        return 204;
+    }
+
     /**
      * Has an up to 5% variance for different dates
      * @return mocked version of exchange rate api

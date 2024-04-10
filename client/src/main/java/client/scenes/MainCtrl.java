@@ -155,6 +155,7 @@ public class MainCtrl implements MainCtrlInterface{
         adminOverviewCtrl.initializeShortcuts(adminOverview);
         editTitleCtrl.initializeShortcuts(titleChanger);
         optionsCtrl.initializeShortcuts(options);
+        openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
     }
 
     /**

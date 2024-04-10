@@ -14,9 +14,11 @@ import commons.*;
 import jakarta.inject.Inject;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 
 import java.net.ConnectException;
@@ -107,6 +109,9 @@ public class OpenDebtsPageCtrl {
         websocket.on(UPDATE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         websocket.on(REMOVE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         tab = Tab.OPEN;
+        settledDebtsBtn.getStyleClass().remove("selectedTabButton");
+        openDebtsBtn.getStyleClass().remove("selectedTabButton");
+        openDebtsBtn.getStyleClass().add("selectedTabButton");
     }
 
     /**
@@ -238,7 +243,7 @@ public class OpenDebtsPageCtrl {
                 index = i;
             }
         }
-        if (index == -1) { //TODO
+        if (index == -1) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(languageConf.get("unexpectedError"));
             alert.showAndWait();
@@ -262,7 +267,6 @@ public class OpenDebtsPageCtrl {
      * @param transaction transaction to settle
      */
     public void settleDebtClicked(Transaction transaction) {
-
         int status = 0;
         try {
             status = server.addTransaction(event.getId(), transaction);
@@ -332,8 +336,10 @@ public class OpenDebtsPageCtrl {
         Optional<ButtonType> button = confirmation.showAndWait();
         if(button.isPresent() && button.get() == ButtonType.YES) {
             try {
-                System.out.println("cancelling transaction");
-            } catch ()
+                server.removeTransaction(transaction);
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+            }
         }
     }
 
@@ -367,4 +373,12 @@ public class OpenDebtsPageCtrl {
         return result;
     }
 
+    /**
+     * Initializes the shortcuts for DebtsPage:
+     *      Escape: go back
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+    }
 }

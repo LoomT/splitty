@@ -379,7 +379,7 @@ public class ServerUtilsImpl implements ServerUtils {
      * @return status code
      */
     @Override
-    public int addTransaction(String eventID, Transaction transaction) {
+    public int addTransaction(String eventID, Transaction transaction) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
                 .target(getPath())
                 .path("api/events/" + eventID + "/transactions")
@@ -387,8 +387,33 @@ public class ServerUtilsImpl implements ServerUtils {
                 .post(Entity.entity(transaction, APPLICATION_JSON))) {
             System.out.println(response.toString());
             return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
         }
+    }
 
+    /**
+     * @param transaction transaction to remove
+     * @return 204 if removed, 404 if not found
+     */
+    @Override
+    public int removeTransaction(Transaction transaction) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(getPath())
+                .path("api/events/" + transaction.getEventID() +
+                        "/transactions/" + transaction.getId())
+                .request(APPLICATION_JSON)
+                .delete()) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
     }
 
     /**

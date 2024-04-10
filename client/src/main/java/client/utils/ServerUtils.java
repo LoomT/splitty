@@ -146,6 +146,11 @@ public interface ServerUtils {
     int addTransaction(String eventID, Transaction transaction) throws ConnectException;
 
     /**
+     * @param transaction transaction to remove
+     * @return status code
+     */
+    int removeTransaction(Transaction transaction) throws ConnectException;
+    /**
      * send an API call to add a tag
      * @param eventID event id
      * @param tag tag to add
@@ -166,5 +171,6 @@ public interface ServerUtils {
      * @return true if server responds
      */
     boolean ping(String url);
+
 }
 
