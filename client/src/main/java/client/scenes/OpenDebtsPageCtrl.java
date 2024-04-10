@@ -8,14 +8,17 @@ import client.utils.ServerUtils;
 import client.utils.Websocket;
 import commons.*;
 import jakarta.inject.Inject;
-
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static commons.WebsocketActions.*;
 
 public class OpenDebtsPageCtrl {
 
@@ -73,6 +76,7 @@ public class OpenDebtsPageCtrl {
         websocket.on(WebsocketActions.REMOVE_TRANSACTION,
                 id -> {
                     event.getTransactions().removeIf(t -> t.getId() == (Long) id);
+                    System.out.println("Transaction removed");
                     displayOpenDebtsPage(event);
                 });
     }
@@ -85,6 +89,15 @@ public class OpenDebtsPageCtrl {
     public void displayOpenDebtsPage(Event event) {
 
         this.event = event;
+        websocket.on(ADD_EXPENSE, (exp) -> displayOpenDebtsPage(event));
+        websocket.on(UPDATE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
+        websocket.on(REMOVE_EXPENSE, (exp) -> {
+            System.out.println("Removed expense");
+            displayOpenDebtsPage(event);
+        });
+        websocket.on(ADD_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+        websocket.on(UPDATE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+        websocket.on(REMOVE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         Map<String, Double> map = new HashMap<>();
         Map<Participant, Map<Participant, Double>> partToPartMap = new HashMap<>();
 
@@ -96,8 +109,8 @@ public class OpenDebtsPageCtrl {
         }
 
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
-        if (event.getExpenses().isEmpty()) return;
         allDebtsPane.getChildren().clear();
+        if (event.getExpenses().isEmpty()) return;
         double sum = initializePage(map, partToPartMap);
 
         if (map.equals(participantDebtMap)) return;
