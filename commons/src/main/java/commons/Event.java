@@ -368,6 +368,7 @@ public class Event implements Cloneable {
                         .findAny().orElseThrow());
                 clone.transactions.add(cloneTransaction);
             }
+            clone.tags = new ArrayList<>();
             for (Tag t : this.tags) {
                 clone.tags.add(t.clone());
             }
