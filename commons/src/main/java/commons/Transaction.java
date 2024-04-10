@@ -2,6 +2,7 @@ package commons;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -19,11 +20,14 @@ public class Transaction implements Cloneable {
     private Participant receiver;
     private double amount;
     private String currency;
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
     /**
      * Constructor for JPA
      */
     public Transaction() {
+        date = new Date();
     }
 
     /**
@@ -33,6 +37,7 @@ public class Transaction implements Cloneable {
      * @param currency selected currency
      */
     public Transaction(Participant giver, Participant receiver, double amount, String currency) {
+        this();
         this.giver = giver;
         this.receiver = receiver;
         this.amount = amount;
@@ -96,6 +101,13 @@ public class Transaction implements Cloneable {
     }
 
     /**
+     * @return date the transaction was created
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
      * @return amount in default currency
      */
     public double getAmount() {
@@ -122,7 +134,8 @@ public class Transaction implements Cloneable {
                 && Objects.equals(eventID, that.eventID)
                 && Objects.equals(giver, that.giver)
                 && Objects.equals(receiver, that.receiver)
-                && Objects.equals(currency, that.currency);
+                && Objects.equals(currency, that.currency)
+                && Objects.equals(date, that.date);
     }
 
     /**
@@ -130,7 +143,7 @@ public class Transaction implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, eventID, giver, receiver, amount, currency);
+        return Objects.hash(id, eventID, giver, receiver, amount, currency, date);
     }
 
     /**
@@ -145,6 +158,7 @@ public class Transaction implements Cloneable {
                 ", receiver=" + receiver +
                 ", amount=" + amount +
                 ", currency='" + currency + '\'' +
+                ", date=" + date +
                 '}';
     }
 
@@ -162,6 +176,7 @@ public class Transaction implements Cloneable {
             Transaction clone = (Transaction) super.clone();
             clone.giver = this.giver.clone();
             clone.receiver = this.receiver.clone();
+            clone.date = (Date) this.date.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
@@ -182,6 +197,7 @@ public class Transaction implements Cloneable {
                     .filter(p -> p.getName().equals(receiver.getName())).findFirst().orElseThrow();
             clone.giver = event.getParticipants().stream()
                     .filter(p -> p.getName().equals(giver.getName())).findFirst().orElseThrow();
+            clone.date = (Date) this.date.clone();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();

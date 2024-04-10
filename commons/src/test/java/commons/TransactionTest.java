@@ -59,9 +59,9 @@ class TransactionTest {
     }
 
     @Test
-    void testEquals() {
+    void testEqualsDifferentDate() {
         Transaction t2 = new Transaction(giver, receiver, 50, "EUR");
-        assertEquals(t, t2);
+        assertNotEquals(t, t2);
     }
 
     @Test
@@ -95,6 +95,7 @@ class TransactionTest {
     }
     @Test
     void testToStringEventID() {
+        t.setEventID("ABCDE");
         assertTrue(t.toString().contains("ABCDE"));
     }
     @Test
