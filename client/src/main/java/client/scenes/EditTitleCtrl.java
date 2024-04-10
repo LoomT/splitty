@@ -8,9 +8,11 @@ import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
@@ -117,5 +119,15 @@ public class EditTitleCtrl {
         warningLabel.setVisible(false);
         eventTitle.setText(event.getTitle());
         nameTextField.textProperty().setValue("");
+    }
+
+    /**
+     * Initializes the shortcuts for EditTitle
+     *      Enter: saveTitle if the focus is on the textField.
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene){
+        MainCtrl.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, this::cancelTitle, KeyCode.ESCAPE);
     }
 }
