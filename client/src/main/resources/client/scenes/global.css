@@ -110,6 +110,30 @@
 
 }
 
+/*cbutton for currency combobox*/
+.cbutton {
+    -fx-background-color: -secondary;
+    -fx-border-color: -secondary;
+    -fx-border-insets: 0, 0 0 0 0;
+    -fx-background-insets: 0;
+    -fx-border-width: 1;
+    -fx-border-radius: 0 8 8 0;
+    -fx-background-radius: 0 8 8 0;
+    -fx-cursor: hand;
+    -fx-text-fill: -text;
+}
+
+
+.cbutton:hover {
+    -fx-border-color: -secondary-hover;
+    -fx-background-color: -secondary-hover;
+}
+
+.cbutton:focused {
+    -fx-border-color: -focus-col;
+
+}
+
 
 /*
 sbutton stands for secondary button

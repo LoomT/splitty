@@ -63,15 +63,15 @@
                         </Text>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
                      <children>
-                              <TextField fx:id="amount" prefHeight="27.0" styleClass="ntextfield">
+                              <TextField fx:id="amount" prefHeight="27.0" styleClass="sstextfield">
                                   <opaqueInsets>
                                       <Insets />
                                   </opaqueInsets>
                            <HBox.margin>
-                              <Insets right="5.0" />
+                              <Insets />
                            </HBox.margin>
                               </TextField>
-                        <ComboBox fx:id="currency" minWidth="-Infinity" prefHeight="27.0" prefWidth="70.0" styleClass="sbutton" />
+                        <ComboBox fx:id="currency" minWidth="-Infinity" prefHeight="27.0" prefWidth="75.0" styleClass="cbutton" />
                      </children>
                   </HBox>
                       <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="labelFont" text="%AddExp.when" GridPane.rowIndex="3">
