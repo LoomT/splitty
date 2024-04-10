@@ -18,6 +18,7 @@ public class Transaction implements Cloneable {
     @ManyToOne
     private Participant receiver;
     private double amount;
+    private String currency;
 
     /**
      * Constructor for JPA
@@ -28,12 +29,14 @@ public class Transaction implements Cloneable {
     /**
      * @param giver participant that paid
      * @param receiver participant that received
-     * @param amount amount paid in default currency
+     * @param amount amount paid
+     * @param currency selected currency
      */
-    public Transaction(Participant giver, Participant receiver, double amount) {
+    public Transaction(Participant giver, Participant receiver, double amount, String currency) {
         this.giver = giver;
         this.receiver = receiver;
         this.amount = amount;
+        this.currency = currency;
     }
 
     /**
@@ -99,6 +102,13 @@ public class Transaction implements Cloneable {
         return amount;
     }
 
+
+    /**
+     * @return currency
+     */
+    public String getCurrency() {
+        return currency;
+    }
     /**
      * @param o object to compare against
      * @return true iff equal
@@ -111,7 +121,8 @@ public class Transaction implements Cloneable {
         return id == that.id && Double.compare(amount, that.amount) == 0
                 && Objects.equals(eventID, that.eventID)
                 && Objects.equals(giver, that.giver)
-                && Objects.equals(receiver, that.receiver);
+                && Objects.equals(receiver, that.receiver)
+                && Objects.equals(currency, that.currency);
     }
 
     /**
@@ -119,7 +130,7 @@ public class Transaction implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, eventID, giver, receiver, amount);
+        return Objects.hash(id, eventID, giver, receiver, amount, currency);
     }
 
     /**
@@ -133,6 +144,7 @@ public class Transaction implements Cloneable {
                 ", giver=" + giver +
                 ", receiver=" + receiver +
                 ", amount=" + amount +
+                ", currency='" + currency + '\'' +
                 '}';
     }
 

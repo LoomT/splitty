@@ -1,6 +1,8 @@
 package client.scenes;
 
 import client.MyFXML;
+import client.TestMainCtrl;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
@@ -11,10 +13,9 @@ import commons.WebsocketActions;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(ApplicationExtension.class)
 class AddCustomTransactionCtrlTest {
@@ -50,16 +52,16 @@ class AddCustomTransactionCtrlTest {
         server = new TestServerUtils(websocket);
         fileManager = new FileManagerMock();
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(websocket, languageConf, userConfig, null);
 
         var addCustomTransactionLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AddCustomTransaction.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new AddCustomTransactionCtrl(mainCtrl, server, languageConf),
+                (type) -> new AddCustomTransactionCtrl(new TestMainCtrl(), server, languageConf,
+                        new CurrencyConverter(server, fileManager, languageConf), userConfig),
                 StandardCharsets.UTF_8);
         Scene scene = new Scene(addCustomTransactionLoader.load());
         ctrl = addCustomTransactionLoader.getController();
@@ -88,54 +90,49 @@ class AddCustomTransactionCtrlTest {
     @Test
     void display(FxRobot robot) {
         ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
+        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiver").query();
+        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiver").query();
+        ComboBox<CommonFunctions.HideableItem<String>> currencies = robot.fromAll().lookup("#chooseCurrency").query();
         assertEquals(2, givers.getItems().size());
         assertEquals(2, receivers.getItems().size());
-        assertEquals(4, currencies.getItems().size());
+        assertEquals(fileManager.getAvailableCurrencies().size(), currencies.getItems().size());
     }
 
     @Test
     void saveClicked(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertTrue(server.getCalls().contains("addTransaction"));
         assertFalse(event.getTransactions().isEmpty());
+        Transaction saved = event.getTransactions().getFirst();
+        Transaction expected = new Transaction(event.getParticipants().getFirst(), event.getParticipants().get(1), 1, "EUR");
+        expected.setEventID(event.getId());
+        assertNotEquals(0, saved.getId());
+        saved.setId(0);
+        assertEquals(expected, saved);
+        assertFalse(stage.isShowing());
     }
 
     @Test
     void saveClickedSameParticipant(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -143,18 +140,14 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedNoAmount(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -162,18 +155,15 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedDefaultCurrency(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertTrue(server.getCalls().contains("addTransaction"));
         assertFalse(event.getTransactions().isEmpty());
     }
@@ -181,18 +171,13 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedNoGiver(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -200,18 +185,14 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedNoReceiver(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -219,20 +200,15 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedBrokenCurrency(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        Platform.runLater(() -> currencies.setValue(null));
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(null);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -240,21 +216,16 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedInputLettersIntoAmount(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.A).type(KeyCode.B).type(KeyCode.DIGIT1);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("AB");
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            ctrl.saveClicked();
+        });
+        waitForFxEvents();
         assertTrue(server.getCalls().contains("addTransaction"));
         assertFalse(event.getTransactions().isEmpty());
         assertEquals(1, event.getTransactions().getFirst().getAmount());
@@ -263,21 +234,15 @@ class AddCustomTransactionCtrlTest {
     @Test
     void saveClickedInputZero(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
-        ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT0);
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            ctrl.display(event, stage);
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("0");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -286,21 +251,15 @@ class AddCustomTransactionCtrlTest {
     void saveClickedWhileParticipantChanged(FxRobot robot) {
         assertTrue(event.getTransactions().isEmpty());
         ctrl.display(event, stage);
-        ChoiceBox<String> givers = robot.fromAll().lookup("#chooseGiverBtn").query();
-        ChoiceBox<String> receivers = robot.fromAll().lookup("#chooseReceiverBtn").query();
-        ChoiceBox<String> currencies = robot.fromAll().lookup("#chooseCurrencyBtn").query();
-        TextField amountField = robot.fromAll().lookup("#chooseAmountBtn").query();
-        Button save = robot.fromAll().lookup("#saveBtn").queryButton();
-        robot.clickOn(givers);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(receivers);
-        robot.type(KeyCode.DOWN).type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(currencies);
-        robot.type(KeyCode.DOWN).type(KeyCode.ENTER);
-        robot.clickOn(amountField);
-        robot.type(KeyCode.DIGIT1);
         event.getParticipants().removeFirst();
-        robot.clickOn(save);
+        Platform.runLater(() -> {
+            robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
+            robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).getSelectionModel().select(0);
+            robot.lookup("#amountField").queryAs(TextField.class).setText("1");
+            robot.lookup("#save").queryButton().fire();
+        });
+        waitForFxEvents();
         assertFalse(server.getCalls().contains("addTransaction"));
         assertTrue(event.getTransactions().isEmpty());
     }
@@ -311,7 +270,8 @@ class AddCustomTransactionCtrlTest {
         assertTrue(stage.isShowing());
         Platform.runLater(() -> {
             ctrl.backClicked();
-            assertFalse(stage.isShowing());
         });
+        waitForFxEvents();
+        assertFalse(stage.isShowing());
     }
 }

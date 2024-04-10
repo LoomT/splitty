@@ -10,7 +10,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//TODO implement DI and test id generation
 public class EventTest {
 
     private Event event;
@@ -266,7 +265,7 @@ public class EventTest {
         Participant p2 = new Participant("Bob");
         p2.setId(2);
         Event event = new Event("title", List.of(p1, p2), null);
-        event.addTransaction(new Transaction(p1, p2, 10));
+        event.addTransaction(new Transaction(p1, p2, 10, "EUR"));
         Event clone = event.clone();
 
         assertNotSame(event.getTransactions(), clone.getTransactions());
@@ -281,7 +280,7 @@ public class EventTest {
         Participant p2 = new Participant("Bob");
         p2.setId(2);
         Event event = new Event("title", List.of(p1, p2), null);
-        event.addTransaction(new Transaction(p1, p2, 10));
+        event.addTransaction(new Transaction(p1, p2, 10, "EUR"));
         Event clone = event.clone();
 
         assertSame(clone.getParticipants().getFirst(), clone.getTransactions().getFirst().getGiver());

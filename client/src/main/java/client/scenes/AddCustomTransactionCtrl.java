@@ -128,7 +128,7 @@ public class AddCustomTransactionCtrl {
             return;
         }
         Transaction transaction = new Transaction(giver, receiver,
-                Double.parseDouble(amountField.getText()));
+                Double.parseDouble(amountField.getText()), chooseCurrency.getValue().toString());
         int status = 0;
         try {
             status = server.addTransaction(event.getId(), transaction);

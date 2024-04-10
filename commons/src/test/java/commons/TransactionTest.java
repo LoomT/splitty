@@ -14,7 +14,7 @@ class TransactionTest {
     void setUp() {
         giver = new Participant("Tom");
         receiver = new Participant("Bob");
-        t = new Transaction(giver, receiver, 50);
+        t = new Transaction(giver, receiver, 50, "EUR");
     }
 
     @Test
@@ -60,24 +60,24 @@ class TransactionTest {
 
     @Test
     void testEquals() {
-        Transaction t2 = new Transaction(giver, receiver, 50);
+        Transaction t2 = new Transaction(giver, receiver, 50, "EUR");
         assertEquals(t, t2);
     }
 
     @Test
     void testEqualsDifferentAmount() {
-        Transaction t2 = new Transaction(giver, receiver, 70);
+        Transaction t2 = new Transaction(giver, receiver, 70, "EUR");
         assertNotEquals(t, t2);
     }
 
     @Test
     void testHashCode() {
-        Transaction t2 = new Transaction(giver, receiver, 50);
+        Transaction t2 = new Transaction(giver, receiver, 50, "EUR");
         assertEquals(t.hashCode(), t2.hashCode());
     }
     @Test
     void testDifferentHashCode() {
-        Transaction t2 = new Transaction(giver, receiver, 70);
+        Transaction t2 = new Transaction(giver, receiver, 70, "EUR");
         assertNotEquals(t.hashCode(), t2.hashCode());
     }
 
@@ -92,6 +92,14 @@ class TransactionTest {
     @Test
     void testToStringAmount() {
         assertTrue(t.toString().contains("50"));
+    }
+    @Test
+    void testToStringEventID() {
+        assertTrue(t.toString().contains("ABCDE"));
+    }
+    @Test
+    void testToStringCurrency() {
+        assertTrue(t.toString().contains("EUR"));
     }
 
     @Test
@@ -114,5 +122,10 @@ class TransactionTest {
         assertEquals(t.getGiver(), clone.getGiver());
         assertNotSame(t.getReceiver(), clone.getReceiver());
         assertEquals(t.getReceiver(), clone.getReceiver());
+    }
+
+    @Test
+    void getCurrency() {
+        assertEquals("EUR", t.getCurrency());
     }
 }
