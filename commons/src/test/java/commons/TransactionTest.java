@@ -3,6 +3,13 @@ package commons;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.stream.Stream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TransactionTest {
@@ -134,5 +141,14 @@ class TransactionTest {
     @Test
     void getCurrency() {
         assertEquals("EUR", t.getCurrency());
+    }
+
+    @Test
+    void compareTo() {
+        Transaction t2 = new Transaction(giver, receiver, 70, "EUR", Date.from(Instant.EPOCH));
+        Transaction t3 = new Transaction(giver, receiver, 70, "EUR", new GregorianCalendar(2050, Calendar.APRIL, 12).getTime());
+        List<Transaction> sorted = Stream.of(t, t2, t3).sorted().toList();
+        assertEquals(t3, sorted.getFirst());
+        assertEquals(t2, sorted.getLast());
     }
 }

@@ -1,13 +1,14 @@
 package commons;
 
 import jakarta.persistence.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.Objects;
 
 @Entity
 @IdClass(EventWeakKey.class)
-public class Transaction implements Cloneable {
+public class Transaction implements Cloneable, Comparable<Transaction> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -20,7 +21,7 @@ public class Transaction implements Cloneable {
     private Participant receiver;
     private double amount;
     private String currency;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
 
     /**
@@ -37,6 +38,7 @@ public class Transaction implements Cloneable {
      * @param currency selected currency
      */
     public Transaction(Participant giver, Participant receiver, double amount, String currency) {
+        this();
         this.giver = giver;
         this.receiver = receiver;
         this.amount = amount;
@@ -217,5 +219,13 @@ public class Transaction implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    /**
+     * Compares according to date
+     */
+    @Override
+    public int compareTo(@NotNull Transaction o) {
+        return -this.date.compareTo(o.date);
     }
 }
