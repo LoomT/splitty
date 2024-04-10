@@ -21,8 +21,8 @@ public class WebsocketImpl implements Websocket {
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
     private final UserConfig userConfig;
+    private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
 
     /**
      * Websocket client constructor
@@ -221,7 +221,7 @@ public class WebsocketImpl implements Websocket {
      */
     @Override
     public void resetAction(WebsocketActions action) {
-        functions.put(action, new HashSet<>());
+        functions.put(action, new ArrayList<>());
     }
 
     /**
