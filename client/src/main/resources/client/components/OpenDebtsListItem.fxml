@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
-
-<fx:root alignment="CENTER_LEFT" onMouseClicked="#onEventClicked" prefHeight="35.0" prefWidth="355.0" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<fx:root alignment="CENTER_LEFT" onMouseClicked="#onEventClicked" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="participantLabel" prefHeight="17.0" prefWidth="200.0" text="Label" HBox.hgrow="ALWAYS">
+      <Label fx:id="participantLabel" styleClass="labelFont" text="Label" HBox.hgrow="ALWAYS">
          <HBox.margin>
             <Insets right="10.0" />
          </HBox.margin>
       </Label>
-      <Button mnemonicParsing="false" onAction="#settleDebt" prefHeight="25.0" prefWidth="143.0" text="%OpenDebtsListItem.markReceived" />
+      <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+      <Button mnemonicParsing="false" onAction="#settleDebt" styleClass="sbutton" text="%OpenDebtsListItem.markReceived" />
    </children>
    <padding>
-      <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+      <Insets bottom="7.0" left="10.0" right="10.0" top="7.0" />
    </padding>
    <cursor>
       <Cursor fx:constant="HAND" />
    </cursor>
+   <stylesheets>
+      <URL value="@/client/scenes/global.css" />
+   </stylesheets>
 </fx:root>
