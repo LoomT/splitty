@@ -43,6 +43,7 @@ public class OpenDebtsPageCtrl {
      * @param serverUtils  the server utils
      * @param mainCtrl     the main controller
      * @param languageConf language conf of the user
+     * @param websocket    websocket
      */
     @Inject
     public OpenDebtsPageCtrl(
@@ -56,10 +57,13 @@ public class OpenDebtsPageCtrl {
         this.websocket = websocket;
     }
 
-    public void initialize(){
+    /**
+     * Initialize the websockets for the OpenDebtsPageCtrl.
+     */
+    public void initialize() {
         websocket.on(WebsocketActions.ADD_TRANSACTION,
                 transaction -> {
-                    if (event.getTransactions().contains((Transaction) transaction)){
+                    if (event.getTransactions().contains((Transaction) transaction)) {
                         return;
                     }
                     event.addTransaction((Transaction) transaction);
@@ -84,15 +88,15 @@ public class OpenDebtsPageCtrl {
         Map<String, Double> map = new HashMap<>();
         Map<Participant, Map<Participant, Double>> partToPartMap = new HashMap<>();
 
-        for(Participant p1 : event.getParticipants()){
+        for (Participant p1 : event.getParticipants()) {
             partToPartMap.put(p1, new HashMap<>());
-            for(Participant p2 : event.getParticipants()){
+            for (Participant p2 : event.getParticipants()) {
                 partToPartMap.get(p1).put(p2, 0.0);
             }
         }
 
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
-        if(event.getExpenses().isEmpty()) return;
+        if (event.getExpenses().isEmpty()) return;
         allDebtsPane.getChildren().clear();
         double sum = initializePage(map, partToPartMap);
 
@@ -112,8 +116,9 @@ public class OpenDebtsPageCtrl {
 
     /**
      * Initializes the graph and the open debts
+     *
      * @param graphMap map to be used to populate the graph
-     * @param debtMap map to be used to populate the debts
+     * @param debtMap  map to be used to populate the debts
      * @return sum of all the expenses
      */
     public double initializePage(Map<String, Double> graphMap,
@@ -147,15 +152,16 @@ public class OpenDebtsPageCtrl {
     /**
      * Given a set of debts with Map<Participant, Map<Participant,Double>> calculates the
      * minimum cash flow to settle all debts.
+     *
      * @param debtMap Map of all the debts using an adjacency map data structure
-     * @param event event that the debts occur in
+     * @param event   event that the debts occur in
      */
-    public void minCashFlow(Map<Participant, Map<Participant, Double>> debtMap, Event event){
+    public void minCashFlow(Map<Participant, Map<Participant, Double>> debtMap, Event event) {
         Map<Participant, Double> map = new HashMap<>();
         event.getParticipants().forEach(p -> map.put(p, 0.0));
-        for(Participant p : event.getParticipants()){
-            for (Participant i : event.getParticipants()){
-                if(p.equals(i)) continue;
+        for (Participant p : event.getParticipants()) {
+            for (Participant i : event.getParticipants()) {
+                if (p.equals(i)) continue;
                 map.put(p, map.get(p) + debtMap.get(i).get(p) - debtMap.get(p).get(i));
             }
         }
@@ -167,16 +173,17 @@ public class OpenDebtsPageCtrl {
      * all debts with a maximum on n-1 where n is the number of participants.
      * Works via finding the maximum debit and credit and decrementing them
      * from each other until they are both zero.
+     *
      * @param debtMap map of all the participants and minimum cash flows that conclude all debts
      */
-    public void recursionCalculate(Map<Participant, Double> debtMap){
+    public void recursionCalculate(Map<Participant, Double> debtMap) {
         Participant maxCredit = getMax(debtMap);
         Participant maxDebit = getMin(debtMap);
-        if(debtMap.get(maxDebit) == 0 && debtMap.get(maxCredit) == 0)
+        if (debtMap.get(maxDebit) == 0 && debtMap.get(maxCredit) == 0)
             return;
         double min = Math.min(-debtMap.get(maxDebit), debtMap.get(maxCredit));
-        debtMap.put(maxCredit, debtMap.get(maxCredit)-min);
-        debtMap.put(maxDebit, debtMap.get(maxDebit)+min);
+        debtMap.put(maxCredit, debtMap.get(maxCredit) - min);
+        debtMap.put(maxDebit, debtMap.get(maxDebit) + min);
         recursionCalculate(debtMap);
 
         allDebtsPane.getChildren().add(new ShrunkOpenDebtsListItem(maxDebit,
@@ -185,6 +192,7 @@ public class OpenDebtsPageCtrl {
 
     /**
      * resizes the debtItems depending on their size.
+     *
      * @param item OpenDebts item to be resized
      */
     public void resizeOpenDebtItem(Node item) {
@@ -238,28 +246,30 @@ public class OpenDebtsPageCtrl {
 
     /**
      * Finds the maximum value from the map and returns the key
+     *
      * @param debtMap map to be searched
      * @return the Participant key with the maximum value
      */
-    public static Participant getMax(Map<Participant, Double> debtMap){
+    public static Participant getMax(Map<Participant, Double> debtMap) {
         Participant result = null;
-        for(Participant p : debtMap.keySet()){
-            if(result == null) result = p;
-            else if(debtMap.get(p) > debtMap.get(result)) result = p;
+        for (Participant p : debtMap.keySet()) {
+            if (result == null) result = p;
+            else if (debtMap.get(p) > debtMap.get(result)) result = p;
         }
         return result;
     }
 
     /**
      * Finds the minimum value from the map and returns the key
+     *
      * @param debtMap map to be searched
      * @return the Participant key with the minimum value
      */
-    public static Participant getMin(Map<Participant, Double> debtMap){
+    public static Participant getMin(Map<Participant, Double> debtMap) {
         Participant result = null;
-        for(Participant p : debtMap.keySet()){
-            if(result == null) result = p;
-            else if(debtMap.get(p) < debtMap.get(result)) result = p;
+        for (Participant p : debtMap.keySet()) {
+            if (result == null) result = p;
+            else if (debtMap.get(p) < debtMap.get(result)) result = p;
         }
         return result;
     }
