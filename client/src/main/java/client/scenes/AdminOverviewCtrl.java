@@ -13,6 +13,11 @@ import com.google.inject.Inject;
 import commons.Event;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.input.KeyCode;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -24,7 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-public class AdminOverviewCtrl {
+public class AdminOverviewCtrl{
 
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
@@ -38,6 +43,7 @@ public class AdminOverviewCtrl {
 
     @FXML
     private ChoiceBox<String> orderByChoiceBox;
+
     @FXML
     private Button backButton;
 
@@ -359,5 +365,20 @@ public class AdminOverviewCtrl {
     public void stopPoller() {
         if(poller != null && !poller.isInterrupted())
             poller.interrupt();
+    }
+
+    /**
+     * Initializes the shortcuts for AdminOverview:
+     *      Escape: go back
+     *      Enter: shows currency and type choiceBox
+     *      Shift: shows datePicker
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::refreshButtonClicked, KeyCode.F5);
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.orderByChoiceBox.show(),
+                orderByChoiceBox, KeyCode.ENTER);
     }
 }

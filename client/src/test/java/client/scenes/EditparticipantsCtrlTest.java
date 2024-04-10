@@ -49,8 +49,7 @@ public class EditparticipantsCtrlTest {
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         FileManagerMock fm = new FileManagerMock();
-        CurrencyConverter cc = new CurrencyConverter(server, fm, languageConf);
-        MainCtrl mainCtrl = new MainCtrl(websocket, languageConf, userConfig, cc);
+        MainCtrl mainCtrl = new MainCtrl(websocket, languageConf, userConfig);
 
 
         var editParticipantsPageLoader = new FXMLLoader(MyFXML.class.getClassLoader()

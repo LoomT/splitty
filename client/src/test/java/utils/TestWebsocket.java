@@ -14,6 +14,9 @@ public class TestWebsocket implements Websocket {
     private String eventID;
     private boolean connected = false;
 
+    /**
+     * @return the registered event listerers. could be useful for debugging
+     */
     public EnumMap<WebsocketActions, Set<Consumer<Object>>> getFunctions() {
         return functions;
     }
@@ -73,11 +76,9 @@ public class TestWebsocket implements Websocket {
             Consumer<Event> updatePartCallback,
             Consumer<Event> addPartCallback,
             Consumer<Event> deletePartCallback) {
-
         this.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
         this.resetAction(WebsocketActions.ADD_PARTICIPANT);
         this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
-
         this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             int index = -1;
@@ -121,10 +122,7 @@ public class TestWebsocket implements Websocket {
                         ") does not match with any ID's of the already existing participants");
             }
             event.getParticipants().remove(index);
-            System.out.println("removed part");
-            System.out.println(event);
             deletePartCallback.accept(event);
-
         });
     }
 
@@ -196,15 +194,6 @@ public class TestWebsocket implements Websocket {
     @Override
     public void resetAction(WebsocketActions action) {
         functions.remove(action);
-    }
-
-    /**
-     * Resets all listeners
-     */
-
-    @Override
-    public void resetAllActions() {
-        functions.clear();
     }
 
     /**

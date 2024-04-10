@@ -177,4 +177,13 @@ public class TestMainCtrl implements MainCtrlInterface {
         currentScene = "StartScreen";
         scenes.add("StartScreen");
     }
+
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    @Override
+    public void openOptions() {
+        scenes.add("Options");
+    }
 }

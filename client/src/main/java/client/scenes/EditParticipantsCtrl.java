@@ -9,6 +9,12 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 
@@ -267,5 +273,17 @@ public class EditParticipantsCtrl {
         nameField.setStyle("""
                         -fx-border-color: red;
                         -fx-text-inner-color: red""");
+    }
+
+    /**
+     * Initializes the shortcuts for EditParticipants:
+     *      Escape: go back
+     *      Enter: shows the chooseParticipant choiceBox
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.chooseParticipant.show(),
+                chooseParticipant, KeyCode.ENTER);
     }
 }
