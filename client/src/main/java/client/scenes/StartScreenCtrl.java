@@ -15,12 +15,16 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
+import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 
-import java.io.IOException;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import java.io.File;
 import java.net.ConnectException;
 import java.util.*;
 
@@ -214,7 +218,10 @@ public class StartScreenCtrl {
                                         recentEventCodes.indexOf(eventCode)
                                 )
                         ),
-                        code::setText
+                        (String c) -> {
+                            code.setText(c);
+                            join();
+                        }
                 );
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
@@ -281,14 +288,31 @@ public class StartScreenCtrl {
         } catch (ConnectException e) {
             showServerNotFoundError();
         }
-    }
 
+
+    }
 
     /**
      * Display admin login
      */
     public void showAdminLogin() {
         mainCtrl.showAdminLogin();
+    }
+
+    /**
+     * Initializes the shortcuts for StartScreen:
+     *      Enter: create/join an event if the focus is on the respective textFields.
+     *      go to event focused on in the eventList
+     *      expand the languageBox if it is focused
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene){
+        MainCtrl.checkKey(scene, this::join, code, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
+                languageChoiceBox, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
+                currencyChoiceBox, KeyCode.ENTER);
     }
 
     /**
