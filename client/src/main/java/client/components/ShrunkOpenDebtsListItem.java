@@ -1,6 +1,7 @@
 package client.components;
 
 import client.utils.LanguageConf;
+import client.utils.currency.CurrencyConverter;
 import commons.Transaction;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,11 +29,13 @@ public class ShrunkOpenDebtsListItem extends HBox {
      * @param languageConf languageConf of the page
      * @param callBackExpand shrink when this component is clicked
      * @param callBackSettle settle when clicked
+     * @param converter currency converter
      */
     public ShrunkOpenDebtsListItem(Transaction transaction,
                                    LanguageConf languageConf,
                                    Consumer<ShrunkOpenDebtsListItem> callBackExpand,
-                                   Consumer<Transaction> callBackSettle) {
+                                   Consumer<Transaction> callBackSettle,
+                                   CurrencyConverter converter) {
         this.transaction = transaction;
         this.callBackExpand = callBackExpand;
         this.callBackSettle = callBackSettle;
@@ -51,15 +54,25 @@ public class ShrunkOpenDebtsListItem extends HBox {
             alert.showAndWait();
             return;
         }
-
+        double convertedAmount;
+        try {
+            convertedAmount = converter.convert("USD", transaction.getCurrency(),
+                    transaction.getAmount(), transaction.getDate().toInstant());
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("Currency.IOError"));
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+            return;
+        }
         String template = languageConf.get("OpenDebtsListItem.template");
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
         formater.setMaximumFractionDigits(2);
         formater.setCurrency(Currency.getInstance(transaction.getCurrency()));
-        String formattedAmount = formater.format(transaction.getAmount());
-        System.out.println(formattedAmount);
-        String text = String.format(template, transaction.getReceiver().getName(),
-                transaction.getGiver().getName(), formattedAmount);
+        String formattedAmount = formater.format(convertedAmount);
+        String text = String.format(template, transaction.getGiver().getName(),
+                transaction.getReceiver().getName(), formattedAmount);
         participantLabel.setText(text);
     }
 
