@@ -19,10 +19,10 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
+import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
@@ -30,7 +30,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.event.EventTarget;
 
 import java.io.File;
 import java.time.ZoneId;
@@ -142,7 +141,7 @@ public class MainCtrl implements MainCtrlInterface{
         adminLoginCtrl.initializeShortcuts(adminLogin);
         adminOverviewCtrl.initializeShortcuts(adminOverview);
         editTitleCtrl.initializeShortcuts(titleChanger);
-
+        optionsCtrl.initializeShortcuts(options);
     }
 
     /**

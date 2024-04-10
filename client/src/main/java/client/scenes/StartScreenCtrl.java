@@ -10,22 +10,19 @@ import com.google.inject.Inject;
 import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-import javafx.scene.Scene;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import java.io.File;
 import java.net.ConnectException;
 import java.util.*;
 
@@ -280,8 +277,6 @@ public class StartScreenCtrl {
         MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
                 languageChoiceBox, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
-                currencyChoiceBox, KeyCode.ENTER);
     }
 
     /**

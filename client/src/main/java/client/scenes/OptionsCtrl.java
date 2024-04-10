@@ -7,8 +7,13 @@ import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
 import jakarta.inject.Inject;
 import javafx.animation.FadeTransition;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -167,5 +172,39 @@ public class OptionsCtrl {
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
+    }
+
+    private final BooleanProperty ctrlPressed = new SimpleBooleanProperty(false);
+    private final BooleanProperty sPressed = new SimpleBooleanProperty(false);
+    private final BooleanBinding spaceAndRightPressed = ctrlPressed.and(sPressed);
+    /**
+     * Enable keyboard shortcuts
+     *
+     * @param scene this options scene
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
+                currencyChoiceBox, KeyCode.ENTER);
+
+
+        // adds a listener for when CTRL + S is pressed to save settings
+        spaceAndRightPressed.addListener((observable, oldValue, newValue) -> saveClicked());
+
+        scene.setOnKeyPressed(key -> {
+            if (key.getCode() == KeyCode.CONTROL) {
+                ctrlPressed.set(true);
+            } else if (key.getCode() == KeyCode.S) {
+                sPressed.set(true);
+            }
+        });
+
+        scene.setOnKeyReleased(key -> {
+            if (key.getCode() == KeyCode.CONTROL) {
+                ctrlPressed.set(false);
+            } else if (key.getCode() == KeyCode.S) {
+                sPressed.set(false);
+            }
+        });
     }
 }
