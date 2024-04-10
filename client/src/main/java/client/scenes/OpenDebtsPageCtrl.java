@@ -67,6 +67,7 @@ public class OpenDebtsPageCtrl {
         this.converter = converter;
         this.userConfig = userConfig;
         participantDebtMap = new HashMap<>();
+        tab = Tab.OPEN;
     }
 
     /**
@@ -75,18 +76,30 @@ public class OpenDebtsPageCtrl {
     public void initialize() {
         websocket.on(WebsocketActions.ADD_TRANSACTION,
                 transaction -> {
-                    if (event.getTransactions().contains((Transaction) transaction)) {
-                        return;
-                    }
-                    event.addTransaction((Transaction) transaction);
-                    displayOpenDebtsPage(event);
+                    if(tab == Tab.SETTLED)
+                        displaySettledDebts();
+                    else displayOpenDebtsPage(event);
                 });
 
         websocket.on(WebsocketActions.REMOVE_TRANSACTION,
                 id -> {
-                    event.getTransactions().removeIf(t -> t.getId() == (Long) id);
-                    displayOpenDebtsPage(event);
+                    if(tab == Tab.SETTLED)
+                        displaySettledDebts();
+                    else displayOpenDebtsPage(event);
                 });
+    }
+
+    /**
+     * Register websocket listeners and set tab to open
+     */
+    public void registerWS() {
+        websocket.on(ADD_EXPENSE, (exp) -> displayOpenDebtsPage(event));
+        websocket.on(UPDATE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
+        websocket.on(REMOVE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
+        websocket.on(ADD_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+        websocket.on(UPDATE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+        websocket.on(REMOVE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+        tab = Tab.OPEN;
     }
 
     /**
@@ -95,14 +108,9 @@ public class OpenDebtsPageCtrl {
      * @param event the event
      */
     public void displayOpenDebtsPage(Event event) {
-
+        if(tab == Tab.SETTLED) return;
         this.event = event;
-        websocket.on(ADD_EXPENSE, (exp) -> displayOpenDebtsPage(event));
-        websocket.on(UPDATE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
-        websocket.on(REMOVE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
-        websocket.on(ADD_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
-        websocket.on(UPDATE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
-        websocket.on(REMOVE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+
         Map<String, Double> map = new HashMap<>();
         Map<Participant, Map<Participant, Double>> partToPartMap = new HashMap<>();
 
@@ -312,7 +320,11 @@ public class OpenDebtsPageCtrl {
      */
     @FXML
     public void openDebtsClicked() {
-
+        if (tab == Tab.OPEN) return;
+        tab = Tab.OPEN;
+        openDebtsBtn.getStyleClass().add("selectedTabButton");
+        settledDebtsBtn.getStyleClass().remove("selectedTabButton");
+        displayOpenDebtsPage(event);
     }
 
     /**
@@ -320,7 +332,33 @@ public class OpenDebtsPageCtrl {
      */
     @FXML
     public void settledDebtsClicked() {
+        if(tab == Tab.SETTLED) return;
+        tab = Tab.SETTLED;
+        openDebtsBtn.getStyleClass().remove("selectedTabButton");
+        settledDebtsBtn.getStyleClass().add("selectedTabButton");
+        displaySettledDebts();
+    }
 
+    private void displaySettledDebts() {
+        allDebtsPane.getChildren().clear();
+        List<Transaction> sorted = event.getTransactions().stream().sorted().toList();
+        for(Transaction t : sorted) {
+            allDebtsPane.getChildren().add(
+                    new SettledDebtsListItem(t, userConfig, languageConf,
+                            this::cancelTransaction, converter));
+        }
+    }
+
+    private void cancelTransaction(Transaction transaction) {
+        Confirmation confirmation =
+                new Confirmation(languageConf.get("OpenDebts.cancelMessage"),
+                        languageConf.get("Confirmation.areYouSure"), languageConf);
+        Optional<ButtonType> button = confirmation.showAndWait();
+        if(button.isPresent() && button.get() == ButtonType.YES) {
+            try {
+                System.out.println("cancelling transaction");
+            } catch ()
+        }
     }
 
     /**

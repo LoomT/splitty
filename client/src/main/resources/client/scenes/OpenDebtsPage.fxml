@@ -32,13 +32,13 @@
          <children>
             <HBox prefHeight="45.0" prefWidth="363.0" styleClass="tabHeader">
                <children>
-                  <Button fx:id="openDebts" mnemonicParsing="false" onAction="#openDebtsClicked" text="%OpenDebts.openDebts">
+                  <Button fx:id="openDebtsBtn" mnemonicParsing="false" onAction="#openDebtsClicked" text="%OpenDebts.openDebts">
                      <styleClass>
                         <String fx:value="tabButton" />
                         <String fx:value="selectedTabButton" />
                      </styleClass>
                   </Button>
-                  <Button fx:id="settledDebts" mnemonicParsing="false" onAction="#settledDebtsClicked" styleClass="tabButton" text="%OpenDebts.settledDebts">
+                  <Button fx:id="settledDebtsBtn" mnemonicParsing="false" onAction="#settledDebtsClicked" styleClass="tabButton" text="%OpenDebts.settledDebts">
                      <HBox.margin>
                         <Insets left="5.0" right="5.0" />
                      </HBox.margin>
@@ -47,7 +47,7 @@
             </HBox>
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" prefHeight="276.0" styleClass="expenseVBox">
                <content>
-                  <VBox fx:id="allDebtsPane" />
+                  <VBox fx:id="allDebtsPane" minWidth="-Infinity" />
                </content>
             </ScrollPane>
          </children>

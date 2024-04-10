@@ -401,6 +401,7 @@ public class MainCtrl implements MainCtrlInterface{
      */
     @Override
     public void showDebtsPage(Event eventToShow) {
+        openDebtsPageCtrl.registerWS();
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
         primaryStage.setScene(openDebtsPage);
     }
