@@ -181,6 +181,13 @@ public class OpenDebtsPageCtrl {
         Participant maxDebit = getMin(debtMap);
         if (debtMap.get(maxDebit) == 0 && debtMap.get(maxCredit) == 0)
             return;
+
+        //Check to stop a stackoverflow error if a floating point issue has occurred
+        if((debtMap.get(maxDebit) == 0 || debtMap.get(maxCredit) == 0)
+                && Math.floor(debtMap.get(maxDebit)) == 0
+                || Math.floor(debtMap.get(maxCredit)) == 0)
+            return;
+
         double min = Math.min(-debtMap.get(maxDebit), debtMap.get(maxCredit));
         debtMap.put(maxCredit, debtMap.get(maxCredit) - min);
         debtMap.put(maxDebit, debtMap.get(maxDebit) + min);
