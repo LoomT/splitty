@@ -9,7 +9,9 @@ import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Tag;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
@@ -99,8 +101,6 @@ public class TagPageCtrl {
                         return;
                     }
 
-                    //tag.setColor(null);
-                    System.out.println(tag.getColor());
                     // Update UI
                     populateTagList(event);
 
@@ -114,8 +114,38 @@ public class TagPageCtrl {
                 colorPickerStage.show();
             });
 
+            // Create delete button
+            Button deleteButton = new Button("X");
+            deleteButton.setOnAction(e -> {
+                String tagNameToRemove = tag.getName();
+                ObservableList<Node> temp = tagList.getChildren();
+                for (Node node : temp) {
+                    if (node instanceof HBox) {
+                        HBox hBox = (HBox) node;
+                        for (Node child : hBox.getChildren()) {
+                            if (child instanceof Label) {
+                                Label lab = (Label) child;
+                                if (tagNameToRemove.equals(lab.getText())) {
+                                    // Remove the HBox (which contains both the tag and delete button) from the VBox
+                                    tagList.getChildren().remove(hBox);
+                                    try {
+                                        server.deleteTag(tag.getId(), event.getId());
+                                    } catch (ConnectException ex) {
+                                        mainCtrl.handleServerNotFound();
+                                        return;
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                // You may want to handle tag deletion from the backend here
+            });
+
             HBox legendItem = new HBox(15);
-            legendItem.getChildren().addAll(coloredBox, label);
+            legendItem.getChildren().addAll(coloredBox, label, deleteButton);
 
             tagList.getChildren().add(legendItem);
         }

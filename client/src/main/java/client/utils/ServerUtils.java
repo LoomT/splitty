@@ -151,6 +151,8 @@ public interface ServerUtils {
 
     int updateTag(long id, String eventID, Tag tag) throws ConnectException;
 
+    int deleteTag(long id, String eventID) throws ConnectException;
+
     /**
      * @param date date of wanted exchange rates
      * @return map of the exchange rates

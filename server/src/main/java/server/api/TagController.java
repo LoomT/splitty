@@ -87,6 +87,26 @@ public class TagController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Expense> deleteById(@PathVariable long id,
+                                              @PathVariable String eventID) {
+        try {
+            Optional<Tag> optionalTag = tagRepo.findById(new EventWeakKey(eventID, id));
+            if(optionalTag.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            tagRepo.delete(optionalTag.get());
+            Tag tag = optionalTag.get();
+            updateEv(eventID, tag);
+            simp.convertAndSend("/event/" + eventID, id,
+                    Map.of("action", WebsocketActions.REMOVE_TAG,
+                            "type", Tag.class.getTypeName()));
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     /**
      * Updates the last activity date of the specified event
      * and updates the date for long poll in admin controller
@@ -96,6 +116,14 @@ public class TagController {
     private void update(String eventID) {
         Event event = eventRepo.getReferenceById(eventID);
         event.setLastActivity(new Date());
+        eventRepo.save(event);
+        adminController.update();
+    }
+
+    private void updateEv(String eventID, Tag tag) {
+        Event event = eventRepo.getReferenceById(eventID);
+        event.setLastActivity(new Date());
+        event.getTags().remove(tag);
         eventRepo.save(event);
         adminController.update();
     }

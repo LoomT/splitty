@@ -414,6 +414,24 @@ public class ServerUtilsImpl implements ServerUtils {
         }
     }
 
+
+    @Override
+    public int deleteTag(long id, String eventID) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(server)
+                .path("api/events/" + eventID + "/tags/" + id)
+                .request(APPLICATION_JSON)
+                .delete()) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
+    }
+
+
     /**
      * @param date date for which to fetch rates
      *
