@@ -1,5 +1,6 @@
 package client.scenes;
 
+import client.MockClass.MainCtrlInterface;
 import client.components.DebtListItem;
 import client.utils.ServerUtils;
 import commons.Event;
@@ -33,9 +34,8 @@ public class OpenDebtsPageCtrl {
 
     private Event event;
 
-    private ServerUtils server;
-    private boolean idk = true;
-    private MainCtrl mainCtrl;
+    private final ServerUtils server;
+    private final MainCtrlInterface mainCtrl;
     private Map<String, Double> participantDebtMap = new HashMap<>();
 
 
@@ -48,7 +48,7 @@ public class OpenDebtsPageCtrl {
     @Inject
     public OpenDebtsPageCtrl(
             ServerUtils serverUtils,
-            MainCtrl mainCtrl
+            MainCtrlInterface mainCtrl
     ) {
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;

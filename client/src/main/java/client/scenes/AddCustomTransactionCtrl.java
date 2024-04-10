@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.stage.Stage;
 
+import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
 import java.util.List;
@@ -114,7 +115,12 @@ public class AddCustomTransactionCtrl {
         }
         Transaction transaction = new Transaction(giver, receiver,
                 Double.parseDouble(amountField.getText()));
-        int status = server.addTransaction(event.getId(), transaction);
+        int status = 0;
+        try {
+            status = server.addTransaction(event.getId(), transaction);
+        } catch (ConnectException e) {
+            // TODO alert the user
+        }
         if(status / 100 != 2) {
             System.out.println("server error: " + status);
         }

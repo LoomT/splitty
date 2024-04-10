@@ -105,4 +105,16 @@ public interface MainCtrlInterface {
      * Disconnects from the server and shows an error
      */
     void handleServerNotFound();
+
+    /**
+     * Shows the open debts page
+     * @param eventToShow the event to show the open debts for
+     */
+    void showDebtsPage(Event eventToShow);
+
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
+    void showAddCustomTransaction(Event event);
 }

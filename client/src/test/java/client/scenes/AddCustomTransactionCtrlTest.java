@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
+import utils.FileManagerMock;
 import utils.TestIO;
 import utils.TestServerUtils;
 import utils.TestWebsocket;
@@ -38,12 +39,14 @@ class AddCustomTransactionCtrlTest {
     TestWebsocket websocket;
     Stage stage;
     Event event;
+    FileManagerMock fileManager;
 
     @Start
     public void start(Stage stage) throws IOException {
         this.stage = stage;
         websocket = new TestWebsocket();
         server = new TestServerUtils(websocket);
+        fileManager = new FileManagerMock();
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=http://localhost:8080/
                 lang=en

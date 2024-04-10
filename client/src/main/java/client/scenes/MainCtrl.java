@@ -19,7 +19,6 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
@@ -36,7 +35,6 @@ import java.util.List;
 public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -74,15 +72,13 @@ public class MainCtrl implements MainCtrlInterface{
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
-     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig, CurrencyConverter converter) {
+                    UserConfig userConfig) {
         this.websocket = websocket;
         this.languageConf = languageConf;
         this.userConfig = userConfig;
-        this.converter = converter;
     }
 
     /**
@@ -131,8 +127,6 @@ public class MainCtrl implements MainCtrlInterface{
 
         showStartScreen();
         primaryStage.show();
-
-
     }
 
     /**
@@ -311,6 +305,7 @@ public class MainCtrl implements MainCtrlInterface{
      * Shows the open debts page
      * @param eventToShow the event to show the open debts for
      */
+    @Override
     public void showDebtsPage(Event eventToShow) {
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
         primaryStage.setScene(openDebtsPage);
@@ -320,6 +315,7 @@ public class MainCtrl implements MainCtrlInterface{
      * Display a window for adding a custom transaction
      * @param event event to load
      */
+    @Override
     public void showAddCustomTransaction(Event event) {
         Stage stage = new Stage();
         stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));

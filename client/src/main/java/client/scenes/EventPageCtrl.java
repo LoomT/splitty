@@ -549,6 +549,7 @@ public class EventPageCtrl {
     /**
      * Show the openDebts page with the current event
      */
+    @FXML
     public void openDebtsPage() {
         mainCtrl.showDebtsPage(event);
     }

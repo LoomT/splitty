@@ -54,7 +54,7 @@ public class EventPageCtrlTest {
                 currency=EUR"""));
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
+        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,

@@ -10,7 +10,7 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<AdminOverviewCtrl, Parent> adminOverview,
                             Pair<AddExpenseCtrl, Parent> addExpensePage,
                             Pair<EditTitleCtrl, Parent> editTitlePage,
+                            Pair<AddTagCtrl, Parent> addTagPage,
                             Pair<AddCustomTransactionCtrl, Parent> addCustomTransaction,
-                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage,
-                            Pair<AddTagCtrl, Parent> addTagPage) {
+                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage) {
 }

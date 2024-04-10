@@ -67,6 +67,7 @@ public class Event implements Cloneable {
         this.participants = new ArrayList<>();
         this.expenses = new ArrayList<>();
         this.transactions = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.creationDate = new Date();
         this.lastActivity = new Date();
     }

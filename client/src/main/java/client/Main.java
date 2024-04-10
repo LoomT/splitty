@@ -15,12 +15,13 @@
  */
 package client;
 
-import client.components.ErrorPopupCtrl;
+import client.MockClass.MainCtrlInterface;
 import client.scenes.*;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import com.google.inject.Injector;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import static com.google.inject.Guice.createInjector;
