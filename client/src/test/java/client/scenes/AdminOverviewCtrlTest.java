@@ -41,7 +41,7 @@ public class AdminOverviewCtrlTest {
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
+        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
 
         var adminOverviewLoader = new FXMLLoader(MyFXML.class.getClassLoader()
                 .getResource("client/scenes/AdminOverview.fxml"),

@@ -39,7 +39,6 @@ import java.util.List;
 public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
@@ -75,16 +74,13 @@ public class MainCtrl implements MainCtrlInterface{
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
-     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig, CurrencyConverter converter) {
+                    UserConfig userConfig) {
         this.websocket = websocket;
         this.languageConf = languageConf;
-        this.userConfig = userConfig;
-        this.converter = converter;
-    }
+        this.userConfig = userConfig;}
 
     /**
      * Initializes the UI
