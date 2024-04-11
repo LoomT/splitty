@@ -81,8 +81,12 @@ public class MainCtrl implements MainCtrlInterface{
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
     private Scene addCustomTransaction;
 
+    private InviteMailCtrl inviteMailCtrl;
+    private Scene inviteMail;
+
     private boolean startPage = true;
     private Event event;
+
 
 
     /**
@@ -143,6 +147,9 @@ public class MainCtrl implements MainCtrlInterface{
 
         this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
         this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
+
+        this.inviteMailCtrl = pairCollector.inviteMailPage().getKey();
+        this.inviteMail = new Scene(pairCollector.inviteMailPage().getValue());
 
         initializeShortcuts();
         if(startPage){
@@ -234,6 +241,18 @@ public class MainCtrl implements MainCtrlInterface{
         stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
+        editTitleCtrl.displayEditEventTitle(event, stage);
+        stage.show();
+    }
+
+    public void showInviteMail(Event event){
+        Stage stage = new Stage();
+        stage.setScene(inviteMail);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("InviteMail.pageTitle"));
         stage.setResizable(false);
         stage.initOwner(primaryStage);
         editTitleCtrl.displayEditEventTitle(event, stage);

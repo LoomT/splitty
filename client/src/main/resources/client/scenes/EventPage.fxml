@@ -1,38 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import java.lang.String?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
       <HBox prefWidth="600.0" styleClass="navbar">
          <children>
-            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="New Year Party">
+            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="EVENT" wrappingWidth="230.0">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
             </Text>
-            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_RIGHT" prefHeight="53.0" prefWidth="363.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
-                     <HBox.margin>
-                        <Insets right="10.0" />
-                     </HBox.margin>
-                  </Button>
-                  <VBox alignment="CENTER_LEFT">
+                  <GridPane prefHeight="53.0" prefWidth="330.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="172.71429443359375" minWidth="10.0" percentWidth="40.0" prefWidth="145.00003487723214" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="126.85711669921875" minWidth="10.0" percentWidth="15.0" prefWidth="103.85709926060267" />
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="126.85711669921875" minWidth="10.0" percentWidth="5.0" prefWidth="20.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="207.4285888671875" minWidth="10.0" percentWidth="40.0" prefWidth="121.14286586216517" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
                      <children>
-                        <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                        </Label>
-                        <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
+                        <VBox alignment="CENTER_LEFT" GridPane.columnIndex="3">
+                           <children>
+                              <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Label>
+                              <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
+                           </children>
+                        </VBox>
+                        <HBox alignment="CENTER" prefHeight="53.0" prefWidth="122.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#sendInvite" prefHeight="25.0" prefWidth="80.0" styleClass="pbutton" text="%EventPage.sendInvite" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="77.0" GridPane.columnIndex="1">
+                           <children>
+                              <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#changeTitle" prefHeight="25.0" prefWidth="78.0" styleClass="sbutton" text="%EventPage.editEventTitle" />
+                           </children>
+                        </HBox>
                      </children>
-                  </VBox>
+                  </GridPane>
                </children>
             </HBox>
          </children>
@@ -108,7 +137,7 @@
             </ScrollPane>
          </children>
       </VBox>
-      <ComboBox fx:id="languageChoiceBoxEvent" prefWidth="70.0" styleClass="sbutton" layoutX="510" layoutY="78" />
+      <ComboBox fx:id="languageChoiceBoxEvent" layoutX="510" layoutY="78" prefWidth="70.0" styleClass="sbutton" />
       <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
    </children>
    <stylesheets>

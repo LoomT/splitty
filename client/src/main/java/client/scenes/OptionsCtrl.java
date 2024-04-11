@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.CommonFunctions;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import jakarta.inject.Inject;
 import javafx.animation.FadeTransition;
@@ -26,6 +23,7 @@ public class OptionsCtrl {
     private final UserConfig userConfig;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
+    private final EmailService emailService;
     private final ServerUtils server;
     @FXML
     private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
@@ -49,11 +47,13 @@ public class OptionsCtrl {
      */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
-                       CurrencyConverter converter, ServerUtils server) {
+                       CurrencyConverter converter, ServerUtils server,
+                       EmailService emailService) {
         this.userConfig = userConfig;
         this.languageConf = languageConf;
         this.converter = converter;
         this.server = server;
+        this.emailService = emailService;
     }
 
     /**
@@ -206,5 +206,24 @@ public class OptionsCtrl {
                 sPressed.set(false);
             }
         });
+    }
+
+    @FXML
+    public void testMail(){
+        loadIndicator.setVisible(true);
+        boolean result = emailService.sendTestEmail();
+        confirmationLabel.setVisible(false);
+
+        if(result){
+            confirmationLabel.setText(languageConf.get("Options.mailSuccessful"));
+        }
+        else{
+            confirmationLabel.setText(languageConf.get("Options.mailFailure"));
+        }
+        ft.stop();
+        loadIndicator.setVisible(false);
+        confirmationLabel.setVisible(true);
+        confirmationLabel.setOpacity(1.0);
+        ft.play();
     }
 }

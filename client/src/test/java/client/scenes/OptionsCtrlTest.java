@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.MyFXML;
 import client.utils.CommonFunctions;
+import client.utils.EmailService;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
@@ -57,7 +58,8 @@ class OptionsCtrlTest {
 
         var optionsLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/Options.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new OptionsCtrl(userConfig, languageConf, new CurrencyConverter(server, new FileManagerMock(), languageConf), server),
+                (type) -> new OptionsCtrl(userConfig, languageConf, new CurrencyConverter(
+                        server, new FileManagerMock(), languageConf), server, new EmailService(userConfig)),
                 StandardCharsets.UTF_8);
 
         reloadedFXML = 0;

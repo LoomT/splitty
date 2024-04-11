@@ -5,10 +5,7 @@ import client.components.Confirmation;
 import client.components.ExpandedOpenDebtsListItem;
 import client.components.SettledDebtsListItem;
 import client.components.ShrunkOpenDebtsListItem;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import commons.*;
 import jakarta.inject.Inject;
@@ -46,6 +43,7 @@ public class OpenDebtsPageCtrl {
     private final Websocket websocket;
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
+    private final EmailService emailService;
     private Map<String, Double> participantDebtMap;
 
     private enum Tab{OPEN, SETTLED};
@@ -68,13 +66,16 @@ public class OpenDebtsPageCtrl {
             LanguageConf languageConf,
             Websocket websocket,
             CurrencyConverter converter,
-            UserConfig userConfig) {
+            UserConfig userConfig,
+            EmailService emailService) {
+
         this.server = serverUtils;
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.websocket = websocket;
         this.converter = converter;
         this.userConfig = userConfig;
+        this.emailService = emailService;
         participantDebtMap = new HashMap<>();
         tab = Tab.OPEN;
     }
@@ -249,7 +250,7 @@ public class OpenDebtsPageCtrl {
             ShrunkOpenDebtsListItem oldItem = (ShrunkOpenDebtsListItem) list.get(index);
             list.set(index, new ExpandedOpenDebtsListItem(oldItem.getTransaction(),
                     languageConf, this::resizeOpenDebtItem,
-                    this::settleDebtClicked, converter, mainCtrl));
+                    this::settleDebtClicked, converter, mainCtrl, emailService));
         } else {
             ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
             allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(

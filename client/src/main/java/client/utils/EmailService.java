@@ -14,12 +14,13 @@ public class EmailService {
     private String fromEmail;
     private JavaMailSenderImpl mailSender;
     private final UserConfig userConfig;
+    private boolean valid;
 
     @Inject
     public EmailService(UserConfig userConfig){
         this.userConfig = userConfig;
         initializeMailSender();
-
+        valid = checkInitialization();
     }
 
     public void initializeMailSender(){
@@ -32,6 +33,12 @@ public class EmailService {
         mailSender.setDefaultEncoding("UTF-8");
         mailSender.setProtocol("smtp");
         mailSender.setJavaMailProperties(userConfig.getMailProperties());
+    }
+
+    public boolean checkInitialization(){
+        if(fromEmail == null || fromEmail.isEmpty()) return false;
+        if(mailSender == null) return false;
+        return mailSender.getHost() != null && !mailSender.getHost().isEmpty();
     }
 
     public void sendEmail(String toEmail, String subject, String body){
@@ -50,10 +57,10 @@ public class EmailService {
         }
 
         mailSender.send(mimeMessage);
-        System.out.println("email sent");
+        System.out.println("Email Sent");
     }
 
-    public void sendTestEmail(){
+    public boolean sendTestEmail(){
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
@@ -64,9 +71,19 @@ public class EmailService {
             helper.setSubject("Test Email");
             helper.setText("This is a test email to see if it has been configured correctly");
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            System.out.println("Test Email couldn't be sent");
+            return false;
         }
         mailSender.send(mimeMessage);
-        System.out.println("email sent");
+        System.out.println("Test Email Sent");
+        return true;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setFromEmail(){
+        valid = true;
     }
 }

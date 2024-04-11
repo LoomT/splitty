@@ -568,4 +568,9 @@ public class EventPageCtrl {
     public void openDebtsPage() {
         mainCtrl.showDebtsPage(event);
     }
+
+    @FXML
+    public void sendInvite(){
+
+    }
 }
