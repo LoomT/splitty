@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.Confirmation;
 import client.components.EventListItem;
 import client.components.FlagListCell;
 import client.utils.LanguageConf;
@@ -11,10 +12,7 @@ import commons.Event;
 import jakarta.ws.rs.WebApplicationException;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
@@ -27,6 +25,7 @@ import java.net.ConnectException;
 import java.util.*;
 
 import static client.utils.CommonFunctions.lengthListener;
+import static java.lang.String.format;
 
 
 public class StartScreenCtrl {
@@ -88,7 +87,7 @@ public class StartScreenCtrl {
         code.textProperty().addListener((observable, oldValue, newValue) -> {
             joinError.setVisible(false);
             String filteredValue = newValue.replaceAll("[^a-zA-Z]", "");
-            if(filteredValue.length() > 5) filteredValue = filteredValue.substring(0, 5);
+            if (filteredValue.length() > 5) filteredValue = filteredValue.substring(0, 5);
             code.setText(filteredValue.toUpperCase());
         });
         lengthListener(title, createEventError, 30,
@@ -121,7 +120,6 @@ public class StartScreenCtrl {
 
 
     /**
-     *
      * Downloads the template
      */
     private void downloadTemplate() {
@@ -161,7 +159,6 @@ public class StartScreenCtrl {
 
     /**
      * Reloads the event codes from the user config and updates the event list
-     *
      */
     public void reloadEventCodes() {
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
@@ -179,11 +176,22 @@ public class StartScreenCtrl {
                 EventListItem eventListItem = new EventListItem(
                         event.getTitle(),
                         eventCode,
-                        () -> eventList.getChildren().remove(
-                                list.get(
-                                        recentEventCodes.indexOf(eventCode)
-                                )
-                        ),
+                        () -> {
+                            Confirmation confirmation =
+                                    new Confirmation((format(languageConf.get(
+                                            "StartScreen.deleteConfirmMessage"),
+                                            event.getTitle())),
+                                            languageConf.get(
+                                                    "Confirmation.areYouSure"),
+                                            languageConf);
+                            Optional<ButtonType> result = confirmation.showAndWait();
+                            if (result.isPresent() && result.get() == ButtonType.YES) {
+                                eventList.getChildren().remove(
+                                        list.get(
+                                        recentEventCodes.indexOf(
+                                                eventCode)));
+                            }
+                        },
                         (String c) -> {
                             code.setText(c);
                             join();
@@ -214,7 +222,7 @@ public class StartScreenCtrl {
      * Creates and joins the event with provided title
      */
     public void create() {
-        if (title.getText().isEmpty()){
+        if (title.getText().isEmpty()) {
             createEventError.setText(languageConf.get("StartScreen.emptyEventName"));
             createEventError.setVisible(true);
             return;
@@ -238,14 +246,14 @@ public class StartScreenCtrl {
      * Tries to join the inputted event
      */
     public void join() {
-        if(code.getText().isEmpty() || code.getText().length() != 5){
+        if (code.getText().isEmpty() || code.getText().length() != 5) {
             joinError.setText(languageConf.get("StartScreen.invalidJoinCode"));
             joinError.setVisible(true);
             return;
         }
         try {
             Event joinedEvent = server.getEvent(code.getText());
-            if(joinedEvent == null) {
+            if (joinedEvent == null) {
                 joinError.setText(languageConf.get("StartScreen.eventNotFoundMessage"));
                 joinError.setVisible(true);
                 return;
@@ -267,12 +275,13 @@ public class StartScreenCtrl {
 
     /**
      * Initializes the shortcuts for StartScreen:
-     *      Enter: create/join an event if the focus is on the respective textFields.
-     *      go to event focused on in the eventList
-     *      expand the languageBox if it is focused
+     * Enter: create/join an event if the focus is on the respective textFields.
+     * go to event focused on in the eventList
+     * expand the languageBox if it is focused
+     *
      * @param scene scene the listeners are initialised in
      */
-    public void initializeShortcuts(Scene scene){
+    public void initializeShortcuts(Scene scene) {
         MainCtrl.checkKey(scene, this::join, code, KeyCode.ENTER);
         MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
