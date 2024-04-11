@@ -11,7 +11,9 @@ import commons.Event;
 import commons.Participant;
 import commons.Transaction;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
@@ -141,7 +143,7 @@ public class AddCustomTransactionCtrl {
         }
         Transaction transaction = new Transaction(giver, receiver,
                 convertedAmount, chooseCurrency.getValue().toString());
-        int status = 0;
+        int status;
         try {
             status = server.addTransaction(event.getId(), transaction);
         } catch (ConnectException e) {
@@ -211,5 +213,15 @@ public class AddCustomTransactionCtrl {
     @FXML
     public void backClicked() {
         stage.close();
+    }
+
+    /**
+     * @param scene this scene
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> chooseReceiver.show(), chooseReceiver, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> chooseGiver.show(), chooseGiver, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> chooseCurrency.show(), chooseCurrency, KeyCode.ENTER);
     }
 }
