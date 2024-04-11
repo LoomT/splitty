@@ -275,6 +275,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -336,7 +337,6 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
-        primaryStage.setResizable(false);
     }
 
     /**
@@ -418,6 +418,7 @@ public class MainCtrl implements MainCtrlInterface{
     public void showDebtsPage(Event eventToShow) {
         openDebtsPageCtrl.registerWS();
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+        primaryStage.setTitle(languageConf.get("OpenDebts.title"));
         primaryStage.setScene(openDebtsPage);
     }
 
