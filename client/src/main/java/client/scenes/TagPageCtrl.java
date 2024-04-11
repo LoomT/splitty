@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -26,6 +27,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
+import java.util.Optional;
 
 public class TagPageCtrl {
 
@@ -120,11 +122,9 @@ public class TagPageCtrl {
                 String tagNameToRemove = tag.getName();
                 ObservableList<Node> temp = tagList.getChildren();
                 for (Node node : temp) {
-                    if (node instanceof HBox) {
-                        HBox hBox = (HBox) node;
+                    if (node instanceof HBox hBox) {
                         for (Node child : hBox.getChildren()) {
-                            if (child instanceof Label) {
-                                Label lab = (Label) child;
+                            if (child instanceof Label lab) {
                                 if (tagNameToRemove.equals(lab.getText())) {
                                     // Remove the HBox (which contains both the tag and delete button) from the VBox
                                     tagList.getChildren().remove(hBox);
@@ -145,11 +145,49 @@ public class TagPageCtrl {
                 // You may want to handle tag deletion from the backend here
             });
 
-            HBox legendItem = new HBox(15);
-            legendItem.getChildren().addAll(coloredBox, label, deleteButton);
+            // Create edit button
+            Button editButton = new Button("Edit");
+            editButton.setOnAction(e -> {
+                // Create text input dialog for renaming the tag
+                TextInputDialog dialog = new TextInputDialog(tag.getName());
+                dialog.setTitle("Edit Tag Name");
+                dialog.setHeaderText(null);
+                dialog.setContentText("Enter new tag name:");
 
-            tagList.getChildren().add(legendItem);
+                // Get the result of the dialog
+                Optional<String> result = dialog.showAndWait();
+                result.ifPresent(newTagName -> {
+                    // Update the tag's name
+                    tag.setName(newTagName);
+                    try {
+                        server.updateTag(tag.getId(), event.getId(), tag);
+                    } catch (ConnectException ex) {
+                        mainCtrl.handleServerNotFound();
+                        return;
+                    }
+
+                    // Update UI
+                    populateTagList(event);
+                });
+            });
+
+            // Set minimum width for label to ensure full visibility
+            label.setMinWidth(Label.USE_PREF_SIZE);
+
+// Set minimum width for edit button to ensure full visibility
+            editButton.setMinWidth(Button.USE_PREF_SIZE);
+
+// Set minimum width for delete button to ensure full visibility
+            deleteButton.setMinWidth(Button.USE_PREF_SIZE);
+
+            // Create an HBox to contain the color box, label, edit button, and delete button
+            HBox tagItem = new HBox(15);
+            tagItem.getChildren().addAll(coloredBox, label, editButton, deleteButton);
+
+            // Add the HBox to the tagList VBox
+            tagList.getChildren().add(tagItem);
         }
     }
+
 
 }
