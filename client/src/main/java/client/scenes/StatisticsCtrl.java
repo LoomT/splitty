@@ -24,7 +24,6 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import org.apache.tomcat.util.security.Escape;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -131,6 +130,10 @@ public class StatisticsCtrl {
         });
     }
 
+    /**
+     * method for handling the back button action
+     * @param event
+     */
     public void handleBackButton(Event event) {
         mainCtrl.goBackToEventPage(event);
     }
@@ -403,6 +406,10 @@ public class StatisticsCtrl {
         return formater.format(amount);
     }
 
+    /**
+     * set the escape shortcut
+     * @param scene
+     */
     public void initializeShortcuts(Scene scene) {
         MainCtrl.checkKey(scene, () -> handleBackButton(event), KeyCode.ESCAPE);
     }

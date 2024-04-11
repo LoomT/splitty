@@ -29,7 +29,6 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
