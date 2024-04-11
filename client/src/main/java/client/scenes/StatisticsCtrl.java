@@ -79,7 +79,16 @@ public class StatisticsCtrl {
     /**
      * initialize method
      */
+    public void initialize() {
+        websocket.on(ADD_TAG, tag -> {
+            populateLegend(event);
+        });
+    }
 
+    /**
+     * populate the legend of the pie-chart
+     * @param event the current event
+     */
     private void populateLegend(Event event) {
         legend.getChildren().clear();
 
@@ -125,9 +134,7 @@ public class StatisticsCtrl {
             initPieChart(event);
             initCost(event);
         });
-        websocket.on(ADD_TAG, tag -> {
-            populateLegend(event);
-        });
+
     }
 
     /**
