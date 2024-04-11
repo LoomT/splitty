@@ -3,7 +3,6 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
 import client.components.EventListItem;
-import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -15,14 +14,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.net.ConnectException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static client.utils.CommonFunctions.lengthListener;
 import static java.lang.String.format;
@@ -81,7 +76,7 @@ public class StartScreenCtrl {
      */
     @FXML
     private void initialize() {
-        languageChoiceBoxInitializer();
+        mainCtrl.initLangChoiceBox(languageChoiceBox);
         joinError.setVisible(false);
         createEventError.setVisible(false);
         code.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -92,67 +87,6 @@ public class StartScreenCtrl {
         });
         lengthListener(title, createEventError, 30,
                 languageConf.get("StartScreen.maxEventNameLength"));
-
-    }
-
-    /**
-     * Initializes the language choice box
-     */
-    private void languageChoiceBoxInitializer() {
-        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
-        languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
-        final String downloadTemplateOption = "Download Template";
-        languageChoiceBox.getItems().add(downloadTemplateOption);
-        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
-        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
-        languageChoiceBox.setOnAction(event -> {
-            String selectedOption = languageChoiceBox.getValue();
-            if (selectedOption.equals(downloadTemplateOption)) {
-
-                downloadTemplate();
-                languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
-            } else {
-
-                languageConf.changeCurrentLocaleTo(selectedOption);
-            }
-        });
-    }
-
-
-    /**
-     * Downloads the template
-     */
-    private void downloadTemplate() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialFileName("template.properties");
-
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("Properties files (*.properties)",
-                        "*.properties");
-        fileChooser.getExtensionFilters().add(extFilter);
-
-        File file = mainCtrl.showSaveFileDialog(fileChooser);
-        if (file == null) {
-
-            return;
-        }
-        ResourceBundle bundle = ResourceBundle.getBundle("languages", Locale.of("template"));
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            List<String> keyList = new ArrayList<>();
-            Enumeration<String> keys = bundle.getKeys();
-            while (keys.hasMoreElements()) {
-                String key = keys.nextElement();
-                keyList.add(key);
-            }
-            keyList.sort(String::compareTo);
-            for (String key : keyList) {
-                writer.write(key + "=" + bundle.getString(key) + "\n");
-            }
-            System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
-        } catch (IOException e) {
-            System.err.println("An error occurred while writing the template file: "
-                    + e.getMessage());
-        }
 
     }
 
