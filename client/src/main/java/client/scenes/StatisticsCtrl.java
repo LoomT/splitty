@@ -10,10 +10,12 @@ import commons.Event;
 import commons.Expense;
 import commons.Tag;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -22,6 +24,7 @@ import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.apache.tomcat.util.security.Escape;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -43,6 +46,8 @@ public class StatisticsCtrl {
     private Button back;
     @FXML
     private VBox legend;
+
+    private Event event;
 
     private final MainCtrlInterface mainCtrl;
     private final Websocket websocket;
@@ -75,8 +80,6 @@ public class StatisticsCtrl {
     /**
      * initialize method
      */
-    public void initialize() {
-    }
 
     private void populateLegend(Event event) {
         legend.getChildren().clear();
@@ -103,11 +106,12 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     public void displayStatisticsPage(Event event) {
+        this.event = event;
         pc.setLegendVisible(false);
         initPieChart(event);
         initCost(event);
         back.setOnAction(e -> {
-            mainCtrl.goBackToEventPage(event);
+            handleBackButton(event);
         });
         websocket.on(ADD_EXPENSE, e -> {
             initPieChart(event);
@@ -122,6 +126,13 @@ public class StatisticsCtrl {
             initPieChart(event);
             initCost(event);
         });
+        websocket.on(ADD_TAG, tag -> {
+            populateLegend(event);
+        });
+    }
+
+    public void handleBackButton(Event event) {
+        mainCtrl.goBackToEventPage(event);
     }
 
     /**
@@ -136,7 +147,7 @@ public class StatisticsCtrl {
             double amount = exp.getAmount();
             try {
                 if(!userConfig.getCurrency().equals("NONE")) {
-                    amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                    amount = converter.convert("USD", userConfig.getCurrency(),
                             amount, exp.getDate().toInstant());
                     totalCost += amount;
                 }
@@ -262,7 +273,7 @@ public class StatisticsCtrl {
             if (expense.getType() == null) {
                 double amount = expense.getAmount();
                 try {
-                    amount = converter.convert(expense.getCurrency(), userConfig.getCurrency(),
+                    amount = converter.convert("USD", userConfig.getCurrency(),
                             amount, expense.getDate().toInstant());
                     costExpensesNoTag += amount;
                 } catch (CurrencyConverter.CurrencyConversionException ignored) {
@@ -323,7 +334,7 @@ public class StatisticsCtrl {
             double amount = exp.getAmount();
             try {
                 if(!userConfig.getCurrency().equals("NONE")) {
-                    amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                    amount = converter.convert("USD", userConfig.getCurrency(),
                             amount, exp.getDate().toInstant());
                 }
 
@@ -390,5 +401,9 @@ public class StatisticsCtrl {
         formater.setMaximumFractionDigits(2);
         formater.setCurrency(Currency.getInstance(currency));
         return formater.format(amount);
+    }
+
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, () -> handleBackButton(event), KeyCode.ESCAPE);
     }
 }

@@ -471,6 +471,7 @@ public class AddExpenseCtrl {
                     }
                 } else {
                     Label noneLabel = new Label("None");
+                    noneLabel.setTextFill(Color.BLACK);
                     setGraphic(noneLabel);
                 }
             }
@@ -497,6 +498,7 @@ public class AddExpenseCtrl {
                     }
                 } else {
                     Label noneLabel = new Label("None");
+                    noneLabel.setTextFill(Color.BLACK);
                     setGraphic(noneLabel);
                 }
             }
