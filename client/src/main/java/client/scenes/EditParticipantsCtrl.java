@@ -22,6 +22,7 @@ import java.util.Optional;
 import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.TITLE_CHANGE;
 import static java.lang.String.format;
+import static java.lang.Thread.sleep;
 
 
 public class EditParticipantsCtrl {
@@ -47,8 +48,6 @@ public class EditParticipantsCtrl {
     private Label warningLabel;
     @FXML
     private Button backButton;
-    @FXML
-    private Label confirmationLabel;
 
     /**
      * @return the event
@@ -98,12 +97,12 @@ public class EditParticipantsCtrl {
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
-        confirmationLabel.setVisible(false);
-        ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
+        warningLabel.setVisible(false);
+        ft = new FadeTransition(Duration.millis(3000), warningLabel);
         ft.setFromValue(1.0);
         ft.setToValue(0);
-        ft.setDelay(Duration.millis(1000));
-        ft.setOnFinished(e -> confirmationLabel.setVisible(false));
+        ft.setDelay(Duration.millis(0));
+        ft.setOnFinished(e -> warningLabel.setVisible(false));
     }
 
     /**
@@ -117,7 +116,6 @@ public class EditParticipantsCtrl {
         System.out.println(e);
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
-
         resetFields();
 
         chooseParticipant.getItems().clear();
@@ -183,7 +181,6 @@ public class EditParticipantsCtrl {
         beneficiaryField.setText("");
         ibanField.setText("");
         bicField.setText("");
-        warningLabel.setVisible(false);
         nameField.setStyle("");
     }
 
@@ -232,6 +229,8 @@ public class EditParticipantsCtrl {
         String iban = ibanField.getText();
         String bic = bicField.getText();
 
+        boolean edited = false;
+
         if (index < 0) return;
         if(name.isEmpty()) {
             warningLabel.setVisible(true);
@@ -248,12 +247,8 @@ public class EditParticipantsCtrl {
             Participant newP = new Participant(name, email, beneficiary, iban, bic);
 
             try {
+
                 server.createParticipant(event.getId(), newP);
-                ft.stop();
-                confirmationLabel.setText(languageConf.get("EditP.createConfirmation"));
-                confirmationLabel.setVisible(true);
-                confirmationLabel.setOpacity(1.0);
-                ft.play();
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
             }
@@ -270,16 +265,25 @@ public class EditParticipantsCtrl {
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
             currP.setBic(bic);
-            ft.stop();
-            confirmationLabel.setText(languageConf.get("EditP.editConfirmation"));
-            confirmationLabel.setVisible(true);
-            confirmationLabel.setOpacity(1.0);
-            ft.play();
+
             try {
                 server.updateParticipant(event.getId(), currP);
+                edited = true;
+
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
             }
+        }
+        if(edited) {
+            warningLabel.setVisible(true);
+            warningLabel.setOpacity(1);
+            warningLabel.setText(languageConf.get("EditP.editConfirmation"));
+            ft.play();
+        }else{
+            warningLabel.setVisible(true);
+            warningLabel.setOpacity(1);
+            warningLabel.setText(languageConf.get("EditP.createConfirmation"));
+            ft.play();
         }
     }
 
