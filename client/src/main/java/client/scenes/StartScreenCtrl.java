@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static client.utils.CommonFunctions.lengthListener;
 import static java.lang.String.format;
