@@ -115,7 +115,7 @@ public class UserConfig {
     }
 
     /**
-     * @param code the 5 letter code of the event to store in the config file
+     * @param code the 5-letter code of the event to store in the config file
      */
     public void setMostRecentEventCode(String code) {
         System.out.println("Writing code " + code);
@@ -191,5 +191,30 @@ public class UserConfig {
      */
     public void onContrastChange(Runnable function) {
         callback = function;
+    }
+
+    public String getUsername(){
+        return (String) configProperties.get("spring.mail.username");
+    }
+
+    public String getMailPassword(){
+        return (String) configProperties.get("spring.mail.password");
+    }
+
+    public String getHost(){
+        return (String) configProperties.get("spring.mail.host");
+    }
+
+    public int getPort(){
+        return Integer.parseInt((String)configProperties.get("spring.mail.port"));
+    }
+
+    public Properties getMailProperties(){
+        Properties result = new Properties();
+        result.setProperty("mail.smtp.auth",
+                configProperties.getProperty("mail.smtp.auth"));
+        result.setProperty("mail.smtp.starttls.enable",
+                configProperties.getProperty("mail.smtp.starttls.enable"));
+        return result;
     }
 }

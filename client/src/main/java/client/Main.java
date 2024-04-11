@@ -49,7 +49,6 @@ public class Main extends Application {
      * @param primaryStage stage
      */
     @Override
-
     public void start(Stage primaryStage) {
         languageConf.onLanguageChange(() -> {
             // When the language is changed, this function is run
