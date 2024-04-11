@@ -4,6 +4,7 @@ import client.MockClass.MainCtrlInterface;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
+import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -207,4 +208,19 @@ public class TestMainCtrl implements MainCtrlInterface {
     public void showAddCustomTransaction(Event event) {
         scenes.add("AddCustomTransaction");
     }
+
+    /**
+     * @param languageChoiceBox method for initializing the language switcher
+     */
+    @Override
+    public void initLangChoiceBox(ComboBox<String> languageChoiceBox){
+        scenes.add("initLangChoiceBox");
+    }
+
+
+    /**
+     * @param  page boolean to indicate the startPage (true) or the eventPage (false)
+     */
+    @Override
+    public void setStartPage(boolean page){scenes.add("setStartPage");}
 }

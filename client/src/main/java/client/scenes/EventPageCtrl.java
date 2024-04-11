@@ -74,6 +74,8 @@ public class EventPageCtrl {
     private Label copiedToClipboardMsg;
     @FXML
     private Button editTitleButton;
+    @FXML
+    private ComboBox<String> languageChoiceBoxEvent;
 
     private FadeTransition ft;
     private int selectedParticipantId;
@@ -184,6 +186,8 @@ public class EventPageCtrl {
      * Runs once after the fxml is loaded
      */
     public void initialize() {
+        mainCtrl.initLangChoiceBox(languageChoiceBoxEvent);
+
         ft = new FadeTransition(Duration.millis(2000), copiedToClipboardMsg);
         ft.setFromValue(1.0);
         ft.setToValue(0);
@@ -271,6 +275,7 @@ public class EventPageCtrl {
     @FXML
     private void backButtonClicked() {
         websocket.disconnect();
+        mainCtrl.setStartPage(true);
         mainCtrl.showStartScreen();
     }
 

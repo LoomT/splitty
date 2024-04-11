@@ -108,6 +108,7 @@
             </ScrollPane>
          </children>
       </VBox>
+      <ComboBox fx:id="languageChoiceBoxEvent" prefWidth="70.0" styleClass="sbutton" layoutX="510" layoutY="78" />
       <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
    </children>
    <stylesheets>

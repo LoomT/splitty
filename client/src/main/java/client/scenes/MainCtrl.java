@@ -16,6 +16,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -25,15 +26,19 @@ import commons.Expense;
 import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.*;
 
 public class MainCtrl implements MainCtrlInterface{
 
@@ -75,6 +80,9 @@ public class MainCtrl implements MainCtrlInterface{
 
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
     private Scene addCustomTransaction;
+
+    private boolean startPage = true;
+    private Event event;
 
 
     /**
@@ -137,9 +145,12 @@ public class MainCtrl implements MainCtrlInterface{
         this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
 
         initializeShortcuts();
-        showStartScreen();
+        if(startPage){
+            showStartScreen();
+        } else {
+            showEventPage(event);
+        }
         primaryStage.show();
-
     }
 
     /**
@@ -250,6 +261,8 @@ public class MainCtrl implements MainCtrlInterface{
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
+        startPage = false;
+        this.event = eventToShow;
         primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
@@ -423,4 +436,74 @@ public class MainCtrl implements MainCtrlInterface{
         stage.initOwner(primaryStage);
         stage.show();
     }
+
+    /**
+     * @param languageChoiceBox method to initialize the language switcher
+     */
+    public void initLangChoiceBox(ComboBox<String> languageChoiceBox){
+        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+        final String downloadTemplateOption = "Download Template";
+        if(languageChoiceBox.getItems().isEmpty()) {
+            languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+            languageChoiceBox.getItems().add(downloadTemplateOption);
+        }
+        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
+        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
+        languageChoiceBox.setOnAction(event -> {
+            String selectedOption = languageChoiceBox.getValue();
+            if (selectedOption.equals(downloadTemplateOption)) {
+
+                downloadTemplate();
+                languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+            } else {
+
+                languageConf.changeCurrentLocaleTo(selectedOption);
+            }
+        });
+    }
+
+    /**
+     * @param  page boolean for the startPage (true) or the eventPage (false)
+     */
+    public void setStartPage(boolean page) {this.startPage = page;}
+
+    /**
+     *
+     * Downloads the template
+     */
+    private void downloadTemplate() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("template.properties");
+
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Properties files (*.properties)",
+                        "*.properties");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = showSaveFileDialog(fileChooser);
+        if (file == null) {
+
+            return;
+        }
+        ResourceBundle bundle = ResourceBundle.getBundle("languages", Locale.of("template"));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            List<String> keyList = new ArrayList<>();
+            Enumeration<String> keys = bundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                keyList.add(key);
+            }
+            keyList.sort(String::compareTo);
+            for (String key : keyList) {
+                writer.write(key + "=" + bundle.getString(key) + "\n");
+            }
+            System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing the template file: "
+                    + e.getMessage());
+        }
+
+    }
+
+
 }

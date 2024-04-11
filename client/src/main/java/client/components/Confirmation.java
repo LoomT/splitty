@@ -25,6 +25,7 @@ public class Confirmation {
         alert.setTitle(languageConf.get("Confirmation.confirmation"));
         ((Button) alert.getDialogPane().lookupButton(ButtonType.YES))
                 .setText(languageConf.get("yes"));
+        alert.getDialogPane().lookupButton(ButtonType.YES).setId("#yesButton");
         ((Button) alert.getDialogPane().lookupButton(ButtonType.CANCEL))
                 .setText(languageConf.get("cancel"));
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
