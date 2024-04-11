@@ -80,7 +80,7 @@
                         <Insets left="10.0" right="10.0" />
                      </HBox.margin>
                   </Button>
-                  <Button fx:id="debtsPageButton" layoutX="180.0" layoutY="15.0" mnemonicParsing="false" onAction="#openDebtsPage" prefHeight="26.0" prefWidth="100.0" styleClass="sbutton" text="%EventPage.openDebts" />
+                  <Button fx:id="debtsPageButton" mnemonicParsing="false" onAction="#openDebtsPage" styleClass="sbutton" text="%EventPage.openDebts" />
                </children>
                <padding>
                   <Insets bottom="10.0" top="5.0" />
