@@ -34,6 +34,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
     private final EmailService emailService;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
+    private int size;
 
 
     /**
@@ -93,6 +94,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
         String text = String.format(template, transaction.getGiver().getName(),
                 transaction.getReceiver().getName(), formattedAmount);
         participantLabel.setText(text);
+        size = detailContainer.getChildren().size();
     }
 
     /**
@@ -176,9 +178,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
         try {
             convertedAmount = converter.convert("USD", transaction.getCurrency(),
                     transaction.getAmount(), transaction.getDate().toInstant());
-        } catch (CurrencyConverter.CurrencyConversionException e) {
-            throw new RuntimeException(e);
-        } catch (ConnectException e) {
+        } catch (CurrencyConverter.CurrencyConversionException | ConnectException e) {
             throw new RuntimeException(e);
         }
 
@@ -189,12 +189,20 @@ public class ExpandedOpenDebtsListItem extends HBox {
         body = String.format(body, formattedAmount,
                 transaction.getReceiver().getName());
 
-        if (emailService != null && emailService.isValid()
-                && transaction.getReceiver().getEmailAddress() != null
-                && !transaction.getReceiver().getEmailAddress().isEmpty()) {
-            emailService.sendEmail(transaction.getReceiver().getEmailAddress(),
-                    subject,
-                    body);
-        } else System.out.println("Email couldn't be sent");
+        boolean status = emailService.sendEmail(transaction.getReceiver().getEmailAddress(),
+                subject, body);
+        Label label;
+        if(status){
+            System.out.println("Email successful");
+            label = new Label(languageConf.get("ExpandedOpenDebtsListItem.reminderSuccessful"));
+            label.getStyleClass().add("textFont");
+        } else{
+            System.out.println("Email couldn't be sent");
+            label = new Label(languageConf.get("ExpandedOpenDebtsListItem.reminderFailed"));
+            label.getStyleClass().add("textFont");
+        }
+        if(detailContainer.getChildren().size() > size)
+            detailContainer.getChildren().removeLast();
+        detailContainer.getChildren().add(size, label);
     }
 }

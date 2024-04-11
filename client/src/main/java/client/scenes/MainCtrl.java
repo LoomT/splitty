@@ -252,10 +252,10 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setScene(inviteMail);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.initModality(Modality.APPLICATION_MODAL);
-        stage.setTitle(languageConf.get("InviteMail.pageTitle"));
+        stage.setTitle(languageConf.get("InviteMail.title"));
         stage.setResizable(false);
         stage.initOwner(primaryStage);
-        editTitleCtrl.displayEditEventTitle(event, stage);
+        inviteMailCtrl.ShowInviteMail(event, stage);
         stage.show();
     }
 

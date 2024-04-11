@@ -571,6 +571,6 @@ public class EventPageCtrl {
 
     @FXML
     public void sendInvite(){
-
+        mainCtrl.showInviteMail(event);
     }
 }

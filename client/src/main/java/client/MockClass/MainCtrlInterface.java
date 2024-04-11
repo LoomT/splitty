@@ -135,4 +135,10 @@ public interface MainCtrlInterface {
      * @param  page boolean for the startPage (true) or the eventPage (false)
      */
     void setStartPage(boolean page);
+
+    /**
+     * shows the invite page for the event
+     * @param event event to send invite to
+     */
+    void showInviteMail(Event event);
 }

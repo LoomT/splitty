@@ -14,13 +14,11 @@ public class EmailService {
     private String fromEmail;
     private JavaMailSenderImpl mailSender;
     private final UserConfig userConfig;
-    private boolean valid;
 
     @Inject
     public EmailService(UserConfig userConfig){
         this.userConfig = userConfig;
         initializeMailSender();
-        valid = checkInitialization();
     }
 
     public void initializeMailSender(){
@@ -37,12 +35,11 @@ public class EmailService {
 
     public boolean checkInitialization(){
         if(fromEmail == null || fromEmail.isEmpty()) return false;
-        if(mailSender == null) return false;
-        return mailSender.getHost() != null && !mailSender.getHost().isEmpty();
+        return mailSender == null;
     }
 
-    public void sendEmail(String toEmail, String subject, String body){
-
+    public boolean sendEmail(String toEmail, String subject, String body){
+        if(checkInitialization()) return false;
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -53,15 +50,16 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setText(body);
         } catch (MessagingException e) {
-            throw new RuntimeException(e);
+            return false;
         }
 
         mailSender.send(mimeMessage);
         System.out.println("Email Sent");
+        return true;
     }
 
     public boolean sendTestEmail(){
-
+        if(checkInitialization()) return false;
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -77,13 +75,5 @@ public class EmailService {
         mailSender.send(mimeMessage);
         System.out.println("Test Email Sent");
         return true;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void setFromEmail(){
-        valid = true;
     }
 }

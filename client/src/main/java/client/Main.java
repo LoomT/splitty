@@ -114,6 +114,10 @@ public class Main extends Application {
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "OpenDebtsPage.fxml"
         );
+        var inviteMailPage = FXML.load(InviteMailCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "InviteMail.fxml"
+        );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
@@ -121,7 +125,7 @@ public class Main extends Application {
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, titleChanger, addTag, options,
-                addCustomTransaction, openDebtsPage)
+                addCustomTransaction, openDebtsPage, inviteMailPage)
         );
     }
 }
