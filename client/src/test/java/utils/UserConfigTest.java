@@ -16,7 +16,7 @@ class UserConfigTest {
     @BeforeEach
     void setUp() throws IOException {
         IO = new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes=hello,there""");
         userConfig = new UserConfig(IO);
@@ -35,7 +35,7 @@ class UserConfigTest {
      */
     @Test
     void getUrl() {
-        assertEquals("http://localhost:8080/", userConfig.getUrl());
+        assertEquals("localhost:8080", userConfig.getUrl());
     }
 
     /**

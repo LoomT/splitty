@@ -29,12 +29,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ResourceBundle;
 
+import static client.utils.CommonFunctions.getHighContrastEffect;
+
 public class MyFXML {
 
-    private Injector injector;
+    private final Injector injector;
 
     /**
-     * @param injector
+     * @param injector injector of the app
      */
     public MyFXML(Injector injector) {
         this.injector = injector;
@@ -45,15 +47,20 @@ public class MyFXML {
      *
      * @param c unused obj
      * @param resources the resources for the module
+     * @param isHighContrast for enabling high contrast
      * @param parts path parts
      * @param <T> class
      * @return fxml controller and scene pair
      */
-    public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources, String... parts) {
+    public <T> Pair<T, Parent> load(Class<T> c, ResourceBundle resources,
+                                    boolean isHighContrast, String... parts) {
         try {
             var loader = new FXMLLoader(getLocation(parts), resources, null,
                     new MyFactory(), StandardCharsets.UTF_8);
             Parent parent = loader.load();
+
+            if (isHighContrast) parent.setEffect(getHighContrastEffect());
+
             T ctrl = loader.getController();
             return new Pair<>(ctrl, parent);
         } catch (IOException e) {

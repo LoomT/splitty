@@ -1,9 +1,6 @@
 package client.utils;
 
-import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.Tag;
+import commons.*;
 
 import java.net.ConnectException;
 import java.util.List;
@@ -142,6 +139,18 @@ public interface ServerUtils {
     int updateEventTitle(Event event) throws ConnectException;
 
     /**
+     * @param eventID event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    int addTransaction(String eventID, Transaction transaction) throws ConnectException;
+
+    /**
+     * @param transaction transaction to remove
+     * @return status code
+     */
+    int removeTransaction(Transaction transaction) throws ConnectException;
+    /**
      * send an API call to add a tag
      * @param eventID event id
      * @param tag tag to add
@@ -154,5 +163,14 @@ public interface ServerUtils {
      * @return map of the exchange rates
      */
     Map<String, Double> getExchangeRates(String date) throws ConnectException;
+
+    /**
+     * Pings the server to check if the url is correct
+     *
+     * @param url url to check
+     * @return true if server responds
+     */
+    boolean ping(String url);
+
 }
 

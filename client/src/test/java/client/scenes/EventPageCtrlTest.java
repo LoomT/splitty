@@ -25,6 +25,7 @@ import utils.TestServerUtils;
 import utils.TestWebsocket;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,7 @@ public class EventPageCtrlTest {
     TestServerUtils server;
     FileManagerMock fileManager;
     TestWebsocket websocket;
+    CurrencyConverter converter;
 
     @Start
     public void start(Stage stage) throws IOException {
@@ -48,18 +50,19 @@ public class EventPageCtrlTest {
         fileManager = new FileManagerMock();
 
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes=
                 currency=EUR"""));
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
-        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig, null);
+        MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);
+        converter = new CurrencyConverter(server, fileManager, languageConf);
 
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,
                 (type) -> new EventPageCtrl(mainCtrl, languageConf, websocket, server,
-                        new CurrencyConverter(server, fileManager, languageConf), userConfig),
+                        converter, userConfig),
                 StandardCharsets.UTF_8);
         Scene scene = new Scene(eventPageLoader.load());
         ctrl = eventPageLoader.getController();
@@ -103,9 +106,11 @@ public class EventPageCtrlTest {
     }
 
     @Test
-    public void toStringText(FxRobot robot) throws ParseException {
+    public void toStringText(FxRobot robot) throws ParseException, CurrencyConverter.CurrencyConversionException, ConnectException {
         Participant p = new Participant("name");
-        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), "food");
+        double amount = converter.convert("EUR", "USD", 20,
+                new SimpleDateFormat("MM/dd/yy").parse("01/02/2024").toInstant());
+        Expense ex = new Expense(p, "expense", amount, "EUR", List.of(p), "food");
         ex.setDate(new SimpleDateFormat("MM/dd/yy").parse("01/02/2024"));
         assertEquals("2024-01-02     name paid \u20ac20.00 for expense", ctrl.toString(ex));
         assertTrue(server.getCalls().contains("getExchangeRates"));

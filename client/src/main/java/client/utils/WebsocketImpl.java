@@ -21,8 +21,8 @@ public class WebsocketImpl implements Websocket {
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private final String url;
-    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
+    private final UserConfig userConfig;
 
     /**
      * Websocket client constructor
@@ -40,7 +40,7 @@ public class WebsocketImpl implements Websocket {
                 new StringMessageConverter());
         stompClient.setMessageConverter(new CompositeMessageConverter(converterList));
 
-        this.url = "ws:" + config.getUrl() + "ws";
+        this.userConfig = config;
         sessionHandler = new client.utils.WebsocketImpl.MyStompSessionHandler();
     }
 
@@ -53,7 +53,8 @@ public class WebsocketImpl implements Websocket {
     public void connect(String eventID) {
         if (stompSession != null && stompSession.isConnected()) return;
         try {
-            stompSession = stompClient.connectAsync(url, sessionHandler).get();
+            stompSession = stompClient.connectAsync(
+                    "ws://" + userConfig.getUrl() + "/ws", sessionHandler).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Could not connect to server", e);
         }
@@ -72,17 +73,6 @@ public class WebsocketImpl implements Websocket {
 
     /**
      * Sets the function for provided name
-     * <pre>
-     * available functions:
-     * titleChange(String)
-     * deleteEvent()
-     * addParticipant(Participant)
-     * updateParticipant(Participant)
-     * removeParticipant(id)
-     * addExpense(Expense)
-     * updateExpense(Expense)
-     * removeExpense(id)
-     * </pre>
      *
      * @param action   enum name of the function
      * @param consumer function that consumes type of payload and payload in that order
@@ -231,15 +221,14 @@ public class WebsocketImpl implements Websocket {
      */
     @Override
     public void resetAction(WebsocketActions action) {
-        functions.put(action, new HashSet<>());
+        functions.put(action, new ArrayList<>());
     }
 
     /**
      * Resets all action listeners
      * DO NOT USE THIS, WILL BREAK SOME LISTENERS
      */
-    @Override
-    public void resetAllActions() {
+    private void resetAllActions() {
         EnumSet.allOf(WebsocketActions.class).forEach(this::resetAction);
     }
 
@@ -249,7 +238,7 @@ public class WebsocketImpl implements Websocket {
      * @param expense expense for which participants to link
      * @param participants participant list from event
      */
-    public void linkExpenseParticipants(Expense expense, List<Participant> participants) {
+    private void linkExpenseParticipants(Expense expense, List<Participant> participants) {
         expense.setExpenseAuthor(participants.stream()
                 .filter(p -> p.getId() == expense.getExpenseAuthor().getId())
                 .findFirst().orElseThrow());
@@ -264,6 +253,7 @@ public class WebsocketImpl implements Websocket {
                 "commons.Event", Event.class,
                 "commons.Participant", Participant.class,
                 "commons.Expense", Expense.class,
+                "commons.Transaction", Transaction.class,
                 "java.lang.String", String.class,
                 "java.lang.Long", Long.class,
                 "commons.Tag", Tag.class));

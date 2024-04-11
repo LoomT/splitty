@@ -11,7 +11,9 @@ import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -70,6 +72,7 @@ public class AddExpenseCtrl {
     @FXML
     private Label warningLabel;
 
+    private Event event;
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
     private final Websocket websocket;
@@ -134,6 +137,7 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+        this.event = event;
         warningLabel.setVisible(false);
         blockDate();
         setupDateListener();
@@ -359,9 +363,20 @@ public class AddExpenseCtrl {
                     .findFirst().orElseThrow();
 
             String expCurrency = currency.getValue().toString();
+            double convertedAmount;
+            try {
+                convertedAmount = converter.convert(expCurrency, "USD",
+                        expAmount, expenseDate.toInstant());
+            } catch (CurrencyConverter.CurrencyConversionException e) {
+                mainCtrl.goBackToEventPage(ev);
+                return null;
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+                return null;
+            }
 
             String expType = type.getValue();
-            Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+            Expense expense = new Expense(selectedParticipant, expPurpose, convertedAmount,
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
             return expense;
@@ -583,10 +598,22 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the amountText field
-     * @param amountText
+     * @param num amount
+     * @param date date
+     * @param currency currency
      */
-    public void setAmount(String amountText) {
-        amount.setText(amountText);
+    public void setAmount(double num, Date date, String currency) {
+        double convertedAmount;
+        try {
+            convertedAmount = converter.convert("USD", currency,
+                    num, date.toInstant());
+        } catch (CurrencyConverter.CurrencyConversionException e) {
+            return;
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
+        amount.setText(String.format("%1$,.2f", convertedAmount));
     }
 
     /**
@@ -594,7 +621,8 @@ public class AddExpenseCtrl {
      * @param currencyText
      */
     public void setCurrency(String currencyText) {
-        currency.setValue(new CommonFunctions.HideableItem<>(currencyText.toUpperCase()));
+        currency.setValue(currency.getItems().stream()
+                .filter(h -> h.toString().equals(currencyText)).findFirst().orElse(null));
     }
 
     /**
@@ -651,5 +679,20 @@ public class AddExpenseCtrl {
                 }
             }
         }
+    }
+
+    /**
+     * Initializes the shortcuts for AddExpense:
+     *      Escape: go back
+     *      Enter: shows currency and type choiceBox
+     *      Shift: shows datePicker
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, () -> handleAbortButton(event), KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.expenseAuthor.show(), expenseAuthor, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.currency.show(), currency, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.type.show(), type, KeyCode.ENTER);
+        MainCtrl.checkKey(scene, () -> this.date.show(), date, KeyCode.SHIFT);
     }
 }

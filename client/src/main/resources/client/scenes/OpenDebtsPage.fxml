@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<?import java.lang.String?>
+<?import java.net.URL?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.OpenDebtsPageCtrl">
+   <children>
+      <HBox prefWidth="600.0" styleClass="navbar">
+         <children>
+            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="%OpenDebts.title">
+               <font>
+                  <Font name="System Bold" size="36.0" />
+               </font>
+            </Text>
+            <Region prefHeight="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+            <BorderPane prefHeight="0.0" prefWidth="176.0">
+               <right>
+                  <Button mnemonicParsing="false" onAction="#addCustomTransactionClicked" styleClass="sbutton" text="%OpenDebts.addCustomTransactionBtn" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+      </HBox>
+      <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%OpenDebts.backButton" />
+      <VBox layoutX="118.0" layoutY="80.0" prefHeight="289.0" prefWidth="383.0" styleClass="container">
+         <children>
+            <HBox prefHeight="45.0" prefWidth="363.0" styleClass="tabHeader">
+               <children>
+                  <Button fx:id="openDebtsBtn" mnemonicParsing="false" onAction="#openDebtsClicked" text="%OpenDebts.openDebts">
+                     <styleClass>
+                        <String fx:value="tabButton" />
+                        <String fx:value="selectedTabButton" />
+                     </styleClass>
+                  </Button>
+                  <Button fx:id="settledDebtsBtn" mnemonicParsing="false" onAction="#settledDebtsClicked" styleClass="tabButton" text="%OpenDebts.settledDebts">
+                     <HBox.margin>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" prefHeight="276.0" styleClass="expenseVBox">
+               <content>
+                  <VBox fx:id="allDebtsPane" minWidth="-Infinity" />
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </children>
+   <stylesheets>
+      <URL value="@/client/scenes/global.css" />
+   </stylesheets>
+</AnchorPane>

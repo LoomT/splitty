@@ -75,9 +75,4 @@ public interface Websocket {
      * @param action websocket action to reset all listeners for
      */
     void resetAction(WebsocketActions action);
-
-    /**
-     * Resets all action listeners
-     */
-    void resetAllActions();
 }

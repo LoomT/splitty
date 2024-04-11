@@ -38,11 +38,12 @@
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin></Button>
-                    <ComboBox fx:id="currencyChoiceBox" prefWidth="70.0" styleClass="sbutton">
-                     <HBox.margin>
-                        <Insets right="10.0" />
-                     </HBox.margin></ComboBox>
                   <ComboBox fx:id="languageChoiceBox" prefWidth="70.0" styleClass="sbutton" />
+                  <Button mnemonicParsing="false" onAction="#optionsClicked" styleClass="sbutton" text="⚙">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Button>
                </children>
             </HBox>
          </children>
@@ -92,6 +93,6 @@
       </VBox>
     </children>
     <stylesheets>
-        <URL value="@client/scenes/global.css" />
+        <URL value="@/client/scenes/global.css" />
     </stylesheets>
 </AnchorPane>

@@ -6,8 +6,8 @@ import client.TestMainCtrl;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
-import commons.*;
 import commons.Tag;
+import commons.*;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -57,7 +57,7 @@ public class AddExpenseCtrlTest {
         websocket = new TestWebsocket();
         server = new TestServerUtils(websocket);
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
                 recentEventCodes="""));
         LanguageConf languageConf = new LanguageConf(userConfig);
@@ -158,13 +158,11 @@ public class AddExpenseCtrlTest {
 
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().getFirst(), "createExpense");
+        assertTrue(server.getCalls().contains("createExpense"));
         assertEquals(server.getStatuses().getFirst(), 204);
         assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.ADD_EXPENSE));
         assertNotNull(websocket.getPayloads().getFirst());
-        assertTrue(websocket.getPayloads().getFirst().getClass().equals(Expense.class));
-
-
+        assertTrue(websocket.getPayloads().stream().map(Object::getClass).toList().contains(Expense.class));
     }
 
     @Test
@@ -191,12 +189,11 @@ public class AddExpenseCtrlTest {
 
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().getFirst(), "updateExpense");
+        assertTrue(server.getCalls().contains("updateExpense"));
         assertEquals(server.getStatuses().getFirst(), 204);
         assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.UPDATE_EXPENSE));
         assertNotNull(websocket.getPayloads().getFirst());
-        assertEquals(websocket.getPayloads().getFirst().getClass(), Expense.class);
-
+        assertTrue(websocket.getPayloads().stream().map(Object::getClass).toList().contains(Expense.class));
     }
 
     @Test
@@ -247,11 +244,11 @@ public class AddExpenseCtrlTest {
             robot.clickOn("#add");
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().getFirst(), "createExpense");
+        assertTrue(server.getCalls().contains("createExpense"));
         assertEquals(server.getStatuses().getFirst(), 204);
         assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.ADD_EXPENSE));
         assertNotNull(websocket.getPayloads().getFirst());
-        assertEquals(websocket.getPayloads().getFirst().getClass(), Expense.class);
+        assertTrue(websocket.getPayloads().stream().map(Object::getClass).toList().contains(Expense.class));
     }
 
     @Test

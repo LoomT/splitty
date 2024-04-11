@@ -15,9 +15,8 @@
  */
 package client;
 
+import client.scenes.*;
 import client.MockClass.MainCtrlInterface;
-import client.scenes.MainCtrl;
-import client.scenes.StartScreenCtrl;
 import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import client.utils.currency.FileManager;
@@ -37,6 +36,12 @@ public class MyModule implements Module {
     public void configure(Binder binder) {
         binder.bind(MainCtrlInterface.class).to(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AddCustomTransactionCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AddExpenseCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AdminLoginCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EditParticipantsCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EditTitleCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(EventPageCtrl.class).in(Scopes.SINGLETON);
         binder.bind(UserConfig.class).in(Scopes.SINGLETON);
         binder.bind(ServerUtils.class).to(ServerUtilsImpl.class).in(Scopes.SINGLETON);
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
