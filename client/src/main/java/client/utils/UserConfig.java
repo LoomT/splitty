@@ -115,7 +115,31 @@ public class UserConfig {
     }
 
     /**
-     * @param code the 5 letter code of the event to store in the config file
+     * Deletes the event code from the list of recent event codes
+     *
+     * @param code the 5-letter code of the event to delete from the config file
+     */
+    public void deleteEventCode(String code) {
+        List<String> currentCodes = getRecentEventCodes();
+        currentCodes.remove(code);
+        StringBuilder strToWrite = new StringBuilder();
+        for (int i = 0; i < currentCodes.size(); i++) {
+            String curr = currentCodes.get(i);
+            strToWrite.append(curr);
+            if (i < currentCodes.size() - 1) {
+                strToWrite.append(",");
+            }
+        }
+        configProperties.setProperty("recentEventCodes", strToWrite.toString());
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Deleted the following event code: " + code);
+        } catch (Exception e) {
+            System.out.println("Something went wrong while writing to the config file.");
+        }
+    }
+
+    /**
+     * @param code the 5-letter code of the event to store in the config file
      */
     public void setMostRecentEventCode(String code) {
         System.out.println("Writing code " + code);

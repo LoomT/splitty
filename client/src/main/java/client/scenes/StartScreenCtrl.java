@@ -190,6 +190,7 @@ public class StartScreenCtrl {
                                         list.get(
                                         recentEventCodes.indexOf(
                                                 eventCode)));
+                                userConfig.deleteEventCode(eventCode);
                             }
                         },
                         (String c) -> {
