@@ -129,6 +129,7 @@ public class TagPageCtrl {
                                     // Remove the HBox (which contains both the tag and delete button) from the VBox
                                     tagList.getChildren().remove(hBox);
                                     try {
+                                        //event.getTags().remove(tag);
                                         server.deleteTag(tag.getId(), event.getId());
                                     } catch (ConnectException ex) {
                                         mainCtrl.handleServerNotFound();

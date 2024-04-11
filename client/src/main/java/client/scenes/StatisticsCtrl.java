@@ -86,20 +86,23 @@ public class StatisticsCtrl {
      * initialize method
      */
     public void initialize() {
+        if (!pc.getData().isEmpty()) {
+            pc.getData().clear();
+        }
     }
 
-    private void populateLegend() {
+    private void populateLegend(Event event) {
+
         legend.getChildren().clear();
 
-        for (PieChart.Data data : pc.getData()) {
-            String[] lines = data.getName().split("\n");
-            String tagName = lines[0];
+        for (Tag tag : event.getTags()) {
+            String tagName = tag.getName();
             if (!tagName.equals("No tag")) {
                 Label label = new Label(tagName);
                 label.setFont(Font.font("Arial", FontWeight.NORMAL, 12));
 
                 Shape coloredBox = new Rectangle(10, 10);
-                coloredBox.setFill(Color.web(data.getNode().getStyle().split(": ")[1]));
+                coloredBox.setFill(Color.web(tag.getColor()));
 
                 HBox legendItem = new HBox(10);
                 legendItem.getChildren().addAll(coloredBox, label);
@@ -114,6 +117,9 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     public void displayStatisticsPage(Event event) {
+        if (!pc.getData().isEmpty()) {
+            pc.getData().clear();
+        }
         pc.setLegendVisible(false);
         initPieChart(event);
         initCost(event);
@@ -165,7 +171,7 @@ public class StatisticsCtrl {
         double totalCost = initCost(event);
         updateTagsPieChart(event, totalCost);
         updateNoTagPieChart(event, totalCost);
-        populateLegend();
+        populateLegend(event);
     }
 
     /**
