@@ -47,9 +47,11 @@ public class CurrencyConverter {
      * @param amount amount of from currency
      * @param time date at which to convert
      * @return converted amount
+     * @throws CurrencyConversionException the method will throw its own error pop-up
+     * @throws ConnectException if server is unavailable
      */
     public double convert(String from, String to, double amount, Instant time)
-            throws IOException {
+            throws CurrencyConversionException, ConnectException {
         try {
             String date = DateTimeFormatter.ISO_DATE
                     .format(time.atZone(ZoneOffset.UTC).toLocalDate());
@@ -57,12 +59,16 @@ public class CurrencyConverter {
             if(rates == null) {
                 rates = server.getExchangeRates(date); // fetch rates from server
                 if(rates.containsKey("status")) {
-                    System.out.println("status: " + rates.get("status"));
-                    return 0;
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            languageConf.get("Currency.IOError"));
+                    alert.setHeaderText(languageConf.get("unexpectedError"));
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                    alert.showAndWait();
+                    throw new CurrencyConversionException("Server error: " + rates.get("status"));
                 }
                 fileManager.add(rates, date); // cache the rates
             }
-            return amount / rates.get(from.toUpperCase()) * rates.get(to.toUpperCase());
+            return amount * (rates.get(to.toUpperCase()) / rates.get(from.toUpperCase()));
         } catch (ConnectException e) {
             throw e;
         } catch (IOException e) {
@@ -71,14 +77,28 @@ public class CurrencyConverter {
             alert.setHeaderText(languageConf.get("unexpectedError"));
             java.awt.Toolkit.getDefaultToolkit().beep();
             alert.showAndWait();
-            throw e;
+            throw new CurrencyConversionException("IO error");
         }
     }
+
+
 
     /**
      * @return get a set of
      */
     public List<String> getCurrencies() {
         return currencies;
+    }
+
+    /**
+     * Custom exception for currency conversion errors
+     */
+    public static class CurrencyConversionException extends Exception {
+        /**
+         * @param message  message
+         */
+        public CurrencyConversionException(String message) {
+            super(message);
+        }
     }
 }

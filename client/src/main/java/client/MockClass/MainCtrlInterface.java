@@ -114,6 +114,18 @@ public interface MainCtrlInterface {
     void openOptions();
 
     /**
+     * shows openDebts Page
+     * @param event event linked to the page
+     */
+    void showDebtsPage(Event event);
+
+    /**
+     * Shows addCustomTransaction scene
+     * @param event event customTransaction is connected to
+     */
+    void showAddCustomTransaction(Event event);
+
+    /**
      * @param languageChoiceBox method for initializing the language switcher
      */
     void initLangChoiceBox(ComboBox<String> languageChoiceBox);

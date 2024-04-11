@@ -47,6 +47,7 @@ public class MainCtrl implements MainCtrlInterface{
     private final Websocket websocket;
 
     private Stage primaryStage;
+
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
 
@@ -62,6 +63,9 @@ public class MainCtrl implements MainCtrlInterface{
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
 
+    private OpenDebtsPageCtrl openDebtsPageCtrl;
+    private Scene openDebtsPage;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
@@ -70,8 +74,12 @@ public class MainCtrl implements MainCtrlInterface{
 
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
+
     private OptionsCtrl optionsCtrl;
     private Scene options;
+
+    private AddCustomTransactionCtrl addCustomTransactionCtrl;
+    private Scene addCustomTransaction;
 
     private boolean startPage = true;
     private Event event;
@@ -112,6 +120,8 @@ public class MainCtrl implements MainCtrlInterface{
         this.eventPageCtrl = pairCollector.eventPage().getKey();
         this.eventPage = new Scene(pairCollector.eventPage().getValue());
 
+        this.openDebtsPageCtrl = pairCollector.openDebtsPage().getKey();
+        this.openDebtsPage = new Scene(pairCollector.openDebtsPage().getValue());
 
         this.editParticipantsCtrl = pairCollector.editParticipantsPage().getKey();
         this.editParticipants = new Scene(pairCollector.editParticipantsPage().getValue());
@@ -130,6 +140,9 @@ public class MainCtrl implements MainCtrlInterface{
 
         this.optionsCtrl = pairCollector.options().getKey();
         this.options = new Scene(pairCollector.options().getValue());
+
+        this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
+        this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
 
         initializeShortcuts();
         if(startPage){
@@ -153,6 +166,8 @@ public class MainCtrl implements MainCtrlInterface{
         adminOverviewCtrl.initializeShortcuts(adminOverview);
         editTitleCtrl.initializeShortcuts(titleChanger);
         optionsCtrl.initializeShortcuts(options);
+        openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
+        addCustomTransactionCtrl.initializeShortcuts(addCustomTransaction);
     }
 
     /**
@@ -260,6 +275,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -321,7 +337,6 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
-        primaryStage.setResizable(false);
     }
 
     /**
@@ -356,7 +371,8 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
         addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
         addExpenseCtrl.setPurpose(exp.getPurpose());
-        addExpenseCtrl.setAmount(Double.toString(exp.getAmount()));
+
+        addExpenseCtrl.setAmount(exp.getAmount(), exp.getDate(), exp.getCurrency());
         addExpenseCtrl.setCurrency(exp.getCurrency());
         addExpenseCtrl.setDate(exp.getDate().toInstant().
                 atZone(ZoneId.systemDefault()).toLocalDate());
@@ -391,6 +407,34 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setResizable(false);
         stage.initOwner(primaryStage);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.show();
+    }
+
+    /**
+     * Shows the open debts page
+     * @param eventToShow the event to show the open debts for
+     */
+    @Override
+    public void showDebtsPage(Event eventToShow) {
+        openDebtsPageCtrl.registerWS();
+        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+        primaryStage.setTitle(languageConf.get("OpenDebts.title"));
+        primaryStage.setScene(openDebtsPage);
+    }
+
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
+    @Override
+    public void showAddCustomTransaction(Event event) {
+        Stage stage = new Stage();
+        stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));
+        addCustomTransactionCtrl.display(event, stage);
+        stage.setScene(addCustomTransaction);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(primaryStage);
         stage.show();
     }
 
