@@ -29,7 +29,6 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
@@ -447,15 +446,10 @@ public class EventPageCtrl {
                 currency = userConfig.getCurrency().toUpperCase();
             }
 
+        } catch (CurrencyConverter.CurrencyConversionException ignored) {
         } catch (ConnectException e) {
             mainCtrl.handleServerNotFound();
-            return "connection issue";
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    languageConf.get("Currency.IOError"));
-            alert.setHeaderText(languageConf.get("unexpectedError"));
-            alert.showAndWait();
-            return "broke";
+            return "...";
         }
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
         formater.setMaximumFractionDigits(2);

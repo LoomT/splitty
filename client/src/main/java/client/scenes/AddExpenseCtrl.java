@@ -19,7 +19,6 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -368,11 +367,11 @@ public class AddExpenseCtrl {
             try {
                 convertedAmount = converter.convert(expCurrency, "USD",
                         expAmount, expenseDate.toInstant());
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        languageConf.get("Currency.IOError"));
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.showAndWait();
+            } catch (CurrencyConverter.CurrencyConversionException e) {
+                mainCtrl.goBackToEventPage(ev);
+                return null;
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
                 return null;
             }
 
@@ -608,11 +607,10 @@ public class AddExpenseCtrl {
         try {
             convertedAmount = converter.convert("USD", currency,
                     num, date.toInstant());
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    languageConf.get("Currency.IOError"));
-            alert.setHeaderText(languageConf.get("unexpectedError"));
-            alert.showAndWait();
+        } catch (CurrencyConverter.CurrencyConversionException e) {
+            return;
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
             return;
         }
         amount.setText(String.format("%1$,.2f", convertedAmount));

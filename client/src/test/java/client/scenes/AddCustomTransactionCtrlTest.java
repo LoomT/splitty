@@ -29,6 +29,7 @@ import utils.TestServerUtils;
 import utils.TestWebsocket;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -124,7 +125,7 @@ class AddCustomTransactionCtrlTest {
     }
 
     @Test
-    void saveClickedNotBaseCurrency(FxRobot robot) throws IOException {
+    void saveClickedNotBaseCurrency(FxRobot robot) throws CurrencyConverter.CurrencyConversionException, ConnectException {
         assertTrue(event.getTransactions().isEmpty());
         Platform.runLater(() -> {
             ctrl.display(event, stage);

@@ -25,6 +25,7 @@ import utils.TestServerUtils;
 import utils.TestWebsocket;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -105,7 +106,7 @@ public class EventPageCtrlTest {
     }
 
     @Test
-    public void toStringText(FxRobot robot) throws ParseException, IOException {
+    public void toStringText(FxRobot robot) throws ParseException, CurrencyConverter.CurrencyConversionException, ConnectException {
         Participant p = new Participant("name");
         double amount = converter.convert("EUR", "USD", 20,
                 new SimpleDateFormat("MM/dd/yy").parse("01/02/2024").toInstant());

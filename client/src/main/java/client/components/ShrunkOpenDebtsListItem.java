@@ -1,5 +1,6 @@
 package client.components;
 
+import client.MockClass.MainCtrlInterface;
 import client.utils.LanguageConf;
 import client.utils.currency.CurrencyConverter;
 import commons.Transaction;
@@ -10,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.Locale;
@@ -30,12 +32,14 @@ public class ShrunkOpenDebtsListItem extends HBox {
      * @param callBackExpand shrink when this component is clicked
      * @param callBackSettle settle when clicked
      * @param converter currency converter
+     * @param mainCtrl main controller
      */
     public ShrunkOpenDebtsListItem(Transaction transaction,
                                    LanguageConf languageConf,
                                    Consumer<ShrunkOpenDebtsListItem> callBackExpand,
                                    Consumer<Transaction> callBackSettle,
-                                   CurrencyConverter converter) {
+                                   CurrencyConverter converter,
+                                   MainCtrlInterface mainCtrl) {
         this.transaction = transaction;
         this.callBackExpand = callBackExpand;
         this.callBackSettle = callBackSettle;
@@ -58,12 +62,10 @@ public class ShrunkOpenDebtsListItem extends HBox {
         try {
             convertedAmount = converter.convert("USD", transaction.getCurrency(),
                     transaction.getAmount(), transaction.getDate().toInstant());
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    languageConf.get("Currency.IOError"));
-            alert.setHeaderText(languageConf.get("unexpectedError"));
-            java.awt.Toolkit.getDefaultToolkit().beep();
-            alert.showAndWait();
+        } catch (CurrencyConverter.CurrencyConversionException e) {
+            return;
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
             return;
         }
         String template = languageConf.get("OpenDebtsListItem.template");

@@ -14,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.ConnectException;
 import java.text.DecimalFormat;
 import java.text.ParsePosition;
@@ -134,11 +133,10 @@ public class AddCustomTransactionCtrl {
         try {
             convertedAmount = converter.convert(chooseCurrency.getValue().toString(), "USD",
                     amount, Instant.now());
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    languageConf.get("Currency.IOError"));
-            alert.setHeaderText(languageConf.get("unexpectedError"));
-            alert.showAndWait();
+        } catch (CurrencyConverter.CurrencyConversionException e) {
+            return;
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
             return;
         }
         Transaction transaction = new Transaction(giver, receiver,

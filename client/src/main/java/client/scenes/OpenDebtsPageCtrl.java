@@ -147,11 +147,9 @@ public class OpenDebtsPageCtrl {
      *
      * @param graphMap map to be used to populate the graph
      * @param debtMap  map to be used to populate the debts
-     * @return sum of all the expenses
      */
-    public double initializePage(Map<String, Double> graphMap,
-                                 Map<Participant, Map<Participant, Double>> debtMap) {
-        double sum = 0;
+    public void initializePage(Map<String, Double> graphMap,
+                               Map<Participant, Map<Participant, Double>> debtMap) {
         for (Expense e : event.getExpenses()) {
             for (Participant p : e.getExpenseParticipants()) {
                 double cost = e.getAmount() / e.getExpenseParticipants().size();
@@ -162,7 +160,6 @@ public class OpenDebtsPageCtrl {
 
                 temp.put(p, temp.get(p) + cost);
             }
-            sum += e.getAmount();
         }
         for (Participant receiver : debtMap.keySet()) {
             for (Participant giver : debtMap.get(receiver).keySet()) {
@@ -176,7 +173,6 @@ public class OpenDebtsPageCtrl {
             }
         }
         minCashFlow(debtMap, event);
-        return sum;
     }
 
     /**
@@ -227,7 +223,7 @@ public class OpenDebtsPageCtrl {
                 new ShrunkOpenDebtsListItem(
                         new Transaction(maxCredit, maxDebit, min, userConfig.getCurrency()),
                         languageConf, this::resizeOpenDebtItem,
-                        this::settleDebtClicked, converter));
+                        this::settleDebtClicked, converter, mainCtrl));
     }
 
     /**
@@ -252,12 +248,14 @@ public class OpenDebtsPageCtrl {
         if (item.getClass() == ShrunkOpenDebtsListItem.class) {
             ShrunkOpenDebtsListItem oldItem = (ShrunkOpenDebtsListItem) list.get(index);
             list.set(index, new ExpandedOpenDebtsListItem(oldItem.getTransaction(),
-                    languageConf, this::resizeOpenDebtItem, this::settleDebtClicked, converter));
+                    languageConf, this::resizeOpenDebtItem,
+                    this::settleDebtClicked, converter, mainCtrl));
         } else {
             ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
             allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(
                     oldItem.getTransaction(),
-                    languageConf, this::resizeOpenDebtItem, this::settleDebtClicked, converter));
+                    languageConf, this::resizeOpenDebtItem,
+                    this::settleDebtClicked, converter, mainCtrl));
         }
     }
 
@@ -325,7 +323,7 @@ public class OpenDebtsPageCtrl {
         for(Transaction t : sorted) {
             allDebtsPane.getChildren().add(
                     new SettledDebtsListItem(t, userConfig, languageConf,
-                            this::cancelTransaction, converter));
+                            this::cancelTransaction, converter, mainCtrl));
         }
     }
 
