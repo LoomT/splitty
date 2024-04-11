@@ -111,7 +111,6 @@ public class EventPageCtrlTest {
     public void toStringText(FxRobot robot) throws ParseException, CurrencyConverter.CurrencyConversionException, ConnectException {
         Tag tag = new Tag("food", "#00FF00");
         Participant p = new Participant("name");
-        Expense ex = new Expense(p, "expense", 20d, "EUR", List.of(p), tag);
         double amount = converter.convert("EUR", "USD", 20,
                 new SimpleDateFormat("MM/dd/yy").parse("01/02/2024").toInstant());
         Expense ex = new Expense(p, "expense", amount, "EUR", List.of(p), tag);

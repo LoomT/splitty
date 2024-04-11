@@ -141,13 +141,9 @@ public class StatisticsCtrl {
                     totalCost += amount;
                 }
 
+            } catch (CurrencyConverter.CurrencyConversionException ignored) {
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        languageConf.get("Currency.IOError"));
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.showAndWait();
             }
         }
         String preferedCurrency = userConfig.getCurrency();
@@ -269,8 +265,9 @@ public class StatisticsCtrl {
                     amount = converter.convert(expense.getCurrency(), userConfig.getCurrency(),
                             amount, expense.getDate().toInstant());
                     costExpensesNoTag += amount;
-                } catch (IOException e) {
-                    handleCurrencyError(e);
+                } catch (CurrencyConverter.CurrencyConversionException ignored) {
+                } catch (ConnectException e) {
+                    mainCtrl.handleServerNotFound();
                 }
             }
         }
@@ -330,13 +327,9 @@ public class StatisticsCtrl {
                             amount, exp.getDate().toInstant());
                 }
 
+            } catch (CurrencyConverter.CurrencyConversionException ignored) {
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        languageConf.get("Currency.IOError"));
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.showAndWait();
             }
 
             if (tag != null && exp.getType() != null) {
