@@ -247,6 +247,10 @@ public class MainCtrl implements MainCtrlInterface{
         stage.show();
     }
 
+    /**
+     * Shows invite mail screen
+     * @param event event to send invite to
+     */
     public void showInviteMail(Event event){
         Stage stage = new Stage();
         stage.setScene(inviteMail);
@@ -255,7 +259,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setTitle(languageConf.get("InviteMail.title"));
         stage.setResizable(false);
         stage.initOwner(primaryStage);
-        inviteMailCtrl.ShowInviteMail(event, stage);
+        inviteMailCtrl.showInviteMail(event, stage);
         stage.show();
     }
 

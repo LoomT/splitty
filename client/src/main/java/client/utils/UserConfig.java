@@ -193,22 +193,42 @@ public class UserConfig {
         callback = function;
     }
 
+    /**
+     * Username of the mail address
+     * @return mail password in the config file
+     */
     public String getUsername(){
         return (String) configProperties.get("spring.mail.username");
     }
 
+    /**
+     * Password of the mail address
+     * @return mail password in the config file
+     */
     public String getMailPassword(){
         return (String) configProperties.get("spring.mail.password");
     }
 
+    /**
+     * host in the config file for the MailService
+     * @return host
+     */
     public String getHost(){
         return (String) configProperties.get("spring.mail.host");
     }
 
+    /**
+     * port in the config file for the MailService
+     * @return port
+     */
     public int getPort(){
         return Integer.parseInt((String)configProperties.get("spring.mail.port"));
     }
 
+    /**
+     * return properties needed in the JavaMailSender
+     * @return properties to initialise the MailService
+     */
     public Properties getMailProperties(){
         Properties result = new Properties();
         result.setProperty("mail.smtp.auth",

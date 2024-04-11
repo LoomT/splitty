@@ -569,6 +569,9 @@ public class EventPageCtrl {
         mainCtrl.showDebtsPage(event);
     }
 
+    /**
+     * shows the invite page
+     */
     @FXML
     public void sendInvite(){
         mainCtrl.showInviteMail(event);

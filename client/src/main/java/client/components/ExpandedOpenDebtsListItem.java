@@ -46,6 +46,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
      * @param callBackSettle settle when clicked
      * @param converter      currency converter
      * @param mainCtrl       main controller
+     * @param emailService   email service
      */
     public ExpandedOpenDebtsListItem(Transaction transaction,
                                      LanguageConf languageConf,
@@ -170,6 +171,9 @@ public class ExpandedOpenDebtsListItem extends HBox {
         return transaction;
     }
 
+    /**
+     * sends email reminder to the debtor
+     */
     public void sendEmail() {
         String subject = languageConf.get("EmailService.reminderHeader");
         String body = languageConf.get("EmailService.reminderBody");

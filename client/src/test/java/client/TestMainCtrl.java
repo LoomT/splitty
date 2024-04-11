@@ -223,4 +223,11 @@ public class TestMainCtrl implements MainCtrlInterface {
      */
     @Override
     public void setStartPage(boolean page){scenes.add("setStartPage");}
+
+    /**
+     *
+     * @param event event to send invite to
+     */
+    @Override
+    public void showInviteMail(Event event) {scenes.add("setInviteMail");}
 }

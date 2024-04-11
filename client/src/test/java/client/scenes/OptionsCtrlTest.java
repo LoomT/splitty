@@ -50,7 +50,8 @@ class OptionsCtrlTest {
                 lang=en
                 recentEventCodes=
                 currency=EUR
-                highContrast=false""");
+                highContrast=false
+                """);
 
         userConfig = new UserConfig(testIO);
 

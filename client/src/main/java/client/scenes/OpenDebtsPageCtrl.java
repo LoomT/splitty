@@ -46,7 +46,7 @@ public class OpenDebtsPageCtrl {
     private final EmailService emailService;
     private Map<String, Double> participantDebtMap;
 
-    private enum Tab{OPEN, SETTLED};
+    private enum Tab{OPEN, SETTLED}
     private Tab tab;
 
     /**
@@ -58,6 +58,7 @@ public class OpenDebtsPageCtrl {
      * @param websocket    websocket
      * @param converter currency converter
      * @param userConfig user config
+     * @param emailService email service
      */
     @Inject
     public OpenDebtsPageCtrl(

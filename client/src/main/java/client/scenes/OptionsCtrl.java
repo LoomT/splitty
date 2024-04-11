@@ -44,6 +44,7 @@ public class OptionsCtrl {
      * @param languageConf language configuration
      * @param converter currency converter
      * @param server server utils
+     * @param emailService email service
      */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
@@ -208,6 +209,9 @@ public class OptionsCtrl {
         });
     }
 
+    /**
+     * Sends a test email to see if it has been configured correctly
+     */
     @FXML
     public void testMail(){
         loadIndicator.setVisible(true);
