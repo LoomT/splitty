@@ -13,6 +13,14 @@ public class TestWebsocket implements Websocket {
 
     private String eventID;
     private boolean connected = false;
+
+    /**
+     * @return the registered event listerers. could be useful for debugging
+     */
+    public EnumMap<WebsocketActions, Set<Consumer<Object>>> getFunctions() {
+        return functions;
+    }
+
     private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
 
     private final List<WebsocketActions> triggeredActions = new ArrayList<>();
@@ -21,14 +29,12 @@ public class TestWebsocket implements Websocket {
 
     /**
      * Constructor for the TestWebsocket
-     *
      */
     public TestWebsocket() {
         functions = new EnumMap<>(WebsocketActions.class);
     }
 
     /**
-     *
      * @param eventID the event id to connect to
      */
     @Override
@@ -40,7 +46,6 @@ public class TestWebsocket implements Websocket {
 
     /**
      * Disconnect from the event
-     *
      */
     @Override
     public void disconnect() {
@@ -51,9 +56,7 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
-     *
-     * @param action enum name of the function
+     * @param action   enum name of the function
      * @param consumer function that consumes type of payload and payload in that order
      */
     @Override
@@ -62,11 +65,9 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
-     *
-     * @param event the event in which we listen on the participant changes
+     * @param event              the event in which we listen on the participant changes
      * @param updatePartCallback this is called when a participant in the event is updated
-     * @param addPartCallback this is called when a participant in the event is created
+     * @param addPartCallback    this is called when a participant in the event is created
      * @param deletePartCallback this is called when a participant in the event is deleted
      */
 
@@ -75,11 +76,9 @@ public class TestWebsocket implements Websocket {
             Consumer<Event> updatePartCallback,
             Consumer<Event> addPartCallback,
             Consumer<Event> deletePartCallback) {
-
         this.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
         this.resetAction(WebsocketActions.ADD_PARTICIPANT);
         this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
-
         this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             int index = -1;
@@ -102,7 +101,9 @@ public class TestWebsocket implements Websocket {
 
         this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
+
             event.getParticipants().add(p);
+
             addPartCallback.accept(event);
         });
         this.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
@@ -126,11 +127,9 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
-     *
-     * @param event the event in which we listen on the participant changes
+     * @param event             the event in which we listen on the participant changes
      * @param updateExpCallback this is called when a participant in the event is updated
-     * @param addExpCallback this is called when a participant in the event is created
+     * @param addExpCallback    this is called when a participant in the event is created
      * @param deleteExpCallback this is called when a participant in the event is deleted
      */
 
@@ -139,8 +138,7 @@ public class TestWebsocket implements Websocket {
             Event event,
             Consumer<Event> updateExpCallback,
             Consumer<Event> addExpCallback,
-            Consumer<Event> deleteExpCallback)
-    {
+            Consumer<Event> deleteExpCallback) {
 
         this.resetAction(WebsocketActions.UPDATE_EXPENSE);
         this.resetAction(WebsocketActions.ADD_EXPENSE);
@@ -191,7 +189,6 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
      * @param action websocket action to reset all listeners for
      */
     @Override
@@ -203,7 +200,7 @@ public class TestWebsocket implements Websocket {
      * simulateAction is used to simulate an action from the server.
      * It triggers all registered consumers for the specified action.
      *
-     * @param action The WebSocket action to simulate.
+     * @param action  The WebSocket action to simulate.
      * @param payload The payload to pass to the consumers for this action.
      */
     public void simulateAction(WebsocketActions action, Object payload) {
@@ -222,6 +219,7 @@ public class TestWebsocket implements Websocket {
 
     /**
      * isConnected is used to check if the websocket is connected
+     *
      * @return true if connected, false otherwise (boolean)
      */
 
@@ -232,7 +230,8 @@ public class TestWebsocket implements Websocket {
 
     /**
      * String representation of the event ID
-      * @return eventID
+     *
+     * @return eventID
      */
     public String getEventID() {
         return eventID;

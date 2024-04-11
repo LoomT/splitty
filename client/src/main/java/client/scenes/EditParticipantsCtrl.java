@@ -50,6 +50,13 @@ public class EditParticipantsCtrl {
     @FXML
     private Button backButton;
 
+    /**
+     * @return the event
+     */
+    public Event getEvent() {
+        return event;
+    }
+
     private Event event;
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
@@ -99,6 +106,8 @@ public class EditParticipantsCtrl {
      */
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
+        System.out.println("display");
+        System.out.println(e);
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
 
