@@ -6,7 +6,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.*?>
 <?import java.net.URL?>
-<fx:root alignment="CENTER_LEFT" onMouseClicked="#onEventClicked" prefWidth="359.0" styleClass="eventListItemContainer" stylesheets="@EventListItem.css" type="HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="CENTER_LEFT" onMouseClicked="#onEventClicked" prefWidth="359.0" styleClass="eventListItemContainer" type="HBox" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="participantLabel" styleClass="labelFont" text="dklsjfklsdjfsdjflksdjfklsdjlkfsdklfjlsdjflksd" wrapText="true" HBox.hgrow="SOMETIMES">
          <HBox.margin>
