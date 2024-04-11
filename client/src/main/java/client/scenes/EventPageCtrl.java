@@ -9,9 +9,7 @@ import client.utils.Websocket;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.Tag;
+import commons.*;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,15 +29,13 @@ import javafx.util.Duration;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
-import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
 
-import static commons.WebsocketActions.ADD_TAG;
-import static commons.WebsocketActions.TITLE_CHANGE;
+import static commons.WebsocketActions.*;
 
 
 public class EventPageCtrl {
@@ -207,6 +203,14 @@ public class EventPageCtrl {
                 event.getTags().add((Tag) tag);
             }
         });
+        websocket.on(ADD_TRANSACTION, transaction -> {
+            if (!event.getTransactions().contains((Transaction) transaction)) {
+                event.getTransactions().add((Transaction) transaction);
+            }
+        });
+        websocket.on(REMOVE_TRANSACTION, id -> {
+            event.getTransactions().removeIf(t -> t.getId() == (long) id);
+        });
     }
 
     /**
@@ -372,7 +376,6 @@ public class EventPageCtrl {
                 stackPane.getChildren().addAll(new Text(), buttonBox);
                 editButton.setOnAction(event -> {
                     int index = getIndex();
-                    System.out.println(index);
                     Expense expense = expenses.get(index);
                     mainCtrl.handleEditExpense(expense, ev);
                 });
@@ -443,20 +446,15 @@ public class EventPageCtrl {
         String currency = exp.getCurrency().toUpperCase();
         try {
             if(!userConfig.getCurrency().equals("NONE")) {
-                amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                amount = converter.convert("USD", userConfig.getCurrency(),
                         amount, exp.getDate().toInstant());
                 currency = userConfig.getCurrency().toUpperCase();
             }
 
+        } catch (CurrencyConverter.CurrencyConversionException ignored) {
         } catch (ConnectException e) {
             mainCtrl.handleServerNotFound();
-            return "connection issue";
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    languageConf.get("Currency.IOError"));
-            alert.setHeaderText(languageConf.get("unexpectedError"));
-            alert.showAndWait();
-            return "broke";
+            return "...";
         }
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
         formater.setMaximumFractionDigits(2);
@@ -561,5 +559,13 @@ public class EventPageCtrl {
         MainCtrl.checkKey(scene, () -> this.participantChoiceBox.show(),
                 participantChoiceBox, KeyCode.ENTER);
 
+    }
+
+    /**
+     * Show the openDebts page with the current event
+     */
+    @FXML
+    public void openDebtsPage() {
+        mainCtrl.showDebtsPage(event);
     }
 }

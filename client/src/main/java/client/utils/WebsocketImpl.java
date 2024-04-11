@@ -21,7 +21,7 @@ public class WebsocketImpl implements Websocket {
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
     private final UserConfig userConfig;
 
     /**
@@ -221,7 +221,7 @@ public class WebsocketImpl implements Websocket {
      */
     @Override
     public void resetAction(WebsocketActions action) {
-        functions.put(action, new HashSet<>());
+        functions.put(action, new ArrayList<>());
     }
 
     /**
@@ -253,6 +253,7 @@ public class WebsocketImpl implements Websocket {
                 "commons.Event", Event.class,
                 "commons.Participant", Participant.class,
                 "commons.Expense", Expense.class,
+                "commons.Transaction", Transaction.class,
                 "java.lang.String", String.class,
                 "java.lang.Long", Long.class,
                 "commons.Tag", Tag.class));

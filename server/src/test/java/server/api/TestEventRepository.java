@@ -18,6 +18,7 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Transaction;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +39,7 @@ public class TestEventRepository implements EventRepository {
 
     private TestParticipantRepository partRepo;
     private TestExpenseRepository expenseRepo;
+    private TestTransactionRepository transactionRepo;
 
     /**
      * default constructor
@@ -65,6 +67,14 @@ public class TestEventRepository implements EventRepository {
         this.partRepo = partRepo;
         this.expenseRepo = expRepo;
     }
+
+    /**
+     * @param transactionRepo test transaction repository
+     */
+    public void setTransactionRepo(TestTransactionRepository transactionRepo) {
+        this.transactionRepo = transactionRepo;
+    }
+
     /**
      * @return called methods
      */
@@ -262,28 +272,36 @@ public class TestEventRepository implements EventRepository {
     public <S extends Event> S save(S entity) {
         call("save");
         events.removeIf(e -> entity.getId().equals(e.getId()));
-        events.add(entity);
+        Event clone = entity.clone();
+        events.add(clone);
         // Cascades any changes to participants and expenses
         if(partRepo != null){
             // Deletes participants that are no longer in the event entity
-            partRepo.getParticipants().removeIf(p -> entity.getParticipants()
+            partRepo.getParticipants().removeIf(p -> clone.getParticipants()
                     .stream()
-                    .noneMatch(pp -> pp.getEventID().equals(entity.getId())
+                    .noneMatch(pp -> pp.getEventID().equals(clone.getId())
                             && pp.getId() == p.getId()));
-            List<Participant> participants = entity.getParticipants();
-            entity.setParticipants(new ArrayList<>());
+            List<Participant> participants = clone.getParticipants();
+            clone.setParticipants(new ArrayList<>());
             partRepo.saveAll(participants);
         }
         if(expenseRepo != null) {
-            expenseRepo.getExpenses().removeIf(e -> entity.getExpenses()
+            expenseRepo.getExpenses().removeIf(e -> clone.getExpenses()
                     .stream()
-                    .noneMatch(ee -> ee.getEventID().equals(entity.getId())
+                    .noneMatch(ee -> ee.getEventID().equals(clone.getId())
                             && ee.getId() == e.getId()));
-            List<Expense> expenses = entity.getExpenses();
-            entity.setExpenses(new ArrayList<>());
+            List<Expense> expenses = clone.getExpenses();
+            clone.setExpenses(new ArrayList<>());
             expenseRepo.saveAll(expenses);
         }
-        return entity;
+        if(transactionRepo != null) {
+            transactionRepo.getTransactions().removeIf(t -> t.getEventID().equals(clone.getId()) &&
+                    !clone.getTransactions().contains(t));
+            List<Transaction> transactions = clone.getTransactions();
+            clone.setTransactions(new ArrayList<>());
+            transactionRepo.saveAll(transactions);
+        }
+        return (S) clone.clone();
     }
 
     /**
