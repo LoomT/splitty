@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditParticipantsCtrl">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditParticipantsCtrl">
     <children>
         <HBox prefHeight="49.0" prefWidth="600.0" styleClass="navbar">
             <children>
@@ -89,6 +79,11 @@
               </GridPane>
          </children>
       </VBox>
+      <Label fx:id="confirmationLabel" alignment="CENTER_RIGHT" layoutX="228.0" layoutY="72.0" prefHeight="17.0" prefWidth="189.0" text="%EditP.createConfirmation" textAlignment="CENTER" textFill="#1eda05">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </Label>
     </children>
     <stylesheets>
         <URL value="@/client/scenes/global.css" />

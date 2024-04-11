@@ -8,6 +8,7 @@ import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -17,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.net.ConnectException;
 import java.util.Optional;
@@ -49,6 +51,8 @@ public class EditParticipantsCtrl {
     private Label warningLabel;
     @FXML
     private Button backButton;
+    @FXML
+    private Label confirmationLabel;
 
     /**
      * @return the event
@@ -62,6 +66,7 @@ public class EditParticipantsCtrl {
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final Websocket websocket;
+    private FadeTransition ft;
 
     /**
      * @param server       serverutils instance
@@ -97,6 +102,12 @@ public class EditParticipantsCtrl {
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
+        confirmationLabel.setVisible(false);
+        ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
+        ft.setFromValue(1.0);
+        ft.setToValue(0);
+        ft.setDelay(Duration.millis(1000));
+        ft.setOnFinished(e -> confirmationLabel.setVisible(false));
     }
 
     /**
@@ -241,6 +252,11 @@ public class EditParticipantsCtrl {
 
             try {
                 server.createParticipant(event.getId(), newP);
+                ft.stop();
+                confirmationLabel.setText(languageConf.get("EditP.createConfirmation"));
+                confirmationLabel.setVisible(true);
+                confirmationLabel.setOpacity(1.0);
+                ft.play();
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
             }
@@ -256,6 +272,11 @@ public class EditParticipantsCtrl {
             currP.setEmailAddress(email);
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
+            ft.stop();
+            confirmationLabel.setText(languageConf.get("EditP.editConfirmation"));
+            confirmationLabel.setVisible(true);
+            confirmationLabel.setOpacity(1.0);
+            ft.play();
             try {
                 server.updateParticipant(event.getId(), currP);
             } catch (ConnectException e) {

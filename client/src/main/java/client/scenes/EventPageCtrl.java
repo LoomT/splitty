@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.Confirmation;
 import client.components.ExpenseItem;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
@@ -40,6 +41,7 @@ import java.util.*;
 
 import static commons.WebsocketActions.ADD_TAG;
 import static commons.WebsocketActions.TITLE_CHANGE;
+import static java.lang.String.format;
 
 
 public class EventPageCtrl {
@@ -161,7 +163,7 @@ public class EventPageCtrl {
         updateExpenses(event);
 
         copiedToClipboardMsg.setVisible(false);
-        inviteCode.setText(String.format(languageConf.get("EventPage.inviteCode"), event.getId()));
+        inviteCode.setText(format(languageConf.get("EventPage.inviteCode"), event.getId()));
     }
 
     private void addIconsToButtons() {
@@ -321,10 +323,20 @@ public class EventPageCtrl {
                         mainCtrl.handleEditExpense(e, event);
                     },
                     () -> {
-                        try {
-                            server.deleteExpense(e.getId(), event.getId());
-                        } catch (ConnectException ex) {
-                            mainCtrl.handleServerNotFound();
+                        Confirmation confirmation =
+                                new Confirmation((format(
+                                        languageConf.get(
+                                                "EventPage.deleteExpenseConfirmation"),
+                                        "")),
+                                        languageConf.get("Confirmation.areYouSure"),
+                                        languageConf);
+                        Optional<ButtonType> result = confirmation.showAndWait();
+                        if (result.isPresent() && result.get() == ButtonType.YES) {
+                            try {
+                                server.deleteExpense(e.getId(), event.getId());
+                            } catch (ConnectException ex) {
+                                mainCtrl.handleServerNotFound();
+                            }
                         }
                     }
             );
