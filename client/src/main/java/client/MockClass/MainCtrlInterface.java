@@ -3,6 +3,7 @@ package client.MockClass;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
+import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -117,4 +118,27 @@ public interface MainCtrlInterface {
      * and opens it
      */
     void openOptions();
+
+    /**
+     * shows openDebts Page
+     * @param event event linked to the page
+     */
+    void showDebtsPage(Event event);
+
+    /**
+     * Shows addCustomTransaction scene
+     * @param event event customTransaction is connected to
+     */
+    void showAddCustomTransaction(Event event);
+
+    /**
+     * @param languageChoiceBox method for initializing the language switcher
+     */
+    void initLangChoiceBox(ComboBox<String> languageChoiceBox);
+
+
+    /**
+     * @param  page boolean for the startPage (true) or the eventPage (false)
+     */
+    void setStartPage(boolean page);
 }

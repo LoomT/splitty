@@ -9,9 +9,7 @@ import client.utils.Websocket;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Expense;
-import commons.Participant;
-import commons.Tag;
+import commons.*;
 import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -38,8 +36,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
 
-import static commons.WebsocketActions.ADD_TAG;
-import static commons.WebsocketActions.TITLE_CHANGE;
+import static commons.WebsocketActions.*;
 
 
 public class EventPageCtrl {
@@ -78,6 +75,8 @@ public class EventPageCtrl {
     private Label copiedToClipboardMsg;
     @FXML
     private Button editTitleButton;
+    @FXML
+    private ComboBox<String> languageChoiceBoxEvent;
 
     private FadeTransition ft;
     private int selectedParticipantId;
@@ -188,6 +187,8 @@ public class EventPageCtrl {
      * Runs once after the fxml is loaded
      */
     public void initialize() {
+        mainCtrl.initLangChoiceBox(languageChoiceBoxEvent);
+
         ft = new FadeTransition(Duration.millis(2000), copiedToClipboardMsg);
         ft.setFromValue(1.0);
         ft.setToValue(0);
@@ -202,6 +203,14 @@ public class EventPageCtrl {
             if (!event.getTags().contains((Tag) tag)) {
                 event.getTags().add((Tag) tag);
             }
+        });
+        websocket.on(ADD_TRANSACTION, transaction -> {
+            if (!event.getTransactions().contains((Transaction) transaction)) {
+                event.getTransactions().add((Transaction) transaction);
+            }
+        });
+        websocket.on(REMOVE_TRANSACTION, id -> {
+            event.getTransactions().removeIf(t -> t.getId() == (long) id);
         });
     }
 
@@ -267,6 +276,7 @@ public class EventPageCtrl {
     @FXML
     private void backButtonClicked() {
         websocket.disconnect();
+        mainCtrl.setStartPage(true);
         mainCtrl.showStartScreen();
     }
 
@@ -367,7 +377,6 @@ public class EventPageCtrl {
                 stackPane.getChildren().addAll(new Text(), buttonBox);
                 editButton.setOnAction(event -> {
                     int index = getIndex();
-                    System.out.println(index);
                     Expense expense = expenses.get(index);
                     mainCtrl.handleEditExpense(expense, ev);
                 });
@@ -438,20 +447,15 @@ public class EventPageCtrl {
         String currency = exp.getCurrency().toUpperCase();
         try {
             if(!userConfig.getCurrency().equals("NONE")) {
-                amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                amount = converter.convert("USD", userConfig.getCurrency(),
                         amount, exp.getDate().toInstant());
                 currency = userConfig.getCurrency().toUpperCase();
             }
 
+        } catch (CurrencyConverter.CurrencyConversionException ignored) {
         } catch (ConnectException e) {
             mainCtrl.handleServerNotFound();
-            return "connection issue";
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    languageConf.get("Currency.IOError"));
-            alert.setHeaderText(languageConf.get("unexpectedError"));
-            alert.showAndWait();
-            return "broke";
+            return "...";
         }
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
         formater.setMaximumFractionDigits(2);
@@ -563,5 +567,13 @@ public class EventPageCtrl {
      */
     public void statisticsClicked() {
         mainCtrl.showStatisticsPage(event);
+    }
+
+    /**
+     * Show the openDebts page with the current event
+     */
+    @FXML
+    public void openDebtsPage() {
+        mainCtrl.showDebtsPage(event);
     }
 }

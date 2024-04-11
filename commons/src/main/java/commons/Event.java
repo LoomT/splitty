@@ -51,6 +51,9 @@ public class Event implements Cloneable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date lastActivity;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JoinColumn(name = "event_id", updatable = false, insertable = false)
+    private List<Transaction> transactions;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JoinColumn(name = "event_id", updatable = false, insertable = false)
@@ -61,6 +64,10 @@ public class Event implements Cloneable {
      * Required by JPA
      */
     public Event() {
+        this.participants = new ArrayList<>();
+        this.expenses = new ArrayList<>();
+        this.transactions = new ArrayList<>();
+        this.tags = new ArrayList<>();
         this.creationDate = new Date();
         this.lastActivity = new Date();
     }
@@ -73,8 +80,6 @@ public class Event implements Cloneable {
     public Event(@NotNull String title) {
         this();
         this.title = title;
-        this.participants = new ArrayList<>();
-        this.expenses = new ArrayList<>();
     }
 
     /**
@@ -238,6 +243,27 @@ public class Event implements Cloneable {
     }
 
     /**
+     * @return transaction list
+     */
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    /**
+     * @param transactions transactions
+     */
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    /**
+     * @param transaction transaction to add to the event
+     */
+    public void addTransaction(Transaction transaction) {
+        transactions.add(transaction);
+    }
+
+    /**
      * getter for tags
      * @return the list of tags correlated with that event
      */
@@ -264,13 +290,14 @@ public class Event implements Cloneable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Event event = (Event) o;
-
-        if (!Objects.equals(id, event.id) || !Objects.equals(title, event.title)) return false;
-        if (!Objects.equals(participants, event.participants)) return false;
-        if (!Objects.equals(expenses, event.expenses)) return false;
-        return Objects.equals(creationDate, event.creationDate);
+        return Objects.equals(id, event.id) && Objects.equals(title, event.title)
+                && Objects.equals(participants, event.participants)
+                && Objects.equals(expenses, event.expenses)
+                && Objects.equals(creationDate, event.creationDate)
+                && Objects.equals(lastActivity, event.lastActivity)
+                && Objects.equals(transactions, event.transactions)
+                && Objects.equals(tags, event.tags);
     }
 
     /**
@@ -280,12 +307,8 @@ public class Event implements Cloneable {
      */
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (participants != null ? participants.hashCode() : 0);
-        result = 31 * result + (expenses != null ? expenses.hashCode() : 0);
-        result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
-        return result;
+        return Objects.hash(id, title, participants, expenses,
+                creationDate, lastActivity, transactions, tags);
     }
 
     /**
@@ -298,8 +321,10 @@ public class Event implements Cloneable {
                 ", title='" + title + '\'' +
                 ", participants=" + participants +
                 ", expenses=" + expenses +
-                ", lastActivity=" + lastActivity +
                 ", creationDate=" + creationDate +
+                ", lastActivity=" + lastActivity +
+                ", transactions=" + transactions +
+                ", tags=" + tags +
                 '}';
     }
 
@@ -331,6 +356,21 @@ public class Event implements Cloneable {
                         .map(Participant::getId).collect(Collectors.toSet());
                 e.setExpenseParticipants(new ArrayList<>(clone.participants.stream()
                         .filter(p -> ids.contains(p.getId())).toList()));
+            }
+            clone.transactions = new ArrayList<>(this.transactions.size());
+            for(Transaction t : this.transactions) {
+                Transaction cloneTransaction = t.clone();
+                cloneTransaction.setGiver(clone.participants.stream()
+                        .filter(p -> p.getId() == cloneTransaction.getGiver().getId())
+                        .findAny().orElseThrow());
+                cloneTransaction.setReceiver(clone.participants.stream()
+                        .filter(p -> p.getId() == cloneTransaction.getReceiver().getId())
+                        .findAny().orElseThrow());
+                clone.transactions.add(cloneTransaction);
+            }
+            clone.tags = new ArrayList<>();
+            for (Tag t : this.tags) {
+                clone.tags.add(t.clone());
             }
             clone.creationDate = (Date) this.creationDate.clone();
             clone.lastActivity = (Date) this.lastActivity.clone();

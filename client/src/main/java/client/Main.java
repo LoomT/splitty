@@ -31,8 +31,8 @@ public class Main extends Application {
     private static final Injector INJECTOR = createInjector(new MyModule());
     private static final MyFXML FXML = new MyFXML(INJECTOR);
 
-    private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
     private static final UserConfig userConfig = INJECTOR.getInstance(UserConfig.class);
+    private static final LanguageConf languageConf = INJECTOR.getInstance(LanguageConf.class);
 
     /**
      * Main class
@@ -110,12 +110,22 @@ public class Main extends Application {
         var statistics = FXML.load(StatisticsCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "Statistics.fxml");
+        var addCustomTransaction = FXML.load(AddCustomTransactionCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "AddCustomTransaction.fxml"
+        );
+        var openDebtsPage = FXML.load(OpenDebtsPageCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "OpenDebtsPage.fxml"
+        );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
+
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag, statistics, options)
+                adminOverview, addExpense, titleChanger, addTag, statistics, options,
+                addCustomTransaction, openDebtsPage)
         );
     }
 }

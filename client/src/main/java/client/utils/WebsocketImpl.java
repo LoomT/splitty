@@ -21,8 +21,8 @@ public class WebsocketImpl implements Websocket {
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private final UserConfig userConfig;
     private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
+    private final UserConfig userConfig;
 
     /**
      * Websocket client constructor
@@ -253,6 +253,7 @@ public class WebsocketImpl implements Websocket {
                 "commons.Event", Event.class,
                 "commons.Participant", Participant.class,
                 "commons.Expense", Expense.class,
+                "commons.Transaction", Transaction.class,
                 "java.lang.String", String.class,
                 "java.lang.Long", Long.class,
                 "commons.Tag", Tag.class));

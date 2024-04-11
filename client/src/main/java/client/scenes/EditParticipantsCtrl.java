@@ -10,12 +10,8 @@ import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 import java.net.ConnectException;
@@ -49,6 +45,13 @@ public class EditParticipantsCtrl {
     private Label warningLabel;
     @FXML
     private Button backButton;
+
+    /**
+     * @return the event
+     */
+    public Event getEvent() {
+        return event;
+    }
 
     private Event event;
     private final ServerUtils server;
@@ -99,6 +102,8 @@ public class EditParticipantsCtrl {
      */
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
+        System.out.println("display");
+        System.out.println(e);
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
 
@@ -132,6 +137,7 @@ public class EditParticipantsCtrl {
                 emailField.setText(p.getEmailAddress());
                 beneficiaryField.setText(p.getBeneficiary());
                 ibanField.setText(p.getAccountNumber());
+                bicField.setText(p.getBic());
             }
         });
 
@@ -228,7 +234,7 @@ public class EditParticipantsCtrl {
                 informNameExists();
                 return;
             }
-            Participant newP = new Participant(name, email, beneficiary, iban);
+            Participant newP = new Participant(name, email, beneficiary, iban, bic);
 
             try {
                 server.createParticipant(event.getId(), newP);
@@ -247,6 +253,7 @@ public class EditParticipantsCtrl {
             currP.setEmailAddress(email);
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
+            currP.setBic(bic);
             try {
                 server.updateParticipant(event.getId(), currP);
             } catch (ConnectException e) {

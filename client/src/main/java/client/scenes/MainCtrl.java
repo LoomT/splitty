@@ -16,6 +16,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -25,15 +26,19 @@ import commons.Expense;
 import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.*;
 
 public class MainCtrl implements MainCtrlInterface{
 
@@ -42,6 +47,7 @@ public class MainCtrl implements MainCtrlInterface{
     private final Websocket websocket;
 
     private Stage primaryStage;
+
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
 
@@ -57,6 +63,9 @@ public class MainCtrl implements MainCtrlInterface{
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
 
+    private OpenDebtsPageCtrl openDebtsPageCtrl;
+    private Scene openDebtsPage;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
@@ -65,11 +74,18 @@ public class MainCtrl implements MainCtrlInterface{
 
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
+
     private OptionsCtrl optionsCtrl;
     private Scene options;
     private StatisticsCtrl statisticsCtrl;
     private Scene statistics;
 
+
+    private AddCustomTransactionCtrl addCustomTransactionCtrl;
+    private Scene addCustomTransaction;
+
+    private boolean startPage = true;
+    private Event event;
 
 
     /**
@@ -107,6 +123,8 @@ public class MainCtrl implements MainCtrlInterface{
         this.eventPageCtrl = pairCollector.eventPage().getKey();
         this.eventPage = new Scene(pairCollector.eventPage().getValue());
 
+        this.openDebtsPageCtrl = pairCollector.openDebtsPage().getKey();
+        this.openDebtsPage = new Scene(pairCollector.openDebtsPage().getValue());
 
         this.editParticipantsCtrl = pairCollector.editParticipantsPage().getKey();
         this.editParticipants = new Scene(pairCollector.editParticipantsPage().getValue());
@@ -126,12 +144,21 @@ public class MainCtrl implements MainCtrlInterface{
         this.optionsCtrl = pairCollector.options().getKey();
         this.options = new Scene(pairCollector.options().getValue());
 
-        initializeShortcuts();
+        this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
+        this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
+
         this.statisticsCtrl = pairCollector.statisticsPage().getKey();
         this.statistics = new Scene(pairCollector.statisticsPage().getValue());
+        initializeShortcuts();
+
 
         //showOverview();
         showStartScreen();
+        if(startPage){
+            showStartScreen();
+        } else {
+            showEventPage(event);
+        }
         primaryStage.show();
 
     }
@@ -149,6 +176,8 @@ public class MainCtrl implements MainCtrlInterface{
         adminOverviewCtrl.initializeShortcuts(adminOverview);
         editTitleCtrl.initializeShortcuts(titleChanger);
         optionsCtrl.initializeShortcuts(options);
+        openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
+        addCustomTransactionCtrl.initializeShortcuts(addCustomTransaction);
     }
 
     /**
@@ -242,6 +271,8 @@ public class MainCtrl implements MainCtrlInterface{
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
+        startPage = false;
+        this.event = eventToShow;
         primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
@@ -316,7 +347,6 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
-        primaryStage.setResizable(false);
     }
 
     /**
@@ -351,7 +381,8 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
         addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
         addExpenseCtrl.setPurpose(exp.getPurpose());
-        addExpenseCtrl.setAmount(Double.toString(exp.getAmount()));
+
+        addExpenseCtrl.setAmount(exp.getAmount(), exp.getDate(), exp.getCurrency());
         addExpenseCtrl.setCurrency(exp.getCurrency());
         addExpenseCtrl.setDate(exp.getDate().toInstant().
                 atZone(ZoneId.systemDefault()).toLocalDate());
@@ -400,4 +431,102 @@ public class MainCtrl implements MainCtrlInterface{
         stage.getIcons().add(primaryStage.getIcons().getFirst());
         stage.show();
     }
+
+    /**
+     * Shows the open debts page
+     * @param eventToShow the event to show the open debts for
+     */
+    @Override
+    public void showDebtsPage(Event eventToShow) {
+        openDebtsPageCtrl.registerWS();
+        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+        primaryStage.setTitle(languageConf.get("OpenDebts.title"));
+        primaryStage.setScene(openDebtsPage);
+    }
+
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
+    @Override
+    public void showAddCustomTransaction(Event event) {
+        Stage stage = new Stage();
+        stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));
+        addCustomTransactionCtrl.display(event, stage);
+        stage.setScene(addCustomTransaction);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(primaryStage);
+        stage.show();
+    }
+
+    /**
+     * @param languageChoiceBox method to initialize the language switcher
+     */
+    public void initLangChoiceBox(ComboBox<String> languageChoiceBox){
+        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+        final String downloadTemplateOption = "Download Template";
+        if(languageChoiceBox.getItems().isEmpty()) {
+            languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+            languageChoiceBox.getItems().add(downloadTemplateOption);
+        }
+        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
+        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
+        languageChoiceBox.setOnAction(event -> {
+            String selectedOption = languageChoiceBox.getValue();
+            if (selectedOption.equals(downloadTemplateOption)) {
+
+                downloadTemplate();
+                languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+            } else {
+
+                languageConf.changeCurrentLocaleTo(selectedOption);
+            }
+        });
+    }
+
+    /**
+     * @param  page boolean for the startPage (true) or the eventPage (false)
+     */
+    public void setStartPage(boolean page) {this.startPage = page;}
+
+    /**
+     *
+     * Downloads the template
+     */
+    private void downloadTemplate() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("template.properties");
+
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Properties files (*.properties)",
+                        "*.properties");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = showSaveFileDialog(fileChooser);
+        if (file == null) {
+
+            return;
+        }
+        ResourceBundle bundle = ResourceBundle.getBundle("languages", Locale.of("template"));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            List<String> keyList = new ArrayList<>();
+            Enumeration<String> keys = bundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                keyList.add(key);
+            }
+            keyList.sort(String::compareTo);
+            for (String key : keyList) {
+                writer.write(key + "=" + bundle.getString(key) + "\n");
+            }
+            System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing the template file: "
+                    + e.getMessage());
+        }
+
+    }
+
+
 }

@@ -34,8 +34,8 @@ public class Participant implements Cloneable {
     @Nullable
     private String emailAddress;
     private String beneficiary;
-
     private String accountNumber;
+    private String bic;
 
     /**
      * constructor
@@ -64,12 +64,14 @@ public class Participant implements Cloneable {
      * @param email email of the participant. Can be Null
      * @param beneficiary bank account beneficiary name
      * @param accountNumber bank account number
+     * @param bic bic code
      */
     public Participant(String name, @Nullable String email,
-                       String beneficiary, String accountNumber ) {
+                       String beneficiary, String accountNumber, @Nullable String bic) {
         this(name, email);
         this.beneficiary = beneficiary;
         this.accountNumber = accountNumber;
+        this.bic = bic;
     }
 
     /**
@@ -177,7 +179,8 @@ public class Participant implements Cloneable {
                 && Objects.equals(name, that.name)
                 && Objects.equals(emailAddress, that.emailAddress)
                 && Objects.equals(beneficiary, that.beneficiary)
-                && Objects.equals(accountNumber, that.accountNumber);
+                && Objects.equals(accountNumber, that.accountNumber)
+                && Objects.equals(bic, that.bic);
     }
 
     /**
@@ -185,7 +188,7 @@ public class Participant implements Cloneable {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, eventID, name, emailAddress, beneficiary, accountNumber);
+        return Objects.hash(id, eventID, name, emailAddress, beneficiary, accountNumber, bic);
     }
 
     /**
@@ -200,9 +203,12 @@ public class Participant implements Cloneable {
                 ", name='" + name + '\'';
         if(emailAddress != null)
             result += ", emailAddress='" + emailAddress + '\'';
-        if(beneficiary != null && accountNumber != null)
-            result += ", beneficiary='" + beneficiary
-                    + "', account number='" + accountNumber + '\'';
+        if(beneficiary != null)
+            result += ", beneficiary='" + beneficiary + '\'';
+        if(accountNumber != null)
+            result += "', account number='" + accountNumber + '\'';
+        if(bic != null)
+            result += ", bic='" + bic + '\'';
         result += "}";
         return result;
     }
@@ -222,6 +228,20 @@ public class Participant implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
+    }
+
+    /**
+     * @return bic
+     */
+    public String getBic() {
+        return bic;
+    }
+
+    /**
+     * @param bic bic
+     */
+    public void setBic(String bic) {
+        this.bic = bic;
     }
 }
 

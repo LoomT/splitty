@@ -10,6 +10,7 @@ import utils.TestServerUtils;
 import utils.TestWebsocket;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.time.Instant;
 import java.util.List;
 
@@ -41,7 +42,7 @@ class CurrencyConverterTest {
     }
 
     @Test
-    void conversionBothWays() throws IOException {
+    void conversionBothWays() throws CurrencyConverter.CurrencyConversionException, ConnectException {
         double original = 10;
         double converted = converter.convert("EUR", "USD", original, Instant.EPOCH);
         converted = converter.convert("USD", "EUR", converted, Instant.EPOCH);
@@ -49,7 +50,7 @@ class CurrencyConverterTest {
     }
 
     @Test
-    void newCache() throws IOException {
+    void newCache() throws CurrencyConverter.CurrencyConversionException, ConnectException {
         assertEquals(0, fileManager.getCache().size());
         assertFalse(server.getCalls().contains("getExchangeRates"));
         converter.convert("EUR", "USD", 10, Instant.EPOCH);
@@ -58,7 +59,7 @@ class CurrencyConverterTest {
     }
 
     @Test
-    void usingCache() throws IOException {
+    void usingCache() throws CurrencyConverter.CurrencyConversionException, ConnectException {
         converter.convert("EUR", "USD", 10, Instant.EPOCH);
         assertEquals(1, fileManager.getCache().size());
         converter.convert("EUR", "USD", 10, Instant.EPOCH);
@@ -67,7 +68,7 @@ class CurrencyConverterTest {
     }
 
     @Test
-    void usingSameCacheForDifferentCurrencies() throws IOException {
+    void usingSameCacheForDifferentCurrencies() throws CurrencyConverter.CurrencyConversionException, ConnectException {
         converter.convert("JPY", "CHF", 10, Instant.EPOCH);
         assertEquals(1, fileManager.getCache().size());
         converter.convert("EUR", "USD", 10, Instant.EPOCH);

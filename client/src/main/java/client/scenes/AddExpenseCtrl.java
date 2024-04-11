@@ -362,6 +362,17 @@ public class AddExpenseCtrl {
                     .findFirst().orElseThrow();
 
             String expCurrency = currency.getValue().toString();
+            double convertedAmount;
+            try {
+                convertedAmount = converter.convert(expCurrency, "USD",
+                        expAmount, expenseDate.toInstant());
+            } catch (CurrencyConverter.CurrencyConversionException e) {
+                mainCtrl.goBackToEventPage(ev);
+                return null;
+            } catch (ConnectException e) {
+                mainCtrl.handleServerNotFound();
+                return null;
+            }
 
             Tag expType = type.getValue();
             Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
@@ -626,10 +637,22 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the amountText field
-     * @param amountText the amount that was paid
+     * @param num amount
+     * @param date date
+     * @param currency currency
      */
-    public void setAmount(String amountText) {
-        amount.setText(amountText);
+    public void setAmount(double num, Date date, String currency) {
+        double convertedAmount;
+        try {
+            convertedAmount = converter.convert("USD", currency,
+                    num, date.toInstant());
+        } catch (CurrencyConverter.CurrencyConversionException e) {
+            return;
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
+        amount.setText(String.format("%1$,.2f", convertedAmount));
     }
 
     /**
@@ -637,7 +660,8 @@ public class AddExpenseCtrl {
      * @param currencyText the text for the currency
      */
     public void setCurrency(String currencyText) {
-        currency.setValue(new CommonFunctions.HideableItem<>(currencyText.toUpperCase()));
+        currency.setValue(currency.getItems().stream()
+                .filter(h -> h.toString().equals(currencyText)).findFirst().orElse(null));
     }
 
     /**

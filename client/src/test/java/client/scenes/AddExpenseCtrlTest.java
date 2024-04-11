@@ -158,13 +158,11 @@ public class AddExpenseCtrlTest {
 
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().getFirst(), "createExpense");
+        assertTrue(server.getCalls().contains("createExpense"));
         assertEquals(server.getStatuses().getFirst(), 204);
         assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.ADD_EXPENSE));
         assertNotNull(websocket.getPayloads().getFirst());
-        assertTrue(websocket.getPayloads().getFirst().getClass().equals(Expense.class));
-
-
+        assertTrue(websocket.getPayloads().stream().map(Object::getClass).toList().contains(Expense.class));
     }
 
     @Test
@@ -192,12 +190,11 @@ public class AddExpenseCtrlTest {
 
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().getFirst(), "updateExpense");
+        assertTrue(server.getCalls().contains("updateExpense"));
         assertEquals(server.getStatuses().getFirst(), 204);
         assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.UPDATE_EXPENSE));
         assertNotNull(websocket.getPayloads().getFirst());
-        assertEquals(websocket.getPayloads().getFirst().getClass(), Expense.class);
-
+        assertTrue(websocket.getPayloads().stream().map(Object::getClass).toList().contains(Expense.class));
     }
 
     @Test
@@ -248,11 +245,11 @@ public class AddExpenseCtrlTest {
             robot.clickOn("#add");
         });
         waitForFxEvents();
-        assertEquals(server.getCalls().getFirst(), "createExpense");
+        assertTrue(server.getCalls().contains("createExpense"));
         assertEquals(server.getStatuses().getFirst(), 204);
         assertTrue(websocket.hasActionBeenTriggered(WebsocketActions.ADD_EXPENSE));
         assertNotNull(websocket.getPayloads().getFirst());
-        assertEquals(websocket.getPayloads().getFirst().getClass(), Expense.class);
+        assertTrue(websocket.getPayloads().stream().map(Object::getClass).toList().contains(Expense.class));
     }
 
     @Test
