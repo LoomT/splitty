@@ -411,8 +411,8 @@ public class MainCtrl implements MainCtrlInterface{
     public void showStatisticsPage(Event event) {
         statisticsCtrl.displayStatisticsPage(event);
         primaryStage.setTitle(languageConf.get("Statistics.title"));
-        statistics.setCursor(Cursor.DEFAULT);
         primaryStage.setScene(statistics);
+        statistics.setCursor(Cursor.DEFAULT);
     }
 
     /**
@@ -438,7 +438,7 @@ public class MainCtrl implements MainCtrlInterface{
      */
     @Override
     public void showDebtsPage(Event eventToShow) {
-        openDebtsPageCtrl.registerWS();
+        openDebtsPageCtrl.open();
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
         primaryStage.setTitle(languageConf.get("OpenDebts.title"));
         primaryStage.setScene(openDebtsPage);

@@ -53,6 +53,7 @@ public class StatisticsCtrl {
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
+    private boolean opened;
 
     /**
      * @param mainCtrl main control instance
@@ -74,6 +75,7 @@ public class StatisticsCtrl {
         this.languageConf = languageConf;
         this.converter = converter;
         this.userConfig = userConfig;
+        opened = false;
     }
 
     /**
@@ -83,6 +85,18 @@ public class StatisticsCtrl {
         websocket.on(ADD_TAG, tag -> {
             populateLegend(event);
         });
+        back.setOnAction(e -> {
+            handleBackButton(event);
+        });
+        websocket.on(ADD_EXPENSE, e -> {
+            initPieChart(event);
+        });
+        websocket.on(UPDATE_EXPENSE, e -> {
+            initPieChart(event);
+        });
+        websocket.on(REMOVE_EXPENSE, e -> {
+            initPieChart(event);
+        });
     }
 
     /**
@@ -90,6 +104,7 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     private void populateLegend(Event event) {
+        if(!opened) return;
         legend.getChildren().clear();
 
         for (Tag tag : event.getTags()) {
@@ -115,26 +130,9 @@ public class StatisticsCtrl {
      */
     public void displayStatisticsPage(Event event) {
         this.event = event;
+        opened = true;
         pc.setLegendVisible(false);
         initPieChart(event);
-        initCost(event);
-        back.setOnAction(e -> {
-            handleBackButton(event);
-        });
-        websocket.on(ADD_EXPENSE, e -> {
-            initPieChart(event);
-            initCost(event);
-        });
-        websocket.on(UPDATE_EXPENSE, e -> {
-            initPieChart(event);
-            initCost(event);
-        });
-        websocket.on(REMOVE_EXPENSE, e -> {
-            System.out.println((long) e);
-            initPieChart(event);
-            initCost(event);
-        });
-
     }
 
     /**
@@ -142,6 +140,8 @@ public class StatisticsCtrl {
      * @param event
      */
     public void handleBackButton(Event event) {
+        pc.getData().clear();
+        opened = false;
         mainCtrl.goBackToEventPage(event);
     }
 
@@ -151,7 +151,6 @@ public class StatisticsCtrl {
      * @return the total cost
      */
     public double initCost(Event event) {
-
         double totalCost = 0;
         for (Expense exp : event.getExpenses()) {
             double amount = exp.getAmount();
@@ -178,6 +177,7 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     public void initPieChart(Event event) {
+        if(!opened) return;
         double totalCost = initCost(event);
         updateTagsPieChart(event, totalCost);
         updateNoTagPieChart(event, totalCost);

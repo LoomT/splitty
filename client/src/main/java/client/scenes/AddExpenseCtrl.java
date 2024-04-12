@@ -129,6 +129,12 @@ public class AddExpenseCtrl {
         CommonFunctions
                 .comboBoxAutoCompletionSupport(converter.getCurrencies(), currency);
         lengthListener(purpose, warningLabel, 20, languageConf.get("AddExp.charLimit"));
+
+        websocket.on(ADD_TAG, tag -> {
+            if (!type.getItems().contains((Tag) tag)) {
+                type.getItems().add((Tag) tag);
+            }
+        });
     }
 
     /**
@@ -375,7 +381,7 @@ public class AddExpenseCtrl {
             }
 
             Tag expType = type.getValue();
-            Expense expense = new Expense(selectedParticipant, expPurpose, expAmount,
+            Expense expense = new Expense(selectedParticipant, expPurpose, convertedAmount,
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
             return expense;
@@ -440,11 +446,7 @@ public class AddExpenseCtrl {
         type.setCellFactory(createTypeListCellFactory(ev));
         type.setButtonCell(createTypeListCell(ev));
         type.getItems().add(0, null);
-        websocket.on(ADD_TAG, tag -> {
-            if (!type.getItems().contains((Tag) tag)) {
-                type.getItems().add((Tag) tag);
-            }
-        });
+
 
     }
 
