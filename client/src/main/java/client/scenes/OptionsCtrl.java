@@ -83,23 +83,30 @@ public class OptionsCtrl {
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
         loadIndicator.setVisible(false);
 
-        currencyChoiceBox.getSelectionModel()
-                .selectedItemProperty()
-                .addListener((obs, oldVal, newVal) -> {
-                    if (newVal != null && !newVal.equals(oldVal)) {
+        String initialCurrency = currencyChoiceBox.getValue().toString();
+        boolean initialHighContrast = contrastToggle.isSelected();
+        String initialURL = serverField.getText();
+
+        currencyChoiceBox.getSelectionModel().
+                selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null && !newVal.toString().equals(initialCurrency)) {
                         unsavedChanges = true;
+                    } else if (newVal.toString().equals(initialCurrency)) {
+                        unsavedChanges = false;
                     }
                 });
-
         serverField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.equals(oldVal)) {
+            if (newVal != null && !newVal.equals(initialURL)) {
                 unsavedChanges = true;
+            } else if (newVal.equals(initialURL)) {
+                unsavedChanges = false;
             }
         });
-
         contrastToggle.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != oldVal) {
+            if (newVal != initialHighContrast) {
                 unsavedChanges = true;
+            } else {
+                unsavedChanges = false;
             }
         });
     }
@@ -164,8 +171,10 @@ public class OptionsCtrl {
         if (unsavedChanges) {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setHeaderText(languageConf.get("Options.unsavedChanges"));
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.CANCEL);
             alert.showAndWait();
-            if (alert.getResult() == ButtonType.OK) {
+            if (alert.getResult() == ButtonType.CANCEL) {
                 return;
             }
         }
