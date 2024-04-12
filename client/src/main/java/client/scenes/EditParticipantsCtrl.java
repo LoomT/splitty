@@ -14,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
-import javafx.util.Duration;
 
 import java.net.ConnectException;
 import java.util.Optional;
@@ -46,6 +45,8 @@ public class EditParticipantsCtrl {
     private Label warningLabel;
     @FXML
     private Button backButton;
+    @FXML
+    private Label confirmationLabel;
 
     /**
      * @return the event
@@ -95,12 +96,6 @@ public class EditParticipantsCtrl {
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
-        warningLabel.setVisible(false);
-        ft = new FadeTransition(Duration.millis(3000), warningLabel);
-        ft.setFromValue(1.0);
-        ft.setToValue(0);
-        ft.setDelay(Duration.millis(0));
-        ft.setOnFinished(e -> warningLabel.setVisible(false));
     }
 
     /**
@@ -176,6 +171,8 @@ public class EditParticipantsCtrl {
         deletePartButton.setVisible(false);
         nameField.setText("");
         emailField.setText("");
+        warningLabel.setVisible(false);
+        confirmationLabel.setVisible(false);
         beneficiaryField.setText("");
         ibanField.setText("");
         bicField.setText("");
@@ -255,12 +252,12 @@ public class EditParticipantsCtrl {
             try {
                 server.updateParticipant(event.getId(), currP);
                 edited = true;
+                confirmationLabeling(edited);
 
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
             }
         }
-        confirmationLabeling(edited);
     }
 
     /**
@@ -287,6 +284,7 @@ public class EditParticipantsCtrl {
         try {
 
             server.createParticipant(event.getId(), newP);
+            confirmationLabeling(false);
         } catch (ConnectException e) {
             mainCtrl.handleServerNotFound();
         }
@@ -300,15 +298,13 @@ public class EditParticipantsCtrl {
      */
     private void confirmationLabeling(boolean edited) {
         if(edited) {
-            warningLabel.setVisible(true);
-            warningLabel.setOpacity(1);
-            warningLabel.setText(languageConf.get("EditP.editConfirmation"));
-            ft.play();
+            confirmationLabel.setText(languageConf.get("EditP.editConfirmation"));
+            confirmationLabel.setVisible(true);
+
         }else{
-            warningLabel.setVisible(true);
-            warningLabel.setOpacity(1);
-            warningLabel.setText(languageConf.get("EditP.createConfirmation"));
-            ft.play();
+            confirmationLabel.setText(languageConf.get("EditP.createConfirmation"));
+            confirmationLabel.setVisible(true);
+
         }
     }
 

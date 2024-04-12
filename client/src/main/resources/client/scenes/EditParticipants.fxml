@@ -62,7 +62,10 @@
                       <TextField fx:id="bicField" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <HBox alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="370.0" GridPane.columnSpan="2" GridPane.rowIndex="5">
                      <children>
-                        <Label fx:id="warningLabel" styleClass="warningLabel" text="aaaaaaaaaaThe name can only be 30 characters longaaaaaaaaaaaaaaaa" textFill="RED" wrapText="true" />
+                         <StackPane alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="370.0" GridPane.columnSpan="2">
+                             <Label fx:id="warningLabel" styleClass="warningLabel" text="The name can only be 30 characters long" textFill="RED" wrapText="true" />
+                             <Label fx:id="confirmationLabel" styleClass="confirmationLabel" text="Confirmation needed" textFill="GREEN" wrapText="true" opacity="0" />
+                         </StackPane>
                         <Region minWidth="0.0" HBox.hgrow="ALWAYS" />
                           <Button id="deletePartButton" fx:id="deletePartButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#deletePartClicked" styleClass="sbutton" text="%EditP.deletePart" HBox.hgrow="ALWAYS">
                            <HBox.margin>
