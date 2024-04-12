@@ -40,6 +40,8 @@ public class OptionsCtrl {
     private Stage stage;
     private FadeTransition ft;
     private boolean lastContrast;
+    private boolean unsavedChanges = false;
+
 
     /**
      * @param userConfig user configuration
@@ -80,6 +82,24 @@ public class OptionsCtrl {
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
         loadIndicator.setVisible(false);
+
+        currencyChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.equals(oldVal)) {
+                unsavedChanges = true;
+            }
+        });
+
+        serverField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.equals(oldVal)) {
+                unsavedChanges = true;
+            }
+        });
+
+        contrastToggle.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != oldVal) {
+                unsavedChanges = true;
+            }
+        });
     }
 
     /**
@@ -131,6 +151,7 @@ public class OptionsCtrl {
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
+        unsavedChanges = false;
     }
 
     /**
@@ -138,6 +159,14 @@ public class OptionsCtrl {
      */
     @FXML
     public void cancelClicked() {
+        if (unsavedChanges) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText(languageConf.get("Options.unsavedChanges"));
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.OK) {
+                return;
+            }
+        }
         serverField.setText(userConfig.getUrl());
         String cur = userConfig.getCurrency();
         CommonFunctions.HideableItem<String> item =
