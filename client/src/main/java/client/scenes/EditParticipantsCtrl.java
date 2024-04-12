@@ -14,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import java.net.ConnectException;
 import java.util.Optional;
@@ -96,6 +97,11 @@ public class EditParticipantsCtrl {
                 event.setTitle((String) title);
             eventTitle.setText((String) title);
         });
+        ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
+        ft.setFromValue(1.0);
+        ft.setToValue(0);
+        ft.setDelay(Duration.millis(1000));
+        ft.setOnFinished(e -> confirmationLabel.setVisible(false));
     }
 
     /**
@@ -172,7 +178,7 @@ public class EditParticipantsCtrl {
         nameField.setText("");
         emailField.setText("");
         warningLabel.setVisible(false);
-        confirmationLabel.setVisible(false);
+//        confirmationLabel.setVisible(false);
         beneficiaryField.setText("");
         ibanField.setText("");
         bicField.setText("");
@@ -224,8 +230,6 @@ public class EditParticipantsCtrl {
         String iban = ibanField.getText();
         String bic = bicField.getText();
 
-        boolean edited = false;
-
         if (index < 0) return;
         if(name.isEmpty()) {
             warningLabel.setVisible(true);
@@ -251,8 +255,11 @@ public class EditParticipantsCtrl {
 
             try {
                 server.updateParticipant(event.getId(), currP);
-                edited = true;
-                confirmationLabeling(edited);
+                ft.stop();
+                confirmationLabel.setText(languageConf.get("EditP.editConfirmation"));
+                confirmationLabel.setVisible(true);
+                confirmationLabel.setOpacity(1.0);
+                ft.play();
 
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
@@ -284,28 +291,16 @@ public class EditParticipantsCtrl {
         try {
 
             server.createParticipant(event.getId(), newP);
-            confirmationLabeling(false);
+            ft.stop();
+            confirmationLabel.setText(languageConf.get("EditP.createConfirmation"));
+            confirmationLabel.setVisible(true);
+            confirmationLabel.setOpacity(1.0);
+            ft.play();
+
         } catch (ConnectException e) {
             mainCtrl.handleServerNotFound();
         }
         return false;
-    }
-
-    /**
-     * Display a confirmation message
-     *
-     * @param edited whether the participant was edited
-     */
-    private void confirmationLabeling(boolean edited) {
-        if(edited) {
-            confirmationLabel.setText(languageConf.get("EditP.editConfirmation"));
-            confirmationLabel.setVisible(true);
-
-        }else{
-            confirmationLabel.setText(languageConf.get("EditP.createConfirmation"));
-            confirmationLabel.setVisible(true);
-
-        }
     }
 
     /**
