@@ -84,17 +84,13 @@ public class TagPageCtrl {
             label.setFont(Font.font("Arial", FontWeight.NORMAL, 15));
 
             Shape coloredBox = new Rectangle(15, 15);
-            // Set tag color
             coloredBox.setFill(Color.web(tag.getColor()));
 
-            // Add event handler to open color picker dialog
             coloredBox.setOnMouseClicked(e -> {
-                // Create color picker dialog
                 Stage colorPickerStage = new Stage();
                 colorPickerStage.setTitle("Change colour"); // Set title here
                 colorPicker = new ColorPicker(Color.web(tag.getColor()));
                 colorPicker.setOnAction(event1 -> {
-                    // Update tag's color
                     tag.setColor(colorPicker.getValue().toString());
                     try {
                         server.updateTag(tag.getId(), event.getId(), tag);
@@ -103,20 +99,15 @@ public class TagPageCtrl {
                         return;
                     }
 
-                    // Update UI
                     populateTagList(event);
-
-                    // Close color picker dialog
                     colorPickerStage.close();
                 });
 
-                // Set the width of the color picker dialog scene
                 Scene colorPickerScene = new Scene(colorPicker, 200, 50); // Adjust width as needed
                 colorPickerStage.setScene(colorPickerScene);
                 colorPickerStage.show();
             });
 
-            // Create delete button
             Button deleteButton = new Button("X");
             deleteButton.setOnAction(e -> {
                 String tagNameToRemove = tag.getName();
@@ -126,16 +117,15 @@ public class TagPageCtrl {
                         for (Node child : hBox.getChildren()) {
                             if (child instanceof Label lab) {
                                 if (tagNameToRemove.equals(lab.getText())) {
-                                    // Remove the HBox (which contains both the tag and delete button) from the VBox
                                     tagList.getChildren().remove(hBox);
                                     try {
-                                        //event.getTags().remove(tag);
+                                        event.getTags().remove(tag);
                                         server.deleteTag(tag.getId(), event.getId());
                                     } catch (ConnectException ex) {
                                         mainCtrl.handleServerNotFound();
                                         return;
                                     }
-
+                                    populateTagList(event);
                                     break;
                                 }
                             }
@@ -166,25 +156,20 @@ public class TagPageCtrl {
                         return;
                     }
 
-                    // Update UI
                     populateTagList(event);
                 });
             });
 
-            // Set minimum width for label to ensure full visibility
+            //setting for full visibility of the words
             label.setMinWidth(Label.USE_PREF_SIZE);
 
-// Set minimum width for edit button to ensure full visibility
             editButton.setMinWidth(Button.USE_PREF_SIZE);
 
-// Set minimum width for delete button to ensure full visibility
             deleteButton.setMinWidth(Button.USE_PREF_SIZE);
 
-            // Create an HBox to contain the color box, label, edit button, and delete button
             HBox tagItem = new HBox(15);
             tagItem.getChildren().addAll(coloredBox, label, editButton, deleteButton);
 
-            // Add the HBox to the tagList VBox
             tagList.getChildren().add(tagItem);
         }
     }
