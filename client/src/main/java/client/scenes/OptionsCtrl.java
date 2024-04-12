@@ -44,10 +44,10 @@ public class OptionsCtrl {
 
 
     /**
-     * @param userConfig user configuration
+     * @param userConfig   user configuration
      * @param languageConf language configuration
-     * @param converter currency converter
-     * @param server server utils
+     * @param converter    currency converter
+     * @param server       server utils
      */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
@@ -65,7 +65,7 @@ public class OptionsCtrl {
         CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
                 currencyChoiceBox);
         String cur = userConfig.getCurrency();
-        if(!cur.equals("None")) {
+        if (!cur.equals("None")) {
             CommonFunctions.HideableItem<String> item =
                     currencyChoiceBox.getItems().stream()
                             .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
@@ -83,11 +83,13 @@ public class OptionsCtrl {
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
         loadIndicator.setVisible(false);
 
-        currencyChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null && !newVal.equals(oldVal)) {
-                unsavedChanges = true;
-            }
-        });
+        currencyChoiceBox.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null && !newVal.equals(oldVal)) {
+                        unsavedChanges = true;
+                    }
+                });
 
         serverField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.equals(oldVal)) {
@@ -133,7 +135,7 @@ public class OptionsCtrl {
         String serverURL = serverField.getText();
         try {
             String currency = currencyChoiceBox.getValue().toString();
-            if(currency.length() == 3) {
+            if (currency.length() == 3) {
                 userConfig.setCurrency(currency);
             }
             lastContrast = userConfig.getHighContrast();
@@ -193,7 +195,7 @@ public class OptionsCtrl {
         serverField.setDisable(false);
         loadIndicator.setVisible(false);
         ft.stop();
-        if(result) {
+        if (result) {
             confirmationLabel.setText(languageConf.get("Options.serverUp"));
         } else {
             confirmationLabel.setText(languageConf.get("Options.serverDown"));
@@ -206,6 +208,7 @@ public class OptionsCtrl {
     private final BooleanProperty ctrlPressed = new SimpleBooleanProperty(false);
     private final BooleanProperty sPressed = new SimpleBooleanProperty(false);
     private final BooleanBinding spaceAndRightPressed = ctrlPressed.and(sPressed);
+
     /**
      * Enable keyboard shortcuts
      *

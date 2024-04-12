@@ -23,6 +23,7 @@ import com.google.inject.Injector;
 import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 import static com.google.inject.Guice.createInjector;
 
@@ -71,6 +72,28 @@ public class Main extends Application {
      */
     public void loadLanguageResourcesAndStart(Stage primaryStage) {  // Load all the FXML here:
         boolean isHighContrast = userConfig.getHighContrast();
+        FXMLloading result = getFxmLloading(isHighContrast);
+        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
+        primaryStage.setResizable(false);
+        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
+
+        mainCtrl.initialize(primaryStage, new PairCollector(result.start(),
+                result.eventPage(), result.adminLogin(), result.editParticipants(),
+                result.adminOverview(), result.addExpense(),
+                result.titleChanger(), result.addTag(), result.options(),
+                result.addCustomTransaction(), result.openDebtsPage())
+        );
+    }
+
+
+    /**
+     * loads the FXML files
+     *
+     * @param isHighContrast high contrast mode
+     * @return FXMLoading object
+     */
+    @NotNull
+    private static FXMLloading getFxmLloading(boolean isHighContrast) {
         var start = FXML.load(StartScreenCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "StartScreen.fxml"
@@ -115,14 +138,22 @@ public class Main extends Application {
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "OpenDebtsPage.fxml"
         );
-        var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
-        primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
+        return new FXMLloading(start, adminLogin, eventPage,
+                editParticipants, adminOverview, addExpense, titleChanger,
+                addTag, options, addCustomTransaction, openDebtsPage);
+    }
 
-        mainCtrl.initialize(primaryStage, new PairCollector(start,
-                eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag, options,
-                addCustomTransaction, openDebtsPage)
-        );
+    private record FXMLloading(javafx.util.Pair<StartScreenCtrl,
+            javafx.scene.Parent> start, javafx.util.Pair<AdminLoginCtrl,
+            javafx.scene.Parent> adminLogin, javafx.util.Pair<EventPageCtrl,
+            javafx.scene.Parent> eventPage, javafx.util.Pair<EditParticipantsCtrl,
+            javafx.scene.Parent> editParticipants, javafx.util.Pair<AdminOverviewCtrl,
+            javafx.scene.Parent> adminOverview, javafx.util.Pair<AddExpenseCtrl,
+            javafx.scene.Parent> addExpense, javafx.util.Pair<EditTitleCtrl,
+            javafx.scene.Parent> titleChanger, javafx.util.Pair<AddTagCtrl,
+            javafx.scene.Parent> addTag, javafx.util.Pair<OptionsCtrl,
+            javafx.scene.Parent> options, javafx.util.Pair<AddCustomTransactionCtrl,
+            javafx.scene.Parent> addCustomTransaction, javafx.util.Pair<OpenDebtsPageCtrl,
+            javafx.scene.Parent> openDebtsPage) {
     }
 }

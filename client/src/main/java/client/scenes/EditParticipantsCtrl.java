@@ -22,8 +22,6 @@ import java.util.Optional;
 import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.TITLE_CHANGE;
 import static java.lang.String.format;
-import static java.lang.Thread.sleep;
-
 
 public class EditParticipantsCtrl {
     @FXML
@@ -239,19 +237,7 @@ public class EditParticipantsCtrl {
             return;
         }
         if (index == 0) {
-            // create a new participant
-            if(event.getParticipants().stream().map(Participant::getName).toList().contains(name)) {
-                informNameExists();
-                return;
-            }
-            Participant newP = new Participant(name, email, beneficiary, iban, bic);
-
-            try {
-
-                server.createParticipant(event.getId(), newP);
-            } catch (ConnectException e) {
-                mainCtrl.handleServerNotFound();
-            }
+            if (creatingParticipant(name, email, beneficiary, iban, bic)) return;
         } else {
             Participant currP = event.getParticipants().get(index - 1);
             if(event.getParticipants().stream()
@@ -274,6 +260,45 @@ public class EditParticipantsCtrl {
                 mainCtrl.handleServerNotFound();
             }
         }
+        confirmationLabeling(edited);
+    }
+
+    /**
+     * Crating the participant
+     * @param name name of the participant
+     * @param email email of the participant
+     * @param beneficiary beneficiary of the participant
+     * @param iban iban of the participant
+     * @param bic bic of the participant
+     * @return true if the participant already exists
+     */
+    private boolean creatingParticipant(
+            String name,
+            String email,
+            String beneficiary,
+            String iban,
+            String bic) {
+        if(event.getParticipants().stream().map(Participant::getName).toList().contains(name)) {
+            informNameExists();
+            return true;
+        }
+        Participant newP = new Participant(name, email, beneficiary, iban, bic);
+
+        try {
+
+            server.createParticipant(event.getId(), newP);
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+        }
+        return false;
+    }
+
+    /**
+     * Display a confirmation message
+     *
+     * @param edited whether the participant was edited
+     */
+    private void confirmationLabeling(boolean edited) {
         if(edited) {
             warningLabel.setVisible(true);
             warningLabel.setOpacity(1);

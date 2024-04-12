@@ -331,17 +331,7 @@ public class AddExpenseCtrl {
     }
 
     private Expense makeExpense(Event ev) {
-        if (expenseAuthor.getValue() == null ||
-                purpose.getText().isEmpty() ||
-                amount.getText().isEmpty() ||
-                currency.getValue() == null ||
-                currency.getValue().toString() == null ||
-                (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
-                date.getValue() == null ||
-                type.getValue() == null) {
-            alertAllFields();
-            return null;
-        }
+        if (makeExpenseCheckEmpty()) return null;
         try {
             List<Participant> participants = getExpenseParticipants(ev);
             if(participants.isEmpty()) {
@@ -389,6 +379,26 @@ public class AddExpenseCtrl {
             alert.showAndWait();
         }
         return null;
+    }
+
+    /**
+     * check if all fields are filled
+     * @return true if all fields are filled
+     */
+
+    private boolean makeExpenseCheckEmpty() {
+        if (expenseAuthor.getValue() == null ||
+                purpose.getText().isEmpty() ||
+                amount.getText().isEmpty() ||
+                currency.getValue() == null ||
+                currency.getValue().toString() == null ||
+                (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
+                date.getValue() == null ||
+                type.getValue() == null) {
+            alertAllFields();
+            return true;
+        }
+        return false;
     }
 
     /**
