@@ -50,5 +50,6 @@ public class MyModule implements Module {
         binder.bind(Websocket.class).to(WebsocketImpl.class).in(Scopes.SINGLETON);
         binder.bind(FileManager.class).to(FileManagerImpl.class).in(Scopes.SINGLETON);
         binder.bind(CurrencyConverter.class).in(Scopes.SINGLETON);
+        binder.bind(EmailService.class).in(Scopes.SINGLETON);
     }
 }

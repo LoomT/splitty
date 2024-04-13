@@ -105,7 +105,8 @@ public class InviteMailCtrl {
                         || emailField.getText().equals(p.getEmailAddress())) return;
             }
             try {
-                server.createParticipant(event.getId(), new Participant(emailField.getText(),
+                server.createParticipant(event.getId(),
+                        new Participant(emailField.getText().split("@")[0],
                         emailField.getText()));
             } catch (ConnectException e) {
                 throw new RuntimeException(e); //TODO

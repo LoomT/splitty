@@ -251,7 +251,7 @@ public class OpenDebtsPageCtrl {
             ShrunkOpenDebtsListItem oldItem = (ShrunkOpenDebtsListItem) list.get(index);
             list.set(index, new ExpandedOpenDebtsListItem(oldItem.getTransaction(),
                     languageConf, this::resizeOpenDebtItem,
-                    this::settleDebtClicked, converter, mainCtrl, emailService));
+                    this::settleDebtClicked, converter, mainCtrl, emailService, event));
         } else {
             ExpandedOpenDebtsListItem oldItem = (ExpandedOpenDebtsListItem) list.get(index);
             allDebtsPane.getChildren().set(index, new ShrunkOpenDebtsListItem(

@@ -30,11 +30,17 @@ public class OptionsCtrl {
     @FXML
     private TextField serverField;
     @FXML
+    private TextField emailUsername;
+    @FXML
+    private TextField emailPassword;
+    @FXML
     private ToggleButton contrastToggle;
     @FXML
     private Label confirmationLabel;
     @FXML
     private ProgressIndicator loadIndicator;
+    @FXML
+    private Button mailButton;
     private Stage stage;
     private FadeTransition ft;
     private boolean lastContrast;
@@ -91,6 +97,23 @@ public class OptionsCtrl {
     public void display(Stage stage) {
         this.stage = stage;
         lastContrast = userConfig.getHighContrast();
+        updateEmailFields();
+    }
+
+    /**
+     * updates the email fields
+     */
+    public void updateEmailFields(){
+        if(emailService.isNotInitialized()){
+            mailButton.setDisable(true);
+            emailUsername.clear();
+            emailPassword.clear();
+        }
+        else{
+            mailButton.setDisable(false);
+            emailUsername.setText(userConfig.getUsername());
+            emailPassword.setText(userConfig.getMailPassword());
+        }
     }
 
     /**
@@ -112,6 +135,16 @@ public class OptionsCtrl {
     @FXML
     public void saveClicked() {
         String serverURL = serverField.getText();
+        if(!checkEmailFields()){
+            emailUsername.setStyle("-fx-border-color: red;");
+            emailPassword.setStyle("-fx-border-color: red;");
+            ft.stop();
+            confirmationLabel.setText(languageConf.get("Options.invalidEmail"));
+            confirmationLabel.setVisible(true);
+            confirmationLabel.setOpacity(1.0);
+            ft.play();
+            return;
+        }
         try {
             String currency = currencyChoiceBox.getValue().toString();
             if(currency.length() == 3) {
@@ -120,6 +153,8 @@ public class OptionsCtrl {
             lastContrast = userConfig.getHighContrast();
             userConfig.persistContrast();
             userConfig.setURL(serverURL);
+            emailService.setConfiguration(emailUsername.getText(), emailPassword.getText());
+            updateEmailFields();
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(languageConf.get("unexpectedError"));
@@ -132,6 +167,16 @@ public class OptionsCtrl {
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
+    }
+
+    /**
+     * checks the email fields to see if they are valid
+     * @return true iff the fields are both empty or correctly filled
+     */
+    public boolean checkEmailFields(){
+        if(emailUsername.getLength() == 0 && emailPassword.getLength() == 0) return true;
+        if(emailUsername.getLength() != 0 && emailPassword.getLength() == 0) return false;
+        return emailUsername.getText().contains("@");
     }
 
     /**

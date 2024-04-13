@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MyFXML;
+import client.utils.EmailService;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
@@ -62,7 +63,7 @@ public class EventPageCtrlTest {
         var eventPageLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/EventPage.fxml"),
                 languageConf.getLanguageResources(), null,
                 (type) -> new EventPageCtrl(mainCtrl, languageConf, websocket, server,
-                        converter, userConfig),
+                        converter, userConfig, new EmailService(userConfig, languageConf)),
                 StandardCharsets.UTF_8);
         Scene scene = new Scene(eventPageLoader.load());
         ctrl = eventPageLoader.getController();

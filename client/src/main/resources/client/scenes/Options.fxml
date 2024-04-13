@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="299.0" prefWidth="389.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.OptionsCtrl">
+<AnchorPane prefHeight="410.0" prefWidth="400.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.OptionsCtrl">
    <children>
       <HBox prefHeight="62.0" prefWidth="392.0" styleClass="navbar">
          <children>
@@ -26,7 +26,7 @@
             <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
          </padding>
       </HBox>
-      <GridPane hgap="10.0" layoutX="-3.0" layoutY="62.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="237.0" prefWidth="395.0" vgap="10.0">
+      <GridPane hgap="10.0" layoutX="-3.0" layoutY="62.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="305.0" prefWidth="395.0" vgap="10.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="212.0" minWidth="10.0" prefWidth="147.9999755859375" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="258.39996337890625" minWidth="10.0" prefWidth="236.80002441406253" />
@@ -35,7 +35,9 @@
           <RowConstraints maxHeight="95.59998168945313" minHeight="10.0" percentHeight="22.0" prefHeight="49.0" vgrow="SOMETIMES" />
           <RowConstraints maxHeight="149.6" minHeight="10.0" percentHeight="22.0" prefHeight="22.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="149.6" minHeight="10.0" percentHeight="22.0" prefHeight="49.4000244140625" vgrow="SOMETIMES" />
-            <RowConstraints maxHeight="149.6" minHeight="10.0" percentHeight="13.0" prefHeight="29.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="149.6" minHeight="10.0" percentHeight="22.0" prefHeight="49.4000244140625" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="149.6" minHeight="10.0" percentHeight="22.0" prefHeight="26.33331298828125" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="149.6" minHeight="10.0" percentHeight="13.0" prefHeight="37.66668701171875" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="103.60001220703123" minHeight="10.0" prefHeight="42.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
@@ -46,7 +48,7 @@
                </GridPane.margin>
             </ComboBox>
             <Label styleClass="textFont" text="%Options.setServerURL" wrapText="true" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-            <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <children>
                   <TextField fx:id="serverField" styleClass="sstextfield">
                      <opaqueInsets>
@@ -64,9 +66,9 @@
                </children>
             </HBox>
             <Label styleClass="textFont" text="%Options.enableHighContrast" wrapText="true" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
-            <Label fx:id="confirmationLabel" alignment="CENTER" prefHeight="17.0" prefWidth="336.0" styleClass="warningLabel" text="Settings saved successfully!" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-            <ProgressIndicator fx:id="loadIndicator" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" />
-            <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnSpan="2" GridPane.rowIndex="4">
+            <Label fx:id="confirmationLabel" alignment="CENTER" prefHeight="17.0" prefWidth="336.0" styleClass="warningLabel" text="Settings saved successfully!" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
+            <ProgressIndicator fx:id="loadIndicator" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
+            <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnSpan="2" GridPane.rowIndex="6">
                <children>
                   <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                   <Button mnemonicParsing="false" onAction="#cancelClicked" styleClass="sbutton" text="%Options.cancel">
@@ -98,11 +100,37 @@
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#testMail" styleClass="pbutton" text="%Options.sendTestEmail" />
+                        <Button fx:id="mailButton" mnemonicParsing="false" onAction="#testMail" styleClass="pbutton" text="%Options.sendTestEmail" />
                      </children>
                   </HBox>
                </children>
             </GridPane>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <children>
+                  <TextField fx:id="emailUsername" prefHeight="25.0" prefWidth="220.0" styleClass="sstextfield">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+               <children>
+                  <TextField fx:id="emailPassword" prefHeight="25.0" prefWidth="220.0" styleClass="sstextfield">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <HBox.margin>
+                        <Insets bottom="5.0" top="5.0" />
+                     </HBox.margin>
+                  </TextField>
+               </children>
+            </HBox>
+            <Label styleClass="textFont" text="%Options.setMailUsername" GridPane.rowIndex="3" />
+            <Label styleClass="textFont" text="%Options.setMailPassword" GridPane.rowIndex="4" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

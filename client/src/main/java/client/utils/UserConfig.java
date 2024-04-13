@@ -237,4 +237,26 @@ public class UserConfig {
                 configProperties.getProperty("mail.smtp.starttls.enable"));
         return result;
     }
+
+    /**
+     * sets username in the user config
+     * @param username username
+     */
+    public void setUsername(String username) throws IOException {
+        configProperties.setProperty("spring.mail.username", username);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed email username to " + username);
+        }
+    }
+
+    /**
+     * sets password in the user config
+     * @param password password
+     */
+    public void setMailPassword(String password) throws IOException {
+        configProperties.setProperty("spring.mail.password", password);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed email password to " + password);
+        }
+    }
 }

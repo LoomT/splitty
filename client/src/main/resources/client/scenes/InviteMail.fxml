@@ -20,8 +20,8 @@
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="74.71427263532365" minHeight="10.0" percentHeight="30.0" prefHeight="36.9999782017299" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="121.57145036969865" minHeight="10.0" percentHeight="70.0" prefHeight="121.57145036969865" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="74.71427263532365" minHeight="10.0" percentHeight="40.0" prefHeight="27.142850875854492" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="121.57145036969865" minHeight="10.0" percentHeight="60.0" prefHeight="100.85714912414551" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <HBox prefHeight="42.0" prefWidth="392.0" styleClass="navbar">
@@ -32,7 +32,7 @@
                   <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                </padding>
             </HBox>
-            <GridPane hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="97.0" prefWidth="392.0" vgap="10.0" GridPane.rowIndex="1">
+            <GridPane hgap="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="80.0" prefWidth="392.0" vgap="10.0" GridPane.rowIndex="1">
                <columnConstraints>
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="212.0" minWidth="10.0" prefWidth="147.9999755859375" />
                   <ColumnConstraints hgrow="SOMETIMES" maxWidth="258.39996337890625" minWidth="10.0" prefWidth="236.80002441406253" />
