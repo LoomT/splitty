@@ -3,6 +3,7 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,6 +78,7 @@ public class AdminController {
 
             List<Expense> expenses = event.getExpenses();
             List<Participant> participants = event.getParticipants();
+            List<Tag> tags = event.getTags();
             event.setExpenses(new ArrayList<>());
             Event saved = repo.save(event);
             List<Participant> savedParticipants = saved.getParticipants();
@@ -85,8 +87,17 @@ public class AdminController {
                 map.put(participants.get(i).getId(), savedParticipants.get(i).getId());
                 map.put(savedParticipants.get(i).getId(), savedParticipants.get(i).getId());
             }
+            Map<Long, Long> tagMap = new HashMap<>();
+            for (int i = 0; i < tags.size(); i++) {
+                tagMap.put(tags.get(i).getId(), saved.getTags().get(i).getId());
+                tagMap.put(saved.getTags().get(i).getId(), saved.getTags().get(i).getId());
+            }
             for(Expense expense : expenses) {
                 expense.getExpenseAuthor().setId(map.get(expense.getExpenseAuthor().getId()));
+                Tag tag = expense.getType();
+                if(tag != null) {
+                    tag.setId(tagMap.get(tag.getId()));
+                }
                 for(Participant expenseParticipant : expense.getExpenseParticipants()) {
                     expenseParticipant.setId(map.get(expenseParticipant.getId()));
                 }
@@ -97,6 +108,7 @@ public class AdminController {
             return ResponseEntity.ok(saved);
 
         } catch (Exception e) {
+            repo.deleteById(event.getId());
             return ResponseEntity.internalServerError().build();
         }
     }
