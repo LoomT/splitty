@@ -61,11 +61,7 @@
                   <Insets bottom="5.0" />
                </VBox.margin>
             </HBox>
-            <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Text>
+            <Label fx:id="participantLabel" text="Chris, John, Anna, David" />
             <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="headerFont" text="%EventPage.expenses">
                <font>
                   <Font name="System Bold" size="18.0" />
@@ -110,7 +106,7 @@
             </ScrollPane>
          </children>
       </VBox>
-      <ComboBox fx:id="languageChoiceBoxEvent" prefWidth="70.0" styleClass="sbutton" layoutX="510" layoutY="78" />
+      <ComboBox fx:id="languageChoiceBoxEvent" layoutX="510" layoutY="78" prefWidth="70.0" styleClass="sbutton" />
       <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
    </children>
    <stylesheets>
