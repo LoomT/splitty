@@ -4,7 +4,6 @@ import client.MockClass.MainCtrlInterface;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -189,8 +188,12 @@ public class TestMainCtrl implements MainCtrlInterface {
 
     }
 
+    /**
+     * show the tag page
+     * @param event the current event
+     */
     @Override
-    public void showTagPage(Event event, PieChart pc) {
+    public void showTagPage(Event event) {
 
     }
 

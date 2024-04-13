@@ -13,7 +13,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -29,9 +28,9 @@ import javafx.stage.Stage;
 
 import java.net.ConnectException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+
 
 public class TagPageCtrl {
 
@@ -42,7 +41,7 @@ public class TagPageCtrl {
     @FXML
     private ColorPicker colorPicker;
 
-    List<Tag> removedTags = new ArrayList<>();
+    private List<Tag> removedTags = new ArrayList<>();
 
     private final Websocket websocket;
     private final CurrencyConverter converter;
@@ -50,6 +49,7 @@ public class TagPageCtrl {
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
+    private Event event;
 
     /**
      * @param mainCtrl     mainCtrl injection
@@ -72,137 +72,141 @@ public class TagPageCtrl {
         this.userConfig = userConfig;
     }
 
+    /**
+     * initialize method
+     */
     public void initialize() {
-
     }
-    public void displayTagPage(Event event, PieChart pc) {
+
+    /**
+     * method for displaying the page for editting tags
+     * @param event the current event
+     */
+    public void displayTagPage(Event event) {
+        this.event = event;
         populateTagList(event);
         back.setOnAction(e -> {
             mainCtrl.showStatisticsPage(event); // pass updated tags
-            System.out.println("\n\n\n" + pc.getData().size());
-            removeTags(pc);
-            System.out.println("\n\n\n" + pc.getData().size());
             //pc.getData().clear();
         });
     }
 
-    public void removeTags(PieChart pieChart) {
-        // Get the list of data from the PieChart
-        ObservableList<PieChart.Data> data = pieChart.getData();
 
-        // Iterate through the data
-        Iterator<PieChart.Data> iterator = data.iterator();
-        while (iterator.hasNext()) {
-            PieChart.Data slice = iterator.next();
-
-            // Check if the slice has the property to remove
-            List<String> removedTagNames = new ArrayList<>();
-            for (Tag tag : removedTags) {
-                removedTagNames.add(tag.getName());
-            }
-            if (removedTagNames.contains(slice.getName())) {
-                iterator.remove();
-            }
-        }
-        removedTags.clear();
-    }
-
+    /**
+     * method for populating the tag list
+     * @param event the current event
+     */
     public void populateTagList(Event event) {
         tagList.getChildren().clear();
+
         for (Tag tag : event.getTags()) {
-            String tagName = tag.getName();
-            Label label = new Label(tagName);
-            label.setFont(Font.font("Arial", FontWeight.NORMAL, 15));
+            HBox tagItem = createTagItem(tag, event);
+            tagList.getChildren().add(tagItem);
+        }
+    }
 
-            Shape coloredBox = new Rectangle(15, 15);
-            coloredBox.setFill(Color.web(tag.getColor()));
+    private HBox createTagItem(Tag tag, Event event) {
+        String tagName = tag.getName();
+        Label label = createTagLabel(tagName);
+        Shape coloredBox = createColoredBox(tag, tag.getColor());
+        Button editButton = createEditButton(tag, event);
+        Button deleteButton = createDeleteButton(tag, event);
 
-            coloredBox.setOnMouseClicked(e -> {
-                Stage colorPickerStage = new Stage();
-                colorPickerStage.setTitle("Change colour"); // Set title here
-                colorPicker = new ColorPicker(Color.web(tag.getColor()));
-                colorPicker.setOnAction(event1 -> {
-                    tag.setColor(colorPicker.getValue().toString());
-                    try {
-                        server.updateTag(tag.getId(), event.getId(), tag);
-                    } catch (ConnectException ex) {
-                        mainCtrl.handleServerNotFound();
-                        return;
-                    }
+        HBox tagItem = new HBox(15);
+        tagItem.getChildren().addAll(coloredBox, label, editButton, deleteButton);
 
-                    populateTagList(event);
-                    colorPickerStage.close();
-                });
+        return tagItem;
+    }
 
-                Scene colorPickerScene = new Scene(colorPicker, 200, 50); // Adjust width as needed
-                colorPickerStage.setScene(colorPickerScene);
-                colorPickerStage.show();
-            });
+    private Label createTagLabel(String tagName) {
+        Label label = new Label(tagName);
+        label.setFont(Font.font("Arial", FontWeight.NORMAL, 15));
+        label.setMinWidth(Label.USE_PREF_SIZE); // Ensure full visibility of the words
+        return label;
+    }
 
-            Button deleteButton = new Button("X");
-            deleteButton.setOnAction(e -> {
-                String tagNameToRemove = tag.getName();
-                ObservableList<Node> temp = tagList.getChildren();
-                for (Node node : temp) {
-                    if (node instanceof HBox hBox) {
-                        for (Node child : hBox.getChildren()) {
-                            if (child instanceof Label lab) {
-                                if (tagNameToRemove.equals(lab.getText())) {
-                                    tagList.getChildren().remove(hBox);
-                                    try {
-                                        event.getTags().remove(tag);
-                                        server.deleteTag(tag.getId(), event.getId());
-                                        removedTags.add(tag);
-                                    } catch (ConnectException ex) {
-                                        mainCtrl.handleServerNotFound();
-                                        return;
-                                    }
-                                    populateTagList(event);
-                                    break;
-                                }
+    private Shape createColoredBox(Tag tag, String color) {
+        Shape coloredBox = new Rectangle(15, 15);
+        coloredBox.setFill(Color.web(color));
+        coloredBox.setOnMouseClicked(e -> showColorPicker(tag, color));
+        return coloredBox;
+    }
+
+    private Button createEditButton(Tag tag, Event event) {
+        Button editButton = new Button("Edit name");
+        editButton.setOnAction(e -> showEditDialog(tag, event));
+        editButton.setMinWidth(Button.USE_PREF_SIZE);
+        return editButton;
+    }
+
+    private Button createDeleteButton(Tag tag, Event event) {
+        Button deleteButton = new Button("X");
+        deleteButton.setOnAction(e -> deleteTag(tag, event));
+        deleteButton.setMinWidth(Button.USE_PREF_SIZE);
+        return deleteButton;
+    }
+
+    private void showColorPicker(Tag tag, String color) {
+        Stage colorPickerStage = new Stage();
+        colorPickerStage.setTitle("Change colour");
+        colorPicker = new ColorPicker(Color.web(color));
+        colorPicker.setOnAction(e -> {
+            tag.setColor(colorPicker.getValue().toString());
+            try {
+                server.updateTag(tag.getId(), event.getId(), tag);
+            } catch (ConnectException ex) {
+                mainCtrl.handleServerNotFound();
+                return;
+            }
+            populateTagList(event);
+            colorPickerStage.close();
+        });
+        Scene colorPickerScene = new Scene(colorPicker, 200, 50);
+        colorPickerStage.setScene(colorPickerScene);
+        colorPickerStage.show();
+    }
+
+    private void showEditDialog(Tag tag, Event event) {
+        TextInputDialog dialog = new TextInputDialog(tag.getName());
+        dialog.setTitle("Edit Tag Name");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Enter new tag name:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(newTagName -> {
+            tag.setName(newTagName);
+            try {
+                server.updateTag(tag.getId(), event.getId(), tag);
+            } catch (ConnectException ex) {
+                mainCtrl.handleServerNotFound();
+                return;
+            }
+            populateTagList(event);
+        });
+    }
+
+    private void deleteTag(Tag tag, Event event) {
+        String tagNameToRemove = tag.getName();
+        ObservableList<Node> temp = tagList.getChildren();
+        for (Node node : temp) {
+            if (node instanceof HBox hBox) {
+                for (Node child : hBox.getChildren()) {
+                    if (child instanceof Label lab) {
+                        if (tagNameToRemove.equals(lab.getText())) {
+                            tagList.getChildren().remove(hBox);
+                            try {
+                                event.getTags().remove(tag);
+                                server.deleteTag(tag.getId(), event.getId());
+                                removedTags.add(tag);
+                            } catch (ConnectException ex) {
+                                mainCtrl.handleServerNotFound();
+                                return;
                             }
+                            populateTagList(event);
+                            return;
                         }
                     }
                 }
-                // You may want to handle tag deletion from the backend here
-            });
-
-            // Create edit button
-            Button editButton = new Button("Edit");
-            editButton.setOnAction(e -> {
-                // Create text input dialog for renaming the tag
-                TextInputDialog dialog = new TextInputDialog(tag.getName());
-                dialog.setTitle("Edit Tag Name");
-                dialog.setHeaderText(null);
-                dialog.setContentText("Enter new tag name:");
-
-                // Get the result of the dialog
-                Optional<String> result = dialog.showAndWait();
-                result.ifPresent(newTagName -> {
-                    // Update the tag's name
-                    tag.setName(newTagName);
-                    try {
-                        server.updateTag(tag.getId(), event.getId(), tag);
-                    } catch (ConnectException ex) {
-                        mainCtrl.handleServerNotFound();
-                        return;
-                    }
-
-                    populateTagList(event);
-                });
-            });
-
-            //setting for full visibility of the words
-            label.setMinWidth(Label.USE_PREF_SIZE);
-
-            editButton.setMinWidth(Button.USE_PREF_SIZE);
-
-            deleteButton.setMinWidth(Button.USE_PREF_SIZE);
-
-            HBox tagItem = new HBox(15);
-            tagItem.getChildren().addAll(coloredBox, label, editButton, deleteButton);
-
-            tagList.getChildren().add(tagItem);
+            }
         }
     }
 

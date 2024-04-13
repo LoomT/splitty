@@ -3,8 +3,6 @@ package client.MockClass;
 import client.scenes.PairCollector;
 import commons.Event;
 import commons.Expense;
-import commons.Tag;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -144,5 +142,9 @@ public interface MainCtrlInterface {
      */
     void setStartPage(boolean page);
 
-    void showTagPage(Event event, PieChart pc);
+    /**
+     * shows the tag page
+     * @param event the current event
+     */
+    void showTagPage(Event event);
 }

@@ -3,10 +3,12 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.TagPageCtrl">
    <children>
       <VBox fx:id="tagList" layoutX="82.0" layoutY="42.0" prefHeight="200.0" prefWidth="100.0" />
       <Button fx:id="back" layoutX="21.0" layoutY="351.0" mnemonicParsing="false" text="%TagPage.back" />
+      <Text layoutX="300.0" layoutY="27.0" strokeType="OUTSIDE" strokeWidth="0.0" text="%TagPage.instruction" />
    </children>
 </AnchorPane>

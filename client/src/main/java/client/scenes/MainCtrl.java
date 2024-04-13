@@ -26,7 +26,6 @@ import commons.Expense;
 import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -532,11 +531,13 @@ public class MainCtrl implements MainCtrlInterface{
 
     }
 
-
-
+    /**
+     * show the page for editting tags
+     * @param event the current event
+     */
     @Override
-    public void showTagPage(Event event, PieChart pc) {
-        tagPageCtrl.displayTagPage(event, pc);
+    public void showTagPage(Event event) {
+        tagPageCtrl.displayTagPage(event);
         primaryStage.setTitle("Tags overview");
         primaryStage.setScene(tagPage);
     }

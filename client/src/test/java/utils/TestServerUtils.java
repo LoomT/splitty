@@ -511,6 +511,29 @@ public class TestServerUtils implements ServerUtils {
     }
 
     /**
+     * update the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @param tag the tag
+     * @return
+     */
+    @Override
+    public int updateTag(long id, String eventID, Tag tag) throws ConnectException {
+        return 0;
+    }
+
+    /**
+     * delete the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return
+     */
+    @Override
+    public int deleteTag(long id, String eventID) throws ConnectException {
+        return 0;
+    }
+
+    /**
      * @param eventID     event id
      * @param transaction transaction to save
      * @return status code

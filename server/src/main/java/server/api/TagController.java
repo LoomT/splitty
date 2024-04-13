@@ -63,6 +63,13 @@ public class TagController {
         }
     }
 
+    /**
+     * update the existent tag
+     * @param id the id of the tag
+     * @param updatedTag the updated tag
+     * @param eventID the id of the event
+     * @return updated tag
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Tag> updateTag(@PathVariable long id,
                                          @RequestBody Tag updatedTag,
@@ -87,8 +94,14 @@ public class TagController {
         }
     }
 
+    /**
+     * delete the
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return deleted tag
+     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Expense> deleteById(@PathVariable long id,
+    public ResponseEntity<Expense> deleteTag(@PathVariable long id,
                                               @PathVariable String eventID) {
         try {
             Optional<Tag> optionalTag = tagRepo.findById(new EventWeakKey(eventID, id));

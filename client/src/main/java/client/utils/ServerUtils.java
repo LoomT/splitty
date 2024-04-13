@@ -158,8 +158,21 @@ public interface ServerUtils {
      */
     int addTag(String eventID, Tag tag) throws ConnectException;
 
+    /**
+     * update the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @param tag the tag
+     * @return the status code
+     */
     int updateTag(long id, String eventID, Tag tag) throws ConnectException;
 
+    /**
+     * delete the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return the status code
+     */
     int deleteTag(long id, String eventID) throws ConnectException;
 
     /**

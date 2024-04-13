@@ -10,7 +10,6 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
 import commons.Tag;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
@@ -30,9 +29,7 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Currency;
-import java.util.List;
 import java.util.Locale;
 
 import static commons.WebsocketActions.*;
@@ -95,6 +92,12 @@ public class StatisticsCtrl {
         websocket.on(ADD_TAG, tag -> {
             populateLegend(event);
         });
+        websocket.on(REMOVE_TAG, tag -> {
+            populateLegend(event);
+        });
+        websocket.on(UPDATE_TAG, tag -> {
+            populateLegend(event);
+        });
         back.setOnAction(e -> {
             handleBackButton(event);
         });
@@ -145,7 +148,7 @@ public class StatisticsCtrl {
         initPieChart(event);
         initCost(event);
         editTags.setOnAction(e -> {
-            mainCtrl.showTagPage(event, pc);
+            mainCtrl.showTagPage(event);
         });
     }
 

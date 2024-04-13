@@ -437,6 +437,13 @@ public class ServerUtilsImpl implements ServerUtils {
         }
     }
 
+    /**
+     * update the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @param tag the tag
+     * @return the status code
+     */
     @Override
     public int updateTag(long id, String eventID, Tag tag) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
@@ -453,7 +460,12 @@ public class ServerUtilsImpl implements ServerUtils {
         }
     }
 
-
+    /**
+     * delete the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return the status code
+     */
     @Override
     public int deleteTag(long id, String eventID) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
