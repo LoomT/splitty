@@ -95,7 +95,7 @@
             </HBox>
             <HBox styleClass="tabHeader">
                <children>
-                  <Button fx:id="allTab" mnemonicParsing="false" onAction="#allTabClicked" text="All">
+                  <Button fx:id="allTab" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#allTabClicked" text="All">
                      <styleClass>
                         <String fx:value="tabButton" />
                         <String fx:value="selectedTabButton" />
