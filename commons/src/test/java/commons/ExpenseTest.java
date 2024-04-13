@@ -19,6 +19,7 @@ Remark:
 public class ExpenseTest {
     Expense e1, e2, e3;
     Participant p1, p2, expAuth;
+    Tag t1, t2;
     List<Participant> expPart = new ArrayList<>();
     Date creationDate;
     long expenseId1, expenseId2;
@@ -31,10 +32,11 @@ public class ExpenseTest {
         expPart.add(p1);
         expPart.add(p2);
         expPart.add(expAuth);
-
-        e1 = new Expense(p1, "Groceries", 50.0, "EUR", expPart, "Food");
-        e2 = new Expense(p1, "Groceries", 50.0, "EUR", expPart, "Food");
-        e3 = new Expense(p2, "Uber", 20.5, "USD", expPart, "Transport");
+        t1 = new Tag("food", "#00FF00");
+        t2 = new Tag("transport", "#0000FF");
+        e1 = new Expense(p1, "Groceries", 50.0, "EUR", expPart, t1);
+        e2 = new Expense(p1, "Groceries", 50.0, "EUR", expPart, t1);
+        e3 = new Expense(p2, "Uber", 20.5, "USD", expPart, t2);
 
         LocalDate localDate = LocalDate.of(2024, 2, 25);
         creationDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
@@ -55,7 +57,7 @@ public class ExpenseTest {
     @Test
     void testConstructorNoParticipants() {
         List<Participant> temp = new ArrayList<>();
-        Expense e = new Expense(p2, "Uber", 20.5, "USD", temp, "Transport");
+        Expense e = new Expense(p2, "Uber", 20.5, "USD", temp, t2);
         assertTrue(e.getExpenseParticipants().isEmpty());
     }
 
@@ -86,7 +88,8 @@ public class ExpenseTest {
 
     @Test
     void testGetType() {
-        assertEquals("Food", e2.getType());
+
+        assertEquals(t1, e2.getType());
     }
 
     @Test
@@ -120,8 +123,9 @@ public class ExpenseTest {
 
     @Test
     void testSetType() {
-        e2.setType("Beverages");
-        assertEquals("Beverages", e2.getType());
+        Tag temp = new Tag("Beverages", "FF0000");
+        e2.setType(temp);
+        assertEquals(temp, e2.getType());
     }
 
     //Revert changes
@@ -131,7 +135,7 @@ public class ExpenseTest {
         e1.setPurpose("Groceries");
         e3.setAmount(20.5);
         e3.setCurrency("USD");
-        e2.setType("Food");
+        e2.setType(t1);
     }
 
     @Test

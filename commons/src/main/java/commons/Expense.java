@@ -41,7 +41,8 @@ public class Expense implements Cloneable {
     private Date date;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Participant> expenseParticipants;
-    private String type;
+    @ManyToOne(optional = true)
+    private Tag type;
 
     /**
      * constructor for Expense class
@@ -53,7 +54,7 @@ public class Expense implements Cloneable {
      * @param type type of expense
      */
     public Expense(Participant expenseAuthor, String purpose, double amount,
-                   String currency, List<Participant> expenseParticipants, String type) {
+                   String currency, List<Participant> expenseParticipants, Tag type) {
         this.expenseAuthor = expenseAuthor;
         this.purpose = purpose;
         this.amount = amount;
@@ -152,7 +153,7 @@ public class Expense implements Cloneable {
      * getter for type
      * @return the type of expense
      */
-    public String getType() {
+    public Tag getType() {
         return type;
     }
 
@@ -193,7 +194,7 @@ public class Expense implements Cloneable {
      * setter for type
      * @param type type of expense
      */
-    public void setType(String type) {
+    public void setType(Tag type) {
         this.type = type;
     }
 

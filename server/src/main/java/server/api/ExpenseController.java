@@ -168,8 +168,7 @@ public class ExpenseController {
         return expense == null || expense.getExpenseAuthor() == null
                 || expense.getPurpose() == null || expense.getPurpose().isEmpty()
                 || expense.getCurrency() == null || expense.getCurrency().isEmpty()
-                || expense.getExpenseParticipants() == null
-                || expense.getType() == null || expense.getType().isEmpty();
+                || expense.getExpenseParticipants() == null;
     }
 }
 

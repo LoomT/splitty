@@ -60,7 +60,7 @@ public class AddExpenseCtrl {
     private TextFlow expenseParticipants;
 
     @FXML
-    private ComboBox<String> type;
+    private ComboBox<Tag> type;
 
     @FXML
     private Button abort;
@@ -129,6 +129,12 @@ public class AddExpenseCtrl {
         CommonFunctions
                 .comboBoxAutoCompletionSupport(converter.getCurrencies(), currency);
         lengthListener(purpose, warningLabel, 20, languageConf.get("AddExp.charLimit"));
+
+        websocket.on(ADD_TAG, tag -> {
+            if (!type.getItems().contains((Tag) tag)) {
+                type.getItems().add((Tag) tag);
+            }
+        });
     }
 
     /**
@@ -153,6 +159,7 @@ public class AddExpenseCtrl {
         equalSplit.setDisable(false);
         populateAuthorChoiceBox(event);
         populateTypeBox(event);
+        type.getSelectionModel().clearSelection();
         purpose.clear();
         amount.clear();
         setPreferredCurrency();
@@ -176,17 +183,16 @@ public class AddExpenseCtrl {
                 editButton(event, exp);
             }
         });
-        abort.setOnAction(x -> {
-            handleAbortButton(event);
-        });
+        abort.setOnAction(x -> handleAbortButton(event));
         addTag.setOnAction(x -> {
             handeAddTagButton(event);
+            populateTypeBox(event);
         });
     }
 
     /**
      * behaviour for add tag button
-     * @param ev
+     * @param ev the current event
      */
     public void handeAddTagButton(Event ev) {
         mainCtrl.showAddTagPage(ev);
@@ -337,8 +343,7 @@ public class AddExpenseCtrl {
                 currency.getValue() == null ||
                 currency.getValue().toString() == null ||
                 (!equalSplit.isSelected() && !partialSplit.isSelected()) ||
-                date.getValue() == null ||
-                type.getValue() == null) {
+                date.getValue() == null) {
             alertAllFields();
             return null;
         }
@@ -375,7 +380,7 @@ public class AddExpenseCtrl {
                 return null;
             }
 
-            String expType = type.getValue();
+            Tag expType = type.getValue();
             Expense expense = new Expense(selectedParticipant, expPurpose, convertedAmount,
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
@@ -430,76 +435,114 @@ public class AddExpenseCtrl {
      */
     public void populateTypeBox(Event ev) {
         setupTypeComboBox(ev);
+        type.setValue(type.getItems().getFirst());
     }
 
     private void setupTypeComboBox(Event ev) {
         type.getItems().clear();
         for (Tag tag : ev.getTags()) {
-            type.getItems().add(tag.getName());
+            type.getItems().add(tag);
         }
         type.setCellFactory(createTypeListCellFactory(ev));
         type.setButtonCell(createTypeListCell(ev));
-        websocket.on(ADD_TAG, tag -> {
-            String typeName = ((Tag) tag).getName();
-            if (!type.getItems().contains(typeName)) {
-                type.getItems().add(typeName);
-            }
-        });
+        type.getItems().add(0, null);
+
 
     }
 
-    private Callback<ListView<String>, ListCell<String>> createTypeListCellFactory(Event ev) {
+    /** set the label for when displaying the option
+     *
+     * @param ev the current event
+     * @return callback
+     */
+    private Callback<ListView<Tag>, ListCell<Tag>> createTypeListCellFactory(Event ev) {
         return param -> new ListCell<>() {
             @Override
-            protected void updateItem(String item, boolean empty) {
+            protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
-                    Tag tag = findTagByName(item, ev.getTags());
+                    Tag tag = findTagById(item.getId(), ev.getTags());
                     if (tag != null) {
-                        Label label = createLabelWithColor(item, hexToColor(tag.getColor()));
+                        Label label = createLabelWithColor(item.getName(),
+                                hexToColor(tag.getColor()));
+                        label.setUserData(tag.getId());
                         setGraphic(label);
+                    } else {
+                        setText(item.getName());
+                        setGraphic(null);
                     }
                 } else {
-                    setText(null);
-                    setGraphic(null);
+                    Label noneLabel = new Label("None");
+                    noneLabel.setTextFill(Color.BLACK);
+                    setGraphic(noneLabel);
                 }
             }
         };
     }
 
-    private ListCell<String> createTypeListCell(Event ev) {
+    /**
+     * set the label after choosing an option
+     * @param ev the current event
+     * @return callback
+     */
+    private ListCell<Tag> createTypeListCell(Event ev) {
         return new ListCell<>() {
             @Override
-            protected void updateItem(String item, boolean empty) {
+            protected void updateItem(Tag item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item != null && !empty) {
-                    Tag tag = findTagByName(item, ev.getTags());
+                    Tag tag = findTagById(item.getId(), ev.getTags());
                     if (tag != null) {
-                        Label label = createLabelWithColor(item, hexToColor(tag.getColor()));
+                        Label label = createLabelWithColor(item.getName(),
+                                hexToColor(tag.getColor()));
+                        label.setUserData(tag.getId());
                         setGraphic(label);
                     }
                 } else {
-                    setText(null);
-                    setGraphic(null);
+                    Label noneLabel = new Label("None");
+                    noneLabel.setTextFill(Color.BLACK);
+                    setGraphic(noneLabel);
                 }
             }
         };
     }
 
+    /**
+     * colour the background of the tag
+     * @param text the text
+     * @param backgroundColor the color
+     * @return the styled label
+     */
     private Label createLabelWithColor(String text, Color backgroundColor) {
         Label label = new Label(text);
-        if (backgroundColor != null) {
+        if (backgroundColor != null && !text.isEmpty()) {
+            String textColor = brightness(backgroundColor) > 0.5 ? "#000000" : "#FFFFFF";
             label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
-                    + "; -fx-padding: 5px; -fx-text-fill: white;");
+                    + "; -fx-padding: 5px; -fx-text-fill: " + textColor + ";");
         }
         double textWidth = new Text(text).getLayoutBounds().getWidth();
         label.setMinWidth(textWidth + 10);
         return label;
     }
 
-    private Tag findTagByName(String tagName, List<Tag> tags) {
+    /**
+     * compute brightness of the colour
+     * @param color the color
+     * @return a double
+     */
+    private double brightness(Color color) {
+        return (0.21 * color.getRed() + 0.72 * color.getGreen() + 0.07 * color.getBlue());
+    }
+
+    /**
+     * find the tag
+     * @param id the id of the tag
+     * @param tags the list of tags
+     * @return the tag
+     */
+    private Tag findTagById(long id, List<Tag> tags) {
         for (Tag tag : tags) {
-            if (tag.getName().equals(tagName)) {
+            if (tag.getId() == id) {
                 return tag;
             }
         }
@@ -509,7 +552,7 @@ public class AddExpenseCtrl {
 
     /**
      * convert from color to string
-     * @param color
+     * @param color the color of the tag
      * @return the String color
      */
     private String toHexString(Color color) {
@@ -521,8 +564,8 @@ public class AddExpenseCtrl {
 
     /**
      * convert from string to color
-     * @param hexCode
-     * @return the Color
+     * @param hexCode the hexcode of the colour
+     * @return the color
      */
     public static Color hexToColor(String hexCode) {
         if (!hexCode.startsWith("#")) {
@@ -582,7 +625,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the expense author field
-     * @param author
+     * @param author the author of the expense
      */
     public void setExpenseAuthor(String author) {
         expenseAuthor.setValue(author);
@@ -590,7 +633,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the purposeText field
-     * @param purposeText
+     * @param purposeText the purpose of the expense
      */
     public void setPurpose(String purposeText) {
         purpose.setText(purposeText);
@@ -618,7 +661,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the currencyText field
-     * @param currencyText
+     * @param currencyText the text for the currency
      */
     public void setCurrency(String currencyText) {
         currency.setValue(currency.getItems().stream()
@@ -627,7 +670,7 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the expenseDate field
-     * @param expenseDate
+     * @param expenseDate the date of the expense
      */
     public void setDate(LocalDate expenseDate) {
         date.setValue(expenseDate);
@@ -635,15 +678,15 @@ public class AddExpenseCtrl {
 
     /**
      * setter for the typeText field
-     * @param typeText
+     * @param tag the tag of the current expense
      */
-    public void setType(String typeText) {
-        type.setValue(typeText);
+    public void setType(Tag tag) {
+        type.setValue(tag);
     }
 
     /**
      * setter for button text
-     * @param s
+     * @param s the text for the add/save button
      */
     public void setButton(String s) {
         add.setText(s);
@@ -652,8 +695,8 @@ public class AddExpenseCtrl {
 
     /**
      * Method to set the checkboxes regarding the way in which an expense is split.
-     * @param exp
-     * @param event
+     * @param exp the current expense
+     * @param event the current event
      */
     public void setSplitCheckboxes(Expense exp, Event event) {
         List<Participant> temp = exp.getExpenseParticipants();

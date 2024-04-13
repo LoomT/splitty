@@ -6,7 +6,9 @@ import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class TestWebsocket implements Websocket {
@@ -14,14 +16,8 @@ public class TestWebsocket implements Websocket {
     private String eventID;
     private boolean connected = false;
 
-    /**
-     * @return the registered event listerers. could be useful for debugging
-     */
-    public EnumMap<WebsocketActions, Set<Consumer<Object>>> getFunctions() {
-        return functions;
-    }
-
-    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, Consumer<Object>> pastMistakes;
 
     private final List<WebsocketActions> triggeredActions = new ArrayList<>();
     private final List<Object> payloads = new ArrayList<>();
@@ -32,6 +28,21 @@ public class TestWebsocket implements Websocket {
      */
     public TestWebsocket() {
         functions = new EnumMap<>(WebsocketActions.class);
+        pastMistakes = new EnumMap<>(WebsocketActions.class);
+    }
+
+    /**
+     * @return the registered event listeners. could be useful for debugging
+     */
+    public EnumMap<WebsocketActions, List<Consumer<Object>>> getFunctions() {
+        return functions;
+    }
+
+    /**
+     * @return main functions for event overview
+     */
+    public EnumMap<WebsocketActions, Consumer<Object>> getPastMistakes() {
+        return pastMistakes;
     }
 
     /**
@@ -61,7 +72,7 @@ public class TestWebsocket implements Websocket {
      */
     @Override
     public void on(WebsocketActions action, Consumer<Object> consumer) {
-        functions.computeIfAbsent(action, k -> new HashSet<>()).add(consumer);
+        functions.computeIfAbsent(action, k -> new ArrayList<>()).add(consumer);
     }
 
     /**
@@ -79,7 +90,7 @@ public class TestWebsocket implements Websocket {
         this.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
         this.resetAction(WebsocketActions.ADD_PARTICIPANT);
         this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
-        this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -99,14 +110,14 @@ public class TestWebsocket implements Websocket {
             updatePartCallback.accept(event);
         });
 
-        this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
 
             event.getParticipants().add(p);
 
             addPartCallback.accept(event);
         });
-        this.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
             long partId = (long) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -144,12 +155,12 @@ public class TestWebsocket implements Websocket {
         this.resetAction(WebsocketActions.ADD_EXPENSE);
         this.resetAction(WebsocketActions.REMOVE_EXPENSE);
 
-        this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
             event.getExpenses().add(expense);
             addExpCallback.accept(event);
         });
-        this.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
@@ -168,7 +179,7 @@ public class TestWebsocket implements Websocket {
             event.getExpenses().add(index, expense);
             updateExpCallback.accept(event);
         });
-        this.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
             long expId = (long) exp;
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
@@ -193,7 +204,7 @@ public class TestWebsocket implements Websocket {
      */
     @Override
     public void resetAction(WebsocketActions action) {
-        functions.remove(action);
+        pastMistakes.remove(action);
     }
 
     /**
@@ -206,7 +217,10 @@ public class TestWebsocket implements Websocket {
     public void simulateAction(WebsocketActions action, Object payload) {
         triggeredActions.add(action);
         payloads.add(payload);
-        Set<Consumer<Object>> consumers = functions.get(action);
+        if(pastMistakes.containsKey(action)) {
+            pastMistakes.get(action).accept(payload);
+        }
+        List<Consumer<Object>> consumers = functions.get(action);
         if (consumers != null && !consumers.isEmpty()) {
             for (Consumer<Object> consumer : consumers) {
                 consumer.accept(payload);
@@ -271,7 +285,6 @@ public class TestWebsocket implements Websocket {
     /**
      * Resets the list of triggered actions and payloads
      */
-
     public void resetTriggers() {
         triggeredActions.clear();
         payloads.clear();

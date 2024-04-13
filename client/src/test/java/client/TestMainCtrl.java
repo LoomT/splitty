@@ -180,6 +180,15 @@ public class TestMainCtrl implements MainCtrlInterface {
     }
 
     /**
+     * display the statistics page
+     * @param event
+     */
+    @Override
+    public void showStatisticsPage(Event event) {
+
+    }
+
+    /**
      * Initializes a new stage with options
      * and opens it
      */
