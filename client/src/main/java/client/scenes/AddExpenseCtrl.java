@@ -518,7 +518,8 @@ public class AddExpenseCtrl {
         if (backgroundColor != null && !text.isEmpty()) {
             String textColor = brightness(backgroundColor) > 0.5 ? "#000000" : "#FFFFFF";
             label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
-                    + "; -fx-padding: 5px; -fx-text-fill: " + textColor + ";");
+                    + "; -fx-padding: 5px; -fx-text-fill: " + textColor + ";"
+                    + "-fx-background-radius: 10px;");
         }
         double textWidth = new Text(text).getLayoutBounds().getWidth();
         label.setMinWidth(textWidth + 10);

@@ -326,6 +326,7 @@ public class EventPageCtrl {
             ExpenseItem ei = new ExpenseItem(
                     toString(e),
                     partString,
+                    e.getType(),
                     () -> {
                         mainCtrl.handleEditExpense(e, event);
                     },
