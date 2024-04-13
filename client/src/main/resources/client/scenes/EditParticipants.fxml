@@ -64,7 +64,7 @@
                      <children>
                          <StackPane alignment="CENTER_LEFT" prefHeight="46.0" prefWidth="370.0" GridPane.columnSpan="2">
                              <Label fx:id="warningLabel" styleClass="warningLabel" text="The name can only be 30 characters long" textFill="RED" wrapText="true" />
-                             <Label fx:id="confirmationLabel" styleClass="confirmationLabel" text="Confirmation needed" textFill="GREEN" wrapText="true" opacity="0" />
+                             <Label fx:id="confirmationLabel" opacity="0" prefHeight="35.0" prefWidth="206.0" styleClass="confirmationLabel" text="Confirmation needed" textFill="GREEN" wrapText="true" />
                          </StackPane>
                         <Region minWidth="0.0" HBox.hgrow="ALWAYS" />
                           <Button id="deletePartButton" fx:id="deletePartButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#deletePartClicked" styleClass="sbutton" text="%EditP.deletePart" HBox.hgrow="ALWAYS">
