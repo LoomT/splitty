@@ -21,8 +21,9 @@ public class WebsocketImpl implements Websocket {
     private StompSession stompSession;
     private final StompSessionHandler sessionHandler;
     private final WebSocketStompClient stompClient;
-    private final String url;
-    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, Consumer<Object>> pastMistakes;
+    private final UserConfig userConfig;
 
     /**
      * Websocket client constructor
@@ -33,6 +34,7 @@ public class WebsocketImpl implements Websocket {
     public WebsocketImpl(UserConfig config) {
         // Initialize the enum map with all enum values
         functions = new EnumMap<>(WebsocketActions.class);
+        pastMistakes = new EnumMap<>(WebsocketActions.class);
         resetAllActions();
 
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
@@ -40,7 +42,7 @@ public class WebsocketImpl implements Websocket {
                 new StringMessageConverter());
         stompClient.setMessageConverter(new CompositeMessageConverter(converterList));
 
-        this.url = "ws:" + config.getUrl() + "ws";
+        this.userConfig = config;
         sessionHandler = new client.utils.WebsocketImpl.MyStompSessionHandler();
     }
 
@@ -53,7 +55,8 @@ public class WebsocketImpl implements Websocket {
     public void connect(String eventID) {
         if (stompSession != null && stompSession.isConnected()) return;
         try {
-            stompSession = stompClient.connectAsync(url, sessionHandler).get();
+            stompSession = stompClient.connectAsync(
+                    "ws://" + userConfig.getUrl() + "/ws", sessionHandler).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException("Could not connect to server", e);
         }
@@ -72,17 +75,6 @@ public class WebsocketImpl implements Websocket {
 
     /**
      * Sets the function for provided name
-     * <pre>
-     * available functions:
-     * titleChange(String)
-     * deleteEvent()
-     * addParticipant(Participant)
-     * updateParticipant(Participant)
-     * removeParticipant(id)
-     * addExpense(Expense)
-     * updateExpense(Expense)
-     * removeExpense(id)
-     * </pre>
      *
      * @param action   enum name of the function
      * @param consumer function that consumes type of payload and payload in that order
@@ -112,7 +104,7 @@ public class WebsocketImpl implements Websocket {
         this.resetAction(WebsocketActions.ADD_PARTICIPANT);
         this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
 
-        this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -134,12 +126,12 @@ public class WebsocketImpl implements Websocket {
             }
             updatePartCallback.accept(event);
         });
-        this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             event.getParticipants().add(p);
             addPartCallback.accept(event);
         });
-        this.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
             long partId = (long) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -179,13 +171,13 @@ public class WebsocketImpl implements Websocket {
         this.resetAction(WebsocketActions.ADD_EXPENSE);
         this.resetAction(WebsocketActions.REMOVE_EXPENSE);
 
-        this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
             linkExpenseParticipants(expense, event.getParticipants());
             event.getExpenses().add(expense);
             addExpCallback.accept(event);
         });
-        this.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
@@ -204,7 +196,7 @@ public class WebsocketImpl implements Websocket {
             event.getExpenses().add(index, expense);
             updateExpCallback.accept(event);
         });
-        this.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
             long expId = (long) exp;
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
@@ -231,16 +223,18 @@ public class WebsocketImpl implements Websocket {
      */
     @Override
     public void resetAction(WebsocketActions action) {
-        functions.put(action, new HashSet<>());
+        pastMistakes.remove(action);
     }
 
     /**
      * Resets all action listeners
      * DO NOT USE THIS, WILL BREAK SOME LISTENERS
      */
-    @Override
-    public void resetAllActions() {
-        EnumSet.allOf(WebsocketActions.class).forEach(this::resetAction);
+    private void resetAllActions() {
+        EnumSet.allOf(WebsocketActions.class)
+                .forEach(action -> functions.put(action, new ArrayList<>()));
+        EnumSet.allOf(WebsocketActions.class)
+                .forEach(this::resetAction);
     }
 
     /**
@@ -249,7 +243,7 @@ public class WebsocketImpl implements Websocket {
      * @param expense expense for which participants to link
      * @param participants participant list from event
      */
-    public void linkExpenseParticipants(Expense expense, List<Participant> participants) {
+    private void linkExpenseParticipants(Expense expense, List<Participant> participants) {
         expense.setExpenseAuthor(participants.stream()
                 .filter(p -> p.getId() == expense.getExpenseAuthor().getId())
                 .findFirst().orElseThrow());
@@ -264,6 +258,7 @@ public class WebsocketImpl implements Websocket {
                 "commons.Event", Event.class,
                 "commons.Participant", Participant.class,
                 "commons.Expense", Expense.class,
+                "commons.Transaction", Transaction.class,
                 "java.lang.String", String.class,
                 "java.lang.Long", Long.class,
                 "commons.Tag", Tag.class));
@@ -297,16 +292,12 @@ public class WebsocketImpl implements Websocket {
             try {
                 WebsocketActions action = WebsocketActions
                         .valueOf(headers.get("action").getFirst());
-                functions.get(action).forEach(consumer -> {
-                    // This is necessary to run the Javafx updates on the same
-                    // thread as the app is run on, and not the WS thread
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            consumer.accept(payload);
-                        }
-                    });
-                });
+                // This is necessary to run the Javafx updates on the same
+                // thread as the app is run on, and not the WS thread
+                if(pastMistakes.containsKey(action))
+                    Platform.runLater(() -> pastMistakes.get(action).accept(payload));
+                functions.get(action)
+                        .forEach(consumer -> Platform.runLater(() -> consumer.accept(payload)));
 
             } catch (IllegalArgumentException e) {
                 System.out.println("Server sent an unknown action");

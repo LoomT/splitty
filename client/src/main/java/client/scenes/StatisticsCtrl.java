@@ -12,10 +12,12 @@ import commons.Expense;
 import commons.Tag;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -33,6 +35,8 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
 
+import static commons.WebsocketActions.*;
+
 public class StatisticsCtrl {
 
     @FXML
@@ -48,14 +52,15 @@ public class StatisticsCtrl {
     @FXML
     private Button editTags;
 
+    private Event event;
+
     private final MainCtrlInterface mainCtrl;
     private final ServerUtils server;
     private final Websocket websocket;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
-
-    private List<Tag> displayedTags = new ArrayList<>();
+    private boolean opened;
 
     /**
      * @param mainCtrl main control instance
@@ -80,19 +85,36 @@ public class StatisticsCtrl {
         this.languageConf = languageConf;
         this.converter = converter;
         this.userConfig = userConfig;
+        opened = false;
     }
 
     /**
      * initialize method
      */
     public void initialize() {
-        if (!pc.getData().isEmpty()) {
-            pc.getData().clear();
-        }
+        websocket.on(ADD_TAG, tag -> {
+            populateLegend(event);
+        });
+        back.setOnAction(e -> {
+            handleBackButton(event);
+        });
+        websocket.on(ADD_EXPENSE, e -> {
+            initPieChart(event);
+        });
+        websocket.on(UPDATE_EXPENSE, e -> {
+            initPieChart(event);
+        });
+        websocket.on(REMOVE_EXPENSE, e -> {
+            initPieChart(event);
+        });
     }
 
+    /**
+     * populate the legend of the pie-chart
+     * @param event the current event
+     */
     private void populateLegend(Event event) {
-
+        if(!opened) return;
         legend.getChildren().clear();
 
         for (Tag tag : event.getTags()) {
@@ -117,18 +139,24 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     public void displayStatisticsPage(Event event) {
-        if (!pc.getData().isEmpty()) {
-            pc.getData().clear();
-        }
+        this.event = event;
+        opened = true;
         pc.setLegendVisible(false);
         initPieChart(event);
         initCost(event);
-        back.setOnAction(e -> {
-            mainCtrl.goBackToEventPage(event);
-        });
         editTags.setOnAction(e -> {
             mainCtrl.showTagPage(event);
         });
+    }
+
+    /**
+     * method for handling the back button action
+     * @param event
+     */
+    public void handleBackButton(Event event) {
+        pc.getData().clear();
+        opened = false;
+        mainCtrl.goBackToEventPage(event);
     }
 
     /**
@@ -137,29 +165,24 @@ public class StatisticsCtrl {
      * @return the total cost
      */
     public double initCost(Event event) {
-
         double totalCost = 0;
         for (Expense exp : event.getExpenses()) {
             double amount = exp.getAmount();
             try {
                 if(!userConfig.getCurrency().equals("NONE")) {
-                    amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                    amount = converter.convert("USD", userConfig.getCurrency(),
                             amount, exp.getDate().toInstant());
                     totalCost += amount;
                 }
 
+            } catch (CurrencyConverter.CurrencyConversionException ignored) {
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        languageConf.get("Currency.IOError"));
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.showAndWait();
             }
         }
         String preferedCurrency = userConfig.getCurrency();
         String form = getCurrencySymbol(totalCost, preferedCurrency);
-        cost.setText("Total cost: " + form);
+        cost.setText(languageConf.get("Statistics.totalCost") + form);
         return totalCost;
     }
 
@@ -168,6 +191,7 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     public void initPieChart(Event event) {
+        if(!opened) return;
         double totalCost = initCost(event);
         updateTagsPieChart(event, totalCost);
         updateNoTagPieChart(event, totalCost);
@@ -185,6 +209,8 @@ public class StatisticsCtrl {
                 double currCost = getAmount(event, tag);
                 if (currCost > 0) {
                     updateOrAddTagSlice(tag, currCost, totalCost);
+                } else {
+                    pc.getData().removeIf(slice -> slice.getName().startsWith(tag.getName()));
                 }
             }
         }
@@ -208,12 +234,6 @@ public class StatisticsCtrl {
             if (slice.getName().startsWith(tag.getName())) {
                 slice.setName(tagInfo);
                 slice.setPieValue(currCost);
-//                if (!slice.getNode().getStyle().equals(tag.getColor())) {
-//                    applyTagColor(slice, tag.getColor());
-//                }
-
-                applyTagColor(slice, tag.getColor());
-
                 found = true;
                 break;
             }
@@ -277,11 +297,12 @@ public class StatisticsCtrl {
             if (expense.getType() == null) {
                 double amount = expense.getAmount();
                 try {
-                    amount = converter.convert(expense.getCurrency(), userConfig.getCurrency(),
+                    amount = converter.convert("USD", userConfig.getCurrency(),
                             amount, expense.getDate().toInstant());
                     costExpensesNoTag += amount;
-                } catch (IOException e) {
-                    handleCurrencyError(e);
+                } catch (CurrencyConverter.CurrencyConversionException ignored) {
+                } catch (ConnectException e) {
+                    mainCtrl.handleServerNotFound();
                 }
             }
         }
@@ -294,21 +315,23 @@ public class StatisticsCtrl {
      * @param totalCost the total cost of the event
      */
     private void updateNoTagSlice(Event event, double totalCost) {
-        for (PieChart.Data slice : pc.getData()) {
-            if (slice.getName().contains("No tag")) {
-                double costExpensesNoTag = calculateExpensesNoTag(event);
-                String text = configureNoTag(costExpensesNoTag, totalCost);
-                slice.setName(text);
-                slice.setPieValue(costExpensesNoTag);
-                break;
+        double costExpensesNoTag = calculateExpensesNoTag(event);
+        if(costExpensesNoTag > 0)
+            for (PieChart.Data slice : pc.getData()) {
+                if (slice.getName().contains("No tag")) {
+                    String text = configureNoTag(costExpensesNoTag, totalCost);
+                    slice.setName(text);
+                    slice.setPieValue(costExpensesNoTag);
+                    break;
+                }
             }
-        }
+        else pc.getData().removeIf(slice -> slice.getName().contains("No tag"));
     }
 
     /**
      * configure the no tag slice
-     * @param costExpensesNoTag
-     * @param totalCost
+     * @param costExpensesNoTag cost of untagged expenses
+     * @param totalCost total event cost
      * @return the text for no tag
      */
     public String configureNoTag(double costExpensesNoTag, double totalCost) {
@@ -335,17 +358,13 @@ public class StatisticsCtrl {
             double amount = exp.getAmount();
             try {
                 if(!userConfig.getCurrency().equals("NONE")) {
-                    amount = converter.convert(exp.getCurrency(), userConfig.getCurrency(),
+                    amount = converter.convert("USD", userConfig.getCurrency(),
                             amount, exp.getDate().toInstant());
                 }
 
+            } catch (CurrencyConverter.CurrencyConversionException ignored) {
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
-            } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR,
-                        languageConf.get("Currency.IOError"));
-                alert.setHeaderText(languageConf.get("unexpectedError"));
-                alert.showAndWait();
             }
 
             if (tag != null && exp.getType() != null) {
@@ -367,7 +386,6 @@ public class StatisticsCtrl {
             return Color.BLACK;
         }
         hexCode = hexCode.replace("#", "").replace("0x", "");
-
         if (!hexCode.matches("[0-9a-fA-F]+")) {
             return Color.BLACK;
         }
@@ -375,12 +393,12 @@ public class StatisticsCtrl {
             int red = Integer.parseInt(hexCode.substring(0, 2), 16);
             int green = Integer.parseInt(hexCode.substring(2, 4), 16);
             int blue = Integer.parseInt(hexCode.substring(4, 6), 16);
-
             return Color.rgb(red, green, blue);
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             return Color.BLACK;
         }
     }
+
 
     /**
      * handle the currency error
@@ -407,5 +425,13 @@ public class StatisticsCtrl {
         formater.setMaximumFractionDigits(2);
         formater.setCurrency(Currency.getInstance(currency));
         return formater.format(amount);
+    }
+
+    /**
+     * set the escape shortcut
+     * @param scene
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, () -> handleBackButton(event), KeyCode.ESCAPE);
     }
 }

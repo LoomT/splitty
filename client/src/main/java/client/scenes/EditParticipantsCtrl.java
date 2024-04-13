@@ -9,14 +9,16 @@ import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
 import java.net.ConnectException;
 import java.util.Optional;
 
 import static client.utils.CommonFunctions.lengthListener;
-import static commons.WebsocketActions.TITLE_CHANGE;
+import static commons.WebsocketActions.*;
 import static java.lang.String.format;
 
 
@@ -44,11 +46,19 @@ public class EditParticipantsCtrl {
     @FXML
     private Button backButton;
 
+    /**
+     * @return the event
+     */
+    public Event getEvent() {
+        return event;
+    }
+
     private Event event;
     private final ServerUtils server;
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final Websocket websocket;
+    private boolean opened;
 
     /**
      * @param server       serverutils instance
@@ -67,6 +77,7 @@ public class EditParticipantsCtrl {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.websocket = websocket;
+        opened = false;
     }
 
     /**
@@ -80,9 +91,22 @@ public class EditParticipantsCtrl {
             }
         });
         websocket.on(TITLE_CHANGE, title -> {
-            if(event != null)
+            if(opened) {
                 event.setTitle((String) title);
-            eventTitle.setText((String) title);
+                eventTitle.setText((String) title);
+            }
+        });
+        websocket.on(ADD_PARTICIPANT, participant -> {
+            if(opened)
+                displayEditParticipantsPage(event);
+        });
+        websocket.on(UPDATE_PARTICIPANT, participant -> {
+            if(opened)
+                displayEditParticipantsPage(event);
+        });
+        websocket.on(REMOVE_PARTICIPANT, id -> {
+            if(opened)
+                displayEditParticipantsPage(event);
         });
     }
 
@@ -93,6 +117,9 @@ public class EditParticipantsCtrl {
      */
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
+        opened = true;
+        System.out.println("display");
+        System.out.println(e);
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
 
@@ -126,15 +153,9 @@ public class EditParticipantsCtrl {
                 emailField.setText(p.getEmailAddress());
                 beneficiaryField.setText(p.getBeneficiary());
                 ibanField.setText(p.getAccountNumber());
+                bicField.setText(p.getBic());
             }
         });
-
-        websocket.registerParticipantChangeListener(
-                event,
-                this::displayEditParticipantsPage,
-                this::displayEditParticipantsPage,
-                this::displayEditParticipantsPage
-        );
 
     }
 
@@ -169,6 +190,7 @@ public class EditParticipantsCtrl {
      */
     @FXML
     private void backButtonClicked() {
+        opened = false;
         mainCtrl.goBackToEventPage(event);
     }
 
@@ -222,7 +244,7 @@ public class EditParticipantsCtrl {
                 informNameExists();
                 return;
             }
-            Participant newP = new Participant(name, email, beneficiary, iban);
+            Participant newP = new Participant(name, email, beneficiary, iban, bic);
 
             try {
                 server.createParticipant(event.getId(), newP);
@@ -241,6 +263,7 @@ public class EditParticipantsCtrl {
             currP.setEmailAddress(email);
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
+            currP.setBic(bic);
             try {
                 server.updateParticipant(event.getId(), currP);
             } catch (ConnectException e) {
@@ -258,5 +281,17 @@ public class EditParticipantsCtrl {
         nameField.setStyle("""
                         -fx-border-color: red;
                         -fx-text-inner-color: red""");
+    }
+
+    /**
+     * Initializes the shortcuts for EditParticipants:
+     *      Escape: go back
+     *      Enter: shows the chooseParticipant choiceBox
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        MainCtrl.checkKey(scene, () -> this.chooseParticipant.show(),
+                chooseParticipant, KeyCode.ENTER);
     }
 }

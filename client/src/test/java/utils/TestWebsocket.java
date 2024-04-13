@@ -6,14 +6,18 @@ import commons.Expense;
 import commons.Participant;
 import commons.WebsocketActions;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class TestWebsocket implements Websocket {
 
     private String eventID;
     private boolean connected = false;
-    private final EnumMap<WebsocketActions, Set<Consumer<Object>>> functions;
+
+    private final EnumMap<WebsocketActions, List<Consumer<Object>>> functions;
+    private final EnumMap<WebsocketActions, Consumer<Object>> pastMistakes;
 
     private final List<WebsocketActions> triggeredActions = new ArrayList<>();
     private final List<Object> payloads = new ArrayList<>();
@@ -21,14 +25,27 @@ public class TestWebsocket implements Websocket {
 
     /**
      * Constructor for the TestWebsocket
-     *
      */
     public TestWebsocket() {
         functions = new EnumMap<>(WebsocketActions.class);
+        pastMistakes = new EnumMap<>(WebsocketActions.class);
     }
 
     /**
-     *
+     * @return the registered event listeners. could be useful for debugging
+     */
+    public EnumMap<WebsocketActions, List<Consumer<Object>>> getFunctions() {
+        return functions;
+    }
+
+    /**
+     * @return main functions for event overview
+     */
+    public EnumMap<WebsocketActions, Consumer<Object>> getPastMistakes() {
+        return pastMistakes;
+    }
+
+    /**
      * @param eventID the event id to connect to
      */
     @Override
@@ -40,7 +57,6 @@ public class TestWebsocket implements Websocket {
 
     /**
      * Disconnect from the event
-     *
      */
     @Override
     public void disconnect() {
@@ -51,22 +67,18 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
-     *
-     * @param action enum name of the function
+     * @param action   enum name of the function
      * @param consumer function that consumes type of payload and payload in that order
      */
     @Override
     public void on(WebsocketActions action, Consumer<Object> consumer) {
-        functions.computeIfAbsent(action, k -> new HashSet<>()).add(consumer);
+        functions.computeIfAbsent(action, k -> new ArrayList<>()).add(consumer);
     }
 
     /**
-     *
-     *
-     * @param event the event in which we listen on the participant changes
+     * @param event              the event in which we listen on the participant changes
      * @param updatePartCallback this is called when a participant in the event is updated
-     * @param addPartCallback this is called when a participant in the event is created
+     * @param addPartCallback    this is called when a participant in the event is created
      * @param deletePartCallback this is called when a participant in the event is deleted
      */
 
@@ -75,12 +87,10 @@ public class TestWebsocket implements Websocket {
             Consumer<Event> updatePartCallback,
             Consumer<Event> addPartCallback,
             Consumer<Event> deletePartCallback) {
-
         this.resetAction(WebsocketActions.UPDATE_PARTICIPANT);
         this.resetAction(WebsocketActions.ADD_PARTICIPANT);
         this.resetAction(WebsocketActions.REMOVE_PARTICIPANT);
-
-        this.on(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.UPDATE_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -100,12 +110,14 @@ public class TestWebsocket implements Websocket {
             updatePartCallback.accept(event);
         });
 
-        this.on(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.ADD_PARTICIPANT, (Object part) -> {
             Participant p = (Participant) part;
+
             event.getParticipants().add(p);
+
             addPartCallback.accept(event);
         });
-        this.on(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
+        pastMistakes.put(WebsocketActions.REMOVE_PARTICIPANT, (Object part) -> {
             long partId = (long) part;
             int index = -1;
             for (int i = 0; i < event.getParticipants().size(); i++) {
@@ -126,11 +138,9 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
-     *
-     * @param event the event in which we listen on the participant changes
+     * @param event             the event in which we listen on the participant changes
      * @param updateExpCallback this is called when a participant in the event is updated
-     * @param addExpCallback this is called when a participant in the event is created
+     * @param addExpCallback    this is called when a participant in the event is created
      * @param deleteExpCallback this is called when a participant in the event is deleted
      */
 
@@ -139,19 +149,18 @@ public class TestWebsocket implements Websocket {
             Event event,
             Consumer<Event> updateExpCallback,
             Consumer<Event> addExpCallback,
-            Consumer<Event> deleteExpCallback)
-    {
+            Consumer<Event> deleteExpCallback) {
 
         this.resetAction(WebsocketActions.UPDATE_EXPENSE);
         this.resetAction(WebsocketActions.ADD_EXPENSE);
         this.resetAction(WebsocketActions.REMOVE_EXPENSE);
 
-        this.on(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.ADD_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
             event.getExpenses().add(expense);
             addExpCallback.accept(event);
         });
-        this.on(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.UPDATE_EXPENSE, (Object exp) -> {
             Expense expense = (Expense) exp;
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
@@ -170,7 +179,7 @@ public class TestWebsocket implements Websocket {
             event.getExpenses().add(index, expense);
             updateExpCallback.accept(event);
         });
-        this.on(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
+        pastMistakes.put(WebsocketActions.REMOVE_EXPENSE, (Object exp) -> {
             long expId = (long) exp;
             int index = -1;
             for (int i = 0; i < event.getExpenses().size(); i++) {
@@ -191,35 +200,27 @@ public class TestWebsocket implements Websocket {
     }
 
     /**
-     *
      * @param action websocket action to reset all listeners for
      */
     @Override
     public void resetAction(WebsocketActions action) {
-        functions.remove(action);
-    }
-
-    /**
-     * Resets all listeners
-     *
-     */
-
-    @Override
-    public void resetAllActions() {
-        functions.clear();
+        pastMistakes.remove(action);
     }
 
     /**
      * simulateAction is used to simulate an action from the server.
      * It triggers all registered consumers for the specified action.
      *
-     * @param action The WebSocket action to simulate.
+     * @param action  The WebSocket action to simulate.
      * @param payload The payload to pass to the consumers for this action.
      */
     public void simulateAction(WebsocketActions action, Object payload) {
         triggeredActions.add(action);
         payloads.add(payload);
-        Set<Consumer<Object>> consumers = functions.get(action);
+        if(pastMistakes.containsKey(action)) {
+            pastMistakes.get(action).accept(payload);
+        }
+        List<Consumer<Object>> consumers = functions.get(action);
         if (consumers != null && !consumers.isEmpty()) {
             for (Consumer<Object> consumer : consumers) {
                 consumer.accept(payload);
@@ -232,6 +233,7 @@ public class TestWebsocket implements Websocket {
 
     /**
      * isConnected is used to check if the websocket is connected
+     *
      * @return true if connected, false otherwise (boolean)
      */
 
@@ -242,7 +244,8 @@ public class TestWebsocket implements Websocket {
 
     /**
      * String representation of the event ID
-      * @return eventID
+     *
+     * @return eventID
      */
     public String getEventID() {
         return eventID;
@@ -282,7 +285,6 @@ public class TestWebsocket implements Websocket {
     /**
      * Resets the list of triggered actions and payloads
      */
-
     public void resetTriggers() {
         triggeredActions.clear();
         payloads.clear();

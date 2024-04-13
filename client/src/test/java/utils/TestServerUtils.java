@@ -3,6 +3,7 @@ package utils;
 import client.utils.ServerUtils;
 import commons.*;
 
+import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -18,6 +19,7 @@ public class TestServerUtils implements ServerUtils {
     private final List<Integer> statuses;
     private final TestWebsocket websocket;
     private boolean polled;
+    private boolean goodPing;
 
     /**
      * constructor
@@ -151,6 +153,7 @@ public class TestServerUtils implements ServerUtils {
         if(clone != null){
             websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, clone);
         }
+
         lastChange = new Date();
         statuses.add(204);
         return 204;
@@ -213,6 +216,8 @@ public class TestServerUtils implements ServerUtils {
             expense.getExpenseParticipants().removeIf(p -> p.equals(old));
         }
         event.getParticipants().remove(old);
+        System.out.println("removed");
+        System.out.println(event);
         event.setLastActivity(new Date());
         websocket.simulateAction(WebsocketActions.REMOVE_PARTICIPANT, old);
         lastChange = new Date();
@@ -490,7 +495,6 @@ public class TestServerUtils implements ServerUtils {
         events.add(eventIndex, event);
         statuses.add(204);
         return 204;
-
     }
 
     /**
@@ -503,6 +507,58 @@ public class TestServerUtils implements ServerUtils {
     public int addTag(String eventID, Tag tag) {
         calls.add("addTag");
         assertTrue(true);
+        return 204;
+    }
+
+    /**
+     * @param eventID     event id
+     * @param transaction transaction to save
+     * @return status code
+     */
+    @Override
+    public int addTransaction(String eventID, Transaction transaction) {
+        calls.add("addTransaction");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID))
+                .findFirst().orElse(null);
+        if(event == null) return 404;
+        if (transaction == null || !event.hasParticipant(transaction.getGiver())
+                || !event.hasParticipant(transaction.getReceiver())) {
+            return 400;
+        }
+        Transaction clone = transaction.clone(event);
+        clone.setEventID(eventID);
+        clone.setId(counter++);
+        event.addTransaction(clone);
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_TRANSACTION, clone);
+        lastChange = new Date();
+        statuses.add(200);
+        return 200;
+    }
+
+    /**
+     * @param transaction transaction to remove
+     * @return status code
+     * @throws ConnectException
+     */
+    @Override
+    public int removeTransaction(Transaction transaction) throws ConnectException {
+        calls.add("removeTransaction");
+        Event event = events.stream().filter(e -> e.getId().equals(transaction.getEventID()))
+                .findFirst().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        };
+        boolean removed = event.getTransactions().removeIf(t -> t.getId() == transaction.getId());
+        if(!removed) {
+            statuses.add(404);
+            return 404;
+        }
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_TRANSACTION, transaction.getId());
+        lastChange = new Date();
+        statuses.add(204);
         return 204;
     }
 
@@ -521,5 +577,25 @@ public class TestServerUtils implements ServerUtils {
                     (((double) Objects.hash(date, count++) / Integer.MAX_VALUE) / 20d + 1));
         }
         return map;
+    }
+
+    /**
+     * Pings the server to check if the url is correct
+     *
+     * @param url url to check
+     * @return true if server responds
+     */
+    @Override
+    public boolean ping(String url) {
+        calls.add("ping");
+        goodPing = url.equals("localhost:8080");
+        return goodPing;
+    }
+
+    /**
+     * @return true if server was found on previous ping
+     */
+    public boolean isGoodPing() {
+        return goodPing;
     }
 }

@@ -11,5 +11,7 @@ public enum WebsocketActions {
         REMOVE_EXPENSE,
         ADD_TAG,
         UPDATE_TAG,
-        REMOVE_TAG
+        REMOVE_TAG,
+        ADD_TRANSACTION,
+        REMOVE_TRANSACTION
 }

@@ -4,12 +4,14 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class TestSimpMessagingTemplate extends SimpMessagingTemplate {
-    private String destination;
-    private Object payload;
-    private Map<String, Object> headers;
+    private final List<String> destination;
+    private final List<Object> payload;
+    private final List<Map<String, Object>> headers;
 
     /**
      * Create a new {@link SimpMessagingTemplate} instance.
@@ -18,6 +20,9 @@ public class TestSimpMessagingTemplate extends SimpMessagingTemplate {
      */
     public TestSimpMessagingTemplate(MessageChannel messageChannel) {
         super(messageChannel);
+        destination = new ArrayList<>();
+        payload = new ArrayList<>();
+        headers = new ArrayList<>();
     }
 
     /**
@@ -29,29 +34,50 @@ public class TestSimpMessagingTemplate extends SimpMessagingTemplate {
     @Override
     public void convertAndSend(String destination, Object payload,
                                Map<String, Object> headers) throws MessagingException {
-        this.destination = destination;
-        this.payload = payload;
-        this.headers = headers;
+        this.destination.add(destination);
+        this.payload.add(payload);
+        this.headers.add(headers);
     }
 
     /**
-     * @return destination
+     * @return last destination
      */
     public String getDestination() {
+        return destination.getLast();
+    }
+
+    /**
+     * @return last payload
+     */
+    public Object getPayload() {
+        return payload.getLast();
+    }
+
+    /**
+     * @return last headers
+     */
+    public Map<String, Object> getHeaders() {
+        return headers.getLast();
+    }
+
+    /**
+     * @return all destinations
+     */
+    public List<String> getAllDestinations() {
         return destination;
     }
 
     /**
-     * @return payload
+     * @return all payloads
      */
-    public Object getPayload() {
+    public List<Object> getAllPayloads() {
         return payload;
     }
 
     /**
-     * @return headers
+     * @return all headers
      */
-    public Map<String, Object> getHeaders() {
+    public List<Map<String, Object>> getAllHeaders() {
         return headers;
     }
 

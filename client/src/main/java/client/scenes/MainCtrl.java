@@ -16,50 +16,77 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.FlagListCell;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Expense;
+import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.ZoneId;
-import java.util.List;
+import java.util.*;
 
 public class MainCtrl implements MainCtrlInterface{
 
     private final UserConfig userConfig;
-    private final CurrencyConverter converter;
     private final LanguageConf languageConf;
     private final Websocket websocket;
 
     private Stage primaryStage;
+
     private StartScreenCtrl startScreenCtrl;
     private Scene startScreen;
+
     private AdminLoginCtrl adminLoginCtrl;
     private Scene adminLogin;
+
     private AdminOverviewCtrl adminOverviewCtrl;
     private Scene adminOverview;
+
     private EditParticipantsCtrl editParticipantsCtrl;
     private Scene editParticipants;
+
     private AddExpenseCtrl addExpenseCtrl;
     private Scene addExpense;
+
+    private OpenDebtsPageCtrl openDebtsPageCtrl;
+    private Scene openDebtsPage;
+
     private EventPageCtrl eventPageCtrl;
     private Scene eventPage;
 
     private EditTitleCtrl editTitleCtrl;
     private Scene titleChanger;
+
     private AddTagCtrl addTagCtrl;
     private Scene addTag;
+
+    private OptionsCtrl optionsCtrl;
+    private Scene options;
     private StatisticsCtrl statisticsCtrl;
     private Scene statistics;
+
+
+    private AddCustomTransactionCtrl addCustomTransactionCtrl;
+    private Scene addCustomTransaction;
+
+    private boolean startPage = true;
+    private Event event;
+
     private TagPageCtrl tagPageCtrl;
     private Scene tagPage;
 
@@ -67,16 +94,13 @@ public class MainCtrl implements MainCtrlInterface{
      * @param websocket the websocket instance
      * @param languageConf the language config
      * @param userConfig the user configuration
-     * @param converter currency converter
      */
     @Inject
     public MainCtrl(Websocket websocket, LanguageConf languageConf,
-                    UserConfig userConfig, CurrencyConverter converter) {
+                    UserConfig userConfig) {
         this.websocket = websocket;
         this.languageConf = languageConf;
-        this.userConfig = userConfig;
-        this.converter = converter;
-    }
+        this.userConfig = userConfig;}
 
     /**
      * Initializes the UI
@@ -101,6 +125,8 @@ public class MainCtrl implements MainCtrlInterface{
         this.eventPageCtrl = pairCollector.eventPage().getKey();
         this.eventPage = new Scene(pairCollector.eventPage().getValue());
 
+        this.openDebtsPageCtrl = pairCollector.openDebtsPage().getKey();
+        this.openDebtsPage = new Scene(pairCollector.openDebtsPage().getValue());
 
         this.editParticipantsCtrl = pairCollector.editParticipantsPage().getKey();
         this.editParticipants = new Scene(pairCollector.editParticipantsPage().getValue());
@@ -117,17 +143,87 @@ public class MainCtrl implements MainCtrlInterface{
         this.addTagCtrl = pairCollector.addTagPage().getKey();
         this.addTag = new Scene(pairCollector.addTagPage().getValue());
 
+        this.optionsCtrl = pairCollector.options().getKey();
+        this.options = new Scene(pairCollector.options().getValue());
+
+        this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
+        this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
+
         this.statisticsCtrl = pairCollector.statisticsPage().getKey();
         this.statistics = new Scene(pairCollector.statisticsPage().getValue());
 
         this.tagPageCtrl = pairCollector.tagPage().getKey();
         this.tagPage = new Scene(pairCollector.tagPage().getValue());
 
+        initializeShortcuts();
         //showOverview();
         showStartScreen();
+        if(startPage){
+            showStartScreen();
+        } else {
+            showEventPage(event);
+        }
         primaryStage.show();
 
+    }
 
+    /**
+     * Initializes the shortcuts for all scenes
+     */
+    public void initializeShortcuts(){
+
+        startScreenCtrl.initializeShortcuts(startScreen);
+        eventPageCtrl.initializeShortcuts(eventPage);
+        editParticipantsCtrl.initializeShortcuts(editParticipants);
+        addExpenseCtrl.initializeShortcuts(addExpense);
+        adminLoginCtrl.initializeShortcuts(adminLogin);
+        adminOverviewCtrl.initializeShortcuts(adminOverview);
+        editTitleCtrl.initializeShortcuts(titleChanger);
+        optionsCtrl.initializeShortcuts(options);
+        openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
+        addCustomTransactionCtrl.initializeShortcuts(addCustomTransaction);
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted.
+     * @param target target the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     */
+    public static void checkKey(EventTarget target, Runnable function, KeyCode key) {
+        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                try {
+                    function.run();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                ke.consume(); // <-- stops passing the event to next node
+            }
+        });
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted in a particular field.
+     * @param target target the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     * @param field field that should be in the focus for the function to be executed
+     */
+    public static void checkKey(EventTarget target, Runnable function, Object field, KeyCode key){
+        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                if(ke.getTarget().equals(field)){
+                    System.out.println("Key Pressed: " + ke.getCode());
+                    System.out.println(ke.getTarget());
+                    function.run();
+                    ke.consume(); // <-- stops passing the event to next node
+                }
+            }
+        });
     }
 
     /**
@@ -150,7 +246,12 @@ public class MainCtrl implements MainCtrlInterface{
         Stage stage = new Stage();
         stage.setScene(titleChanger);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("TitleChanger.pageTitle"));
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
         editTitleCtrl.displayEditEventTitle(event, stage);
+        stage.show();
     }
 
     /**
@@ -174,6 +275,8 @@ public class MainCtrl implements MainCtrlInterface{
         websocket.connect(eventToShow.getId());
         eventPageCtrl.displayEvent(eventToShow);
         startScreen.setCursor(Cursor.DEFAULT);
+        startPage = false;
+        this.event = eventToShow;
         primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
@@ -186,6 +289,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void goBackToEventPage(Event event) {
         eventPageCtrl.displayEvent(event);
+        primaryStage.setTitle(languageConf.get("EventPage.title"));
         primaryStage.setScene(eventPage);
     }
 
@@ -247,7 +351,6 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
-        primaryStage.setResizable(false);
     }
 
     /**
@@ -263,6 +366,7 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setResizable(false);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initOwner(primaryStage);
         stage.show();
     }
 
@@ -281,7 +385,8 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setButton(languageConf.get("AddExp.save"));
         addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
         addExpenseCtrl.setPurpose(exp.getPurpose());
-        addExpenseCtrl.setAmount(Double.toString(exp.getAmount()));
+
+        addExpenseCtrl.setAmount(exp.getAmount(), exp.getDate(), exp.getCurrency());
         addExpenseCtrl.setCurrency(exp.getCurrency());
         addExpenseCtrl.setDate(exp.getDate().toInstant().
                 atZone(ZoneId.systemDefault()).toLocalDate());
@@ -304,14 +409,130 @@ public class MainCtrl implements MainCtrlInterface{
 
     /**
      * display the statistics page
-     * @param event
+     * @param event event to display
      */
     @Override
     public void showStatisticsPage(Event event) {
         statisticsCtrl.displayStatisticsPage(event);
-        primaryStage.setTitle("Statistics");
+        primaryStage.setTitle(languageConf.get("Statistics.title"));
         primaryStage.setScene(statistics);
+        statistics.setCursor(Cursor.DEFAULT);
     }
+
+    /**
+     * Initializes a new stage with options
+     * and opens it
+     */
+    @Override
+    public void openOptions() {
+        Stage stage = new Stage();
+        stage.setScene(options);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("Options.title"));
+        optionsCtrl.display(stage);
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.show();
+    }
+
+    /**
+     * Shows the open debts page
+     * @param eventToShow the event to show the open debts for
+     */
+    @Override
+    public void showDebtsPage(Event eventToShow) {
+        openDebtsPageCtrl.open();
+        openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
+        primaryStage.setTitle(languageConf.get("OpenDebts.title"));
+        primaryStage.setScene(openDebtsPage);
+    }
+
+    /**
+     * Display a window for adding a custom transaction
+     * @param event event to load
+     */
+    @Override
+    public void showAddCustomTransaction(Event event) {
+        Stage stage = new Stage();
+        stage.setTitle(languageConf.get("AddCustomTransaction.titlebar"));
+        addCustomTransactionCtrl.display(event, stage);
+        stage.setScene(addCustomTransaction);
+        stage.setResizable(false);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.initOwner(primaryStage);
+        stage.show();
+    }
+
+    /**
+     * @param languageChoiceBox method to initialize the language switcher
+     */
+    public void initLangChoiceBox(ComboBox<String> languageChoiceBox){
+        languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+        final String downloadTemplateOption = "Download Template";
+        if(languageChoiceBox.getItems().isEmpty()) {
+            languageChoiceBox.getItems().addAll(languageConf.getAvailableLocalesString());
+            languageChoiceBox.getItems().add(downloadTemplateOption);
+        }
+        languageChoiceBox.setButtonCell(new FlagListCell(languageConf));
+        languageChoiceBox.setCellFactory(param -> new FlagListCell(languageConf));
+        languageChoiceBox.setOnAction(event -> {
+            String selectedOption = languageChoiceBox.getValue();
+            if (selectedOption.equals(downloadTemplateOption)) {
+
+                downloadTemplate();
+                languageChoiceBox.setValue(languageConf.getCurrentLocaleString());
+            } else {
+
+                languageConf.changeCurrentLocaleTo(selectedOption);
+            }
+        });
+    }
+
+    /**
+     * @param  page boolean for the startPage (true) or the eventPage (false)
+     */
+    public void setStartPage(boolean page) {this.startPage = page;}
+
+    /**
+     *
+     * Downloads the template
+     */
+    private void downloadTemplate() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialFileName("template.properties");
+
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("Properties files (*.properties)",
+                        "*.properties");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = showSaveFileDialog(fileChooser);
+        if (file == null) {
+
+            return;
+        }
+        ResourceBundle bundle = ResourceBundle.getBundle("languages", Locale.of("template"));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            List<String> keyList = new ArrayList<>();
+            Enumeration<String> keys = bundle.getKeys();
+            while (keys.hasMoreElements()) {
+                String key = keys.nextElement();
+                keyList.add(key);
+            }
+            keyList.sort(String::compareTo);
+            for (String key : keyList) {
+                writer.write(key + "=" + bundle.getString(key) + "\n");
+            }
+            System.out.println("Template downloaded successfully to: " + file.getAbsolutePath());
+        } catch (IOException e) {
+            System.err.println("An error occurred while writing the template file: "
+                    + e.getMessage());
+        }
+
+    }
+
+
 
     @Override
     public void showTagPage(Event event) {

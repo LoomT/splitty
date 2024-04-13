@@ -9,6 +9,7 @@ import java.io.Writer;
 
 public class TestIO implements IOInterface {
     private StringBuffer buffer;
+    private int writes;
 
     /**
      * Constructs a test IO instance to mock a file IO
@@ -17,6 +18,7 @@ public class TestIO implements IOInterface {
      */
     public TestIO(String content) {
         buffer = new StringBuffer(content);
+        writes = 0;
     }
 
     /**
@@ -36,6 +38,7 @@ public class TestIO implements IOInterface {
      */
     @Override
     public Writer write() {
+        writes++;
         StringWriter writer = new StringWriter();
         buffer = writer.getBuffer();
         return writer;
@@ -49,4 +52,10 @@ public class TestIO implements IOInterface {
     public String getContent() {
         return buffer.toString();
     }
+
+
+    /**
+     * @return number of writes
+     */
+    public int getWrites() {return writes;}
 }

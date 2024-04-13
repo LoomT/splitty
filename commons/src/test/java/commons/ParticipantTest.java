@@ -18,7 +18,7 @@ class ParticipantTest {
     @BeforeEach
     public void testSetup(){
         Tag tag = new Tag("test", "FF0000");
-        participant1 = new Participant("participant1", "p1@gmail.com", "Bob",  "1234");
+        participant1 = new Participant("participant1", "p1@gmail.com", "Bob",  "1234", "BASALT");
         participant2 = new Participant("participant2", "p2@gmail.com");
         List<Participant> expenseParticipants = new ArrayList<>();
         expenseParticipants.add(participant1);
@@ -77,6 +77,17 @@ class ParticipantTest {
     void setAccountNumber() {
         participant1.setAccountNumber("Not Bob");
         assertEquals("Not Bob", participant1.getAccountNumber());
+    }
+
+    @Test
+    void getBic() {
+        assertEquals("BASALT", participant1.getBic());
+    }
+
+    @Test
+    void setBic() {
+        participant1.setBic("SOMETHING");
+        assertEquals("SOMETHING", participant1.getBic());
     }
 
     /**
@@ -139,5 +150,10 @@ class ParticipantTest {
     @Test
     void cloneAccountNumber() {
         assertEquals(participant1.getAccountNumber(), clone.getAccountNumber());
+    }
+
+    @Test
+    void cloneBic() {
+        assertEquals(participant1.getBic(), clone.getBic());
     }
 }

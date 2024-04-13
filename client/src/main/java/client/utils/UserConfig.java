@@ -18,6 +18,7 @@ import java.util.Scanner;
 public class UserConfig {
     private final Properties configProperties;
     private final IOInterface io;
+    private Runnable callback;
 
     /**
      * The constructor which initializes properties from file, and opens a writer to the file
@@ -37,9 +38,19 @@ public class UserConfig {
      * @return the server URL
      */
     public String getUrl() {
-        return configProperties.getProperty("serverURL", "http://localhost:8080/");
+        return configProperties.getProperty("serverURL", "localhost:8080");
     }
 
+    /**
+     * @param url server URL
+     * @throws IOException if config file can not be accessed
+     */
+    public void setURL(String url) throws IOException {
+        configProperties.setProperty("serverURL", url);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed server to " + url);
+        }
+    }
     /**
      * Returns previously set locale from the config
      *
@@ -142,5 +153,43 @@ public class UserConfig {
         try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed currency to " + currency);
         }
+    }
+
+    /**
+     * @return true if high contrast is enabled
+     */
+    public boolean getHighContrast() {
+        return Boolean.parseBoolean(configProperties.getProperty("highContrast", "false"));
+    }
+
+    /**
+     * Does not persist the contrast, reloads the fxml files with the new setting
+     *
+     * @param highContrast high contrast bool
+     */
+    public void setHighContrast(boolean highContrast) {
+        configProperties.setProperty("highContrast", highContrast ? "true" : "false");
+
+        callback.run();
+    }
+
+    /**
+     * Persists the currently set contrast option
+     *
+     * @throws IOException if config file can not be accessed
+     */
+    public void persistContrast() throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed high contrast to "
+                    + (Boolean.parseBoolean(configProperties.get("highContrast")
+                    .toString()) ? "true" : "false"));
+        }
+    }
+
+    /**
+     * @param function to callback when contrast changes
+     */
+    public void onContrastChange(Runnable function) {
+        callback = function;
     }
 }

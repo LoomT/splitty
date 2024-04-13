@@ -8,11 +8,7 @@ import server.database.EventRepository;
 import server.database.ExpenseRepository;
 import server.database.ParticipantRepository;
 
-
-import java.util.ArrayList;
 import java.util.Date;
-
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -159,39 +155,40 @@ public class ParticipantController {
 
             Participant participant = optionalParticipant.get();
             Event event = eventRepo.getReferenceById(eventID);
-            List<Expense> expensesToRemove = new ArrayList<>();
 
-            for (int i = 0; i < event.getExpenses().size(); i++) {
-                Expense e = event.getExpenses().get(i);
+            var itr1 = event.getExpenses().iterator();
+            while (itr1.hasNext()) {
+                Expense e = itr1.next();
                 if (e.getExpenseAuthor().getId() == partID) {
-                    expensesToRemove.add(e);
+                    itr1.remove();
+                    simp.convertAndSend("/event/" + eventID, e.getId(),
+                            Map.of("action", WebsocketActions.REMOVE_EXPENSE,
+                                    "type", Long.class.getTypeName())
+                    );
                     continue;
                 }
-                event.getExpenses().get(i).getExpenseParticipants().remove(participant);
-                simp.convertAndSend(
-                        "/event/" + eventID,
-                        event.getExpenses().get(i),
-                        Map.of("action", WebsocketActions.UPDATE_EXPENSE,
-                                "type", Expense.class.getTypeName())
-                );
+                if(e.getExpenseParticipants().remove(participant))
+                    simp.convertAndSend("/event/" + eventID, e,
+                            Map.of("action", WebsocketActions.UPDATE_EXPENSE,
+                                    "type", Expense.class.getTypeName())
+                    );
             }
 
-
-            for (Expense e : expensesToRemove) {
-                event.getExpenses().remove(e);
-                simp.convertAndSend(
-                        "/event/" + eventID,
-                        e.getId(),
-                        Map.of("action", WebsocketActions.REMOVE_EXPENSE,
-                                "type", Long.class.getTypeName())
-                );
+            var itr2 = event.getTransactions().iterator();
+            while(itr2.hasNext()) {
+                Transaction t = itr2.next();
+                if(t.getReceiver().getId() == partID || t.getGiver().getId() == partID) {
+                    itr2.remove();
+                    simp.convertAndSend("/event/" + eventID, t.getId(),
+                            Map.of("action", WebsocketActions.REMOVE_TRANSACTION,
+                                    "type", Long.class.getTypeName()));
+                }
             }
+
             event.getParticipants().remove(participant);
             eventRepo.save(event);
             update(eventID);
-            simp.convertAndSend(
-                    "/event/" + eventID,
-                    partID,
+            simp.convertAndSend("/event/" + eventID, partID,
                     Map.of("action", WebsocketActions.REMOVE_PARTICIPANT,
                             "type", Long.class.getTypeName())
             );
