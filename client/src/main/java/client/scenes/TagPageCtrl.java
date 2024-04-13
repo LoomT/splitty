@@ -8,6 +8,7 @@ import client.utils.Websocket;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
+import commons.Expense;
 import commons.Tag;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -30,6 +31,9 @@ import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static commons.WebsocketActions.REMOVE_TAG;
+import static commons.WebsocketActions.UPDATE_TAG;
 
 
 public class TagPageCtrl {
@@ -76,6 +80,30 @@ public class TagPageCtrl {
      * initialize method
      */
     public void initialize() {
+        websocket.on(REMOVE_TAG, t -> {
+            Tag tag = (Tag) t;
+            event.getTags().remove(tag);
+            for (Expense exp : event.getExpenses()) {
+                if (exp.getType().getId() == tag.getId()) {
+                    exp.setType(null);
+                }
+            }
+            populateTagList(event);
+        });
+        websocket.on(UPDATE_TAG, t -> {
+            Tag tag = (Tag) t;
+            for (int i = 0; i < event.getTags().size(); i++) {
+                if (event.getTags().get(i).getId() == tag.getId()) {
+                    event.getTags().set(i, tag);
+                }
+            }
+            for (Expense exp : event.getExpenses()) {
+                if (exp.getType().getId() == tag.getId()) {
+                    exp.setType(tag);
+                }
+            }
+            populateTagList(event);
+        });
     }
 
     /**
@@ -87,7 +115,6 @@ public class TagPageCtrl {
         populateTagList(event);
         back.setOnAction(e -> {
             mainCtrl.showStatisticsPage(event); // pass updated tags
-            //pc.getData().clear();
         });
     }
 

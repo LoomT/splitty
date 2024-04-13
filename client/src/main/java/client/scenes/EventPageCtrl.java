@@ -16,7 +16,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
@@ -211,6 +210,32 @@ public class EventPageCtrl {
         });
         websocket.on(REMOVE_TRANSACTION, id -> {
             event.getTransactions().removeIf(t -> t.getId() == (long) id);
+        });
+        websocket.on(REMOVE_TAG, t -> {
+            Tag tag = (Tag) t;
+            event.getTags().removeIf(existingTag -> existingTag.getId() == tag.getId());
+            event.getExpenses().forEach(exp -> {
+                if (exp.getType().getId() == tag.getId()) {
+                    exp.setType(null);
+                }
+            });
+            updateExpenses(event);
+        });
+
+        websocket.on(UPDATE_TAG, t -> {
+            Tag tag = (Tag) t;
+            for (int i = 0; i < event.getTags().size(); i++) {
+                if (event.getTags().get(i).getId() == tag.getId()) {
+                    event.getTags().set(i, tag);
+                    break;
+                }
+            }
+            for (Expense exp : event.getExpenses()) {
+                if (exp.getType().getId() == tag.getId()) {
+                    exp.setType(tag);
+                }
+            }
+            updateExpenses(event);
         });
     }
 
@@ -566,7 +591,6 @@ public class EventPageCtrl {
      * display the statistics page when the button is clicked
      */
     public void statisticsClicked() {
-        PieChart pc = new PieChart();
         mainCtrl.showStatisticsPage(event);
     }
 

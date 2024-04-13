@@ -110,6 +110,31 @@ public class StatisticsCtrl {
         websocket.on(REMOVE_EXPENSE, e -> {
             initPieChart(event);
         });
+
+        websocket.on(REMOVE_TAG, t -> {
+            Tag tag = (Tag) t;
+            event.getTags().remove(tag);
+            for (Expense exp : event.getExpenses()) {
+                if (exp.getType().getId() == tag.getId()) {
+                    exp.setType(null);
+                }
+            }
+            initPieChart(event);
+        });
+        websocket.on(UPDATE_TAG, t -> {
+            Tag tag = (Tag) t;
+            for (int i = 0; i < event.getTags().size(); i++) {
+                if (event.getTags().get(i).getId() == tag.getId()) {
+                    event.getTags().set(i, tag);
+                }
+            }
+            for (Expense exp : event.getExpenses()) {
+                if (exp.getType().getId() == tag.getId()) {
+                    exp.setType(tag);
+                }
+            }
+            initPieChart(event);
+        });
     }
 
     /**
