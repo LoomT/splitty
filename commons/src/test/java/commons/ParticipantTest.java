@@ -17,13 +17,14 @@ class ParticipantTest {
     Participant clone;
     @BeforeEach
     public void testSetup(){
+        Tag tag = new Tag("test", "FF0000");
         participant1 = new Participant("participant1", "p1@gmail.com", "Bob",  "1234", "BASALT");
         participant2 = new Participant("participant2", "p2@gmail.com");
         List<Participant> expenseParticipants = new ArrayList<>();
         expenseParticipants.add(participant1);
         expenseParticipants.add(participant2);
         expense = new Expense(participant1, "test", 32,
-                "EUR", expenseParticipants, "type");
+                "EUR", expenseParticipants, tag);
         clone = participant1.clone();
     }
 

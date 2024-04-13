@@ -78,6 +78,9 @@ public class MainCtrl implements MainCtrlInterface{
     private OptionsCtrl optionsCtrl;
     private Scene options;
 
+    private StatisticsCtrl statisticsCtrl;
+    private Scene statistics;
+
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
     private Scene addCustomTransaction;
 
@@ -86,7 +89,6 @@ public class MainCtrl implements MainCtrlInterface{
 
     private boolean startPage = true;
     private Event event;
-
 
 
     /**
@@ -151,13 +153,19 @@ public class MainCtrl implements MainCtrlInterface{
         this.inviteMailCtrl = pairCollector.inviteMailPage().getKey();
         this.inviteMail = new Scene(pairCollector.inviteMailPage().getValue());
 
+        this.statisticsCtrl = pairCollector.statisticsPage().getKey();
+        this.statistics = new Scene(pairCollector.statisticsPage().getValue());
         initializeShortcuts();
+
+        //showOverview();
+        showStartScreen();
         if(startPage){
             showStartScreen();
         } else {
             showEventPage(event);
         }
         primaryStage.show();
+
     }
 
     /**
@@ -417,6 +425,18 @@ public class MainCtrl implements MainCtrlInterface{
     }
 
     /**
+     * display the statistics page
+     * @param event event to display
+     */
+    @Override
+    public void showStatisticsPage(Event event) {
+        statisticsCtrl.displayStatisticsPage(event);
+        primaryStage.setTitle(languageConf.get("Statistics.title"));
+        primaryStage.setScene(statistics);
+        statistics.setCursor(Cursor.DEFAULT);
+    }
+
+    /**
      * Initializes a new stage with options
      * and opens it
      */
@@ -439,7 +459,7 @@ public class MainCtrl implements MainCtrlInterface{
      */
     @Override
     public void showDebtsPage(Event eventToShow) {
-        openDebtsPageCtrl.registerWS();
+        openDebtsPageCtrl.open();
         openDebtsPageCtrl.displayOpenDebtsPage(eventToShow);
         primaryStage.setTitle(languageConf.get("OpenDebts.title"));
         primaryStage.setScene(openDebtsPage);

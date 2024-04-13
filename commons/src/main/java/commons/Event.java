@@ -11,26 +11,6 @@ import java.util.stream.Collectors;
 @Table(indexes = {@Index(name = "idx_event_title", columnList = "title")
 })
 public class Event implements Cloneable {
-    /*
-      Properties:
-      * Int EventID to join an event (getter + set once in constructor)
-      * String title to easily differentiate two events (getter and setter)
-      * List<Participants> to store all
-        active participants of an event (get, remove, edit and add method)
-      * List<Expenses> to store all
-        active expenses of an event(get, remove, edit and add method)
-      * Date creationDate to store the date of creation (getter + set once in constructor)
-
-      Methods:
-      * Constructor to create an event
-      * getters for eventID, title and creationDate
-      * setter for title
-      * unique event ID generator
-      * get, remove, edit and add method for participants, and expenses
-      * equals method
-      * hashing method
-
-      */
     @Id
     @Column(nullable = false, length = 5)
     private String id;
@@ -231,15 +211,6 @@ public class Event implements Cloneable {
      */
     public boolean hasParticipant(Participant participant){
         return participants.contains(participant);
-    }
-
-    /**
-     *
-     * @param expense expense to be checked
-     * @return true iff expense is in list, false otherwise
-     */
-    public boolean hasExpense(Expense expense){
-        return expenses.contains(expense);
     }
 
     /**

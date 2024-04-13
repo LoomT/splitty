@@ -106,6 +106,9 @@ public class Main extends Application {
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "Options.fxml"
         );
+        var statistics = FXML.load(StatisticsCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "Statistics.fxml");
         var addCustomTransaction = FXML.load(AddCustomTransactionCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AddCustomTransaction.fxml"
@@ -124,7 +127,7 @@ public class Main extends Application {
 
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
-                adminOverview, addExpense, titleChanger, addTag, options,
+                adminOverview, addExpense, titleChanger, addTag, statistics, options,
                 addCustomTransaction, openDebtsPage, inviteMailPage)
         );
     }

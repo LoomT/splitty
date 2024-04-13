@@ -48,6 +48,7 @@ public class OpenDebtsPageCtrl {
 
     private enum Tab{OPEN, SETTLED}
     private Tab tab;
+    private boolean opened;
 
     /**
      * Constructor
@@ -79,6 +80,7 @@ public class OpenDebtsPageCtrl {
         this.emailService = emailService;
         participantDebtMap = new HashMap<>();
         tab = Tab.OPEN;
+        opened = false;
     }
 
     /**
@@ -98,19 +100,20 @@ public class OpenDebtsPageCtrl {
                         displaySettledDebts();
                     else displayOpenDebtsPage(event);
                 });
-    }
-
-    /**
-     * Register websocket listeners and set tab to open
-     */
-    public void registerWS() {
         websocket.on(ADD_EXPENSE, (exp) -> displayOpenDebtsPage(event));
         websocket.on(UPDATE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
         websocket.on(REMOVE_EXPENSE, (exp) -> displayOpenDebtsPage(event));
         websocket.on(ADD_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         websocket.on(UPDATE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
         websocket.on(REMOVE_PARTICIPANT, (participant) -> displayOpenDebtsPage(event));
+    }
+
+    /**
+     * Initialize the page when opening it
+     */
+    public void open() {
         tab = Tab.OPEN;
+        opened = true;
         settledDebtsBtn.getStyleClass().remove("selectedTabButton");
         openDebtsBtn.getStyleClass().remove("selectedTabButton");
         openDebtsBtn.getStyleClass().add("selectedTabButton");
@@ -122,7 +125,7 @@ public class OpenDebtsPageCtrl {
      * @param event the event
      */
     public void displayOpenDebtsPage(Event event) {
-        if(tab == Tab.SETTLED) return;
+        if(!opened || tab == Tab.SETTLED) return;
         this.event = event;
 
         Map<String, Double> map = new HashMap<>();
@@ -284,6 +287,7 @@ public class OpenDebtsPageCtrl {
      */
     @FXML
     public void backButtonClicked() {
+        opened = false;
         mainCtrl.goBackToEventPage(event);
     }
 
@@ -320,6 +324,7 @@ public class OpenDebtsPageCtrl {
     }
 
     private void displaySettledDebts() {
+        if(!opened) return;
         allDebtsPane.getChildren().clear();
         List<Transaction> sorted = event.getTransactions().stream().sorted().toList();
         for(Transaction t : sorted) {

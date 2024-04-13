@@ -78,11 +78,13 @@
                         <Font name="System Bold" size="18.0" />
                      </font>
                   </Text>
-                  <Button fx:id="editParticipantsButton" mnemonicParsing="false" onAction="#editParticipantsClicked" styleClass="pbutton" text="%EventPage.editParticipants">
+                  <Button fx:id="editParticipantsButton" minWidth="-Infinity" mnemonicParsing="false" onAction="#editParticipantsClicked" styleClass="pbutton" text="%EventPage.editParticipants">
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Button>
+                  <Region prefHeight="0.0" prefWidth="162.0" />
+                  <Button fx:id="statistics" minWidth="-Infinity" mnemonicParsing="false" onAction="#statisticsClicked" styleClass="sbutton" text="%EventPage.statistics" />
                </children>
                <VBox.margin>
                   <Insets bottom="5.0" />
