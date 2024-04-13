@@ -440,7 +440,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int updateTag(long id, String eventID, Tag tag) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/tags/" + id)
                 .request(APPLICATION_JSON)
                 .put(Entity.entity(tag, APPLICATION_JSON))) {
@@ -457,7 +457,7 @@ public class ServerUtilsImpl implements ServerUtils {
     @Override
     public int deleteTag(long id, String eventID) throws ConnectException {
         try(Response response = ClientBuilder.newClient(new ClientConfig())
-                .target(server)
+                .target(getPath())
                 .path("api/events/" + eventID + "/tags/" + id)
                 .request(APPLICATION_JSON)
                 .delete()) {

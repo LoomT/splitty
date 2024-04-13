@@ -26,6 +26,7 @@ import commons.Expense;
 import javafx.event.EventTarget;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -406,7 +407,6 @@ public class MainCtrl implements MainCtrlInterface{
         primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
     }
-
     /**
      * display the statistics page
      * @param event event to display
@@ -535,8 +535,8 @@ public class MainCtrl implements MainCtrlInterface{
 
 
     @Override
-    public void showTagPage(Event event) {
-        tagPageCtrl.displayTagPage(event);
+    public void showTagPage(Event event, PieChart pc) {
+        tagPageCtrl.displayTagPage(event, pc);
         primaryStage.setTitle("Tags overview");
         primaryStage.setScene(tagPage);
     }

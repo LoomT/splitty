@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.*;
@@ -565,6 +566,7 @@ public class EventPageCtrl {
      * display the statistics page when the button is clicked
      */
     public void statisticsClicked() {
+        PieChart pc = new PieChart();
         mainCtrl.showStatisticsPage(event);
     }
 

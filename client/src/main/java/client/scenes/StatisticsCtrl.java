@@ -145,7 +145,7 @@ public class StatisticsCtrl {
         initPieChart(event);
         initCost(event);
         editTags.setOnAction(e -> {
-            mainCtrl.showTagPage(event);
+            mainCtrl.showTagPage(event, pc);
         });
     }
 

@@ -118,8 +118,8 @@ public class Main extends Application {
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "OpenDebtsPage.fxml"
         );
-        var tagPage = FXML.load(
-                TagPageCtrl.class, languageConf.getLanguageResources(),
+        var tagPage = FXML.load(TagPageCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "TagPage.fxml"
         );
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);

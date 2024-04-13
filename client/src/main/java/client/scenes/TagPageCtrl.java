@@ -13,6 +13,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -27,6 +28,9 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 public class TagPageCtrl {
@@ -37,6 +41,8 @@ public class TagPageCtrl {
     private Button back;
     @FXML
     private ColorPicker colorPicker;
+
+    List<Tag> removedTags = new ArrayList<>();
 
     private final Websocket websocket;
     private final CurrencyConverter converter;
@@ -69,11 +75,36 @@ public class TagPageCtrl {
     public void initialize() {
 
     }
-    public void displayTagPage(Event event) {
+    public void displayTagPage(Event event, PieChart pc) {
         populateTagList(event);
         back.setOnAction(e -> {
             mainCtrl.showStatisticsPage(event); // pass updated tags
+            System.out.println("\n\n\n" + pc.getData().size());
+            removeTags(pc);
+            System.out.println("\n\n\n" + pc.getData().size());
+            //pc.getData().clear();
         });
+    }
+
+    public void removeTags(PieChart pieChart) {
+        // Get the list of data from the PieChart
+        ObservableList<PieChart.Data> data = pieChart.getData();
+
+        // Iterate through the data
+        Iterator<PieChart.Data> iterator = data.iterator();
+        while (iterator.hasNext()) {
+            PieChart.Data slice = iterator.next();
+
+            // Check if the slice has the property to remove
+            List<String> removedTagNames = new ArrayList<>();
+            for (Tag tag : removedTags) {
+                removedTagNames.add(tag.getName());
+            }
+            if (removedTagNames.contains(slice.getName())) {
+                iterator.remove();
+            }
+        }
+        removedTags.clear();
     }
 
     public void populateTagList(Event event) {
@@ -121,6 +152,7 @@ public class TagPageCtrl {
                                     try {
                                         event.getTags().remove(tag);
                                         server.deleteTag(tag.getId(), event.getId());
+                                        removedTags.add(tag);
                                     } catch (ConnectException ex) {
                                         mainCtrl.handleServerNotFound();
                                         return;
