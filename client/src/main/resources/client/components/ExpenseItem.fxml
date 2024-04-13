@@ -18,11 +18,11 @@
             <Label fx:id="participantsLabel" text="Label" />
          </children>
       </VBox>
-      <Button fx:id="editButton" mnemonicParsing="false" onAction="#onEditClicked" styleClass="sbutton" text="Button">
+      <Button fx:id="editButton" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#onEditClicked" styleClass="sbutton" text="Button">
          <HBox.margin>
             <Insets left="10.0" right="5.0" />
          </HBox.margin>
       </Button>
-      <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onDeleteClicked" styleClass="sbutton" text="Button" />
+      <Button fx:id="deleteButton" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#onDeleteClicked" styleClass="sbutton" text="Button" />
    </children>
 </fx:root>

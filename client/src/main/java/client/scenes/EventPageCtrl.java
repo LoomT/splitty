@@ -41,7 +41,7 @@ import static commons.WebsocketActions.*;
 public class EventPageCtrl {
 
     @FXML
-    private Text eventTitle;
+    private Label eventTitle;
 
     @FXML
     private Text participantText;
@@ -69,9 +69,9 @@ public class EventPageCtrl {
     @FXML
     private VBox expenseVbox;
     @FXML
-    private Label inviteCode;
+    private Text inviteCode;
     @FXML
-    private Label copiedToClipboardMsg;
+    private Text copiedToClipboardMsg;
     @FXML
     private Button editTitleButton;
     @FXML

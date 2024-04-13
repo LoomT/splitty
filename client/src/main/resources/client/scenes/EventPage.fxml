@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import java.lang.String?>
 <?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
       <HBox prefWidth="600.0" styleClass="navbar">
          <children>
-            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="New Year Party">
-               <font>
-                  <Font name="System Bold" size="36.0" />
-               </font>
-            </Text>
+            <Label fx:id="eventTitle" styleClass="eventTitleFont" text="New Year Party" />
             <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
+                  <Button fx:id="editTitleButton" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
                      <HBox.margin>
                         <Insets right="10.0" />
                      </HBox.margin>
                   </Button>
                   <VBox alignment="CENTER_LEFT">
                      <children>
-                        <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
+                        <Text fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Invite code: ABCDE">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
-                        </Label>
-                        <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
+                        </Text>
+                        <Text fx:id="copiedToClipboardMsg" strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.copiedToClipboard" />
                      </children>
                   </VBox>
                </children>
@@ -61,11 +66,11 @@
                   <Insets bottom="5.0" />
                </VBox.margin>
             </HBox>
-            <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Text>
+            <ScrollPane fitToWidth="true" focusTraversable="false" styleClass="partScrollPane" vbarPolicy="NEVER" VBox.vgrow="NEVER">
+               <content>
+                  <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David" />
+               </content>
+            </ScrollPane>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="headerFont" text="%EventPage.expenses">
                <font>
                   <Font name="System Bold" size="18.0" />
@@ -110,7 +115,7 @@
             </ScrollPane>
          </children>
       </VBox>
-      <ComboBox fx:id="languageChoiceBoxEvent" prefWidth="70.0" styleClass="sbutton" layoutX="510" layoutY="78" />
+      <ComboBox fx:id="languageChoiceBoxEvent" layoutX="510" layoutY="78" prefWidth="70.0" styleClass="sbutton" />
       <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%EventPage.back" />
    </children>
    <stylesheets>

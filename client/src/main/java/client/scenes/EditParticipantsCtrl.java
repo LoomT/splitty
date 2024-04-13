@@ -12,7 +12,6 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.text.Text;
 
 import java.net.ConnectException;
 import java.util.Optional;
@@ -24,7 +23,7 @@ import static java.lang.String.format;
 
 public class EditParticipantsCtrl {
     @FXML
-    private Text eventTitle;
+    private Label eventTitle;
     @FXML
     private ChoiceBox<String> chooseParticipant;
     @FXML
