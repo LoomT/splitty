@@ -24,6 +24,10 @@ public class TestTagRepository implements TagRepository {
     private final RandomGenerator random = new TestRandom();
     private final TestEventRepository eventRepo;
 
+    /**
+     * Constructor-method for TestTagRepository
+     * @param eventRepo TestEventRepository
+     */
     public TestTagRepository(TestEventRepository eventRepo){
         this.eventRepo= eventRepo;
     }
@@ -126,7 +130,8 @@ public class TestTagRepository implements TagRepository {
 
     /**
      * @param example must not be {@literal null}.
-     * @param sort the {@link Sort} specification to sort the results by, may be {@link Sort#unsorted()}, must not be
+     * @param sort the {@link Sort} specification to sort the
+     *             results by, may be {@link Sort#unsorted()}, must not be
      *          {@literal null}.
      * @return list
      * @param <S> Tag
@@ -138,7 +143,8 @@ public class TestTagRepository implements TagRepository {
 
     /**
      * @param example must not be {@literal null}.
-     * @param pageable the pageable to request a paged result, can be {@link Pageable#unpaged()}, must not be
+     * @param pageable the pageable to request a
+     *                 paged result, can be {@link Pageable#unpaged()}, must not be
      *          {@literal null}.
      * @return result
      * @param <S> Tag
@@ -159,7 +165,8 @@ public class TestTagRepository implements TagRepository {
     }
 
     /**
-     * @param example the {@link Example} to use for the existence check. Must not be {@literal null}.
+     * @param example the {@link Example} to use for
+     *                the existence check. Must not be {@literal null}.
      * @return result
      * @param <S> tag
      */
@@ -176,7 +183,9 @@ public class TestTagRepository implements TagRepository {
      * @param <R> query
      */
     @Override
-    public <S extends Tag, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+    public <S extends Tag, R> R findBy(Example<S> example,
+                                       Function<FluentQuery.FetchableFluentQuery<S>, R>
+                                               queryFunction) {
         return null;
     }
 
@@ -252,7 +261,8 @@ public class TestTagRepository implements TagRepository {
     }
 
     /**
-     * @param eventWeakKeys must not be {@literal null} nor contain any {@literal null} values.
+     * @param eventWeakKeys must not be
+     * {@literal null} nor contain any {@literal null} values.
      * @return result
      */
     @Override
@@ -309,7 +319,8 @@ public class TestTagRepository implements TagRepository {
     }
 
     /**
-     * @param sort the {@link Sort} specification to sort the results by, can be {@link Sort#unsorted()}, must not be
+     * @param sort the {@link Sort} specification to sort the results by,
+     *             can be {@link Sort#unsorted()}, must not be
      *          {@literal null}.
      * @return result
      */
@@ -319,7 +330,8 @@ public class TestTagRepository implements TagRepository {
     }
 
     /**
-     * @param pageable the pageable to request a paged result, can be {@link Pageable#unpaged()}, must not be
+     * @param pageable the pageable to request a paged result,
+     *                 can be {@link Pageable#unpaged()}, must not be
      *          {@literal null}.
      * @return result
      */
