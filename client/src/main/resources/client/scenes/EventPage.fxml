@@ -23,12 +23,12 @@
             <Label fx:id="eventTitle" styleClass="eventTitleFont" text="New Year Party" />
             <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Button fx:id="mailButton" mnemonicParsing="false" onAction="#sendInvite" styleClass="pbutton" text="%EventPage.sendInvite" />
                   <Button fx:id="editTitleButton" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
                   </Button>
+                  <Button fx:id="mailButton" ellipsisString="" mnemonicParsing="false" onAction="#sendInvite" styleClass="sbutton" text="%EventPage.sendInvite" />
                   <VBox alignment="CENTER_LEFT">
                      <children>
                         <Text fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Invite code: ABCDE">
