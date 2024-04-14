@@ -2,9 +2,9 @@ package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
-import client.utils.UserConfig;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
@@ -12,21 +12,24 @@ import commons.Tag;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static commons.WebsocketActions.*;
@@ -40,14 +43,10 @@ public class TagPageCtrl {
     @FXML
     private Button back;
     @FXML
-    private ColorPicker colorPicker;
-    @FXML
     private Button addTag;
 
-    private List<Tag> removedTags = new ArrayList<>();
 
     private final Websocket websocket;
-    private final UserConfig userConfig;
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
@@ -58,18 +57,15 @@ public class TagPageCtrl {
      * @param languageConf the language config instance
      * @param websocket    the websocket instance
      * @param server       server to be ysed
-     * @param userConfig user config
      */
     @Inject
 
     public TagPageCtrl(MainCtrlInterface mainCtrl, LanguageConf languageConf,
-                         Websocket websocket, ServerUtils server,
-                         UserConfig userConfig) {
+                         Websocket websocket, ServerUtils server) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.server = server;
         this.websocket = websocket;
-        this.userConfig = userConfig;
     }
 
     /**
@@ -113,11 +109,12 @@ public class TagPageCtrl {
         Button editButton = createEditButton(tag, event);
         Button deleteButton = createDeleteButton(tag, event);
 
-        HBox tagItem = new HBox(15);
-        tagItem.getChildren().addAll(editButton, deleteButton, coloredBox, label);
-
+        Region region = new Region();
+        region.setPrefSize(0, 0);
+        HBox tagItem = new HBox(10, coloredBox, label, region, editButton, deleteButton);
+        HBox.setHgrow(region, Priority.ALWAYS);
         tagItem.setAlignment(Pos.CENTER_LEFT);
-
+        tagItem.getStyleClass().add("eventListItemContainer");
         return tagItem;
     }
 
@@ -132,6 +129,8 @@ public class TagPageCtrl {
         Shape coloredBox = new Rectangle(15, 15);
         coloredBox.setFill(Color.web(color));
         coloredBox.setOnMouseClicked(e -> showColorPicker(tag, color));
+        coloredBox.setCursor(Cursor.HAND);
+        coloredBox.setFocusTraversable(true);
         return coloredBox;
     }
 
@@ -139,6 +138,7 @@ public class TagPageCtrl {
         Button editButton = new Button("\uD83D\uDD89");
         editButton.setOnAction(e -> showEditDialog(tag, event));
         editButton.setMinWidth(Button.USE_PREF_SIZE);
+        editButton.getStyleClass().add("sbutton");
         return editButton;
     }
 
@@ -146,13 +146,16 @@ public class TagPageCtrl {
         Button deleteButton = new Button("\u274C");
         deleteButton.setOnAction(e -> deleteTag(tag, event));
         deleteButton.setMinWidth(Button.USE_PREF_SIZE);
+        deleteButton.getStyleClass().add("sbutton");
         return deleteButton;
     }
 
     private void showColorPicker(Tag tag, String color) {
         Stage colorPickerStage = new Stage();
-        colorPickerStage.setTitle("Change colour");
-        colorPicker = new ColorPicker(Color.web(color));
+        colorPickerStage.initModality(Modality.APPLICATION_MODAL);
+        colorPickerStage.setTitle(languageConf.get("AddTag.choosecolor"));
+        ColorPicker colorPicker = new ColorPicker(Color.web(color));
+        colorPicker.getStyleClass().add("sbutton");
         colorPicker.setOnAction(e -> {
             tag.setColor(colorPicker.getValue().toString().replace("0x", "#"));
             try {
@@ -161,7 +164,6 @@ public class TagPageCtrl {
                 mainCtrl.handleServerNotFound();
                 return;
             }
-            populateTagList(event);
             colorPickerStage.close();
         });
         Scene colorPickerScene = new Scene(colorPicker, 200, 50);
@@ -171,11 +173,24 @@ public class TagPageCtrl {
 
     private void showEditDialog(Tag tag, Event event) {
         TextInputDialog dialog = new TextInputDialog(tag.getName());
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.setGraphic(null);
+        dialogPane.getStylesheets().add(getClass().getResource("global.css").toExternalForm());
+        dialogPane.getStyleClass().add("backgroundAnchorpane");
+        dialog.getEditor().getStyleClass().add("ntextfield");
         dialog.setTitle("Edit Tag Name");
         dialog.setHeaderText(null);
         dialog.setContentText("Enter new tag name:");
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(newTagName -> {
+            if(event.getTags().stream().anyMatch(t -> t.getName().equals(newTagName))) {
+                Alert alert = new Alert(Alert.AlertType.WARNING,
+                        languageConf.get("AddTag.alrexistmess"));
+                alert.setTitle(languageConf.get("AddTag.alrexist"));
+                alert.setHeaderText(null);
+                alert.showAndWait();
+                return;
+            }
             tag.setName(newTagName);
             try {
                 server.updateTag(tag.getId(), event.getId(), tag);
@@ -183,7 +198,6 @@ public class TagPageCtrl {
                 mainCtrl.handleServerNotFound();
                 return;
             }
-            populateTagList(event);
         });
     }
 
@@ -209,13 +223,8 @@ public class TagPageCtrl {
                                     server.deleteTag(tag.getId(), event.getId());
                                 } catch (ConnectException ex) {
                                     mainCtrl.handleServerNotFound();
-                                    return;
                                 }
                             }
-
-
-                            populateTagList(event);
-                            return;
                         }
                     }
                 }
@@ -228,6 +237,14 @@ public class TagPageCtrl {
      */
     public void addTagClicked() {
         mainCtrl.showAddTagPage(event);
-        populateTagList(event);
+    }
+
+    /**
+     * Initializes the shortcuts for Tag page:
+     *      Escape: go back
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene) {
+        CommonFunctions.checkKey(scene, () -> mainCtrl.showStatisticsPage(event), KeyCode.ESCAPE);
     }
 }

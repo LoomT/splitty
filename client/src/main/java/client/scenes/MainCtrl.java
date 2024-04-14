@@ -185,6 +185,8 @@ public class MainCtrl implements MainCtrlInterface{
         openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
         addCustomTransactionCtrl.initializeShortcuts(addCustomTransaction);
         inviteMailCtrl.initializeShortcuts(inviteMail);
+        statisticsCtrl.initializeShortcuts(statistics);
+        tagPageCtrl.initializeShortcuts(tagPage);
     }
 
     /**
