@@ -68,6 +68,6 @@ public class LanguageConfTest {
         languageConf.changeCurrentLocaleTo("en");
         assertEquals(languageConf.get("flag", "nl"), "flags/flag_nl.png");
         assertEquals(languageConf.get("flag", "de"), "flags/flag_de.png");
-        assertEquals(languageConf.get("flag", "en"), "flags/flag_en.png");
+        assertEquals(languageConf.get("flag", "en"), "flags/flag_uk.png");
     }
 }
