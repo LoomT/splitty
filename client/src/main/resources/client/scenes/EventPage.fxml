@@ -10,23 +10,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
-
-<?import javafx.scene.layout.Region?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.Cursor?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -38,24 +21,15 @@
       <HBox prefWidth="600.0" styleClass="navbar">
          <children>
             <Label fx:id="eventTitle" styleClass="eventTitleFont" text="New Year Party" />
-            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
                <children>
+                  <Button fx:id="mailButton" mnemonicParsing="false" onAction="#sendInvite" styleClass="pbutton" text="%EventPage.sendInvite" />
                   <Button fx:id="editTitleButton" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
                      <HBox.margin>
-                        <Insets right="10.0" />
+                        <Insets />
                      </HBox.margin>
                   </Button>
                   <VBox alignment="CENTER_LEFT">
-                  <GridPane prefHeight="53.0" prefWidth="330.0">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="172.71429443359375" minWidth="10.0" percentWidth="40.0" prefWidth="145.00003487723214" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="126.85711669921875" minWidth="10.0" percentWidth="15.0" prefWidth="103.85709926060267" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="126.85711669921875" minWidth="10.0" percentWidth="5.0" prefWidth="20.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="207.4285888671875" minWidth="10.0" percentWidth="40.0" prefWidth="121.14286586216517" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
                      <children>
                         <Text fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Invite code: ABCDE">
                            <cursor>
@@ -65,29 +39,6 @@
                         <Text fx:id="copiedToClipboardMsg" strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.copiedToClipboard" />
                      </children>
                   </VBox>
-                        <VBox alignment="CENTER_LEFT" GridPane.columnIndex="3">
-                           <children>
-                              <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
-                                 <cursor>
-                                    <Cursor fx:constant="HAND" />
-                                 </cursor>
-                              </Label>
-                              <Label fx:id="copiedToClipboardMsg" text="%EventPage.copiedToClipboard" />
-                           </children>
-                        </VBox>
-                        <HBox alignment="CENTER" prefHeight="53.0" prefWidth="122.0">
-                           <children>
-                              <Button fx:id="mailButton" mnemonicParsing="false" onAction="#sendInvite" prefHeight="25.0" prefWidth="80.0" styleClass="pbutton" text="%EventPage.sendInvite" />
-                              <Region prefHeight="0.0" prefWidth="162.0" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="77.0" GridPane.columnIndex="1">
-                           <children>
-                              <Button fx:id="editTitleButton" mnemonicParsing="false" onAction="#changeTitle" prefHeight="25.0" prefWidth="78.0" styleClass="sbutton" text="%EventPage.editEventTitle" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </GridPane>
                </children>
             </HBox>
          </children>
