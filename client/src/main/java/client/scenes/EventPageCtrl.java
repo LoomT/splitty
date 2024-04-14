@@ -38,10 +38,10 @@ import static commons.WebsocketActions.*;
 public class EventPageCtrl {
 
     @FXML
-    private Text eventTitle;
+    private Label eventTitle;
 
     @FXML
-    private Text participantText;
+    private Text participantLabel;
 
     @FXML
     private Button allTab;
@@ -66,9 +66,9 @@ public class EventPageCtrl {
     @FXML
     private VBox expenseVbox;
     @FXML
-    private Label inviteCode;
+    private Text inviteCode;
     @FXML
-    private Label copiedToClipboardMsg;
+    private Text copiedToClipboardMsg;
     @FXML
     private Button editTitleButton;
     @FXML
@@ -139,7 +139,7 @@ public class EventPageCtrl {
                 p.append(e.getParticipants().get(i).getName());
                 if (i != e.getParticipants().size() - 1) p.append(", ");
             }
-            participantText.setText(p.toString());
+            participantLabel.setText(p.toString());
             participantChoiceBox.getItems().addAll(
                     e.getParticipants().stream().map(Participant::getName).toList()
             );
@@ -239,7 +239,7 @@ public class EventPageCtrl {
      * Sets the labels' styles for the case in which no participants exist
      */
     private void noParticipantsExist() {
-        participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
+        participantLabel.setText(languageConf.get("EventPage.noParticipantsYet"));
         allTab.setStyle("-fx-opacity:0");
         allTab.setDisable(true);
         fromTab.setStyle("-fx-opacity:0");
@@ -329,6 +329,7 @@ public class EventPageCtrl {
             ExpenseItem ei = new ExpenseItem(
                     toString(e),
                     partString,
+                    e.getType(),
                     () -> {
                         mainCtrl.handleEditExpense(e, event);
                     },

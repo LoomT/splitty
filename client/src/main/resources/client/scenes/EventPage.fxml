@@ -19,17 +19,33 @@
 <?import javafx.scene.text.Text?>
 
 <?import javafx.scene.layout.Region?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
       <HBox prefWidth="600.0" styleClass="navbar">
          <children>
-            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="EVENT" wrappingWidth="230.0">
-               <font>
-                  <Font name="System Bold" size="36.0" />
-               </font>
-            </Text>
-            <HBox alignment="CENTER_RIGHT" prefHeight="53.0" prefWidth="363.0" HBox.hgrow="ALWAYS">
+            <Label fx:id="eventTitle" styleClass="eventTitleFont" text="New Year Party" />
+            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                <children>
+                  <Button fx:id="editTitleButton" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#changeTitle" styleClass="sbutton" text="%EventPage.editEventTitle">
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                  </Button>
+                  <VBox alignment="CENTER_LEFT">
                   <GridPane prefHeight="53.0" prefWidth="330.0">
                     <columnConstraints>
                         <ColumnConstraints hgrow="SOMETIMES" maxWidth="172.71429443359375" minWidth="10.0" percentWidth="40.0" prefWidth="145.00003487723214" />
@@ -41,6 +57,14 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
+                        <Text fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Invite code: ABCDE">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Text>
+                        <Text fx:id="copiedToClipboardMsg" strokeType="OUTSIDE" strokeWidth="0.0" text="%EventPage.copiedToClipboard" />
+                     </children>
+                  </VBox>
                         <VBox alignment="CENTER_LEFT" GridPane.columnIndex="3">
                            <children>
                               <Label fx:id="inviteCode" onMouseClicked="#inviteCodeClicked" text="Invite code: ABCDE">
@@ -85,17 +109,18 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </Button>
+                  <Region prefHeight="0.0" prefWidth="162.0" />
                   <Button fx:id="statistics" minWidth="-Infinity" mnemonicParsing="false" onAction="#statisticsClicked" styleClass="sbutton" text="%EventPage.statistics" />
                </children>
                <VBox.margin>
                   <Insets bottom="5.0" />
                </VBox.margin>
             </HBox>
-            <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David">
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </Text>
+            <ScrollPane fitToWidth="true" focusTraversable="false" styleClass="partScrollPane" vbarPolicy="NEVER" VBox.vgrow="NEVER">
+               <content>
+                  <Text fx:id="participantLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David" />
+               </content>
+            </ScrollPane>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="headerFont" text="%EventPage.expenses">
                <font>
                   <Font name="System Bold" size="18.0" />
@@ -120,7 +145,7 @@
             </HBox>
             <HBox styleClass="tabHeader">
                <children>
-                  <Button fx:id="allTab" mnemonicParsing="false" onAction="#allTabClicked" text="All">
+                  <Button fx:id="allTab" ellipsisString="" minWidth="-Infinity" mnemonicParsing="false" onAction="#allTabClicked" text="All">
                      <styleClass>
                         <String fx:value="tabButton" />
                         <String fx:value="selectedTabButton" />

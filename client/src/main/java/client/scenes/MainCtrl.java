@@ -365,6 +365,7 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.displayAddExpensePage(eventToShow, null);
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
+        addExpenseCtrl.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
     }
 
@@ -395,6 +396,7 @@ public class MainCtrl implements MainCtrlInterface{
 
         addExpenseCtrl.displayAddExpensePage(ev, exp);
         primaryStage.setTitle(languageConf.get("AddExp.editexp"));
+        addExpenseCtrl.setTitle(languageConf.get("AddExp.editexp"));
         primaryStage.setScene(addExpense);
 
         addExpenseCtrl.setButton(languageConf.get("AddExp.save"));

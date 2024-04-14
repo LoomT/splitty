@@ -115,8 +115,8 @@ public class AddExpenseCtrlTest {
             assertFalse(robot.lookup("#date").queryAs(DatePicker.class).getValue().toString().isEmpty());
             assertFalse(robot.lookup("#type").queryAs(ComboBox.class).getItems().isEmpty());
             assertFalse(robot.lookup("#expenseParticipants").queryAs(TextFlow.class).getChildren().isEmpty());
-            assertFalse(robot.lookup("#partialSplit").queryAs(CheckBox.class).isSelected());
-            assertFalse(robot.lookup("#equalSplit").queryAs(CheckBox.class).isSelected());
+            assertFalse(robot.lookup("#partialSplit").queryAs(RadioButton.class).isSelected());
+            assertFalse(robot.lookup("#equalSplit").queryAs(RadioButton.class).isSelected());
         });
         waitForFxEvents();
     }
@@ -153,7 +153,7 @@ public class AddExpenseCtrlTest {
             robot.lookup("#currency").queryAs(ComboBox.class).getSelectionModel().select(0);
             robot.lookup("#date").queryAs(DatePicker.class).setValue(java.time.LocalDate.now());
             robot.lookup("#type").queryAs(ComboBox.class).getSelectionModel().select(0);
-            robot.lookup("#equalSplit").queryAs(CheckBox.class).setSelected(true);
+            robot.lookup("#equalSplit").queryAs(RadioButton.class).setSelected(true);
             robot.clickOn("#add");
 
         });
