@@ -64,7 +64,7 @@ public class AdminControllerTest {
         participant1.setEventID("ABCDE");
         participant2.setEventID("ABCDE");
         Expense expense = new Expense(participant1, "no", 5, "eur",
-                new ArrayList<>(List.of(participant1, participant2)), new Tag("food", null));
+                new ArrayList<>(List.of(participant1, participant2)), null);
         expense.setEventID("ABCDE");
         Event event = new Event("title", new ArrayList<>(List.of(participant1, participant2)),
                 new ArrayList<>(List.of(expense)));
@@ -76,5 +76,31 @@ public class AdminControllerTest {
         assertEquals("ABCDE", saved.getId());
         assertEquals(2, saved.getParticipants().size());
         assertEquals(1, saved.getExpenses().size());
+    }
+
+    @Test
+    public void testImportEventWithTags() {
+        Participant participant1 = new Participant("1");
+        Participant participant2 = new Participant("2");
+        participant1.setId(1);
+        participant2.setId(2);
+        participant1.setEventID("ABCDE");
+        participant2.setEventID("ABCDE");
+        Tag tag = new Tag("food", "#ABABAB");
+        tag.setId(1);
+        tag.setEventID("ABCDE");
+        Expense expense = new Expense(participant1, "no", 5, "eur",
+                new ArrayList<>(List.of(participant1, participant2)), tag);
+        expense.setEventID("ABCDE");
+        Event event = new Event("title", new ArrayList<>(List.of(participant1, participant2)),
+                new ArrayList<>(List.of(expense)));
+        event.getTags().add(tag);
+        event.setId("ABCDE");
+
+        ResponseEntity<Event> response = adminController.addEvent(adminService.getAdminPassword(), event);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        Event saved = response.getBody();
+        assertEquals(1, saved.getTags().size());
+        assertEquals(saved.getTags().getFirst(), saved.getExpenses().getFirst().getType());
     }
 }
