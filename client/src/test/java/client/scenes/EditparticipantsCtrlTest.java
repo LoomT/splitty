@@ -3,18 +3,13 @@ package client.scenes;
 import client.MyFXML;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
-import client.utils.currency.CurrencyConverter;
-import client.utils.currency.FileManager;
-import client.utils.currency.FileManagerImpl;
 import commons.Event;
 import commons.Participant;
 import commons.WebsocketActions;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -31,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
 
 @ExtendWith(ApplicationExtension.class)
 public class EditparticipantsCtrlTest {
@@ -85,15 +81,20 @@ public class EditparticipantsCtrlTest {
 
     @Test
     public void displayEditParticipantsPageTest() {
+        Event e = new Event("new event");
+        // simulate ws listener that is in the event overview
+        websocket.on(WebsocketActions.ADD_PARTICIPANT, participant -> e.getParticipants().add((Participant) participant));
+        Event e2 = e.clone(); // making a new event here would create an unequal one because the creation date would be different
+        Participant p = new Participant("name");
+        e2.getParticipants().add(p);
         Platform.runLater(()->{
-            Event e = new Event("new event");
-            Event e2 = new Event("new event");
-            Participant p = new Participant("name");
-            e2.getParticipants().add(p);
             ctrl.displayEditParticipantsPage(e);
             websocket.simulateAction(WebsocketActions.ADD_PARTICIPANT, p);
-            assertEquals(e2, ctrl.getEvent());
         });
+        waitForFxEvents();
+        System.out.println(e2);
+        System.out.println(ctrl.getEvent());
+        assertEquals(e2, ctrl.getEvent());
     }
 
     @Test

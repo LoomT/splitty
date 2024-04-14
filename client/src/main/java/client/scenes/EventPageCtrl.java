@@ -574,6 +574,13 @@ public class EventPageCtrl {
     }
 
     /**
+     * display the statistics page when the button is clicked
+     */
+    public void statisticsClicked() {
+        mainCtrl.showStatisticsPage(event);
+    }
+
+    /**
      * Show the openDebts page with the current event
      */
     @FXML

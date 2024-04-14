@@ -20,7 +20,7 @@ import java.net.ConnectException;
 import java.util.Optional;
 
 import static client.utils.CommonFunctions.lengthListener;
-import static commons.WebsocketActions.TITLE_CHANGE;
+import static commons.WebsocketActions.*;
 import static java.lang.String.format;
 
 public class EditParticipantsCtrl {
@@ -62,6 +62,7 @@ public class EditParticipantsCtrl {
     private final LanguageConf languageConf;
     private final Websocket websocket;
     private FadeTransition ft;
+    private boolean opened;
 
     /**
      * @param server       serverutils instance
@@ -80,6 +81,7 @@ public class EditParticipantsCtrl {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.websocket = websocket;
+        opened = false;
     }
 
     /**
@@ -93,9 +95,22 @@ public class EditParticipantsCtrl {
             }
         });
         websocket.on(TITLE_CHANGE, title -> {
-            if(event != null)
+            if(opened) {
                 event.setTitle((String) title);
-            eventTitle.setText((String) title);
+                eventTitle.setText((String) title);
+            }
+        });
+        websocket.on(ADD_PARTICIPANT, participant -> {
+            if(opened)
+                displayEditParticipantsPage(event);
+        });
+        websocket.on(UPDATE_PARTICIPANT, participant -> {
+            if(opened)
+                displayEditParticipantsPage(event);
+        });
+        websocket.on(REMOVE_PARTICIPANT, id -> {
+            if(opened)
+                displayEditParticipantsPage(event);
         });
         ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
         ft.setFromValue(1.0);
@@ -111,6 +126,7 @@ public class EditParticipantsCtrl {
      */
     public void displayEditParticipantsPage(Event e) {
         this.event = e;
+        opened = true;
         System.out.println("display");
         System.out.println(e);
         eventTitle.setText(e.getTitle());
@@ -149,13 +165,6 @@ public class EditParticipantsCtrl {
             }
         });
 
-        websocket.registerParticipantChangeListener(
-                event,
-                this::displayEditParticipantsPage,
-                this::displayEditParticipantsPage,
-                this::displayEditParticipantsPage
-        );
-
     }
 
     private void addIconsToButtons() {
@@ -190,6 +199,7 @@ public class EditParticipantsCtrl {
      */
     @FXML
     private void backButtonClicked() {
+        opened = false;
         mainCtrl.goBackToEventPage(event);
     }
 

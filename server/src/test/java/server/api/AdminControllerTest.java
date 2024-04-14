@@ -3,6 +3,7 @@ package server.api;
 import commons.Event;
 import commons.Expense;
 import commons.Participant;
+import commons.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ public class AdminControllerTest {
         participant1.setEventID("ABCDE");
         participant2.setEventID("ABCDE");
         Expense expense = new Expense(participant1, "no", 5, "eur",
-                new ArrayList<>(List.of(participant1, participant2)), "food");
+                new ArrayList<>(List.of(participant1, participant2)), new Tag("food", null));
         expense.setEventID("ABCDE");
         Event event = new Event("title", new ArrayList<>(List.of(participant1, participant2)),
                 new ArrayList<>(List.of(expense)));

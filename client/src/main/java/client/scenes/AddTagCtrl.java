@@ -60,6 +60,15 @@ public class AddTagCtrl {
      * initiliaze method
      */
     public void initialize() {
+        cp.setOnAction(event -> {
+            if (cp.getValue().equals(Color.WHITE)) {
+                showAlert("Invalid Color", "White color is not allowed.");
+                cp.setValue(selectedColor != null ? selectedColor : Color.BLACK);
+            } else {
+                selectedColor = cp.getValue();
+            }
+        });
+
         ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
         ft.setFromValue(1.0);
         ft.setToValue(0);

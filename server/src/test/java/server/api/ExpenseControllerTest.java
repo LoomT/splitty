@@ -44,9 +44,11 @@ public class ExpenseControllerTest {
         expPart.add(p1);
         expPart.add(p2);
         expPart.add(expAuth);
-        expense = new Expense(p2, "Groceries", 20, "USD", expPart, "Club");
-        expense2 = new Expense(p1, "Drinks", 10, "EUR", expPart, "Out");
-        updExp = new Expense(p2, "Drinks", 30, "EUR", expPart, "Out");
+        Tag t1 = new Tag("Club", "FF0000");
+        Tag t2 = new Tag("Out", "FF0000");
+        expense = new Expense(p2, "Groceries", 20, "USD", expPart, t1);
+        expense2 = new Expense(p1, "Drinks", 10, "EUR", expPart, t2);
+        updExp = new Expense(p2, "Drinks", 30, "EUR", expPart, t2);
         List<Expense> temp = new ArrayList<>();
         event = new Event("title", expPart, temp);
         var added = eventContr.add(event);
