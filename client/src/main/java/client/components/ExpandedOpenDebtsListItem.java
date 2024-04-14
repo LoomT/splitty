@@ -162,6 +162,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
             Button button = new Button(languageConf.get("ExpandedOpenDebtsListItem.emailButton"));
             button.getStyleClass().add("pbutton");
             button.setOnAction(e -> sendEmail());
+            button.setMinWidth(USE_PREF_SIZE);
             hbox.getChildren().add(label);
             hbox.getChildren().add(button);
             hbox.setSpacing(10);
