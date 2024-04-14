@@ -1,6 +1,6 @@
 package client.components;
 
-import client.scenes.MainCtrl;
+import client.utils.CommonFunctions;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -50,7 +50,7 @@ public class EventListItem extends HBox {
             throw new RuntimeException(exception);
         }
 
-        MainCtrl.checkKey(this, this::eventCodeClicked, KeyCode.ENTER);
+        CommonFunctions.checkKey(this, this::eventCodeClicked, KeyCode.ENTER);
 
         deleteButton.setText("\u274C");
         this.eventName = eventName;

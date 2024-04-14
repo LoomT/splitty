@@ -216,4 +216,71 @@ public class UserConfig {
     public void onContrastChange(Runnable function) {
         callback = function;
     }
+
+    /**
+     * Username of the mail address
+     * @return mail password in the config file
+     */
+    public String getUsername(){
+        return (String) configProperties.get("spring.mail.username");
+    }
+
+    /**
+     * Password of the mail address
+     * @return mail password in the config file
+     */
+    public String getMailPassword(){
+        return (String) configProperties.get("spring.mail.password");
+    }
+
+    /**
+     * host in the config file for the MailService
+     * @return host
+     */
+    public String getHost(){
+        return (String) configProperties.get("spring.mail.host");
+    }
+
+    /**
+     * port in the config file for the MailService
+     * @return port
+     */
+    public int getPort(){
+        return Integer.parseInt((String)configProperties.get("spring.mail.port"));
+    }
+
+    /**
+     * return properties needed in the JavaMailSender
+     * @return properties to initialise the MailService
+     */
+    public Properties getMailProperties(){
+        Properties result = new Properties();
+        result.setProperty("mail.smtp.auth",
+                configProperties.getProperty("mail.smtp.auth"));
+        result.setProperty("mail.smtp.starttls.enable",
+                configProperties.getProperty("mail.smtp.starttls.enable"));
+        return result;
+    }
+
+    /**
+     * sets username in the user config
+     * @param username username
+     */
+    public void setUsername(String username) throws IOException {
+        configProperties.setProperty("spring.mail.username", username);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed email username to " + username);
+        }
+    }
+
+    /**
+     * sets password in the user config
+     * @param password password
+     */
+    public void setMailPassword(String password) throws IOException {
+        configProperties.setProperty("spring.mail.password", password);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed email password to " + password);
+        }
+    }
 }
