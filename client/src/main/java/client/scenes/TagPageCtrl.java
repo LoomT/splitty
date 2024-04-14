@@ -5,10 +5,8 @@ import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import client.utils.Websocket;
-import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
-import commons.Expense;
 import commons.Tag;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -49,34 +47,29 @@ public class TagPageCtrl {
     private List<Tag> removedTags = new ArrayList<>();
 
     private final Websocket websocket;
-    private final CurrencyConverter converter;
     private final UserConfig userConfig;
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
     private Event event;
-    private List<Tag> currentTags;
 
     /**
      * @param mainCtrl     mainCtrl injection
      * @param languageConf the language config instance
      * @param websocket    the websocket instance
      * @param server       server to be ysed
-     * @param converter currency converter
      * @param userConfig user config
      */
     @Inject
 
     public TagPageCtrl(MainCtrlInterface mainCtrl, LanguageConf languageConf,
-                         Websocket websocket, ServerUtils server, CurrencyConverter converter,
+                         Websocket websocket, ServerUtils server,
                          UserConfig userConfig) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.server = server;
         this.websocket = websocket;
-        this.converter = converter;
         this.userConfig = userConfig;
-        currentTags = new ArrayList<>();
     }
 
     /**
@@ -84,48 +77,18 @@ public class TagPageCtrl {
      */
     public void initialize() {
 
-        back.setOnAction(e -> {
-            mainCtrl.showStatisticsPage(event); // pass updated tags
-        });
-        websocket.on(REMOVE_TAG, t -> {
-            Tag tag = (Tag) t;
-            event.getTags().remove(tag);
-            for (Expense exp : event.getExpenses()) {
-                if (exp.getType().getId() == tag.getId()) {
-                    exp.setType(null);
-                }
-            }
-            populateTagList(event);
-        });
-        websocket.on(UPDATE_TAG, t -> {
-            Tag tag = (Tag) t;
-            for (int i = 0; i < event.getTags().size(); i++) {
-                if (event.getTags().get(i).getId() == tag.getId()) {
-                    event.getTags().set(i, tag);
-                }
-            }
-            for (Expense exp : event.getExpenses()) {
-                if (exp.getType().getId() == tag.getId()) {
-                    exp.setType(tag);
-                }
-            }
-            populateTagList(event);
-        });
-        websocket.on(ADD_TAG, t -> {
-            populateTagList(event);
-        });
+        back.setOnAction(e -> mainCtrl.showStatisticsPage(event));
+        websocket.on(REMOVE_TAG, t -> populateTagList(event));
+        websocket.on(UPDATE_TAG, t -> populateTagList(event));
+        websocket.on(ADD_TAG, t -> populateTagList(event));
     }
 
     /**
-     * method for displaying the page for editting tags
+     * method for displaying the page for editing tags
      * @param event the current event
      */
     public void displayTagPage(Event event) {
         this.event = event;
-        currentTags.clear();
-        for (Tag t : event.getTags()) {
-            currentTags.add(t);
-        }
         populateTagList(event);
     }
 
@@ -189,7 +152,7 @@ public class TagPageCtrl {
         colorPickerStage.setTitle("Change colour");
         colorPicker = new ColorPicker(Color.web(color));
         colorPicker.setOnAction(e -> {
-            tag.setColor(colorPicker.getValue().toString());
+            tag.setColor(colorPicker.getValue().toString().replace("0x", "#"));
             try {
                 server.updateTag(tag.getId(), event.getId(), tag);
             } catch (ConnectException ex) {
@@ -232,14 +195,7 @@ public class TagPageCtrl {
                         if (tagNameToRemove.equals(lab.getText())) {
                             tagList.getChildren().remove(hBox);
                             try {
-                                event.getTags().remove(tag);
                                 server.deleteTag(tag.getId(), event.getId());
-                                for (Expense exp : event.getExpenses()) {
-                                    if (exp.getType().getId() == tag.getId()) {
-                                        exp.setType(null);
-                                    }
-                                }
-                                removedTags.add(tag);
                             } catch (ConnectException ex) {
                                 mainCtrl.handleServerNotFound();
                                 return;
