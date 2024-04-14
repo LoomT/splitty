@@ -68,7 +68,7 @@
             </HBox>
             <ScrollPane fitToWidth="true" focusTraversable="false" styleClass="partScrollPane" vbarPolicy="NEVER" VBox.vgrow="NEVER">
                <content>
-                  <Text fx:id="participantText" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David" />
+                  <Text fx:id="participantLabel" strokeType="OUTSIDE" strokeWidth="0.0" text="Chris, John, Anna, David" />
                </content>
             </ScrollPane>
             <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="headerFont" text="%EventPage.expenses">

@@ -51,10 +51,10 @@ public class AddExpenseCtrl {
     private DatePicker date;
 
     @FXML
-    private CheckBox equalSplit;
+    private RadioButton equalSplit;
 
     @FXML
-    private CheckBox partialSplit;
+    private RadioButton partialSplit;
 
     @FXML
     private TextFlow expenseParticipants;
@@ -71,6 +71,10 @@ public class AddExpenseCtrl {
     private Button addTag;
     @FXML
     private Label warningLabel;
+    @FXML
+    private Text titleText;
+    @FXML
+    private ScrollPane scrollPane;
 
     private Event event;
     private final MainCtrlInterface mainCtrl;
@@ -135,6 +139,13 @@ public class AddExpenseCtrl {
                 type.getItems().add((Tag) tag);
             }
         });
+
+        scrollPane.setOnScroll(event -> {
+            if(event.getDeltaX() == 0 && event.getDeltaY() != 0) {
+                scrollPane.setHvalue(scrollPane.getHvalue() - event.getDeltaY()
+                        / expenseParticipants.getWidth());
+            }
+        });
     }
 
     /**
@@ -143,6 +154,7 @@ public class AddExpenseCtrl {
      * @param exp the expense for which the page is displayed
      */
     public void displayAddExpensePage(Event event, Expense exp) {
+
         this.event = event;
         warningLabel.setVisible(false);
         blockDate();
@@ -518,7 +530,8 @@ public class AddExpenseCtrl {
         if (backgroundColor != null && !text.isEmpty()) {
             String textColor = brightness(backgroundColor) > 0.5 ? "#000000" : "#FFFFFF";
             label.setStyle("-fx-background-color: #" + toHexString(backgroundColor)
-                    + "; -fx-padding: 5px; -fx-text-fill: " + textColor + ";");
+                    + "; -fx-padding: 2px 5px 2px 5px; -fx-text-fill: " + textColor + ";"
+                    + "-fx-background-radius: 10px;");
         }
         double textWidth = new Text(text).getLayoutBounds().getWidth();
         label.setMinWidth(textWidth + 10);
@@ -737,5 +750,12 @@ public class AddExpenseCtrl {
         MainCtrl.checkKey(scene, () -> this.currency.show(), currency, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.type.show(), type, KeyCode.ENTER);
         MainCtrl.checkKey(scene, () -> this.date.show(), date, KeyCode.SHIFT);
+    }
+
+    /**
+     * @param title new title
+     */
+    public void setTitle(String title) {
+        titleText.setText(title);
     }
 }
