@@ -209,7 +209,6 @@ public class TagPageCtrl {
                 for (Node child : hBox.getChildren()) {
                     if (child instanceof Label lab) {
                         if (tagNameToRemove.equals(lab.getText())) {
-                            tagList.getChildren().remove(hBox);
                             Confirmation confirmation =
                                     new Confirmation((format(
                                             languageConf.get(
@@ -219,6 +218,7 @@ public class TagPageCtrl {
                                             languageConf);
                             Optional<ButtonType> result = confirmation.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.YES) {
+                                tagList.getChildren().remove(hBox);
                                 try {
                                     server.deleteTag(tag.getId(), event.getId());
                                 } catch (ConnectException ex) {
