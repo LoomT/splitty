@@ -9,7 +9,6 @@ import client.utils.currency.CurrencyConverter;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -52,6 +51,7 @@ class OptionsCtrlTest {
                 recentEventCodes=
                 currency=EUR
                 highContrast=false
+                locales=["en", "nl"]
                 """);
 
         userConfig = new UserConfig(testIO);

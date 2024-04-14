@@ -59,7 +59,8 @@ public class AddExpenseCtrlTest {
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=localhost:8080
                 lang=en
-                recentEventCodes="""));
+                recentEventCodes=
+                locales=["en", "nl"]"""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         mainCtrl = new TestMainCtrl();
         CurrencyConverter currencyConverter = new CurrencyConverter(server, new FileManagerMock(), languageConf);

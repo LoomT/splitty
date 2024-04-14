@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<?import java.net.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditParticipantsCtrl">
+<?import java.net.URL?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EditParticipantsCtrl">
     <children>
         <HBox prefHeight="49.0" prefWidth="600.0" styleClass="navbar">
             <children>
-            <Label fx:id="eventTitle" styleClass="titleFont" text="Event title" />
+            <Label fx:id="eventTitle" styleClass="eventTitleFont" text="Event title" />
             </children>
          <padding>
             <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
