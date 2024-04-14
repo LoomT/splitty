@@ -41,7 +41,14 @@ public class Expense implements Cloneable {
     private Date date;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Participant> expenseParticipants;
-    @ManyToOne(optional = true)
+    @ManyToOne
+    @JoinColumns(value = {
+        @JoinColumn(name = "type_id", referencedColumnName = "id"),
+        @JoinColumn(name = "type_event_id", referencedColumnName = "event_id")
+    },
+        foreignKey = @ForeignKey(name = "expense_tag",
+            foreignKeyDefinition = "FOREIGN KEY (type_id, type_event_id)" +
+            "REFERENCES tag(id, event_id) ON UPDATE CASCADE ON DELETE SET NULL"))
     private Tag type;
 
     /**

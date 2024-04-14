@@ -62,7 +62,8 @@ public class AddTagCtrl {
     public void initialize() {
         cp.setOnAction(event -> {
             if (cp.getValue().equals(Color.WHITE)) {
-                showAlert("Invalid Color", "White color is not allowed.");
+                showAlert(languageConf.get("AddTag.invalidColour"),
+                        languageConf.get("AddTag.whiteNotAllowed"));
                 cp.setValue(selectedColor != null ? selectedColor : Color.BLACK);
             } else {
                 selectedColor = cp.getValue();

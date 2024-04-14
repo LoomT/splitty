@@ -438,6 +438,52 @@ public class ServerUtilsImpl implements ServerUtils {
     }
 
     /**
+     * update the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @param tag the tag
+     * @return the status code
+     */
+    @Override
+    public int updateTag(long id, String eventID, Tag tag) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(getPath())
+                .path("api/events/" + eventID + "/tags/" + id)
+                .request(APPLICATION_JSON)
+                .put(Entity.entity(tag, APPLICATION_JSON))) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
+    }
+
+    /**
+     * delete the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return the status code
+     */
+    @Override
+    public int deleteTag(long id, String eventID) throws ConnectException {
+        try(Response response = ClientBuilder.newClient(new ClientConfig())
+                .target(getPath())
+                .path("api/events/" + eventID + "/tags/" + id)
+                .request(APPLICATION_JSON)
+                .delete()) {
+            return response.getStatus();
+        } catch (ProcessingException e) {
+            if(e.getMessage().contains("Connection refused"))
+                throw (ConnectException) e.getCause();
+            else
+                throw new WebApplicationException();
+        }
+    }
+
+
+    /**
      * @param date date for which to fetch rates
      *
      * @return map representation of the exchange rates

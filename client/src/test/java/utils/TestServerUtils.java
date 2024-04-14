@@ -7,7 +7,6 @@ import java.net.ConnectException;
 import java.util.*;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestServerUtils implements ServerUtils {
 
@@ -506,7 +505,87 @@ public class TestServerUtils implements ServerUtils {
     @Override
     public int addTag(String eventID, Tag tag) {
         calls.add("addTag");
-        assertTrue(true);
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        }
+        if(tag == null || !(tag.getEventID().equals(eventID))) {
+            statuses.add(400);
+            return 400;
+        }
+        Tag clone = tag.clone();
+        clone.setId(counter++);
+        clone.setEventID(eventID);
+        event.getTags().add(clone);
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.ADD_TAG, clone);
+        lastChange = new Date();
+        statuses.add(204);
+        return 204;
+    }
+
+    /**
+     * update the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @param tag the tag
+     * @return
+     */
+    @Override
+    public int updateTag(long id, String eventID, Tag tag) throws ConnectException {
+        //return 0;
+        calls.add("updateTag");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        }
+        Tag old = event.getTags().stream()
+                .filter(e -> e.getId() == id).findAny().orElse(null);
+        if(old == null) {
+            statuses.add(404);
+            return 404;
+        }
+        if(tag.getId() != id
+                || !tag.getEventID().equals(eventID)) {
+            statuses.add(400);
+            return 400;
+        }
+        Tag clone = tag.clone();
+        event.getTags().remove(old);
+        event.getTags().add(clone);
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.UPDATE_TAG, clone);
+        lastChange = new Date();
+        statuses.add(204);
+        return 204;
+    }
+    /**
+     * delete the tag
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return
+     */
+    @Override
+    public int deleteTag(long id, String eventID) throws ConnectException {
+        calls.add("deleteTag");
+        Event event = events.stream().filter(e -> e.getId().equals(eventID)).findAny().orElse(null);
+        if(event == null) {
+            statuses.add(404);
+            return 404;
+        }
+        Tag old = event.getTags().stream()
+                .filter(e -> e.getId() == id).findAny().orElse(null);
+        if(old == null) {
+            statuses.add(404);
+            return 404;
+        }
+        event.getTags().remove(old);
+        event.setLastActivity(new Date());
+        websocket.simulateAction(WebsocketActions.REMOVE_TAG, old);
+        lastChange = new Date();
+        statuses.add(204);
         return 204;
     }
 

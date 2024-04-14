@@ -121,7 +121,7 @@ public class EventPageCtrl {
     }
 
     /**
-     * call this function to set all the text on the eventpage to a given event
+     * call this function to set all the text on the event page to a given event
      *
      * @param e the event to be shown
      */
@@ -215,6 +215,32 @@ public class EventPageCtrl {
         });
         websocket.on(REMOVE_TRANSACTION, id -> {
             event.getTransactions().removeIf(t -> t.getId() == (long) id);
+        });
+        websocket.on(REMOVE_TAG, t -> {
+            long id = (long) t;
+            event.getTags().removeIf(existingTag -> existingTag.getId() == id);
+            event.getExpenses().forEach(exp -> {
+                if (exp.getType() != null && exp.getType().getId() == id) {
+                    exp.setType(null);
+                }
+            });
+            updateExpenses(event);
+        });
+
+        websocket.on(UPDATE_TAG, t -> {
+            Tag tag = (Tag) t;
+            for (int i = 0; i < event.getTags().size(); i++) {
+                if (event.getTags().get(i).getId() == tag.getId()) {
+                    event.getTags().set(i, tag);
+                    break;
+                }
+            }
+            for (Expense exp : event.getExpenses()) {
+                if (exp.getType() != null && exp.getType().getId() == tag.getId()) {
+                    exp.setType(tag);
+                }
+            }
+            updateExpenses(event);
         });
     }
 

@@ -189,6 +189,15 @@ public class TestMainCtrl implements MainCtrlInterface {
     }
 
     /**
+     * show the tag page
+     * @param event the current event
+     */
+    @Override
+    public void showTagPage(Event event) {
+
+    }
+
+    /**
      * Initializes a new stage with options
      * and opens it
      */
