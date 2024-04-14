@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.paint.LinearGradient?>
-<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-
+<?import java.net.URL?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.StatisticsCtrl">
    <children>
       <HBox alignment="CENTER_LEFT" minWidth="-Infinity" prefHeight="64.0" prefWidth="600.0" styleClass="navbar">
@@ -41,9 +33,10 @@
                   </LinearGradient>
                </fill>
             </Text>
-            <Button fx:id="editTags" mnemonicParsing="false" styleClass="sbutton" text="%Statistics.editTags">
+            <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
+            <Button fx:id="editTags" minWidth="-Infinity" mnemonicParsing="false" styleClass="sbutton" text="%Statistics.editTags">
                <HBox.margin>
-                  <Insets left="150.0" />
+                  <Insets />
                </HBox.margin></Button>
          </children>
          <padding>
