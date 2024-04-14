@@ -64,7 +64,10 @@ public class LanguageConfTest {
     @Test
     void getKeyDiffLangTest(){
         assert languageConf != null;
+        //test for usage language switcher
         languageConf.changeCurrentLocaleTo("en");
         assertEquals(languageConf.get("flag", "nl"), "flags/flag_nl.png");
+        assertEquals(languageConf.get("flag", "de"), "flags/flag_de.png");
+        assertEquals(languageConf.get("flag", "en"), "flags/flag_en.png");
     }
 }
