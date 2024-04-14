@@ -393,13 +393,11 @@ public class AddExpenseCtrl {
                 mainCtrl.handleServerNotFound();
                 return null;
             }
-
             Tag expType = type.getValue();
             Expense expense = new Expense(selectedParticipant, expPurpose, convertedAmount,
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
             return expense;
-
         } catch (NumberFormatException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(languageConf.get("AddExp.invamount"));
