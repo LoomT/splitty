@@ -55,7 +55,8 @@ public class EventPageCtrlTest {
                 serverURL=localhost:8080
                 lang=en
                 recentEventCodes=
-                currency=EUR"""));
+                currency=EUR
+                locales=["en", "nl"]"""));
         Websocket websocket = new TestWebsocket();
         LanguageConf languageConf = new LanguageConf(userConfig);
         MainCtrl mainCtrl = new MainCtrl(null, languageConf, userConfig);

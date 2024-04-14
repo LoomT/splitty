@@ -3,19 +3,13 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 <?import java.lang.String?>
 <?import java.net.URL?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.OpenDebtsPageCtrl">
    <children>
       <HBox prefWidth="600.0" styleClass="navbar">
          <children>
-            <Text fx:id="eventTitle" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="eventTitleFont" text="%OpenDebts.title">
-               <font>
-                  <Font name="System Bold" size="36.0" />
-               </font>
-            </Text>
+            <Label fx:id="eventTitle" styleClass="eventTitleFont" text="%OpenDebts.title" />
             <Region prefHeight="0.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
             <BorderPane prefHeight="0.0" prefWidth="176.0">
                <right>

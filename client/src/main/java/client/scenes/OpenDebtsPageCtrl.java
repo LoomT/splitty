@@ -140,7 +140,7 @@ public class OpenDebtsPageCtrl {
 
         event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
         allDebtsPane.getChildren().clear();
-        if (event.getExpenses().isEmpty()) return;
+        if (event.getExpenses().isEmpty() && event.getTransactions().isEmpty()) return;
         initializePage(map, partToPartMap);
 
         if (map.equals(participantDebtMap)) return;
