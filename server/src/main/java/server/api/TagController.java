@@ -109,11 +109,9 @@ public class TagController {
                 return ResponseEntity.notFound().build();
             }
             tagRepo.delete(optionalTag.get());
-            Tag tag = optionalTag.get();
-            updateEv(eventID, tag);
             simp.convertAndSend("/event/" + eventID, id,
                     Map.of("action", WebsocketActions.REMOVE_TAG,
-                            "type", Tag.class.getTypeName()));
+                            "type", Long.class.getTypeName()));
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
@@ -133,11 +131,4 @@ public class TagController {
         adminController.update();
     }
 
-    private void updateEv(String eventID, Tag tag) {
-        Event event = eventRepo.getReferenceById(eventID);
-        event.setLastActivity(new Date());
-        event.getTags().remove(tag);
-        eventRepo.save(event);
-        adminController.update();
-    }
 }

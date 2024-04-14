@@ -44,6 +44,8 @@ public class TagPageCtrl {
     private Button back;
     @FXML
     private ColorPicker colorPicker;
+    @FXML
+    private Button addTag;
 
     private List<Tag> removedTags = new ArrayList<>();
 
@@ -80,6 +82,9 @@ public class TagPageCtrl {
      * initialize method
      */
     public void initialize() {
+        back.setOnAction(e -> {
+            mainCtrl.showStatisticsPage(event); // pass updated tags
+        });
         websocket.on(REMOVE_TAG, t -> {
             Tag tag = (Tag) t;
             event.getTags().remove(tag);
@@ -113,9 +118,6 @@ public class TagPageCtrl {
     public void displayTagPage(Event event) {
         this.event = event;
         populateTagList(event);
-        back.setOnAction(e -> {
-            mainCtrl.showStatisticsPage(event); // pass updated tags
-        });
     }
 
 
@@ -237,5 +239,11 @@ public class TagPageCtrl {
         }
     }
 
-
+    /**
+     * behaviour for the button add tag
+     */
+    public void addTagClicked() {
+        mainCtrl.showAddTagPage(event);
+        populateTagList(event);
+    }
 }

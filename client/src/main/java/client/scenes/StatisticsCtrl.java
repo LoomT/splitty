@@ -89,14 +89,17 @@ public class StatisticsCtrl {
      * initialize method
      */
     public void initialize() {
+        editTags.setOnAction(e -> {
+            mainCtrl.showTagPage(event);
+        });
         websocket.on(ADD_TAG, tag -> {
             populateLegend(event);
         });
         websocket.on(REMOVE_TAG, tag -> {
-            populateLegend(event);
+            initPieChart(event);
         });
         websocket.on(UPDATE_TAG, tag -> {
-            populateLegend(event);
+            initPieChart(event);
         });
         back.setOnAction(e -> {
             handleBackButton(event);
@@ -171,10 +174,7 @@ public class StatisticsCtrl {
         opened = true;
         pc.setLegendVisible(false);
         initPieChart(event);
-        initCost(event);
-        editTags.setOnAction(e -> {
-            mainCtrl.showTagPage(event);
-        });
+
     }
 
     /**
@@ -319,7 +319,7 @@ public class StatisticsCtrl {
      * @param event the current event
      * @return the amount
      */
-    private double calculateExpensesNoTag(Event event) {
+    private double  calculateExpensesNoTag(Event event) {
         double costExpensesNoTag = 0;
         for (Expense expense : event.getExpenses()) {
             if (expense.getType() == null) {
