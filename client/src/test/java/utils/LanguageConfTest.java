@@ -35,11 +35,17 @@ public class LanguageConfTest {
         //test for all standard languages
         assert languageConf != null;
         assertTrue(languageConf.getAvailableLocalesString().containsAll(List.of("en", "nl", "de")));
+
         languageConf.changeCurrentLocaleTo("en");
+        assertEquals(languageConf.getCurrentLocaleString(), "en");
         assertEquals(languageConf.get("flag"), "flags/flag_uk.png");
+
         languageConf.changeCurrentLocaleTo("nl");
+        assertEquals(languageConf.getCurrentLocaleString(), "nl");
         assertEquals(languageConf.get("flag"), "flags/flag_nl.png");
+
         languageConf.changeCurrentLocaleTo("de");
+        assertEquals(languageConf.getCurrentLocaleString(), "de");
         assertEquals(languageConf.get("flag"), "flags/flag_de.png");
     }
 
@@ -53,5 +59,12 @@ public class LanguageConfTest {
             return;
         }
         fail();
+    }
+
+    @Test
+    void getKeyDiffLangTest(){
+        assert languageConf != null;
+        languageConf.changeCurrentLocaleTo("en");
+        assertEquals(languageConf.get("flag", "nl"), "flags/flag_nl.png");
     }
 }
