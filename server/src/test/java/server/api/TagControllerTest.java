@@ -32,7 +32,6 @@ public class TagControllerTest {
     @Test
     void simpleAddTagTest(){
         Tag tag = new Tag("name", "blue");
-        tag.setId(1);
         controller.addTag("eventId", tag);
         Optional<Tag> test = tagRepo.findById(new EventWeakKey("eventId", 1));
         assertTrue(test.isPresent());
@@ -42,7 +41,6 @@ public class TagControllerTest {
     @Test
     void InvalidEventAddTagTest(){
         Tag tag = new Tag("name", "blue");
-        tag.setId(1);
         var actual = controller.addTag("notArealID", tag);
         Optional<Tag> test = tagRepo.findById(new EventWeakKey("eventId", 1));
         assertFalse(test.isPresent());
