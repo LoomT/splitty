@@ -1,18 +1,17 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
-import client.utils.EmailService;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
+import client.utils.*;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -120,5 +119,15 @@ public class InviteMailCtrl {
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
+    }
+
+    /**
+     * Initializes esc and enter shortcuts for inviteMail
+     * @param scene scene the shortcuts are be added to
+     */
+    public void initializeShortcuts(Scene scene) {
+        CommonFunctions.checkKey(scene, () -> stage.close(), KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, this::sendInvite,
+                emailField, KeyCode.ENTER);
     }
 }

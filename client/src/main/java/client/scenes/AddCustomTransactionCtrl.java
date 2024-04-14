@@ -219,9 +219,9 @@ public class AddCustomTransactionCtrl {
      * @param scene this scene
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> chooseReceiver.show(), chooseReceiver, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> chooseGiver.show(), chooseGiver, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> chooseCurrency.show(), chooseCurrency, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, this::backClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> chooseReceiver.show(), chooseReceiver, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> chooseGiver.show(), chooseGiver, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> chooseCurrency.show(), chooseCurrency, KeyCode.ENTER);
     }
 }

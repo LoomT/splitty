@@ -384,6 +384,6 @@ public class OpenDebtsPageCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
     }
 }

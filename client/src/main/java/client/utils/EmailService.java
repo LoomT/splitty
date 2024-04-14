@@ -12,7 +12,6 @@ import java.io.IOException;
 @Service
 public class EmailService {
 
-    private String fromEmail;
     private JavaMailSenderImpl mailSender;
     private final UserConfig userConfig;
     private boolean initializationStatus;
@@ -38,7 +37,6 @@ public class EmailService {
     public void initializeMailSender() {
         try {
             this.mailSender = new JavaMailSenderImpl();
-            this.fromEmail = userConfig.getUsername();
             mailSender.setUsername(userConfig.getUsername());
             mailSender.setPassword(userConfig.getMailPassword());
             mailSender.setHost(userConfig.getHost());
@@ -65,9 +63,9 @@ public class EmailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(userConfig.getUsername());
             helper.setTo(toEmail);
-            helper.setCc(fromEmail);
+            helper.setCc(userConfig.getUsername());
             helper.setSubject(subject);
             helper.setText(body);
             mailSender.send(mimeMessage);

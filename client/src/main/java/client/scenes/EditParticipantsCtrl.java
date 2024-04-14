@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -289,8 +290,8 @@ public class EditParticipantsCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.chooseParticipant.show(),
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.chooseParticipant.show(),
                 chooseParticipant, KeyCode.ENTER);
     }
 }

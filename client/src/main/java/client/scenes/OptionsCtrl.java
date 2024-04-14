@@ -88,6 +88,7 @@ public class OptionsCtrl {
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
         loadIndicator.setVisible(false);
+
     }
 
     /**
@@ -244,8 +245,8 @@ public class OptionsCtrl {
      * @param scene this options scene
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.currencyChoiceBox.show(),
                 currencyChoiceBox, KeyCode.ENTER);
 
 

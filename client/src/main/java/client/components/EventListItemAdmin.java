@@ -1,6 +1,6 @@
 package client.components;
 
-import client.scenes.MainCtrl;
+import client.utils.CommonFunctions;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -44,7 +44,7 @@ public class EventListItemAdmin extends HBox {
             throw new RuntimeException(exception);
         }
 
-        MainCtrl.checkKey(this, this::onEventClicked, KeyCode.ENTER);
+        CommonFunctions.checkKey(this, this::onEventClicked, KeyCode.ENTER);
 
         this.onRemoveCallback = onRemove;
         this.onDownloadClickCallback = onDownload;

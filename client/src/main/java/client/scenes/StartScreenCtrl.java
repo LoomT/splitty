@@ -2,6 +2,7 @@ package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
 import client.components.EventListItem;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -206,9 +207,9 @@ public class StartScreenCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene){
-        MainCtrl.checkKey(scene, this::join, code, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, this::create, title, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> this.languageChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::join, code, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, this::create, title, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.languageChoiceBox.show(),
                 languageChoiceBox, KeyCode.ENTER);
     }
 

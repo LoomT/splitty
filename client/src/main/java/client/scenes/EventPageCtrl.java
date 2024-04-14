@@ -559,8 +559,8 @@ public class EventPageCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.participantChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.participantChoiceBox.show(),
                 participantChoiceBox, KeyCode.ENTER);
 
     }

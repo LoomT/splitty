@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.utils.CommonFunctions;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
 import javafx.fxml.FXML;
@@ -42,8 +43,8 @@ public class AdminLoginCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, this::loginButtonClicked,  passwordTextField, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, this::loginButtonClicked,  passwordTextField, KeyCode.ENTER);
     }
 
     private void addIconsToButtons() {
