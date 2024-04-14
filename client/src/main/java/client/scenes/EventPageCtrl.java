@@ -117,7 +117,7 @@ public class EventPageCtrl {
     }
 
     /**
-     * call this function to set all the text on the eventpage to a given event
+     * call this function to set all the text on the event page to a given event
      *
      * @param e the event to be shown
      */
@@ -215,7 +215,7 @@ public class EventPageCtrl {
             long id = (long) t;
             event.getTags().removeIf(existingTag -> existingTag.getId() == id);
             event.getExpenses().forEach(exp -> {
-                if (exp.getType().getId() == id) {
+                if (exp.getType() != null && exp.getType().getId() == id) {
                     exp.setType(null);
                 }
             });
@@ -231,7 +231,7 @@ public class EventPageCtrl {
                 }
             }
             for (Expense exp : event.getExpenses()) {
-                if (exp.getType().getId() == tag.getId()) {
+                if (exp.getType() != null && exp.getType().getId() == tag.getId()) {
                     exp.setType(tag);
                 }
             }
