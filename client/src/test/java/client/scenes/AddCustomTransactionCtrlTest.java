@@ -56,7 +56,8 @@ class AddCustomTransactionCtrlTest {
         UserConfig userConfig = new UserConfig(new TestIO("""
                 serverURL=localhost:8080
                 lang=en
-                recentEventCodes="""));
+                recentEventCodes=
+                locales=["en", "nl"]"""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         converter = new CurrencyConverter(server, fileManager, languageConf);
 

@@ -40,9 +40,10 @@ public class EditparticipantsCtrlTest {
         websocket = new TestWebsocket();
         server = new TestServerUtils(websocket);
         UserConfig userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
-                recentEventCodes="""));
+                recentEventCodes=
+                locales=["en", "nl"]"""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         FileManagerMock fm = new FileManagerMock();
         MainCtrl mainCtrl = new MainCtrl(websocket, languageConf, userConfig);

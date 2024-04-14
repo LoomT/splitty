@@ -31,7 +31,8 @@ class CurrencyConverterTest {
                                 serverURL=localhost:8080
                                 lang=en
                                 recentEventCodes=
-                                currency=EUR"""));
+                                currency=EUR
+                                locales=["en", "nl"]"""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         converter = new CurrencyConverter(server, fileManager, languageConf);
     }
