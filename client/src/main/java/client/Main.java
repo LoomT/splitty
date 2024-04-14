@@ -110,14 +110,17 @@ public class Main extends Application {
         var inviteMailPage = FXML.load(InviteMailCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "InviteMail.fxml");
+        var tagPage = FXML.load(TagPageCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "TagPage.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image("flags/logo.png"));
+        primaryStage.getIcons().add(new Image("client/scenes/icons8-error-96.png"));
 
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, titleChanger, addTag, statistics, options,
-                addCustomTransaction, openDebtsPage, inviteMailPage)
+                addCustomTransaction, openDebtsPage, inviteMailPage, tagPage)
         );
     }
 }

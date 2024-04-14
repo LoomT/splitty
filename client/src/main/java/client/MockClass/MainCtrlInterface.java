@@ -143,6 +143,12 @@ public interface MainCtrlInterface {
     void setStartPage(boolean page);
 
     /**
+     * shows the tag page
+     * @param event the current event
+     */
+    void showTagPage(Event event);
+
+    /**
      * shows the invite page for the event
      * @param event event to send invite to
      */

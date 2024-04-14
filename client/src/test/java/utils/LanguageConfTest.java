@@ -23,7 +23,8 @@ public class LanguageConfTest {
                     recentEventCodes=
                     initialExportDirectory=
                     currency=EUR
-                    highContrast=false""")));
+                    highContrast=false
+                    locales=["en", "nl", "de"]""")));
             languageConf.onLanguageChange(function);
         } catch (Exception e){
             fail();

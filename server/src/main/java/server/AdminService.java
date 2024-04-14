@@ -2,6 +2,9 @@ package server;
 
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Base64;
 import java.util.random.RandomGenerator;
 
@@ -20,6 +23,7 @@ public class AdminService {
     public AdminService(RandomGenerator random) {
         this.random = random;
         adminPassword = generateAdminPassword();
+        terminal(adminPassword);
     }
 
 
@@ -34,6 +38,7 @@ public class AdminService {
         random.nextBytes(bytes);
         String password = Base64.getEncoder().encodeToString(bytes);
         System.out.println("Admin password: " + password);
+        System.out.println("Type 'pass' to print the password again");
         return password;
     }
 
@@ -57,5 +62,25 @@ public class AdminService {
         String adminServiceAttribute = getAdminPassword();
 
         return adminServiceAttribute.equals(inputPassword);
+    }
+
+    /**
+     * Listens to terminal input and prints the password
+     * when user inputs pass
+     *
+     * @param password password to print
+     */
+    private void terminal(String password) {
+        Thread.startVirtualThread(() -> {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            while (!Thread.currentThread().isInterrupted()) {
+                try {
+                    String input = reader.readLine();
+                    if("pass".equals(input)) System.out.println(password);
+                } catch (IOException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
+            }
+        });
     }
 }

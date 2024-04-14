@@ -1,8 +1,6 @@
 package server.api;
 
-import commons.Event;
-import commons.Tag;
-import commons.WebsocketActions;
+import commons.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -66,6 +64,61 @@ public class TagController {
     }
 
     /**
+     * update the existent tag
+     * @param id the id of the tag
+     * @param updatedTag the updated tag
+     * @param eventID the id of the event
+     * @return updated tag
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Tag> updateTag(@PathVariable long id,
+                                         @RequestBody Tag updatedTag,
+                                         @PathVariable String eventID) {
+        try {
+            if (updatedTag == null || !updatedTag.getEventID().equals(eventID)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            if(!tagRepo.existsById(new EventWeakKey(eventID, id)))
+                return ResponseEntity.notFound().build();
+
+            tagRepo.save(updatedTag);
+            update(eventID);
+            simp.convertAndSend("/event/" + eventID, updatedTag,
+                    Map.of("action", WebsocketActions.UPDATE_TAG,
+                            "type", Tag.class.getTypeName()));
+            return ResponseEntity.noContent().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
+     * delete the
+     * @param id the id of the tag
+     * @param eventID the id of the event
+     * @return deleted tag
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Expense> deleteTag(@PathVariable long id,
+                                              @PathVariable String eventID) {
+        try {
+            Optional<Tag> optionalTag = tagRepo.findById(new EventWeakKey(eventID, id));
+            if(optionalTag.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            tagRepo.delete(optionalTag.get());
+            simp.convertAndSend("/event/" + eventID, id,
+                    Map.of("action", WebsocketActions.REMOVE_TAG,
+                            "type", Long.class.getTypeName()));
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    /**
      * Updates the last activity date of the specified event
      * and updates the date for long poll in admin controller
      *
@@ -77,4 +130,5 @@ public class TagController {
         eventRepo.save(event);
         adminController.update();
     }
+
 }

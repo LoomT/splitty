@@ -25,7 +25,6 @@ import utils.TestWebsocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.testfx.util.WaitForAsyncUtils.waitForFxEvents;
@@ -45,9 +44,10 @@ public class StartScreenCtrlTest {
         websocket = new TestWebsocket();
         server = new TestServerUtils(websocket);
         userConfig = new UserConfig(new TestIO("""
-                serverURL=http://localhost:8080/
+                serverURL=localhost:8080
                 lang=en
-                recentEventCodes="""));
+                recentEventCodes=
+                locales=["en", "nl"]"""));
         LanguageConf languageConf = new LanguageConf(userConfig);
         TestMainCtrl mainCtrl = new TestMainCtrl();
 

@@ -72,7 +72,7 @@ public class AddExpenseCtrl {
     @FXML
     private Label warningLabel;
     @FXML
-    private Text titleText;
+    private Label titleText;
     @FXML
     private ScrollPane scrollPane;
 

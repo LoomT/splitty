@@ -87,6 +87,8 @@ public class MainCtrl implements MainCtrlInterface{
     private boolean startPage = true;
     private Event event;
 
+    private TagPageCtrl tagPageCtrl;
+    private Scene tagPage;
 
     /**
      * @param websocket the websocket instance
@@ -152,6 +154,10 @@ public class MainCtrl implements MainCtrlInterface{
 
         this.statisticsCtrl = pairCollector.statisticsPage().getKey();
         this.statistics = new Scene(pairCollector.statisticsPage().getValue());
+
+        this.tagPageCtrl = pairCollector.tagPage().getKey();
+        this.tagPage = new Scene(pairCollector.tagPage().getValue());
+
         initializeShortcuts();
 
         if(startPage){
@@ -179,6 +185,8 @@ public class MainCtrl implements MainCtrlInterface{
         openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
         addCustomTransactionCtrl.initializeShortcuts(addCustomTransaction);
         inviteMailCtrl.initializeShortcuts(inviteMail);
+        statisticsCtrl.initializeShortcuts(statistics);
+        tagPageCtrl.initializeShortcuts(tagPage);
     }
 
     /**
@@ -379,7 +387,6 @@ public class MainCtrl implements MainCtrlInterface{
         primaryStage.setScene(startScreen);
         startScreenCtrl.showServerNotFoundError();
     }
-
     /**
      * display the statistics page
      * @param event event to display
@@ -505,5 +512,14 @@ public class MainCtrl implements MainCtrlInterface{
 
     }
 
-
+    /**
+     * show the page for editting tags
+     * @param event the current event
+     */
+    @Override
+    public void showTagPage(Event event) {
+        tagPageCtrl.displayTagPage(event);
+        primaryStage.setTitle(languageConf.get("TagPage.tagoverview"));
+        primaryStage.setScene(tagPage);
+    }
 }

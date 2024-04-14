@@ -3,6 +3,7 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
+import client.utils.ServerUtils;
 import client.utils.UserConfig;
 import client.utils.Websocket;
 import client.utils.currency.CurrencyConverter;
@@ -29,8 +30,7 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
-import java.util.Currency;
-import java.util.Locale;
+import java.util.*;
 
 import static commons.WebsocketActions.*;
 
@@ -46,18 +46,25 @@ public class StatisticsCtrl {
     private Button back;
     @FXML
     private VBox legend;
+    @FXML
+    private Button editTags;
 
     private Event event;
 
     private final MainCtrlInterface mainCtrl;
+    private final ServerUtils server;
     private final Websocket websocket;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
     private boolean opened;
+    // this map keeps track of which tags are in the pie chart
+    private final Map<Long, PieChart.Data> map;
+    private final PieChart.Data taglessSlice;
 
     /**
      * @param mainCtrl main control instance
+     * @param server   server utils instance
      * @param websocket websocket client
      * @param languageConf language config
      * @param converter currency converter
@@ -66,25 +73,39 @@ public class StatisticsCtrl {
     @Inject
     public StatisticsCtrl(
             MainCtrlInterface mainCtrl,
+            ServerUtils server,
             Websocket websocket,
             LanguageConf languageConf,
             CurrencyConverter converter,
             UserConfig userConfig
     ) {
         this.mainCtrl = mainCtrl;
+        this.server = server;
         this.websocket = websocket;
         this.languageConf = languageConf;
         this.converter = converter;
         this.userConfig = userConfig;
         opened = false;
+        map = new HashMap<>();
+        taglessSlice = new PieChart.Data("", 0);
     }
 
     /**
      * initialize method
      */
     public void initialize() {
+        editTags.setOnAction(e -> {
+            opened = false;
+            mainCtrl.showTagPage(event);
+        });
         websocket.on(ADD_TAG, tag -> {
             populateLegend(event);
+        });
+        websocket.on(REMOVE_TAG, tag -> {
+            initPieChart(event);
+        });
+        websocket.on(UPDATE_TAG, tag -> {
+            initPieChart(event);
         });
         back.setOnAction(e -> {
             handleBackButton(event);
@@ -98,6 +119,14 @@ public class StatisticsCtrl {
         websocket.on(REMOVE_EXPENSE, e -> {
             initPieChart(event);
         });
+
+        websocket.on(REMOVE_TAG, t -> {
+            initPieChart(event);
+        });
+        websocket.on(UPDATE_TAG, t -> {
+            initPieChart(event);
+        });
+        pc.setLegendVisible(false);
     }
 
     /**
@@ -132,7 +161,7 @@ public class StatisticsCtrl {
     public void displayStatisticsPage(Event event) {
         this.event = event;
         opened = true;
-        pc.setLegendVisible(false);
+
         initPieChart(event);
     }
 
@@ -141,7 +170,7 @@ public class StatisticsCtrl {
      * @param event
      */
     public void handleBackButton(Event event) {
-        pc.getData().clear();
+//        pc.getData().clear();
         opened = false;
         mainCtrl.goBackToEventPage(event);
     }
@@ -179,9 +208,10 @@ public class StatisticsCtrl {
      */
     public void initPieChart(Event event) {
         if(!opened) return;
+        double temp = 0;
         double totalCost = initCost(event);
-        updateTagsPieChart(event, totalCost);
-        updateNoTagPieChart(event, totalCost);
+        temp = updateTagsPieChart(event, totalCost);
+        updateNoTagSlice(event, totalCost);
         populateLegend(event);
     }
 
@@ -190,17 +220,31 @@ public class StatisticsCtrl {
      * @param event the current event
      * @param totalCost the total cost of the event
      */
-    private void updateTagsPieChart(Event event, double totalCost) {
+    private double updateTagsPieChart(Event event, double totalCost) {
+        double temp = 0;
+        List<Long> remove = new ArrayList<>();
+        for(Map.Entry<Long, PieChart.Data> entry : map.entrySet()) {
+            if(event.getTags().stream().noneMatch(t -> t.getId() == entry.getKey())) {
+                pc.getData().remove(entry.getValue());
+                remove.add(entry.getKey());
+            }
+        }
+        for (long id : remove) map.remove(id);
         for (Tag tag : event.getTags()) {
             if (tag != null) {
                 double currCost = getAmount(event, tag);
+                temp += currCost;
                 if (currCost > 0) {
                     updateOrAddTagSlice(tag, currCost, totalCost);
                 } else {
-                    pc.getData().removeIf(slice -> slice.getName().startsWith(tag.getName()));
+                    if(map.containsKey(tag.getId())) {
+                        pc.getData().remove(map.get(tag.getId()));
+                        map.remove(tag.getId());
+                    }
                 }
             }
         }
+        return temp;
     }
 
     /**
@@ -211,25 +255,21 @@ public class StatisticsCtrl {
      */
     private void updateOrAddTagSlice(Tag tag, double currCost, double totalCost) {
         double percentage = currCost / totalCost * 100;
-        String preferedCurrency = userConfig.getCurrency();
-        String form = getCurrencySymbol(currCost, preferedCurrency);
+        String preferredCurrency = userConfig.getCurrency();
+        String form = getCurrencySymbol(currCost, preferredCurrency);
         String formattedPercentage = String.format("%.2f", percentage);
         String tagInfo = tag.getName() + "\n" + formattedPercentage + "% (" + form + ")";
 
-        boolean found = false;
-        for (PieChart.Data slice : pc.getData()) {
-            if (slice.getName().startsWith(tag.getName())) {
-                slice.setName(tagInfo);
-                slice.setPieValue(currCost);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
+        if(map.containsKey(tag.getId())) {
+            PieChart.Data slice = map.get(tag.getId());
+            slice.setName(tagInfo);
+            applyTagColor(slice, tag.getColor());
+            slice.setPieValue(currCost);
+        } else {
             PieChart.Data newSlice = new PieChart.Data(tagInfo, currCost);
             pc.getData().add(newSlice);
             applyTagColor(newSlice, tag.getColor());
+            map.put(tag.getId(), newSlice);
         }
     }
 
@@ -245,24 +285,6 @@ public class StatisticsCtrl {
         }
     }
 
-    /**
-     * update the no tag slice
-     * @param event the current event
-     * @param totalCost the total cost of the event
-     */
-    private void updateNoTagPieChart(Event event, double totalCost) {
-        boolean hasNoTagSlice = pc.getData().stream().anyMatch(slice ->
-                slice.getName().contains("No tag"));
-        if (!hasNoTagSlice && containsExpensesWithNoTag(event)) {
-            double costExpensesNoTag = calculateExpensesNoTag(event);
-            String text = configureNoTag(costExpensesNoTag, totalCost);
-            PieChart.Data slice = new PieChart.Data(text, costExpensesNoTag);
-            pc.getData().add(slice);
-            slice.getNode().setStyle("-fx-pie-color: #FFFFFF");
-        } else {
-            updateNoTagSlice(event, totalCost);
-        }
-    }
 
     /**
      * checks if there are expenses with no tags
@@ -278,7 +300,7 @@ public class StatisticsCtrl {
      * @param event the current event
      * @return the amount
      */
-    private double calculateExpensesNoTag(Event event) {
+    private double  calculateExpensesNoTag(Event event) {
         double costExpensesNoTag = 0;
         for (Expense expense : event.getExpenses()) {
             if (expense.getType() == null) {
@@ -303,16 +325,17 @@ public class StatisticsCtrl {
      */
     private void updateNoTagSlice(Event event, double totalCost) {
         double costExpensesNoTag = calculateExpensesNoTag(event);
-        if(costExpensesNoTag > 0)
-            for (PieChart.Data slice : pc.getData()) {
-                if (slice.getName().contains("No tag")) {
-                    String text = configureNoTag(costExpensesNoTag, totalCost);
-                    slice.setName(text);
-                    slice.setPieValue(costExpensesNoTag);
-                    break;
-                }
+        if(costExpensesNoTag > 0) {
+            String text = configureNoTag(costExpensesNoTag, totalCost);
+            taglessSlice.setName(text);
+            taglessSlice.setPieValue(costExpensesNoTag);
+            if(!pc.getData().contains(taglessSlice)) {
+                pc.getData().add(taglessSlice);
+                taglessSlice.getNode().setStyle("-fx-pie-color: #FFFFFF");
             }
-        else pc.getData().removeIf(slice -> slice.getName().contains("No tag"));
+        } else {
+            pc.getData().remove(taglessSlice);
+        }
     }
 
     /**
