@@ -41,7 +41,7 @@
                   </LinearGradient>
                </fill>
             </Text>
-            <Button fx:id="editTags" mnemonicParsing="false" text="%Statistics.editTags">
+            <Button fx:id="editTags" mnemonicParsing="false" styleClass="sbutton" text="%Statistics.editTags">
                <HBox.margin>
                   <Insets left="150.0" />
                </HBox.margin></Button>

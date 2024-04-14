@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.Confirmation;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -13,10 +14,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -32,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static commons.WebsocketActions.*;
+import static java.lang.String.format;
 
 
 public class TagPageCtrl {
@@ -114,17 +113,15 @@ public class TagPageCtrl {
         Button editButton = createEditButton(tag, event);
         Button deleteButton = createDeleteButton(tag, event);
 
-        // Place the edit and delete buttons to the left of the colored box
         HBox tagItem = new HBox(15);
         tagItem.getChildren().addAll(editButton, deleteButton, coloredBox, label);
 
-        // Align the buttons to the center vertically within the HBox
         tagItem.setAlignment(Pos.CENTER_LEFT);
 
         return tagItem;
     }
 
-        private Label createTagLabel(String tagName) {
+    private Label createTagLabel(String tagName) {
         Label label = new Label(tagName);
         label.setFont(Font.font("Arial", FontWeight.NORMAL, 15));
         label.setMinWidth(Label.USE_PREF_SIZE); // Ensure full visibility of the words
@@ -199,12 +196,24 @@ public class TagPageCtrl {
                     if (child instanceof Label lab) {
                         if (tagNameToRemove.equals(lab.getText())) {
                             tagList.getChildren().remove(hBox);
-                            try {
-                                server.deleteTag(tag.getId(), event.getId());
-                            } catch (ConnectException ex) {
-                                mainCtrl.handleServerNotFound();
-                                return;
+                            Confirmation confirmation =
+                                    new Confirmation((format(
+                                            languageConf.get(
+                                                    "TagPage.deleteTagConfirmation"),
+                                            "")),
+                                            languageConf.get("Confirmation.areYouSure"),
+                                            languageConf);
+                            Optional<ButtonType> result = confirmation.showAndWait();
+                            if (result.isPresent() && result.get() == ButtonType.YES) {
+                                try {
+                                    server.deleteTag(tag.getId(), event.getId());
+                                } catch (ConnectException ex) {
+                                    mainCtrl.handleServerNotFound();
+                                    return;
+                                }
                             }
+
+
                             populateTagList(event);
                             return;
                         }
