@@ -21,7 +21,6 @@ import javafx.util.Callback;
 
 import java.net.ConnectException;
 import java.text.NumberFormat;
-import java.text.ParseException;
 import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -398,14 +397,12 @@ public class AddExpenseCtrl {
                     expCurrency, participants, expType);
             expense.setDate(expenseDate);
             return expense;
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle(languageConf.get("AddExp.invamount"));
             alert.setHeaderText(null);
             alert.setContentText(languageConf.get("AddExp.invamountmess"));
             alert.showAndWait();
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
         }
         return null;
     }
