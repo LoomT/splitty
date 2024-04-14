@@ -32,8 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static commons.WebsocketActions.REMOVE_TAG;
-import static commons.WebsocketActions.UPDATE_TAG;
+import static commons.WebsocketActions.*;
 
 
 public class TagPageCtrl {
@@ -56,6 +55,7 @@ public class TagPageCtrl {
     private final LanguageConf languageConf;
     private final ServerUtils server;
     private Event event;
+    private List<Tag> currentTags;
 
     /**
      * @param mainCtrl     mainCtrl injection
@@ -76,12 +76,14 @@ public class TagPageCtrl {
         this.websocket = websocket;
         this.converter = converter;
         this.userConfig = userConfig;
+        currentTags = new ArrayList<>();
     }
 
     /**
      * initialize method
      */
     public void initialize() {
+
         back.setOnAction(e -> {
             mainCtrl.showStatisticsPage(event); // pass updated tags
         });
@@ -109,6 +111,9 @@ public class TagPageCtrl {
             }
             populateTagList(event);
         });
+        websocket.on(ADD_TAG, t -> {
+            populateTagList(event);
+        });
     }
 
     /**
@@ -117,6 +122,10 @@ public class TagPageCtrl {
      */
     public void displayTagPage(Event event) {
         this.event = event;
+        currentTags.clear();
+        for (Tag t : event.getTags()) {
+            currentTags.add(t);
+        }
         populateTagList(event);
     }
 

@@ -29,8 +29,7 @@ import javafx.scene.text.Text;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.text.NumberFormat;
-import java.util.Currency;
-import java.util.Locale;
+import java.util.*;
 
 import static commons.WebsocketActions.*;
 
@@ -89,17 +88,22 @@ public class StatisticsCtrl {
      * initialize method
      */
     public void initialize() {
+        initPieChart(event);
         editTags.setOnAction(e -> {
+            opened = false;
             mainCtrl.showTagPage(event);
         });
         websocket.on(ADD_TAG, tag -> {
+            initPieChart(event);
             populateLegend(event);
         });
         websocket.on(REMOVE_TAG, tag -> {
             initPieChart(event);
+            populateLegend(event);
         });
         websocket.on(UPDATE_TAG, tag -> {
             initPieChart(event);
+            populateLegend(event);
         });
         back.setOnAction(e -> {
             handleBackButton(event);
@@ -219,6 +223,7 @@ public class StatisticsCtrl {
      * @param event the current event
      */
     public void initPieChart(Event event) {
+        //pc.getData().clear();
         if(!opened) return;
         double temp = 0;
         double totalCost = initCost(event);
@@ -241,7 +246,13 @@ public class StatisticsCtrl {
                 if (currCost > 0) {
                     updateOrAddTagSlice(tag, currCost, totalCost);
                 } else {
-                    pc.getData().removeIf(slice -> slice.getName().startsWith(tag.getName()));
+                    pc.getData().removeIf(slice -> {
+                        Object userData = slice.getNode().getUserData();
+                        if (userData instanceof Tag sliceTag) {
+                            return sliceTag.getId() == tag.getId();
+                        }
+                        return false;
+                    });
                 }
             }
         }
@@ -265,6 +276,7 @@ public class StatisticsCtrl {
         for (PieChart.Data slice : pc.getData()) {
             if (slice.getName().startsWith(tag.getName())) {
                 slice.setName(tagInfo);
+                applyTagColor(slice, tag.getColor());
                 slice.setPieValue(currCost);
                 found = true;
                 break;

@@ -212,10 +212,10 @@ public class EventPageCtrl {
             event.getTransactions().removeIf(t -> t.getId() == (long) id);
         });
         websocket.on(REMOVE_TAG, t -> {
-            Tag tag = (Tag) t;
-            event.getTags().removeIf(existingTag -> existingTag.getId() == tag.getId());
+            long id = (long) t;
+            event.getTags().removeIf(existingTag -> existingTag.getId() == id);
             event.getExpenses().forEach(exp -> {
-                if (exp.getType().getId() == tag.getId()) {
+                if (exp.getType().getId() == id) {
                     exp.setType(null);
                 }
             });
