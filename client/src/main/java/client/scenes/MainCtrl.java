@@ -157,8 +157,6 @@ public class MainCtrl implements MainCtrlInterface{
         this.statistics = new Scene(pairCollector.statisticsPage().getValue());
         initializeShortcuts();
 
-        //showOverview();
-        showStartScreen();
         if(startPage){
             showStartScreen();
         } else {
