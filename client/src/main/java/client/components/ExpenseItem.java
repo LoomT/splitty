@@ -63,9 +63,10 @@ public class ExpenseItem extends HBox {
             tagLabel.setVisible(false);
             return;
         }
-        int red = Integer.parseInt(tag.getColor().substring(0, 2), 16);
-        int green = Integer.parseInt(tag.getColor().substring(2, 4), 16);
-        int blue = Integer.parseInt(tag.getColor().substring(4, 6), 16);
+        String hex = tag.getColor().replace("#", "");
+        int red = Integer.parseInt(hex.substring(0, 2), 16);
+        int green = Integer.parseInt(hex.substring(2, 4), 16);
+        int blue = Integer.parseInt(hex.substring(4, 6), 16);
         Color color = Color.rgb(red, green, blue);
         String textColor = 0.21 * color.getRed() + 0.72 * color.getGreen() + 0.07 * color.getBlue()
                 > 0.5 ? "#000000" : "#FFFFFF";
