@@ -25,6 +25,7 @@ The server will output the admin password in the terminal while starting, additi
     - ESC to go back
     - ENTER on some text fields to confirm (creating and joining an event, admin login, edit title)
     - CTRL + S to save settings while in options
+    - On Mac, the keyboard shortcut functionality of pressing enter can be achieved by pressing space instead
 - The choice box for currency can be filtered by clicking on it and typing.
 - Some bigger errors will play a beep, like failing to connect to a server.
 - To add a language, rename the template file to 'languages_##.properties' where ## is the locale code of the language. Drop this file in /client/build/resources/main/ then the flag in the location specified in the template flag property and add the locale code to locale attribute of config.properties.
