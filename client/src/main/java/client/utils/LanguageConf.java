@@ -10,7 +10,10 @@ import java.util.ResourceBundle;
 
 
 public class LanguageConf {
-    private final List<Locale> availableLocales = List.of(Locale.of("en"), Locale.of("nl"));
+    private final List<Locale> availableLocales = List.of(
+            Locale.of("en"),
+            Locale.of("nl"),
+            Locale.of("de"));
 
     private final UserConfig userConfig;
 

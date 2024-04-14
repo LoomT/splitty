@@ -41,12 +41,14 @@ public class OptionsCtrl {
     private Stage stage;
     private FadeTransition ft;
     private boolean lastContrast;
+    private boolean unsavedChanges = false;
+
 
     /**
-     * @param userConfig user configuration
+     * @param userConfig   user configuration
      * @param languageConf language configuration
-     * @param converter currency converter
-     * @param server server utils
+     * @param converter    currency converter
+     * @param server       server utils
      */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
@@ -64,7 +66,7 @@ public class OptionsCtrl {
         CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
                 currencyChoiceBox);
         String cur = userConfig.getCurrency();
-        if(!cur.equals("None")) {
+        if (!cur.equals("None")) {
             CommonFunctions.HideableItem<String> item =
                     currencyChoiceBox.getItems().stream()
                             .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
@@ -81,6 +83,33 @@ public class OptionsCtrl {
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
         loadIndicator.setVisible(false);
+
+        String initialCurrency = currencyChoiceBox.getValue().toString();
+        boolean initialHighContrast = contrastToggle.isSelected();
+        String initialURL = serverField.getText();
+
+        currencyChoiceBox.getSelectionModel().
+                selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null && !newVal.toString().equals(initialCurrency)) {
+                        unsavedChanges = true;
+                    } else if (newVal.toString().equals(initialCurrency)) {
+                        unsavedChanges = false;
+                    }
+                });
+        serverField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.equals(initialURL)) {
+                unsavedChanges = true;
+            } else if (newVal.equals(initialURL)) {
+                unsavedChanges = false;
+            }
+        });
+        contrastToggle.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != initialHighContrast) {
+                unsavedChanges = true;
+            } else {
+                unsavedChanges = false;
+            }
+        });
     }
 
     /**
@@ -116,7 +145,7 @@ public class OptionsCtrl {
         String serverURL = serverField.getText();
         try {
             String currency = currencyChoiceBox.getValue().toString();
-            if(currency.length() == 3) {
+            if (currency.length() == 3) {
                 userConfig.setCurrency(currency);
             }
             lastContrast = userConfig.getHighContrast();
@@ -134,6 +163,7 @@ public class OptionsCtrl {
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
+        unsavedChanges = false;
     }
 
     /**
@@ -141,6 +171,16 @@ public class OptionsCtrl {
      */
     @FXML
     public void cancelClicked() {
+        if (unsavedChanges) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText(languageConf.get("Options.unsavedChanges"));
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.CANCEL);
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.CANCEL) {
+                return;
+            }
+        }
         serverField.setText(userConfig.getUrl());
         String cur = userConfig.getCurrency();
         CommonFunctions.HideableItem<String> item =
@@ -167,7 +207,7 @@ public class OptionsCtrl {
         serverField.setDisable(false);
         loadIndicator.setVisible(false);
         ft.stop();
-        if(result) {
+        if (result) {
             confirmationLabel.setText(languageConf.get("Options.serverUp"));
         } else {
             confirmationLabel.setText(languageConf.get("Options.serverDown"));
@@ -180,6 +220,7 @@ public class OptionsCtrl {
     private final BooleanProperty ctrlPressed = new SimpleBooleanProperty(false);
     private final BooleanProperty sPressed = new SimpleBooleanProperty(false);
     private final BooleanBinding spaceAndRightPressed = ctrlPressed.and(sPressed);
+
     /**
      * Enable keyboard shortcuts
      *
