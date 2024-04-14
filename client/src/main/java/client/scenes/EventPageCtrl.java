@@ -600,6 +600,8 @@ public class EventPageCtrl {
         CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
         CommonFunctions.checkKey(scene, () -> this.participantChoiceBox.show(),
                 participantChoiceBox, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.languageChoiceBoxEvent.show(),
+                languageChoiceBoxEvent, KeyCode.ENTER);
 
     }
 

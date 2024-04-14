@@ -55,8 +55,22 @@
                </children>
             </HBox>
             <Label styleClass="textFont" text="%Options.enableHighContrast" wrapText="true" GridPane.halignment="RIGHT" GridPane.rowIndex="2" />
+            <BorderPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <right>
+                  <Button fx:id="mailButton" mnemonicParsing="false" onAction="#testMail" styleClass="pbutton" text="%Options.sendTestEmail" BorderPane.alignment="CENTER" />
+               </right>
+               <left>
+                  <ToggleButton fx:id="contrastToggle" mnemonicParsing="false" onAction="#contrastClicked" styleClass="sbutton" text="Toggle" BorderPane.alignment="CENTER" />
+               </left>
+            </BorderPane>
             <Label styleClass="textFont" text="%Options.setMailUsername" wrapText="true" GridPane.halignment="RIGHT" GridPane.rowIndex="3" />
+            <TextField fx:id="emailUsername" prefHeight="25.0" prefWidth="220.0" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+            </TextField>
             <Label styleClass="textFont" text="%Options.setMailPassword" wrapText="true" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <PasswordField fx:id="emailPassword" prefHeight="25.0" prefWidth="220.0" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label fx:id="confirmationLabel" alignment="CENTER" prefHeight="17.0" prefWidth="336.0" styleClass="warningLabel" text="Settings saved successfully!" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
             <ProgressIndicator fx:id="loadIndicator" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="5" />
             <HBox maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnSpan="2" GridPane.rowIndex="6">
@@ -75,20 +89,6 @@
                   <Region prefHeight="0.0" prefWidth="0.0" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
-            <BorderPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-               <right>
-                  <Button fx:id="mailButton" mnemonicParsing="false" onAction="#testMail" styleClass="pbutton" text="%Options.sendTestEmail" BorderPane.alignment="CENTER" />
-               </right>
-               <left>
-                  <ToggleButton fx:id="contrastToggle" mnemonicParsing="false" onAction="#contrastClicked" styleClass="sbutton" text="Toggle" BorderPane.alignment="CENTER" />
-               </left>
-            </BorderPane>
-            <TextField fx:id="emailUsername" prefHeight="25.0" prefWidth="220.0" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="3">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-            </TextField>
-            <PasswordField fx:id="emailPassword" prefHeight="25.0" prefWidth="220.0" styleClass="ntextfield" GridPane.columnIndex="1" GridPane.rowIndex="4" />
          </children>
          <padding>
             <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
