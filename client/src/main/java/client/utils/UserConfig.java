@@ -1,15 +1,16 @@
 package client.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.google.inject.Inject;
+import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Interacts with the config file and stores the settings
@@ -281,6 +282,26 @@ public class UserConfig {
         configProperties.setProperty("spring.mail.password", password);
         try (BufferedWriter writer = new BufferedWriter(io.write())) {
             configProperties.store(writer, "Changed email password to " + password);
+        }
+    }
+
+    /**
+     * @return supported locales
+     */
+    public List<Locale> getSupportedLocales() {
+        List<String> result;
+        ObjectReader reader = new ObjectMapper().reader().forType(ArrayList.class);
+        try {
+            result = reader.readValue((String) configProperties.get("locales"));
+            return result.stream().map(Locale::of).toList();
+        } catch (JsonProcessingException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "The property locales in config.properties is not formatted properly. " +
+                            "Please make sure it's similar to 'locales=[\"en\", \"nl\"]'");
+            alert.setHeaderText("Config parse error");
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+            throw new RuntimeException();
         }
     }
 }

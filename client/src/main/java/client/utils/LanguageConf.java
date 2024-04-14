@@ -1,19 +1,14 @@
 package client.utils;
 
 import com.google.inject.Inject;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 
 public class LanguageConf {
-    private final List<Locale> availableLocales = List.of(
-            Locale.of("en"),
-            Locale.of("nl"),
-            Locale.of("de"));
+    private final List<Locale> availableLocales;
 
     private final UserConfig userConfig;
 
@@ -30,6 +25,7 @@ public class LanguageConf {
     @Inject
     public LanguageConf(UserConfig userConfig) {
         this.userConfig = userConfig;
+        availableLocales = userConfig.getSupportedLocales();
         currentLocale = Locale.of(userConfig.getLocale());
         currentBundle = getCurrentResourceBundle();
     }
@@ -50,7 +46,12 @@ public class LanguageConf {
      * @return String value of requested property
      */
     public String get(String key, String lang){
-        return ResourceBundle.getBundle("languages", Locale.of(lang)).getString(key);
+        try {
+            return ResourceBundle.getBundle("languages", Locale.of(lang)).getString(key);
+        } catch (MissingResourceException e) {
+            missingBundle();
+            return null;
+        }
     }
 
     /**
@@ -85,7 +86,12 @@ public class LanguageConf {
      * @return the resourcebundle for the selected locale
      */
     private ResourceBundle getCurrentResourceBundle() {
-        return ResourceBundle.getBundle("languages", currentLocale);
+        try {
+            return ResourceBundle.getBundle("languages", currentLocale);
+        } catch (MissingResourceException e) {
+            missingBundle();
+            return null;
+        }
     }
 
     /**
@@ -111,5 +117,18 @@ public class LanguageConf {
      */
     public void onLanguageChange(Runnable function) {
         callback = function;
+    }
+
+    private void missingBundle() throws RuntimeException {
+        Alert alert = new Alert(Alert.AlertType.ERROR,
+                "Could not find the resource bundle for "
+                        + currentLocale.getLanguage() +
+                        ". Make that /client/build/resources/main " +
+                        "contains file called 'languages_"
+                        + currentLocale.getLanguage() + ".properties'");
+        alert.setHeaderText("Missing resource bundle");
+        java.awt.Toolkit.getDefaultToolkit().beep();
+        alert.showAndWait();
+        throw new RuntimeException("Could not find the resource bundle");
     }
 }
