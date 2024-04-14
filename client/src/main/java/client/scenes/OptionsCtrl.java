@@ -139,7 +139,6 @@ public class OptionsCtrl {
             emailUsername.setStyle("-fx-border-color: red;");
             emailPassword.setStyle("-fx-border-color: red;");
             ft.stop();
-            confirmationLabel.setText(languageConf.get("Options.invalidEmail"));
             confirmationLabel.setVisible(true);
             confirmationLabel.setOpacity(1.0);
             ft.play();
@@ -155,6 +154,8 @@ public class OptionsCtrl {
             userConfig.setURL(serverURL);
             emailService.setConfiguration(emailUsername.getText(), emailPassword.getText());
             updateEmailFields();
+            emailUsername.setStyle("-fx-border-color: transparent;");
+            emailPassword.setStyle("-fx-border-color: transparent;");
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(languageConf.get("unexpectedError"));
@@ -175,8 +176,19 @@ public class OptionsCtrl {
      */
     public boolean checkEmailFields(){
         if(emailUsername.getLength() == 0 && emailPassword.getLength() == 0) return true;
-        if(emailUsername.getLength() != 0 && emailPassword.getLength() == 0) return false;
-        return emailUsername.getText().contains("@");
+        if(!emailUsername.getText().contains("@gmail.com") && emailPassword.getLength() == 0){
+            confirmationLabel.setText(languageConf.get("Options.invalidEmailFields"));
+            return false;
+        }
+        if(emailUsername.getLength() != 0 && emailPassword.getLength() == 0){
+            confirmationLabel.setText(languageConf.get("Options.invalidPassword"));
+            return false;
+        }
+        if(!emailUsername.getText().contains("@gmail.com")){
+            confirmationLabel.setText(languageConf.get("Options.invalidEmail"));
+            return false;
+        }
+        return true;
     }
 
     /**

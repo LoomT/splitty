@@ -18,6 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.layout.Region?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.EventPageCtrl">
    <children>
       <HBox prefWidth="600.0" styleClass="navbar">
@@ -53,6 +54,7 @@
                         <HBox alignment="CENTER" prefHeight="53.0" prefWidth="122.0">
                            <children>
                               <Button fx:id="mailButton" mnemonicParsing="false" onAction="#sendInvite" prefHeight="25.0" prefWidth="80.0" styleClass="pbutton" text="%EventPage.sendInvite" />
+                              <Region prefHeight="0.0" prefWidth="162.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="77.0" GridPane.columnIndex="1">
