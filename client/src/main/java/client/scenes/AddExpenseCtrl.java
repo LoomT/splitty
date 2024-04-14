@@ -20,7 +20,8 @@ import javafx.scene.text.TextFlow;
 import javafx.util.Callback;
 
 import java.net.ConnectException;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -83,6 +84,7 @@ public class AddExpenseCtrl {
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
+    private final NumberFormat format;
 
     /**
      * @param mainCtrl main control instance
@@ -107,6 +109,7 @@ public class AddExpenseCtrl {
         this.languageConf = languageConf;
         this.converter = converter;
         this.userConfig = userConfig;
+        format = NumberFormat.getNumberInstance();
     }
 
     /**
@@ -114,8 +117,6 @@ public class AddExpenseCtrl {
      * Sets a listener for amount field which only let input double amounts
      */
     public void initialize() {
-        DecimalFormat format = new DecimalFormat( "#.0" );
-
         // only lets the users type decimal numbers
         amount.setTextFormatter(new TextFormatter<>(c -> {
             if(c.getControlNewText().isEmpty())
@@ -365,7 +366,8 @@ public class AddExpenseCtrl {
                 alertSelectPart();
                 return null;
             }
-            double expAmount = Double.parseDouble(amount.getText());
+            Number number = format.parse(amount.getText());
+            double expAmount = number.doubleValue();
             if(expAmount <= 0) throw new NumberFormatException();
 
             LocalDate expDate = date.getValue();
@@ -404,6 +406,8 @@ public class AddExpenseCtrl {
             alert.setHeaderText(null);
             alert.setContentText(languageConf.get("AddExp.invamountmess"));
             alert.showAndWait();
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }

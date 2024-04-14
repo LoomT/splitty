@@ -17,7 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 
 import java.net.ConnectException;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.time.Instant;
 import java.util.NoSuchElementException;
@@ -72,7 +72,8 @@ public class AddCustomTransactionCtrl {
                             .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
             chooseCurrency.setValue(item);
         }
-        DecimalFormat format = new DecimalFormat( "#.0" );
+        //DecimalFormat format = new DecimalFormat( "#.0" );
+        NumberFormat format = NumberFormat.getNumberInstance();
 
         // only lets the users type decimal numbers
         amountField.setTextFormatter(new TextFormatter<>(c -> {
