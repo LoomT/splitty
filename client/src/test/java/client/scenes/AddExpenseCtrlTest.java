@@ -79,9 +79,15 @@ public class AddExpenseCtrlTest {
         server.createParticipant(event.getId(), p1);
         server.createParticipant(event.getId(), p2);
         Tag t1 = new Tag("food", "FF0000");
-        Tag t2 = new Tag("drinks", "0000ff");
-        server.addTag(event.getId(), t1);
-        server.addTag(event.getId(), t2);
+        Tag t2 = new Tag("drinks", "0000FF");
+        try {
+            server.addTag(event.getId(), t1);
+            server.addTag(event.getId(), t2);
+        }
+        catch (Exception e) {
+            System.out.println("pula");
+            e.printStackTrace();
+        }
         event = server.getEvent(event.getId());
         event.setTags(List.of(t1, t2));
 

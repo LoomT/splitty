@@ -538,7 +538,7 @@ public class MainCtrl implements MainCtrlInterface{
     @Override
     public void showTagPage(Event event) {
         tagPageCtrl.displayTagPage(event);
-        primaryStage.setTitle("Tags overview");
+        primaryStage.setTitle(languageConf.get("TagPage.tagoverview"));
         primaryStage.setScene(tagPage);
     }
 }
