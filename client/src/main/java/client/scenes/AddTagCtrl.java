@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import com.google.inject.Inject;
@@ -8,10 +9,12 @@ import commons.Event;
 import commons.Tag;
 import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -179,6 +182,14 @@ public class AddTagCtrl {
     }
 
 
-
-
+    /**
+     * Initializes the shortcuts for EditTitle
+     *      Enter: saveTitle if the focus is on the textField.
+     * @param scene scene the listeners are initialised in
+     */
+    public void initializeShortcuts(Scene scene){
+        CommonFunctions.checkKey(scene, () -> addButton(event), tagTextField, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.cp.show(), cp, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, this::backClicked, KeyCode.ESCAPE);
+    }
 }

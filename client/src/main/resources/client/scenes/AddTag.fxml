@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
+<?import java.net.URL?>
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="213.0" prefWidth="352.0" styleClass="backgroundAnchorpane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.scenes.AddTagCtrl">
    <children>
       <GridPane layoutY="2.0" prefHeight="213.0" prefWidth="352.0">
@@ -54,4 +55,7 @@
          </children>
       </GridPane>
    </children>
+    <stylesheets>
+        <URL value="@/client/scenes/global.css" />
+    </stylesheets>
 </AnchorPane>

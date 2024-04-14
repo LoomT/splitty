@@ -9,6 +9,7 @@ Tip: Double check that the path is correct. You will receive abstract error mess
 
 # To run the project without an IDE or downloading the JavaFX:
 - Open a terminal in the root directory of the project
+- For the first time, type: `./gradlew build`
 - To start the server, type: `./gradlew bootRun`
 - To start the client, type: `./gradlew -a run`
 

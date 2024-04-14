@@ -187,6 +187,7 @@ public class MainCtrl implements MainCtrlInterface{
         inviteMailCtrl.initializeShortcuts(inviteMail);
         statisticsCtrl.initializeShortcuts(statistics);
         tagPageCtrl.initializeShortcuts(tagPage);
+        addTagCtrl.initializeShortcuts(addTag);
     }
 
     /**
