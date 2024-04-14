@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -118,6 +119,8 @@ public class OptionsCtrl {
      */
     public void display(Stage stage) {
         this.stage = stage;
+        stage.getScene().getWindow()
+                .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> cancelClicked());
         lastContrast = userConfig.getHighContrast();
     }
 

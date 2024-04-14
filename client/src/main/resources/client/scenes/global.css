@@ -38,12 +38,14 @@
     -fx-font-family: "Arial Rounded MT Bold";
     -fx-font-size: 42;
     -fx-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
+    -fx-text-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
 }
 
 .eventTitleFont {
     -fx-font-family: "Arial Rounded MT Bold";
     -fx-font-size: 32;
     -fx-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
+    -fx-text-fill: linear-gradient(from 0.0% 100.0% to 100.0% 100.0%, #9dbce3 0.0%, #a894da 100.0%);
 }
 
 .labelFont {
@@ -196,6 +198,11 @@ the buttons have this class by default and the styles get overwritten
     -fx-border-color: -border-color;
     -fx-border-radius: 8;
     -fx-background-radius: 80;
+}
+
+.partScrollPane {
+    -fx-background-color: -bg;
+    -fx-background: -bg;
 }
 
 .eventCodeVBox {
