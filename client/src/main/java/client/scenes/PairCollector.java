@@ -14,5 +14,6 @@ public record PairCollector(Pair<StartScreenCtrl, Parent> startScreen,
                             Pair<StatisticsCtrl, Parent> statisticsPage ,
                             Pair<OptionsCtrl, Parent> options,
                             Pair<AddCustomTransactionCtrl, Parent> addCustomTransaction,
-                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage) {
+                            Pair<OpenDebtsPageCtrl, Parent> openDebtsPage,
+                            Pair<InviteMailCtrl, Parent> inviteMailPage) {
 }

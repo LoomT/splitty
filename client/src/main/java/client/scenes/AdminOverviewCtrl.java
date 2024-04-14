@@ -3,6 +3,7 @@ package client.scenes;
 import client.components.Confirmation;
 import client.MockClass.MainCtrlInterface;
 import client.components.EventListItemAdmin;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -375,10 +376,10 @@ public class AdminOverviewCtrl{
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::refreshButtonClicked, KeyCode.F5);
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.orderByChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::refreshButtonClicked, KeyCode.F5);
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.orderByChoiceBox.show(),
                 orderByChoiceBox, KeyCode.ENTER);
     }
 }

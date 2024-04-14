@@ -745,11 +745,12 @@ public class AddExpenseCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, () -> handleAbortButton(event), KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.expenseAuthor.show(), expenseAuthor, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> this.currency.show(), currency, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> this.type.show(), type, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, () -> this.date.show(), date, KeyCode.SHIFT);
+        CommonFunctions.checkKey(scene, () -> handleAbortButton(event), KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.expenseAuthor.show(),
+                expenseAuthor, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.currency.show(), currency, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.type.show(), type, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.date.show(), date, KeyCode.SHIFT);
     }
 
     /**
