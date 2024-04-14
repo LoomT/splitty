@@ -115,7 +115,7 @@ public class Main extends Application {
                 "client", "scenes", "TagPage.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image("client/scenes/icons8-error-96.png"));
+        primaryStage.getIcons().add(new Image("flags/logo.png"));
 
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
