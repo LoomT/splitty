@@ -746,7 +746,8 @@ public class AddExpenseCtrl {
      */
     public void initializeShortcuts(Scene scene) {
         CommonFunctions.checkKey(scene, () -> handleAbortButton(event), KeyCode.ESCAPE);
-        CommonFunctions.checkKey(scene, () -> this.expenseAuthor.show(), expenseAuthor, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, () -> this.expenseAuthor.show(),
+                expenseAuthor, KeyCode.ENTER);
         CommonFunctions.checkKey(scene, () -> this.currency.show(), currency, KeyCode.ENTER);
         CommonFunctions.checkKey(scene, () -> this.type.show(), type, KeyCode.ENTER);
         CommonFunctions.checkKey(scene, () -> this.date.show(), date, KeyCode.SHIFT);

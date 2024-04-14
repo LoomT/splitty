@@ -44,7 +44,8 @@ public class AdminLoginCtrl {
      */
     public void initializeShortcuts(Scene scene) {
         CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        CommonFunctions.checkKey(scene, this::loginButtonClicked,  passwordTextField, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, this::loginButtonClicked,
+                passwordTextField, KeyCode.ENTER);
     }
 
     private void addIconsToButtons() {
