@@ -45,7 +45,6 @@ public class MyModule implements Module {
         binder.bind(InviteMailCtrl.class).in(Scopes.SINGLETON);
         binder.bind(MainCtrlInterface.class).to(MainCtrl.class).in(Scopes.SINGLETON);
         binder.bind(OpenDebtsPageCtrl.class).in(Scopes.SINGLETON);
-        binder.bind(OptionsCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
         binder.bind(StatisticsCtrl.class).in(Scopes.SINGLETON);
         binder.bind(TagPageCtrl.class).in(Scopes.SINGLETON);
