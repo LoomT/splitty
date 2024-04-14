@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.CommonFunctions;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import jakarta.inject.Inject;
 import javafx.animation.FadeTransition;
@@ -27,17 +24,24 @@ public class OptionsCtrl {
     private final UserConfig userConfig;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
+    private final EmailService emailService;
     private final ServerUtils server;
     @FXML
     private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
     @FXML
     private TextField serverField;
     @FXML
+    private TextField emailUsername;
+    @FXML
+    private TextField emailPassword;
+    @FXML
     private ToggleButton contrastToggle;
     @FXML
     private Label confirmationLabel;
     @FXML
     private ProgressIndicator loadIndicator;
+    @FXML
+    private Button mailButton;
     private Stage stage;
     private FadeTransition ft;
     private boolean lastContrast;
@@ -49,14 +53,17 @@ public class OptionsCtrl {
      * @param languageConf language configuration
      * @param converter    currency converter
      * @param server       server utils
+     * @param emailService email service
      */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
-                       CurrencyConverter converter, ServerUtils server) {
+                       CurrencyConverter converter, ServerUtils server,
+                       EmailService emailService) {
         this.userConfig = userConfig;
         this.languageConf = languageConf;
         this.converter = converter;
         this.server = server;
+        this.emailService = emailService;
     }
 
     /**
@@ -122,6 +129,23 @@ public class OptionsCtrl {
         stage.getScene().getWindow()
                 .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> cancelClicked());
         lastContrast = userConfig.getHighContrast();
+        updateEmailFields();
+    }
+
+    /**
+     * updates the email fields
+     */
+    public void updateEmailFields(){
+        if(emailService.isNotInitialized()){
+            mailButton.setDisable(true);
+            emailUsername.clear();
+            emailPassword.clear();
+        }
+        else{
+            mailButton.setDisable(false);
+            emailUsername.setText(userConfig.getUsername());
+            emailPassword.setText(userConfig.getMailPassword());
+        }
     }
 
     /**
@@ -143,6 +167,15 @@ public class OptionsCtrl {
     @FXML
     public void saveClicked() {
         String serverURL = serverField.getText();
+        if(!checkEmailFields()){
+            emailUsername.setStyle("-fx-border-color: red;");
+            emailPassword.setStyle("-fx-border-color: red;");
+            ft.stop();
+            confirmationLabel.setVisible(true);
+            confirmationLabel.setOpacity(1.0);
+            ft.play();
+            return;
+        }
         try {
             String currency = currencyChoiceBox.getValue().toString();
             if (currency.length() == 3) {
@@ -151,6 +184,10 @@ public class OptionsCtrl {
             lastContrast = userConfig.getHighContrast();
             userConfig.persistContrast();
             userConfig.setURL(serverURL);
+            emailService.setConfiguration(emailUsername.getText(), emailPassword.getText());
+            updateEmailFields();
+            emailUsername.setStyle("-fx-border-color: transparent;");
+            emailPassword.setStyle("-fx-border-color: transparent;");
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(languageConf.get("unexpectedError"));
@@ -164,6 +201,27 @@ public class OptionsCtrl {
         confirmationLabel.setOpacity(1.0);
         ft.play();
         unsavedChanges = false;
+    }
+
+    /**
+     * checks the email fields to see if they are valid
+     * @return true iff the fields are both empty or correctly filled
+     */
+    public boolean checkEmailFields(){
+        if(emailUsername.getLength() == 0 && emailPassword.getLength() == 0) return true;
+        if(!emailUsername.getText().contains("@gmail.com") && emailPassword.getLength() == 0){
+            confirmationLabel.setText(languageConf.get("Options.invalidEmailFields"));
+            return false;
+        }
+        if(emailUsername.getLength() != 0 && emailPassword.getLength() == 0){
+            confirmationLabel.setText(languageConf.get("Options.invalidPassword"));
+            return false;
+        }
+        if(!emailUsername.getText().contains("@gmail.com")){
+            confirmationLabel.setText(languageConf.get("Options.invalidEmail"));
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -227,8 +285,8 @@ public class OptionsCtrl {
      * @param scene this options scene
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.currencyChoiceBox.show(),
                 currencyChoiceBox, KeyCode.ENTER);
 
 
@@ -250,5 +308,27 @@ public class OptionsCtrl {
                 sPressed.set(false);
             }
         });
+    }
+
+    /**
+     * Sends a test email to see if it has been configured correctly
+     */
+    @FXML
+    public void testMail(){
+        loadIndicator.setVisible(true);
+        boolean result = emailService.sendTestEmail();
+        confirmationLabel.setVisible(false);
+
+        if(result){
+            confirmationLabel.setText(languageConf.get("Options.mailSuccessful"));
+        }
+        else{
+            confirmationLabel.setText(languageConf.get("Options.mailFailure"));
+        }
+        ft.stop();
+        loadIndicator.setVisible(false);
+        confirmationLabel.setVisible(true);
+        confirmationLabel.setOpacity(1.0);
+        ft.play();
     }
 }

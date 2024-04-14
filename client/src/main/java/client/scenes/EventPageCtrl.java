@@ -3,10 +3,7 @@ package client.scenes;
 import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
 import client.components.ExpenseItem;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
@@ -78,6 +75,8 @@ public class EventPageCtrl {
     private Button editTitleButton;
     @FXML
     private ComboBox<String> languageChoiceBoxEvent;
+    @FXML
+    private Button mailButton;
 
     private FadeTransition ft;
     private int selectedParticipantId;
@@ -88,6 +87,7 @@ public class EventPageCtrl {
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
+    private final EmailService emailService;
     private Event event;
 
     /**
@@ -104,18 +104,20 @@ public class EventPageCtrl {
      * @param server       server to be ysed
      * @param converter currency converter
      * @param userConfig user config
+     * @param emailService emailService
      */
     @Inject
 
     public EventPageCtrl(MainCtrlInterface mainCtrl, LanguageConf languageConf,
                          Websocket websocket, ServerUtils server, CurrencyConverter converter,
-                         UserConfig userConfig) {
+                         UserConfig userConfig, EmailService emailService) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.server = server;
         this.websocket = websocket;
         this.converter = converter;
         this.userConfig = userConfig;
+        this.emailService = emailService;
     }
 
     /**
@@ -125,6 +127,7 @@ public class EventPageCtrl {
      */
     public void displayEvent(Event e) {
         this.event = e;
+        mailButton.setDisable(emailService.isNotInitialized());
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
         participantChoiceBox.getItems().clear();
@@ -568,8 +571,8 @@ public class EventPageCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.participantChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.participantChoiceBox.show(),
                 participantChoiceBox, KeyCode.ENTER);
 
     }
@@ -587,5 +590,13 @@ public class EventPageCtrl {
     @FXML
     public void openDebtsPage() {
         mainCtrl.showDebtsPage(event);
+    }
+
+    /**
+     * shows the invite page
+     */
+    @FXML
+    public void sendInvite(){
+        mainCtrl.showInviteMail(event);
     }
 }

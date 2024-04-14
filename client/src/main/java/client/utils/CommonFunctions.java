@@ -9,11 +9,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.EventTarget;
 import javafx.scene.control.*;
 import javafx.scene.control.skin.ComboBoxListViewSkin;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 import java.util.List;
@@ -43,6 +45,48 @@ public class CommonFunctions {
                 warningLabel.setVisible(true);
             }
             textField.setText(newValue);
+        });
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted.
+     * @param target target the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     */
+    public static void checkKey(EventTarget target, Runnable function, KeyCode key) {
+        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                System.out.println("Key Pressed: " + ke.getCode());
+                try {
+                    function.run();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                ke.consume(); // <-- stops passing the event to next node
+            }
+        });
+    }
+
+    /**
+     * Initializes an event listener for a scene and executes the runnable
+     * if a key is inputted in a particular field.
+     * @param target target the event listener should be initialised in
+     * @param function function to be executed if the criteria is met
+     * @param key Keycode to be checked.
+     * @param field field that should be in the focus for the function to be executed
+     */
+    public static void checkKey(EventTarget target, Runnable function, Object field, KeyCode key){
+        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
+            if (ke.getCode() == key) {
+                if(ke.getTarget().equals(field)){
+                    System.out.println("Key Pressed: " + ke.getCode());
+                    System.out.println(ke.getTarget());
+                    function.run();
+                    ke.consume(); // <-- stops passing the event to next node
+                }
+            }
         });
     }
 
