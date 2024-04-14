@@ -15,8 +15,8 @@
  */
 package client;
 
-import client.scenes.*;
 import client.MockClass.MainCtrlInterface;
+import client.scenes.*;
 import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import client.utils.currency.FileManager;
@@ -34,14 +34,21 @@ public class MyModule implements Module {
      */
     @Override
     public void configure(Binder binder) {
-        binder.bind(MainCtrlInterface.class).to(MainCtrl.class).in(Scopes.SINGLETON);
-        binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddCustomTransactionCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AddExpenseCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AddTagCtrl.class).in(Scopes.SINGLETON);
         binder.bind(AdminLoginCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(AdminOverviewCtrl.class).in(Scopes.SINGLETON);
         binder.bind(EditParticipantsCtrl.class).in(Scopes.SINGLETON);
         binder.bind(EditTitleCtrl.class).in(Scopes.SINGLETON);
         binder.bind(EventPageCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(InviteMailCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(MainCtrlInterface.class).to(MainCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(OpenDebtsPageCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(OptionsCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(StartScreenCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(StatisticsCtrl.class).in(Scopes.SINGLETON);
+        binder.bind(TagPageCtrl.class).in(Scopes.SINGLETON);
         binder.bind(UserConfig.class).in(Scopes.SINGLETON);
         binder.bind(ServerUtils.class).to(ServerUtilsImpl.class).in(Scopes.SINGLETON);
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
