@@ -72,7 +72,6 @@ public class AddCustomTransactionCtrl {
                             .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
             chooseCurrency.setValue(item);
         }
-        //DecimalFormat format = new DecimalFormat( "#.0" );
         NumberFormat format = NumberFormat.getNumberInstance();
 
         // only lets the users type decimal numbers
