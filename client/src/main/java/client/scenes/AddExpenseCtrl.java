@@ -445,7 +445,7 @@ public class AddExpenseCtrl {
         }
         type.setCellFactory(createTypeListCellFactory(ev));
         type.setButtonCell(createTypeListCell(ev));
-        type.getItems().add(0, null);
+        type.getItems().addFirst(null);
 
 
     }
