@@ -9,6 +9,7 @@ import client.utils.currency.CurrencyConverter;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -159,7 +160,9 @@ class OptionsCtrlTest {
             ctrl.cancelClicked();
         });
         waitForFxEvents();
-        assertFalse(userConfig.getHighContrast());
+
+        assertTrue(userConfig.getHighContrast()); //Because an alert was shown,
+        // but the changes are not yet saved
     }
 
     @Test
@@ -173,6 +176,7 @@ class OptionsCtrlTest {
             ctrl.cancelClicked();
         });
         waitForFxEvents();
+        assertTrue(stage.isShowing()); //because alert is shown
         assertEquals("localhost:8080", userConfig.getUrl());
     }
 
@@ -190,6 +194,7 @@ class OptionsCtrlTest {
         });
         waitForFxEvents();
         assertEquals("EUR", userConfig.getCurrency());
+        assertTrue(stage.isShowing()); //because alert is shown
     }
 
     @Test

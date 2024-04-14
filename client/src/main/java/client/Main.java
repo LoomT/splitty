@@ -112,7 +112,7 @@ public class Main extends Application {
                 "client", "scenes", "InviteMail.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
-        primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
+        primaryStage.getIcons().add(new Image("flags/logo.png"));
 
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
