@@ -10,6 +10,7 @@ import commons.Event;
 import commons.Tag;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -113,13 +114,17 @@ public class TagPageCtrl {
         Button editButton = createEditButton(tag, event);
         Button deleteButton = createDeleteButton(tag, event);
 
+        // Place the edit and delete buttons to the left of the colored box
         HBox tagItem = new HBox(15);
-        tagItem.getChildren().addAll(coloredBox, label, editButton, deleteButton);
+        tagItem.getChildren().addAll(editButton, deleteButton, coloredBox, label);
+
+        // Align the buttons to the center vertically within the HBox
+        tagItem.setAlignment(Pos.CENTER_LEFT);
 
         return tagItem;
     }
 
-    private Label createTagLabel(String tagName) {
+        private Label createTagLabel(String tagName) {
         Label label = new Label(tagName);
         label.setFont(Font.font("Arial", FontWeight.NORMAL, 15));
         label.setMinWidth(Label.USE_PREF_SIZE); // Ensure full visibility of the words
@@ -134,14 +139,14 @@ public class TagPageCtrl {
     }
 
     private Button createEditButton(Tag tag, Event event) {
-        Button editButton = new Button("Edit name");
+        Button editButton = new Button("\uD83D\uDD89");
         editButton.setOnAction(e -> showEditDialog(tag, event));
         editButton.setMinWidth(Button.USE_PREF_SIZE);
         return editButton;
     }
 
     private Button createDeleteButton(Tag tag, Event event) {
-        Button deleteButton = new Button("X");
+        Button deleteButton = new Button("\u274C");
         deleteButton.setOnAction(e -> deleteTag(tag, event));
         deleteButton.setMinWidth(Button.USE_PREF_SIZE);
         return deleteButton;
