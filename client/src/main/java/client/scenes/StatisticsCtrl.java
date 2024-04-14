@@ -220,9 +220,10 @@ public class StatisticsCtrl {
      */
     public void initPieChart(Event event) {
         if(!opened) return;
+        double temp = 0;
         double totalCost = initCost(event);
-        updateTagsPieChart(event, totalCost);
-        updateNoTagPieChart(event, totalCost);
+        temp = updateTagsPieChart(event, totalCost);
+        updateNoTagPieChart(event, totalCost, temp);
         populateLegend(event);
     }
 
@@ -231,10 +232,12 @@ public class StatisticsCtrl {
      * @param event the current event
      * @param totalCost the total cost of the event
      */
-    private void updateTagsPieChart(Event event, double totalCost) {
+    private double updateTagsPieChart(Event event, double totalCost) {
+        double temp = 0;
         for (Tag tag : event.getTags()) {
             if (tag != null) {
                 double currCost = getAmount(event, tag);
+                temp += currCost;
                 if (currCost > 0) {
                     updateOrAddTagSlice(tag, currCost, totalCost);
                 } else {
@@ -242,6 +245,7 @@ public class StatisticsCtrl {
                 }
             }
         }
+        return temp;
     }
 
     /**
@@ -291,11 +295,12 @@ public class StatisticsCtrl {
      * @param event the current event
      * @param totalCost the total cost of the event
      */
-    private void updateNoTagPieChart(Event event, double totalCost) {
+    private void updateNoTagPieChart(Event event, double totalCost, double temp) {
         boolean hasNoTagSlice = pc.getData().stream().anyMatch(slice ->
                 slice.getName().contains("No tag"));
         if (!hasNoTagSlice && containsExpensesWithNoTag(event)) {
-            double costExpensesNoTag = calculateExpensesNoTag(event);
+            //double costExpensesNoTag = calculateExpensesNoTag(event);
+            double costExpensesNoTag = totalCost - temp;
             String text = configureNoTag(costExpensesNoTag, totalCost);
             PieChart.Data slice = new PieChart.Data(text, costExpensesNoTag);
             pc.getData().add(slice);

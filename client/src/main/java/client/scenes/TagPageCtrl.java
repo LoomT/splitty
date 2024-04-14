@@ -225,6 +225,11 @@ public class TagPageCtrl {
                             try {
                                 event.getTags().remove(tag);
                                 server.deleteTag(tag.getId(), event.getId());
+                                for (Expense exp : event.getExpenses()) {
+                                    if (exp.getType().getId() == tag.getId()) {
+                                        exp.setType(null);
+                                    }
+                                }
                                 removedTags.add(tag);
                             } catch (ConnectException ex) {
                                 mainCtrl.handleServerNotFound();
