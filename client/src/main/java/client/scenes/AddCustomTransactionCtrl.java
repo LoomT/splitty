@@ -18,6 +18,7 @@ import javafx.stage.Stage;
 
 import java.net.ConnectException;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.time.Instant;
 import java.util.NoSuchElementException;
@@ -39,6 +40,7 @@ public class AddCustomTransactionCtrl {
 
     private Stage stage;
     private Event event;
+    private final NumberFormat format;
 
     /**
      * @param mainCtrl main controller
@@ -56,6 +58,7 @@ public class AddCustomTransactionCtrl {
         this.languageConf = languageConf;
         this.converter = converter;
         this.userConfig = userConfig;
+        format = NumberFormat.getNumberInstance();
     }
 
     /**
@@ -72,7 +75,6 @@ public class AddCustomTransactionCtrl {
                             .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
             chooseCurrency.setValue(item);
         }
-        NumberFormat format = NumberFormat.getNumberInstance();
 
         // only lets the users type decimal numbers
         amountField.setTextFormatter(new TextFormatter<>(c -> {
@@ -130,7 +132,17 @@ public class AddCustomTransactionCtrl {
             backClicked();
             return;
         }
-        double amount = Double.parseDouble(amountField.getText());
+        Number number;
+        try {
+            number = format.parse(amountField.getText());
+        } catch (ParseException p){
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.error"));
+            alert.show();
+            backClicked();
+            return;
+        }
+        double amount = number.doubleValue();
         double convertedAmount;
         try {
             convertedAmount = converter.convert(chooseCurrency.getValue().toString(), "USD",
@@ -197,7 +209,17 @@ public class AddCustomTransactionCtrl {
             alert.showAndWait();
             return false;
         }
-        if(Double.parseDouble(amountField.getText()) <= 0) {
+        Number number;
+        try {
+            number = format.parse(amountField.getText());
+        } catch (ParseException p){
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    languageConf.get("AddCustomTransaction.error"));
+            alert.showAndWait();
+            return false;
+        }
+        double value = number.doubleValue();
+        if(value <= 0) {
             Alert alert = new Alert(Alert.AlertType.WARNING,
                     languageConf.get("AddCustomTransaction.warningInvalidAmount"));
             alert.setHeaderText(null);
