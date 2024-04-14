@@ -115,7 +115,31 @@ public class UserConfig {
     }
 
     /**
-     * @param code the 5 letter code of the event to store in the config file
+     * Deletes the event code from the list of recent event codes
+     *
+     * @param code the 5-letter code of the event to delete from the config file
+     */
+    public void deleteEventCode(String code) {
+        List<String> currentCodes = getRecentEventCodes();
+        currentCodes.remove(code);
+        StringBuilder strToWrite = new StringBuilder();
+        for (int i = 0; i < currentCodes.size(); i++) {
+            String curr = currentCodes.get(i);
+            strToWrite.append(curr);
+            if (i < currentCodes.size() - 1) {
+                strToWrite.append(",");
+            }
+        }
+        configProperties.setProperty("recentEventCodes", strToWrite.toString());
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Deleted the following event code: " + code);
+        } catch (Exception e) {
+            System.out.println("Something went wrong while writing to the config file.");
+        }
+    }
+
+    /**
+     * @param code the 5-letter code of the event to store in the config file
      */
     public void setMostRecentEventCode(String code) {
         System.out.println("Writing code " + code);
@@ -191,5 +215,72 @@ public class UserConfig {
      */
     public void onContrastChange(Runnable function) {
         callback = function;
+    }
+
+    /**
+     * Username of the mail address
+     * @return mail password in the config file
+     */
+    public String getUsername(){
+        return (String) configProperties.get("spring.mail.username");
+    }
+
+    /**
+     * Password of the mail address
+     * @return mail password in the config file
+     */
+    public String getMailPassword(){
+        return (String) configProperties.get("spring.mail.password");
+    }
+
+    /**
+     * host in the config file for the MailService
+     * @return host
+     */
+    public String getHost(){
+        return (String) configProperties.get("spring.mail.host");
+    }
+
+    /**
+     * port in the config file for the MailService
+     * @return port
+     */
+    public int getPort(){
+        return Integer.parseInt((String)configProperties.get("spring.mail.port"));
+    }
+
+    /**
+     * return properties needed in the JavaMailSender
+     * @return properties to initialise the MailService
+     */
+    public Properties getMailProperties(){
+        Properties result = new Properties();
+        result.setProperty("mail.smtp.auth",
+                configProperties.getProperty("mail.smtp.auth"));
+        result.setProperty("mail.smtp.starttls.enable",
+                configProperties.getProperty("mail.smtp.starttls.enable"));
+        return result;
+    }
+
+    /**
+     * sets username in the user config
+     * @param username username
+     */
+    public void setUsername(String username) throws IOException {
+        configProperties.setProperty("spring.mail.username", username);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed email username to " + username);
+        }
+    }
+
+    /**
+     * sets password in the user config
+     * @param password password
+     */
+    public void setMailPassword(String password) throws IOException {
+        configProperties.setProperty("spring.mail.password", password);
+        try (BufferedWriter writer = new BufferedWriter(io.write())) {
+            configProperties.store(writer, "Changed email password to " + password);
+        }
     }
 }

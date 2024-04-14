@@ -60,7 +60,7 @@
             <HBox VBox.vgrow="NEVER">
                <children>
                       <TextField fx:id="title" promptText="%StartScreen.createEventTitle" styleClass="sstextfield" HBox.hgrow="ALWAYS" />
-                      <Button mnemonicParsing="false" onAction="#create" styleClass="ssbutton" text="%StartScreen.createBtn" HBox.hgrow="SOMETIMES" />
+                      <Button fx:id="createButton" mnemonicParsing="false" onAction="#create" styleClass="ssbutton" text="%StartScreen.createBtn" HBox.hgrow="SOMETIMES" />
                </children>
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />
@@ -71,7 +71,7 @@
             <HBox VBox.vgrow="NEVER">
                <children>
                       <TextField fx:id="code" promptText="%StartScreen.inviteCode" styleClass="sstextfield" HBox.hgrow="ALWAYS" />
-                      <Button mnemonicParsing="false" onAction="#join" styleClass="ssbutton" text="%StartScreen.joinBtn" HBox.hgrow="SOMETIMES" />
+                      <Button fx:id="joinButton"  mnemonicParsing="false" onAction="#join" styleClass="ssbutton" text="%StartScreen.joinBtn" HBox.hgrow="SOMETIMES" />
                </children>
                <VBox.margin>
                   <Insets bottom="5.0" top="5.0" />

@@ -77,12 +77,15 @@ public class MainCtrl implements MainCtrlInterface{
 
     private OptionsCtrl optionsCtrl;
     private Scene options;
+
     private StatisticsCtrl statisticsCtrl;
     private Scene statistics;
 
-
     private AddCustomTransactionCtrl addCustomTransactionCtrl;
     private Scene addCustomTransaction;
+
+    private InviteMailCtrl inviteMailCtrl;
+    private Scene inviteMail;
 
     private boolean startPage = true;
     private Event event;
@@ -149,6 +152,9 @@ public class MainCtrl implements MainCtrlInterface{
         this.addCustomTransactionCtrl = pairCollector.addCustomTransaction().getKey();
         this.addCustomTransaction = new Scene(pairCollector.addCustomTransaction().getValue());
 
+        this.inviteMailCtrl = pairCollector.inviteMailPage().getKey();
+        this.inviteMail = new Scene(pairCollector.inviteMailPage().getValue());
+
         this.statisticsCtrl = pairCollector.statisticsPage().getKey();
         this.statistics = new Scene(pairCollector.statisticsPage().getValue());
 
@@ -156,8 +162,7 @@ public class MainCtrl implements MainCtrlInterface{
         this.tagPage = new Scene(pairCollector.tagPage().getValue());
 
         initializeShortcuts();
-        //showOverview();
-        showStartScreen();
+
         if(startPage){
             showStartScreen();
         } else {
@@ -182,48 +187,7 @@ public class MainCtrl implements MainCtrlInterface{
         optionsCtrl.initializeShortcuts(options);
         openDebtsPageCtrl.initializeShortcuts(openDebtsPage);
         addCustomTransactionCtrl.initializeShortcuts(addCustomTransaction);
-    }
-
-    /**
-     * Initializes an event listener for a scene and executes the runnable
-     * if a key is inputted.
-     * @param target target the event listener should be initialised in
-     * @param function function to be executed if the criteria is met
-     * @param key Keycode to be checked.
-     */
-    public static void checkKey(EventTarget target, Runnable function, KeyCode key) {
-        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
-            if (ke.getCode() == key) {
-                System.out.println("Key Pressed: " + ke.getCode());
-                try {
-                    function.run();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                ke.consume(); // <-- stops passing the event to next node
-            }
-        });
-    }
-
-    /**
-     * Initializes an event listener for a scene and executes the runnable
-     * if a key is inputted in a particular field.
-     * @param target target the event listener should be initialised in
-     * @param function function to be executed if the criteria is met
-     * @param key Keycode to be checked.
-     * @param field field that should be in the focus for the function to be executed
-     */
-    public static void checkKey(EventTarget target, Runnable function, Object field, KeyCode key){
-        target.addEventFilter(KeyEvent.KEY_PRESSED, ke -> {
-            if (ke.getCode() == key) {
-                if(ke.getTarget().equals(field)){
-                    System.out.println("Key Pressed: " + ke.getCode());
-                    System.out.println(ke.getTarget());
-                    function.run();
-                    ke.consume(); // <-- stops passing the event to next node
-                }
-            }
-        });
+        inviteMailCtrl.initializeShortcuts(inviteMail);
     }
 
     /**
@@ -251,6 +215,22 @@ public class MainCtrl implements MainCtrlInterface{
         stage.setResizable(false);
         stage.initOwner(primaryStage);
         editTitleCtrl.displayEditEventTitle(event, stage);
+        stage.show();
+    }
+
+    /**
+     * Shows invite mail screen
+     * @param event event to send invite to
+     */
+    public void showInviteMail(Event event){
+        Stage stage = new Stage();
+        stage.setScene(inviteMail);
+        stage.getIcons().add(primaryStage.getIcons().getFirst());
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setTitle(languageConf.get("InviteMail.title"));
+        stage.setResizable(false);
+        stage.initOwner(primaryStage);
+        inviteMailCtrl.showInviteMail(event, stage);
         stage.show();
     }
 
@@ -350,6 +330,7 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.displayAddExpensePage(eventToShow, null);
         addExpenseCtrl.setButton(languageConf.get("AddExp.add"));
         primaryStage.setTitle(languageConf.get("AddExp.addexp"));
+        addExpenseCtrl.setTitle(languageConf.get("AddExp.addexp"));
         primaryStage.setScene(addExpense);
     }
 
@@ -380,6 +361,7 @@ public class MainCtrl implements MainCtrlInterface{
 
         addExpenseCtrl.displayAddExpensePage(ev, exp);
         primaryStage.setTitle(languageConf.get("AddExp.editexp"));
+        addExpenseCtrl.setTitle(languageConf.get("AddExp.editexp"));
         primaryStage.setScene(addExpense);
 
         addExpenseCtrl.setButton(languageConf.get("AddExp.save"));

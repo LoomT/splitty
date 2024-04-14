@@ -1,9 +1,6 @@
 package client.scenes;
 
-import client.utils.CommonFunctions;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import jakarta.inject.Inject;
 import javafx.animation.FadeTransition;
@@ -15,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -26,34 +24,46 @@ public class OptionsCtrl {
     private final UserConfig userConfig;
     private final LanguageConf languageConf;
     private final CurrencyConverter converter;
+    private final EmailService emailService;
     private final ServerUtils server;
     @FXML
     private ComboBox<CommonFunctions.HideableItem<String>> currencyChoiceBox;
     @FXML
     private TextField serverField;
     @FXML
+    private TextField emailUsername;
+    @FXML
+    private TextField emailPassword;
+    @FXML
     private ToggleButton contrastToggle;
     @FXML
     private Label confirmationLabel;
     @FXML
     private ProgressIndicator loadIndicator;
+    @FXML
+    private Button mailButton;
     private Stage stage;
     private FadeTransition ft;
     private boolean lastContrast;
+    private boolean unsavedChanges = false;
+
 
     /**
-     * @param userConfig user configuration
+     * @param userConfig   user configuration
      * @param languageConf language configuration
-     * @param converter currency converter
-     * @param server server utils
+     * @param converter    currency converter
+     * @param server       server utils
+     * @param emailService email service
      */
     @Inject
     public OptionsCtrl(UserConfig userConfig, LanguageConf languageConf,
-                       CurrencyConverter converter, ServerUtils server) {
+                       CurrencyConverter converter, ServerUtils server,
+                       EmailService emailService) {
         this.userConfig = userConfig;
         this.languageConf = languageConf;
         this.converter = converter;
         this.server = server;
+        this.emailService = emailService;
     }
 
     /**
@@ -63,7 +73,7 @@ public class OptionsCtrl {
         CommonFunctions.comboBoxAutoCompletionSupport(converter.getCurrencies(),
                 currencyChoiceBox);
         String cur = userConfig.getCurrency();
-        if(!cur.equals("None")) {
+        if (!cur.equals("None")) {
             CommonFunctions.HideableItem<String> item =
                     currencyChoiceBox.getItems().stream()
                             .filter(i -> i.toString().equals(cur)).findFirst().orElse(null);
@@ -80,6 +90,33 @@ public class OptionsCtrl {
         ft.setDelay(Duration.millis(1000));
         ft.setOnFinished(e -> confirmationLabel.setVisible(false));
         loadIndicator.setVisible(false);
+
+        String initialCurrency = currencyChoiceBox.getValue().toString();
+        boolean initialHighContrast = contrastToggle.isSelected();
+        String initialURL = serverField.getText();
+
+        currencyChoiceBox.getSelectionModel().
+                selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null && !newVal.toString().equals(initialCurrency)) {
+                        unsavedChanges = true;
+                    } else if (newVal.toString().equals(initialCurrency)) {
+                        unsavedChanges = false;
+                    }
+                });
+        serverField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.equals(initialURL)) {
+                unsavedChanges = true;
+            } else if (newVal.equals(initialURL)) {
+                unsavedChanges = false;
+            }
+        });
+        contrastToggle.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != initialHighContrast) {
+                unsavedChanges = true;
+            } else {
+                unsavedChanges = false;
+            }
+        });
     }
 
     /**
@@ -89,7 +126,26 @@ public class OptionsCtrl {
      */
     public void display(Stage stage) {
         this.stage = stage;
+        stage.getScene().getWindow()
+                .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> cancelClicked());
         lastContrast = userConfig.getHighContrast();
+        updateEmailFields();
+    }
+
+    /**
+     * updates the email fields
+     */
+    public void updateEmailFields(){
+        if(emailService.isNotInitialized()){
+            mailButton.setDisable(true);
+            emailUsername.clear();
+            emailPassword.clear();
+        }
+        else{
+            mailButton.setDisable(false);
+            emailUsername.setText(userConfig.getUsername());
+            emailPassword.setText(userConfig.getMailPassword());
+        }
     }
 
     /**
@@ -111,14 +167,27 @@ public class OptionsCtrl {
     @FXML
     public void saveClicked() {
         String serverURL = serverField.getText();
+        if(!checkEmailFields()){
+            emailUsername.setStyle("-fx-border-color: red;");
+            emailPassword.setStyle("-fx-border-color: red;");
+            ft.stop();
+            confirmationLabel.setVisible(true);
+            confirmationLabel.setOpacity(1.0);
+            ft.play();
+            return;
+        }
         try {
             String currency = currencyChoiceBox.getValue().toString();
-            if(currency.length() == 3) {
+            if (currency.length() == 3) {
                 userConfig.setCurrency(currency);
             }
             lastContrast = userConfig.getHighContrast();
             userConfig.persistContrast();
             userConfig.setURL(serverURL);
+            emailService.setConfiguration(emailUsername.getText(), emailPassword.getText());
+            updateEmailFields();
+            emailUsername.setStyle("-fx-border-color: transparent;");
+            emailPassword.setStyle("-fx-border-color: transparent;");
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setHeaderText(languageConf.get("unexpectedError"));
@@ -131,6 +200,28 @@ public class OptionsCtrl {
         confirmationLabel.setVisible(true);
         confirmationLabel.setOpacity(1.0);
         ft.play();
+        unsavedChanges = false;
+    }
+
+    /**
+     * checks the email fields to see if they are valid
+     * @return true iff the fields are both empty or correctly filled
+     */
+    public boolean checkEmailFields(){
+        if(emailUsername.getLength() == 0 && emailPassword.getLength() == 0) return true;
+        if(!emailUsername.getText().contains("@gmail.com") && emailPassword.getLength() == 0){
+            confirmationLabel.setText(languageConf.get("Options.invalidEmailFields"));
+            return false;
+        }
+        if(emailUsername.getLength() != 0 && emailPassword.getLength() == 0){
+            confirmationLabel.setText(languageConf.get("Options.invalidPassword"));
+            return false;
+        }
+        if(!emailUsername.getText().contains("@gmail.com")){
+            confirmationLabel.setText(languageConf.get("Options.invalidEmail"));
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -138,6 +229,16 @@ public class OptionsCtrl {
      */
     @FXML
     public void cancelClicked() {
+        if (unsavedChanges) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setHeaderText(languageConf.get("Options.unsavedChanges"));
+            alert.getButtonTypes().clear();
+            alert.getButtonTypes().addAll(ButtonType.YES, ButtonType.CANCEL);
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.CANCEL) {
+                return;
+            }
+        }
         serverField.setText(userConfig.getUrl());
         String cur = userConfig.getCurrency();
         CommonFunctions.HideableItem<String> item =
@@ -164,7 +265,7 @@ public class OptionsCtrl {
         serverField.setDisable(false);
         loadIndicator.setVisible(false);
         ft.stop();
-        if(result) {
+        if (result) {
             confirmationLabel.setText(languageConf.get("Options.serverUp"));
         } else {
             confirmationLabel.setText(languageConf.get("Options.serverDown"));
@@ -177,14 +278,15 @@ public class OptionsCtrl {
     private final BooleanProperty ctrlPressed = new SimpleBooleanProperty(false);
     private final BooleanProperty sPressed = new SimpleBooleanProperty(false);
     private final BooleanBinding spaceAndRightPressed = ctrlPressed.and(sPressed);
+
     /**
      * Enable keyboard shortcuts
      *
      * @param scene this options scene
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.currencyChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::cancelClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.currencyChoiceBox.show(),
                 currencyChoiceBox, KeyCode.ENTER);
 
 
@@ -206,5 +308,27 @@ public class OptionsCtrl {
                 sPressed.set(false);
             }
         });
+    }
+
+    /**
+     * Sends a test email to see if it has been configured correctly
+     */
+    @FXML
+    public void testMail(){
+        loadIndicator.setVisible(true);
+        boolean result = emailService.sendTestEmail();
+        confirmationLabel.setVisible(false);
+
+        if(result){
+            confirmationLabel.setText(languageConf.get("Options.mailSuccessful"));
+        }
+        else{
+            confirmationLabel.setText(languageConf.get("Options.mailFailure"));
+        }
+        ft.stop();
+        loadIndicator.setVisible(false);
+        confirmationLabel.setVisible(true);
+        confirmationLabel.setOpacity(1.0);
+        ft.play();
     }
 }

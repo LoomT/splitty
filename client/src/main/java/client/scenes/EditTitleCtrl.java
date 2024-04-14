@@ -2,6 +2,7 @@ package client.scenes;
 
 
 import client.MockClass.MainCtrlInterface;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
@@ -127,7 +128,7 @@ public class EditTitleCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene){
-        MainCtrl.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);
-        MainCtrl.checkKey(scene, this::cancelTitle, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, this::saveTitle, nameTextField, KeyCode.ENTER);
+        CommonFunctions.checkKey(scene, this::cancelTitle, KeyCode.ESCAPE);
     }
 }

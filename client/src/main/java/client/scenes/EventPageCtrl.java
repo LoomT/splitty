@@ -1,11 +1,9 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.components.Confirmation;
 import client.components.ExpenseItem;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
@@ -36,15 +34,16 @@ import java.util.List;
 import java.util.*;
 
 import static commons.WebsocketActions.*;
+import static java.lang.String.format;
 
 
 public class EventPageCtrl {
 
     @FXML
-    private Text eventTitle;
+    private Label eventTitle;
 
     @FXML
-    private Text participantText;
+    private Text participantLabel;
 
     @FXML
     private Button allTab;
@@ -69,13 +68,15 @@ public class EventPageCtrl {
     @FXML
     private VBox expenseVbox;
     @FXML
-    private Label inviteCode;
+    private Text inviteCode;
     @FXML
-    private Label copiedToClipboardMsg;
+    private Text copiedToClipboardMsg;
     @FXML
     private Button editTitleButton;
     @FXML
     private ComboBox<String> languageChoiceBoxEvent;
+    @FXML
+    private Button mailButton;
 
     private FadeTransition ft;
     private int selectedParticipantId;
@@ -86,6 +87,7 @@ public class EventPageCtrl {
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final ServerUtils server;
+    private final EmailService emailService;
     private Event event;
 
     /**
@@ -102,18 +104,20 @@ public class EventPageCtrl {
      * @param server       server to be ysed
      * @param converter currency converter
      * @param userConfig user config
+     * @param emailService emailService
      */
     @Inject
 
     public EventPageCtrl(MainCtrlInterface mainCtrl, LanguageConf languageConf,
                          Websocket websocket, ServerUtils server, CurrencyConverter converter,
-                         UserConfig userConfig) {
+                         UserConfig userConfig, EmailService emailService) {
         this.mainCtrl = mainCtrl;
         this.languageConf = languageConf;
         this.server = server;
         this.websocket = websocket;
         this.converter = converter;
         this.userConfig = userConfig;
+        this.emailService = emailService;
     }
 
     /**
@@ -123,6 +127,7 @@ public class EventPageCtrl {
      */
     public void displayEvent(Event e) {
         this.event = e;
+        mailButton.setDisable(emailService.isNotInitialized());
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
         participantChoiceBox.getItems().clear();
@@ -136,7 +141,7 @@ public class EventPageCtrl {
                 p.append(e.getParticipants().get(i).getName());
                 if (i != e.getParticipants().size() - 1) p.append(", ");
             }
-            participantText.setText(p.toString());
+            participantLabel.setText(p.toString());
             participantChoiceBox.getItems().addAll(
                     e.getParticipants().stream().map(Participant::getName).toList()
             );
@@ -159,7 +164,7 @@ public class EventPageCtrl {
         updateExpenses(event);
 
         copiedToClipboardMsg.setVisible(false);
-        inviteCode.setText(String.format(languageConf.get("EventPage.inviteCode"), event.getId()));
+        inviteCode.setText(format(languageConf.get("EventPage.inviteCode"), event.getId()));
     }
 
     private void addIconsToButtons() {
@@ -262,7 +267,7 @@ public class EventPageCtrl {
      * Sets the labels' styles for the case in which no participants exist
      */
     private void noParticipantsExist() {
-        participantText.setText(languageConf.get("EventPage.noParticipantsYet"));
+        participantLabel.setText(languageConf.get("EventPage.noParticipantsYet"));
         allTab.setStyle("-fx-opacity:0");
         allTab.setDisable(true);
         fromTab.setStyle("-fx-opacity:0");
@@ -352,14 +357,25 @@ public class EventPageCtrl {
             ExpenseItem ei = new ExpenseItem(
                     toString(e),
                     partString,
+                    e.getType(),
                     () -> {
                         mainCtrl.handleEditExpense(e, event);
                     },
                     () -> {
-                        try {
-                            server.deleteExpense(e.getId(), event.getId());
-                        } catch (ConnectException ex) {
-                            mainCtrl.handleServerNotFound();
+                        Confirmation confirmation =
+                                new Confirmation((format(
+                                        languageConf.get(
+                                                "EventPage.deleteExpenseConfirmation"),
+                                        "")),
+                                        languageConf.get("Confirmation.areYouSure"),
+                                        languageConf);
+                        Optional<ButtonType> result = confirmation.showAndWait();
+                        if (result.isPresent() && result.get() == ButtonType.YES) {
+                            try {
+                                server.deleteExpense(e.getId(), event.getId());
+                            } catch (ConnectException ex) {
+                                mainCtrl.handleServerNotFound();
+                            }
                         }
                     }
             );
@@ -581,8 +597,8 @@ public class EventPageCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.participantChoiceBox.show(),
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.participantChoiceBox.show(),
                 participantChoiceBox, KeyCode.ENTER);
 
     }
@@ -600,5 +616,13 @@ public class EventPageCtrl {
     @FXML
     public void openDebtsPage() {
         mainCtrl.showDebtsPage(event);
+    }
+
+    /**
+     * shows the invite page
+     */
+    @FXML
+    public void sendInvite(){
+        mainCtrl.showInviteMail(event);
     }
 }

@@ -49,7 +49,6 @@ public class Main extends Application {
      * @param primaryStage stage
      */
     @Override
-
     public void start(Stage primaryStage) {
         languageConf.onLanguageChange(() -> {
             // When the language is changed, this function is run
@@ -73,7 +72,8 @@ public class Main extends Application {
         boolean isHighContrast = userConfig.getHighContrast();
         var start = FXML.load(StartScreenCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "StartScreen.fxml");
+                "client", "scenes", "StartScreen.fxml"
+        );
         var adminLogin = FXML.load(AdminLoginCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "AdminLogin.fxml");
@@ -107,16 +107,21 @@ public class Main extends Application {
         var openDebtsPage = FXML.load(OpenDebtsPageCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "OpenDebtsPage.fxml");
+        var inviteMailPage = FXML.load(InviteMailCtrl.class,
+                languageConf.getLanguageResources(), isHighContrast,
+                "client", "scenes", "InviteMail.fxml");
+                "client", "scenes", "OpenDebtsPage.fxml");
         var tagPage = FXML.load(TagPageCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
                 "client", "scenes", "TagPage.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("client/scenes/application_logo.png"));
+
         mainCtrl.initialize(primaryStage, new PairCollector(start,
                 eventPage, adminLogin, editParticipants,
                 adminOverview, addExpense, titleChanger, addTag, statistics, options,
-                addCustomTransaction, openDebtsPage, tagPage)
+                addCustomTransaction, openDebtsPage, inviteMailPage, tagPage)
         );
     }
 }

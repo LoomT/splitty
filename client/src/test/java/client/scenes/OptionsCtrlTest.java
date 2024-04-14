@@ -2,12 +2,14 @@ package client.scenes;
 
 import client.MyFXML;
 import client.utils.CommonFunctions;
+import client.utils.EmailService;
 import client.utils.LanguageConf;
 import client.utils.UserConfig;
 import client.utils.currency.CurrencyConverter;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -49,7 +51,8 @@ class OptionsCtrlTest {
                 lang=en
                 recentEventCodes=
                 currency=EUR
-                highContrast=false""");
+                highContrast=false
+                """);
 
         userConfig = new UserConfig(testIO);
 
@@ -57,7 +60,9 @@ class OptionsCtrlTest {
 
         var optionsLoader = new FXMLLoader(MyFXML.class.getClassLoader().getResource("client/scenes/Options.fxml"),
                 languageConf.getLanguageResources(), null,
-                (type) -> new OptionsCtrl(userConfig, languageConf, new CurrencyConverter(server, new FileManagerMock(), languageConf), server),
+                (type) -> new OptionsCtrl(userConfig, languageConf, new CurrencyConverter(
+                        server, new FileManagerMock(), languageConf), server,
+                        new EmailService(userConfig, languageConf)),
                 StandardCharsets.UTF_8);
 
         reloadedFXML = 0;
@@ -119,14 +124,19 @@ class OptionsCtrlTest {
         Platform.runLater(() -> {
             robot.lookup("#contrastToggle").queryAs(ToggleButton.class).fire();
             robot.lookup("#serverField").queryAs(TextField.class).setText("coolmathgames");
+            robot.lookup("#emailUsername").queryAs(TextField.class).setText("paulatreides10191@gmail.com");
+            robot.lookup("#emailPassword").queryAs(TextField.class).setText("LisanAlGaib123");
             ComboBox<CommonFunctions.HideableItem<String>> selection = robot.lookup("#currencyChoiceBox").queryAs(ComboBox.class);
             selection.setValue(selection.getItems().get(1)); // GBP
             ctrl.saveClicked();
         });
         waitForFxEvents();
-        assertEquals(3, testIO.getWrites());
+        assertEquals(5, testIO.getWrites());
         assertEquals("coolmathgames", userConfig.getUrl());
         assertEquals("GBP", userConfig.getCurrency());
+        assertEquals("paulatreides10191@gmail.com", userConfig.getUsername());
+        assertEquals("LisanAlGaib123", userConfig.getMailPassword());
+        assertTrue(userConfig.getHighContrast());
         assertTrue(userConfig.getHighContrast());
     }
 
@@ -150,7 +160,9 @@ class OptionsCtrlTest {
             ctrl.cancelClicked();
         });
         waitForFxEvents();
-        assertFalse(userConfig.getHighContrast());
+
+        assertTrue(userConfig.getHighContrast()); //Because an alert was shown,
+        // but the changes are not yet saved
     }
 
     @Test
@@ -164,6 +176,7 @@ class OptionsCtrlTest {
             ctrl.cancelClicked();
         });
         waitForFxEvents();
+        assertTrue(stage.isShowing()); //because alert is shown
         assertEquals("localhost:8080", userConfig.getUrl());
     }
 
@@ -181,6 +194,7 @@ class OptionsCtrlTest {
         });
         waitForFxEvents();
         assertEquals("EUR", userConfig.getCurrency());
+        assertTrue(stage.isShowing()); //because alert is shown
     }
 
     @Test

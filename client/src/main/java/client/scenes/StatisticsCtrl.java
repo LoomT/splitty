@@ -1,6 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.UserConfig;
@@ -441,6 +442,6 @@ public class StatisticsCtrl {
      * @param scene
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, () -> handleBackButton(event), KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> handleBackButton(event), KeyCode.ESCAPE);
     }
 }

@@ -2,17 +2,20 @@ package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
 import client.components.Confirmation;
+import client.utils.CommonFunctions;
 import client.utils.LanguageConf;
 import client.utils.ServerUtils;
 import client.utils.Websocket;
 import com.google.inject.Inject;
 import commons.Event;
 import commons.Participant;
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.text.Text;
+import javafx.util.Duration;
+
 
 import java.net.ConnectException;
 import java.util.Optional;
@@ -21,10 +24,9 @@ import static client.utils.CommonFunctions.lengthListener;
 import static commons.WebsocketActions.*;
 import static java.lang.String.format;
 
-
 public class EditParticipantsCtrl {
     @FXML
-    private Text eventTitle;
+    private Label eventTitle;
     @FXML
     private ChoiceBox<String> chooseParticipant;
     @FXML
@@ -45,6 +47,8 @@ public class EditParticipantsCtrl {
     private Label warningLabel;
     @FXML
     private Button backButton;
+    @FXML
+    private Label confirmationLabel;
 
     /**
      * @return the event
@@ -58,6 +62,7 @@ public class EditParticipantsCtrl {
     private final MainCtrlInterface mainCtrl;
     private final LanguageConf languageConf;
     private final Websocket websocket;
+    private FadeTransition ft;
     private boolean opened;
 
     /**
@@ -108,6 +113,11 @@ public class EditParticipantsCtrl {
             if(opened)
                 displayEditParticipantsPage(event);
         });
+        ft = new FadeTransition(Duration.millis(2000), confirmationLabel);
+        ft.setFromValue(1.0);
+        ft.setToValue(0);
+        ft.setDelay(Duration.millis(1000));
+        ft.setOnFinished(e -> confirmationLabel.setVisible(false));
     }
 
     /**
@@ -122,7 +132,6 @@ public class EditParticipantsCtrl {
         System.out.println(e);
         eventTitle.setText(e.getTitle());
         addIconsToButtons();
-
         resetFields();
 
         chooseParticipant.getItems().clear();
@@ -178,10 +187,11 @@ public class EditParticipantsCtrl {
         deletePartButton.setVisible(false);
         nameField.setText("");
         emailField.setText("");
+        warningLabel.setVisible(false);
+//        confirmationLabel.setVisible(false);
         beneficiaryField.setText("");
         ibanField.setText("");
         bicField.setText("");
-        warningLabel.setVisible(false);
         nameField.setStyle("");
     }
 
@@ -239,18 +249,7 @@ public class EditParticipantsCtrl {
             return;
         }
         if (index == 0) {
-            // create a new participant
-            if(event.getParticipants().stream().map(Participant::getName).toList().contains(name)) {
-                informNameExists();
-                return;
-            }
-            Participant newP = new Participant(name, email, beneficiary, iban, bic);
-
-            try {
-                server.createParticipant(event.getId(), newP);
-            } catch (ConnectException e) {
-                mainCtrl.handleServerNotFound();
-            }
+            if (creatingParticipant(name, email, beneficiary, iban, bic)) return;
         } else {
             Participant currP = event.getParticipants().get(index - 1);
             if(event.getParticipants().stream()
@@ -264,12 +263,55 @@ public class EditParticipantsCtrl {
             currP.setBeneficiary(beneficiary);
             currP.setAccountNumber(iban);
             currP.setBic(bic);
+
             try {
                 server.updateParticipant(event.getId(), currP);
+                ft.stop();
+                confirmationLabel.setText(languageConf.get("EditP.editConfirmation"));
+                confirmationLabel.setVisible(true);
+                confirmationLabel.setOpacity(1.0);
+                ft.play();
+
             } catch (ConnectException e) {
                 mainCtrl.handleServerNotFound();
             }
         }
+    }
+
+    /**
+     * Crating the participant
+     * @param name name of the participant
+     * @param email email of the participant
+     * @param beneficiary beneficiary of the participant
+     * @param iban iban of the participant
+     * @param bic bic of the participant
+     * @return true if the participant already exists
+     */
+    private boolean creatingParticipant(
+            String name,
+            String email,
+            String beneficiary,
+            String iban,
+            String bic) {
+        if(event.getParticipants().stream().map(Participant::getName).toList().contains(name)) {
+            informNameExists();
+            return true;
+        }
+        Participant newP = new Participant(name, email, beneficiary, iban, bic);
+
+        try {
+
+            server.createParticipant(event.getId(), newP);
+            ft.stop();
+            confirmationLabel.setText(languageConf.get("EditP.createConfirmation"));
+            confirmationLabel.setVisible(true);
+            confirmationLabel.setOpacity(1.0);
+            ft.play();
+
+        } catch (ConnectException e) {
+            mainCtrl.handleServerNotFound();
+        }
+        return false;
     }
 
     /**
@@ -290,8 +332,8 @@ public class EditParticipantsCtrl {
      * @param scene scene the listeners are initialised in
      */
     public void initializeShortcuts(Scene scene) {
-        MainCtrl.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
-        MainCtrl.checkKey(scene, () -> this.chooseParticipant.show(),
+        CommonFunctions.checkKey(scene, this::backButtonClicked, KeyCode.ESCAPE);
+        CommonFunctions.checkKey(scene, () -> this.chooseParticipant.show(),
                 chooseParticipant, KeyCode.ENTER);
     }
 }
