@@ -1,5 +1,9 @@
 # OOPP Project Group 69
 
+A 9 week university course project made using Spring Boot and JavaFX by a team of 6 students. The basic idea of this client/server app is to split bills in an organized fashion. An event can be created with participants and expenses to reflect a real event where the minimal debts will be calculated automatically.
+
+#Instructions
+
 While the project can be run out-of-the-box with Gradle, running it from within your IDE (Eclipse/IntelliJ) requires setting up OpenJFX.
 
 First download (and unzip) an OpenJFX SDK from https://openjfx.io that matches your Java JDK, then add the following *VM* commands to your run configurations:
