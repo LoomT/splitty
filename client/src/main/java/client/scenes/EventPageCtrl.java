@@ -488,7 +488,7 @@ public class EventPageCtrl {
         String currency = exp.getCurrency().toUpperCase();
         try {
             if(!userConfig.getCurrency().equals("NONE")) {
-                amount = converter.convert("USD", userConfig.getCurrency(),
+                amount = converter.convert("EUR", userConfig.getCurrency(),
                         amount, exp.getDate().toInstant());
                 currency = userConfig.getCurrency().toUpperCase();
             }

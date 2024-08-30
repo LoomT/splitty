@@ -60,8 +60,8 @@ public class ShrunkOpenDebtsListItem extends HBox {
         }
         double convertedAmount;
         try {
-            convertedAmount = converter.convert("USD", transaction.getCurrency(),
-                    transaction.getAmount(), transaction.getDate().toInstant());
+            convertedAmount = converter.convert("EUR", transaction.getCurrency(),
+                    transaction.getAmount().doubleValue(), transaction.getDate().toInstant());
         } catch (CurrencyConverter.CurrencyConversionException e) {
             return;
         } catch (ConnectException e) {

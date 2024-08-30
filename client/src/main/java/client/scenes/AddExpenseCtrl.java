@@ -383,7 +383,7 @@ public class AddExpenseCtrl {
             String expCurrency = currency.getValue().toString();
             double convertedAmount;
             try {
-                convertedAmount = converter.convert(expCurrency, "USD",
+                convertedAmount = converter.convert(expCurrency, "EUR",
                         expAmount, expenseDate.toInstant());
             } catch (CurrencyConverter.CurrencyConversionException e) {
                 mainCtrl.goBackToEventPage(ev);
@@ -660,7 +660,7 @@ public class AddExpenseCtrl {
     public void setAmount(double num, Date date, String currency) {
         double convertedAmount;
         try {
-            convertedAmount = converter.convert("USD", currency,
+            convertedAmount = converter.convert("EUR", currency,
                     num, date.toInstant());
         } catch (CurrencyConverter.CurrencyConversionException e) {
             return;

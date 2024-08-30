@@ -59,8 +59,8 @@ public class SettledDebtsListItem extends HBox {
         }
         double convertedAmount;
         try {
-            convertedAmount = converter.convert("USD", userConfig.getCurrency(),
-                    transaction.getAmount(), transaction.getDate().toInstant());
+            convertedAmount = converter.convert("EUR", userConfig.getCurrency(),
+                    transaction.getAmount().doubleValue(), transaction.getDate().toInstant());
         } catch (CurrencyConverter.CurrencyConversionException e) {
             return;
         } catch (ConnectException e) {
