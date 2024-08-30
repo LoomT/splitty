@@ -18,6 +18,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +46,6 @@ public class OpenDebtsPageCtrl {
     private final CurrencyConverter converter;
     private final UserConfig userConfig;
     private final EmailService emailService;
-    private Map<String, Double> participantDebtMap;
 
     private enum Tab{OPEN, SETTLED}
     private Tab tab;
@@ -78,7 +79,6 @@ public class OpenDebtsPageCtrl {
         this.converter = converter;
         this.userConfig = userConfig;
         this.emailService = emailService;
-        participantDebtMap = new HashMap<>();
         tab = Tab.OPEN;
         opened = false;
     }
@@ -128,75 +128,47 @@ public class OpenDebtsPageCtrl {
         if(!opened || tab == Tab.SETTLED) return;
         this.event = event;
 
-        Map<String, Double> map = new HashMap<>();
-        Map<Participant, Map<Participant, Double>> partToPartMap = new HashMap<>();
+        Map<Participant, BigDecimal> map = new HashMap<>();
+//        Map<Participant, Map<Participant, Double>> partToPartMap = new HashMap<>();
 
-        for (Participant p1 : event.getParticipants()) {
-            partToPartMap.put(p1, new HashMap<>());
-            for (Participant p2 : event.getParticipants()) {
-                partToPartMap.get(p1).put(p2, 0.0);
-            }
-        }
+//        for (Participant p1 : event.getParticipants()) {
+//            partToPartMap.put(p1, new HashMap<>());
+//            for (Participant p2 : event.getParticipants()) {
+//                partToPartMap.get(p1).put(p2, 0.0);
+//            }
+//        }
 
-        event.getParticipants().forEach(x -> map.put(x.getName(), 0.0));
+        event.getParticipants().forEach(participant ->
+                map.put(participant, BigDecimal.valueOf(0, 2)));
         allDebtsPane.getChildren().clear();
         if (event.getExpenses().isEmpty() && event.getTransactions().isEmpty()) return;
-        initializePage(map, partToPartMap);
-
-        if (map.equals(participantDebtMap)) return;
-        participantDebtMap = map;
+        initializePage(map);
     }
 
     /**
      * Initializes the graph and the open debts
      *
-     * @param graphMap map to be used to populate the graph
-     * @param debtMap  map to be used to populate the debts
+     * @param map to be used to populate the graph
      */
-    public void initializePage(Map<String, Double> graphMap,
-                               Map<Participant, Map<Participant, Double>> debtMap) {
+    public void initializePage(Map<Participant, BigDecimal> map) {
         for (Expense e : event.getExpenses()) {
+            BigDecimal divisor = BigDecimal.valueOf(e.getExpenseParticipants().size());
+            BigDecimal result = e.getAmount()
+                    .divide(divisor, 2, RoundingMode.DOWN);
+            BigDecimal remainder = e.getAmount().subtract(result.multiply(divisor));
+            BigDecimal cost;
+            if(remainder.compareTo(BigDecimal.ZERO) == 0) cost = result;
+            else cost = result.add(BigDecimal.valueOf(0.01));
+            map.merge(e.getExpenseAuthor(), cost.multiply(divisor), BigDecimal::subtract);
             for (Participant p : e.getExpenseParticipants()) {
-                double cost = e.getAmount() / e.getExpenseParticipants().size();
-                graphMap.put(p.getName(), graphMap.get(p.getName()) + cost);
-                if (e.getExpenseAuthor().equals(p)) continue;
-
-                Map<Participant, Double> temp = debtMap.get(e.getExpenseAuthor());
-
-                temp.put(p, temp.get(p) + cost);
+                map.merge(p, cost, BigDecimal::add);
             }
         }
-        for (Participant receiver : debtMap.keySet()) {
-            for (Participant giver : debtMap.get(receiver).keySet()) {
-                double cost = debtMap.get(receiver).get(giver)
-                        - event.getTransactions().stream().
-                        filter(x -> x.getGiver().equals(giver) && x.getReceiver().
-                                equals(receiver))
-                        .mapToDouble(Transaction::getAmount)
-                        .sum();
-                debtMap.get(receiver).put(giver, cost);
-            }
+        for(Transaction t : event.getTransactions()) {
+            map.merge(t.getReceiver(), t.getAmount(), BigDecimal::add);
+            map.merge(t.getGiver(), t.getAmount(), BigDecimal::subtract);
         }
-        minCashFlow(debtMap, event);
-    }
-
-    /**
-     * Given a set of debts with Map<Participant, Map<Participant,Double>> calculates the
-     * minimum cash flow to settle all debts.
-     *
-     * @param debtMap Map of all the debts using an adjacency map data structure
-     * @param event   event that the debts occur in
-     */
-    public void minCashFlow(Map<Participant, Map<Participant, Double>> debtMap, Event event) {
-        Map<Participant, Double> map = new HashMap<>();
-        event.getParticipants().forEach(p -> map.put(p, 0.0));
-        for (Participant p : event.getParticipants()) {
-            for (Participant i : event.getParticipants()) {
-                if (p.equals(i)) continue;
-                map.put(p, map.get(p) + debtMap.get(i).get(p) - debtMap.get(p).get(i));
-            }
-        }
-        recursionCalculate(map);
+        minCashFlow(map);
     }
 
     /**
@@ -205,31 +177,123 @@ public class OpenDebtsPageCtrl {
      * Works via finding the maximum debit and credit and decrementing them
      * from each other until they are both zero.
      *
-     * @param debtMap map of all the participants and minimum cash flows that conclude all debts
+     * @param map map of all the participants and minimum cash flows that conclude all debts
      */
-    public void recursionCalculate(Map<Participant, Double> debtMap) {
-        Participant maxCredit = getMax(debtMap);
-        Participant maxDebit = getMin(debtMap);
-        if (debtMap.get(maxDebit) == 0 && debtMap.get(maxCredit) == 0)
+    public void minCashFlow(Map<Participant, BigDecimal> map) {
+        Participant maxCreditor = getMin(map);
+        Participant maxDebtor = getMax(map);
+        if (map.get(maxDebtor).compareTo(BigDecimal.ZERO) == 0 &&
+                map.get(maxCreditor).compareTo(BigDecimal.ZERO) == 0)
             return;
-
-        //Check to stop a stackoverflow error if a floating point issue has occurred
-        if((debtMap.get(maxDebit) == 0 || debtMap.get(maxCredit) == 0)
-                && Math.floor(debtMap.get(maxDebit)) == 0
-                || Math.floor(debtMap.get(maxCredit)) == 0)
+        // Error that should not happen
+        if (map.get(maxDebtor).compareTo(BigDecimal.ZERO) == 0 ||
+                map.get(maxCreditor).compareTo(BigDecimal.ZERO) == 0) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(languageConf.get("unexpectedError"));
+            alert.setContentText("Unexpected error while settling debts");
+            alert.showAndWait();
             return;
+        }
 
-        double min = Math.min(-debtMap.get(maxDebit), debtMap.get(maxCredit));
-        debtMap.put(maxCredit, debtMap.get(maxCredit) - min);
-        debtMap.put(maxDebit, debtMap.get(maxDebit) + min);
-        recursionCalculate(debtMap);
+
+        BigDecimal min;
+        if(map.get(maxDebtor).compareTo(map.get(maxCreditor).negate()) < 0)
+            min = map.get(maxDebtor);
+        else min = map.get(maxCreditor).negate();
+        map.merge(maxCreditor, min, BigDecimal::add);
+        map.merge(maxDebtor, min, BigDecimal::subtract);
+        minCashFlow(map);
 
         allDebtsPane.getChildren().add(
                 new ShrunkOpenDebtsListItem(
-                        new Transaction(maxCredit, maxDebit, min, userConfig.getCurrency()),
-                        languageConf, this::resizeOpenDebtItem,
+                        new Transaction(maxDebtor, maxCreditor, min.doubleValue(),
+                                userConfig.getCurrency()), languageConf, this::resizeOpenDebtItem,
                         this::settleDebtClicked, converter, mainCtrl));
     }
+
+//    /**
+//     * Initializes the graph and the open debts
+//     *
+//     * @param graphMap map to be used to populate the graph
+//     * @param debtMap  map to be used to populate the debts
+//     */
+//    public void initializePage(Map<String, Double> graphMap,
+//                               Map<Participant, Map<Participant, Double>> debtMap) {
+//        for (Expense e : event.getExpenses()) {
+//            for (Participant p : e.getExpenseParticipants()) {
+//                double cost = e.getAmount() / e.getExpenseParticipants().size();
+//                graphMap.put(p.getName(), graphMap.get(p.getName()) + cost);
+//                if (e.getExpenseAuthor().equals(p)) continue;
+//
+//                Map<Participant, Double> temp = debtMap.get(e.getExpenseAuthor());
+//
+//                temp.put(p, temp.get(p) + cost);
+//            }
+//        }
+//        for (Participant receiver : debtMap.keySet()) {
+//            for (Participant giver : debtMap.get(receiver).keySet()) {
+//                double cost = debtMap.get(receiver).get(giver)
+//                        - event.getTransactions().stream().
+//                        filter(x -> x.getGiver().equals(giver) && x.getReceiver().
+//                                equals(receiver))
+//                        .mapToDouble(x -> x.getAmount().doubleValue())
+//                        .sum();
+//                debtMap.get(receiver).put(giver, cost);
+//            }
+//        }
+//        minCashFlow(debtMap, event);
+//    }
+
+//    /**
+//     * Given a set of debts with Map<Participant, Map<Participant,Double>> calculates the
+//     * minimum cash flow to settle all debts.
+//     *
+//     * @param debtMap Map of all the debts using an adjacency map data structure
+//     * @param event   event that the debts occur in
+//     */
+//    public void minCashFlow(Map<Participant, Map<Participant, Double>> debtMap, Event event) {
+//        Map<Participant, Double> map = new HashMap<>();
+//        event.getParticipants().forEach(p -> map.put(p, 0.0));
+//        for (Participant p : event.getParticipants()) {
+//            for (Participant i : event.getParticipants()) {
+//                if (p.equals(i)) continue;
+//                map.put(p, map.get(p) + debtMap.get(i).get(p) - debtMap.get(p).get(i));
+//            }
+//        }
+//        recursionCalculate(map);
+//    }
+//
+//    /**
+//     * Recursively calculates the minimum amount of transactions needed to settle
+//     * all debts with a maximum on n-1 where n is the number of participants.
+//     * Works via finding the maximum debit and credit and decrementing them
+//     * from each other until they are both zero.
+//     *
+//     * @param debtMap map of all the participants and minimum cash flows that conclude all debts
+//     */
+//    public void recursionCalculate(Map<Participant, Double> debtMap) {
+//        Participant maxCredit = getMax(debtMap);
+//        Participant maxDebit = getMin(debtMap);
+//        if (debtMap.get(maxDebit) == 0 && debtMap.get(maxCredit) == 0)
+//            return;
+//
+//        //Check to stop a stackoverflow error if a floating point issue has occurred
+//        if((debtMap.get(maxDebit) == 0 || debtMap.get(maxCredit) == 0)
+//                && Math.floor(debtMap.get(maxDebit)) == 0
+//                || Math.floor(debtMap.get(maxCredit)) == 0)
+//            return;
+//
+//        double min = Math.min(-debtMap.get(maxDebit), debtMap.get(maxCredit));
+//        debtMap.put(maxCredit, debtMap.get(maxCredit) - min);
+//        debtMap.put(maxDebit, debtMap.get(maxDebit) + min);
+//        recursionCalculate(debtMap);
+//
+//        allDebtsPane.getChildren().add(
+//                new ShrunkOpenDebtsListItem(
+//                        new Transaction(maxCredit, maxDebit, min, userConfig.getCurrency()),
+//                        languageConf, this::resizeOpenDebtItem,
+//                        this::settleDebtClicked, converter, mainCtrl));
+//    }
 
     /**
      * resizes the debtItems depending on their size.
@@ -351,14 +415,14 @@ public class OpenDebtsPageCtrl {
     /**
      * Finds the maximum value from the map and returns the key
      *
-     * @param debtMap map to be searched
+     * @param map map to be searched
      * @return the Participant key with the maximum value
      */
-    public static Participant getMax(Map<Participant, Double> debtMap) {
+    public static Participant getMax(Map<Participant, BigDecimal> map) {
         Participant result = null;
-        for (Participant p : debtMap.keySet()) {
+        for (Participant p : map.keySet()) {
             if (result == null) result = p;
-            else if (debtMap.get(p) > debtMap.get(result)) result = p;
+            else if (map.get(p).compareTo(map.get(result)) > 0) result = p;
         }
         return result;
     }
@@ -366,14 +430,14 @@ public class OpenDebtsPageCtrl {
     /**
      * Finds the minimum value from the map and returns the key
      *
-     * @param debtMap map to be searched
+     * @param map map to be searched
      * @return the Participant key with the minimum value
      */
-    public static Participant getMin(Map<Participant, Double> debtMap) {
+    public static Participant getMin(Map<Participant, BigDecimal> map) {
         Participant result = null;
-        for (Participant p : debtMap.keySet()) {
+        for (Participant p : map.keySet()) {
             if (result == null) result = p;
-            else if (debtMap.get(p) < debtMap.get(result)) result = p;
+            else if (map.get(p).compareTo(map.get(result)) < 0) result = p;
         }
         return result;
     }
