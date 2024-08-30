@@ -250,7 +250,7 @@ class AddCustomTransactionCtrlTest {
         waitForFxEvents();
         assertTrue(server.getCalls().contains("addTransaction"));
         assertFalse(event.getTransactions().isEmpty());
-        assertEquals(1, event.getTransactions().getFirst().getAmount());
+        assertEquals("1.00", event.getTransactions().getFirst().getAmount().toString());
     }
 
     @Test

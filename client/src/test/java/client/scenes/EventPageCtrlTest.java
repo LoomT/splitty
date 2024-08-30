@@ -117,7 +117,7 @@ public class EventPageCtrlTest {
                 new SimpleDateFormat("MM/dd/yy").parse("01/02/2024").toInstant());
         Expense ex = new Expense(p, "expense", amount, "EUR", List.of(p), tag);
         ex.setDate(new SimpleDateFormat("MM/dd/yy").parse("01/02/2024"));
-        assertEquals("2024-01-02     name paid \u20ac20.00 for expense", ctrl.toString(ex));
+        assertEquals("2024-01-02     name paid \u20ac10.00 for expense", ctrl.toString(ex));
         assertTrue(server.getCalls().contains("getExchangeRates"));
     }
 

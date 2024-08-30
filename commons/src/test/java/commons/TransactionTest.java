@@ -62,7 +62,7 @@ class TransactionTest {
 
     @Test
     void getAmount() {
-        assertEquals(50, t.getAmount());
+        assertEquals("50.00", t.getAmount().toString());
     }
 
     @Test

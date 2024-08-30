@@ -3,6 +3,8 @@ package commons;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -73,7 +75,7 @@ public class ExpenseTest {
 
     @Test
     void testGetAmount() {
-        assertEquals(20.5, e3.getAmount());
+        assertEquals("20.50", e3.getAmount().toString());
     }
 
     @Test
@@ -112,7 +114,7 @@ public class ExpenseTest {
     @Test
     void testSetAmount() {
         e3.setAmount(27.3);
-        assertEquals(27.3, e3.getAmount());
+        assertEquals(new BigDecimal("27.3").setScale(2, RoundingMode.HALF_UP), e3.getAmount());
     }
 
     @Test

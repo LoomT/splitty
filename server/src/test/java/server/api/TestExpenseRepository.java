@@ -252,7 +252,7 @@ public class TestExpenseRepository implements ExpenseRepository {
      * @param newExp new expense
      */
     private void replaceFields(Expense oldExp, Expense newExp) {
-        oldExp.setAmount(newExp.getAmount());
+        oldExp.setAmount(newExp.getAmount().toString());
         oldExp.setCurrency(newExp.getCurrency());
         oldExp.setExpenseAuthor(newExp.getExpenseAuthor());
         oldExp.setPurpose(newExp.getPurpose());

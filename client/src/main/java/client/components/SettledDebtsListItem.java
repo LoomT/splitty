@@ -68,7 +68,8 @@ public class SettledDebtsListItem extends HBox {
             return;
         }
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        formater.setMaximumFractionDigits(2);
+        formater.setMaximumFractionDigits(Currency.getInstance(userConfig.getCurrency())
+                .getDefaultFractionDigits());
         formater.setCurrency(Currency.getInstance(userConfig.getCurrency()));
         String formattedAmount = formater.format(convertedAmount);
         label.setText(String.format(languageConf.get("SettledDebtsListItem.label"),

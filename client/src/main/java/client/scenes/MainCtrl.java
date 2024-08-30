@@ -368,7 +368,7 @@ public class MainCtrl implements MainCtrlInterface{
         addExpenseCtrl.setExpenseAuthor(exp.getExpenseAuthor().getName());
         addExpenseCtrl.setPurpose(exp.getPurpose());
 
-        addExpenseCtrl.setAmount(exp.getAmount(), exp.getDate(), exp.getCurrency());
+        addExpenseCtrl.setAmount(exp.getAmount().doubleValue(), exp.getDate(), exp.getCurrency());
         addExpenseCtrl.setCurrency(exp.getCurrency());
         addExpenseCtrl.setDate(exp.getDate().toInstant().
                 atZone(ZoneId.systemDefault()).toLocalDate());

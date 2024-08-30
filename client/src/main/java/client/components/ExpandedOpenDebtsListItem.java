@@ -4,6 +4,7 @@ import client.MockClass.MainCtrlInterface;
 import client.utils.EmailService;
 import client.utils.LanguageConf;
 import client.utils.currency.CurrencyConverter;
+import commons.Event;
 import commons.Transaction;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +15,6 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import commons.Event;
 
 import java.awt.*;
 import java.io.IOException;
@@ -98,7 +98,8 @@ public class ExpandedOpenDebtsListItem extends HBox {
         }
         String template = languageConf.get("OpenDebtsListItem.template");
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        formatter.setMaximumFractionDigits(2);
+        formatter.setMaximumFractionDigits(Currency.getInstance(transaction.getCurrency())
+                .getDefaultFractionDigits());
         formatter.setCurrency(Currency.getInstance(transaction.getCurrency()));
         String formattedAmount = formatter.format(convertedAmount);
         String text = String.format(template, transaction.getGiver().getName(),
@@ -213,7 +214,8 @@ public class ExpandedOpenDebtsListItem extends HBox {
         }
         
         NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        formatter.setMaximumFractionDigits(2);
+        formatter.setMaximumFractionDigits(Currency.getInstance(transaction.getCurrency())
+                .getDefaultFractionDigits());
         formatter.setCurrency(Currency.getInstance(transaction.getCurrency()));
         String formattedAmount = formatter.format(convertedAmount);
         body = String.format(body, formattedAmount, transaction.getReceiver().getName(),

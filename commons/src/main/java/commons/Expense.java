@@ -3,6 +3,8 @@ package commons;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +36,7 @@ public class Expense implements Cloneable {
     @Column(nullable = false)
     private String purpose;
     @Column(nullable = false)
-    private double amount;
+    private BigDecimal amount;
     @Column(length = 3, nullable = false)
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
@@ -64,7 +66,7 @@ public class Expense implements Cloneable {
                    String currency, List<Participant> expenseParticipants, Tag type) {
         this.expenseAuthor = expenseAuthor;
         this.purpose = purpose;
-        this.amount = amount;
+        this.amount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
         this.date = new Date();
         this.expenseParticipants = expenseParticipants;
@@ -121,7 +123,7 @@ public class Expense implements Cloneable {
      * getter for amount
      * @return the amount
      */
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
@@ -186,7 +188,15 @@ public class Expense implements Cloneable {
      * @param amount cost of the expense in specified currency
      */
     public void setAmount(double amount) {
-        this.amount = amount;
+        this.amount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * setter for amount
+     * @param amount cost of the expense in specified currency
+     */
+    public void setAmount(String amount) {
+        this.amount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
     }
 
     /**
@@ -232,7 +242,7 @@ public class Expense implements Cloneable {
         if (o == null || getClass() != o.getClass()) return false;
         Expense expense = (Expense) o;
         return id == expense.id
-                && Double.compare(amount, expense.amount) == 0
+                && Objects.equals(amount, expense.amount)
                 && Objects.equals(eventID, expense.eventID)
                 && Objects.equals(expenseAuthor, expense.expenseAuthor)
                 && Objects.equals(purpose, expense.purpose)
