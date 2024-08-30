@@ -1,11 +1,7 @@
 package client.scenes;
 
 import client.MockClass.MainCtrlInterface;
-import client.utils.CommonFunctions;
-import client.utils.LanguageConf;
-import client.utils.ServerUtils;
-import client.utils.UserConfig;
-import client.utils.Websocket;
+import client.utils.*;
 import client.utils.currency.CurrencyConverter;
 import com.google.inject.Inject;
 import commons.Event;
@@ -59,8 +55,8 @@ public class StatisticsCtrl {
     private final UserConfig userConfig;
     private boolean opened;
     // this map keeps track of which tags are in the pie chart
-    private final Map<Long, PieChart.Data> map;
-    private final PieChart.Data taglessSlice;
+    private Map<Long, PieChart.Data> map;
+    private PieChart.Data taglessSlice;
 
     /**
      * @param mainCtrl main control instance
@@ -86,8 +82,7 @@ public class StatisticsCtrl {
         this.converter = converter;
         this.userConfig = userConfig;
         opened = false;
-        map = new HashMap<>();
-        taglessSlice = new PieChart.Data("", 0);
+
     }
 
     /**
@@ -127,6 +122,8 @@ public class StatisticsCtrl {
             initPieChart(event);
         });
         pc.setLegendVisible(false);
+        map = new HashMap<>();
+        taglessSlice = new PieChart.Data("", 0);
     }
 
     /**
@@ -183,10 +180,10 @@ public class StatisticsCtrl {
     public double initCost(Event event) {
         double totalCost = 0;
         for (Expense exp : event.getExpenses()) {
-            double amount = exp.getAmount();
+            double amount = exp.getAmount().doubleValue();
             try {
                 if(!userConfig.getCurrency().equals("NONE")) {
-                    amount = converter.convert("USD", userConfig.getCurrency(),
+                    amount = converter.convert("EUR", userConfig.getCurrency(),
                             amount, exp.getDate().toInstant());
                     totalCost += amount;
                 }
@@ -196,21 +193,20 @@ public class StatisticsCtrl {
                 mainCtrl.handleServerNotFound();
             }
         }
-        String preferedCurrency = userConfig.getCurrency();
-        String form = getCurrencySymbol(totalCost, preferedCurrency);
+        String preferredCurrency = userConfig.getCurrency();
+        String form = getCurrencySymbol(totalCost, preferredCurrency);
         cost.setText(languageConf.get("Statistics.totalCost") + form);
         return totalCost;
     }
 
     /**
-     * initialize the piechart
+     * initialize the pie chart
      * @param event the current event
      */
     public void initPieChart(Event event) {
         if(!opened) return;
-        double temp = 0;
         double totalCost = initCost(event);
-        temp = updateTagsPieChart(event, totalCost);
+        updateTagsPieChart(event, totalCost);
         updateNoTagSlice(event, totalCost);
         populateLegend(event);
     }
@@ -220,8 +216,7 @@ public class StatisticsCtrl {
      * @param event the current event
      * @param totalCost the total cost of the event
      */
-    private double updateTagsPieChart(Event event, double totalCost) {
-        double temp = 0;
+    private void updateTagsPieChart(Event event, double totalCost) {
         List<Long> remove = new ArrayList<>();
         for(Map.Entry<Long, PieChart.Data> entry : map.entrySet()) {
             if(event.getTags().stream().noneMatch(t -> t.getId() == entry.getKey())) {
@@ -233,7 +228,6 @@ public class StatisticsCtrl {
         for (Tag tag : event.getTags()) {
             if (tag != null) {
                 double currCost = getAmount(event, tag);
-                temp += currCost;
                 if (currCost > 0) {
                     updateOrAddTagSlice(tag, currCost, totalCost);
                 } else {
@@ -244,7 +238,6 @@ public class StatisticsCtrl {
                 }
             }
         }
-        return temp;
     }
 
     /**
@@ -259,7 +252,6 @@ public class StatisticsCtrl {
         String form = getCurrencySymbol(currCost, preferredCurrency);
         String formattedPercentage = String.format("%.2f", percentage);
         String tagInfo = tag.getName() + "\n" + formattedPercentage + "% (" + form + ")";
-
         if(map.containsKey(tag.getId())) {
             PieChart.Data slice = map.get(tag.getId());
             slice.setName(tagInfo);
@@ -304,9 +296,9 @@ public class StatisticsCtrl {
         double costExpensesNoTag = 0;
         for (Expense expense : event.getExpenses()) {
             if (expense.getType() == null) {
-                double amount = expense.getAmount();
+                double amount = expense.getAmount().doubleValue();
                 try {
-                    amount = converter.convert("USD", userConfig.getCurrency(),
+                    amount = converter.convert("EUR", userConfig.getCurrency(),
                             amount, expense.getDate().toInstant());
                     costExpensesNoTag += amount;
                 } catch (CurrencyConverter.CurrencyConversionException ignored) {
@@ -346,8 +338,8 @@ public class StatisticsCtrl {
      */
     public String configureNoTag(double costExpensesNoTag, double totalCost) {
         double percentage = costExpensesNoTag / totalCost * 100;
-        String preferedCurrency = userConfig.getCurrency();
-        String form = getCurrencySymbol(costExpensesNoTag, preferedCurrency);
+        String preferredCurrency = userConfig.getCurrency();
+        String form = getCurrencySymbol(costExpensesNoTag, preferredCurrency);
         String formattedPercentage = String.format("%.2f", percentage);
         String temp = "";
         temp += "No tag\n";
@@ -365,10 +357,10 @@ public class StatisticsCtrl {
     public double getAmount(Event event, Tag tag) {
         double rez = 0;
         for (Expense exp : event.getExpenses()) {
-            double amount = exp.getAmount();
+            double amount = exp.getAmount().doubleValue();
             try {
                 if(!userConfig.getCurrency().equals("NONE")) {
-                    amount = converter.convert("USD", userConfig.getCurrency(),
+                    amount = converter.convert("EUR", userConfig.getCurrency(),
                             amount, exp.getDate().toInstant());
                 }
 
@@ -432,7 +424,8 @@ public class StatisticsCtrl {
      */
     public String getCurrencySymbol(double amount, String currency) {
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        formater.setMaximumFractionDigits(2);
+        formater.setMaximumFractionDigits(Currency.getInstance(userConfig.getCurrency())
+                .getDefaultFractionDigits());
         formater.setCurrency(Currency.getInstance(currency));
         return formater.format(amount);
     }
