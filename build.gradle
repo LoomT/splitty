@@ -1,4 +1,4 @@
-plugins {
+		plugins {
     id 'org.kordamp.gradle.jacoco' version '0.54.0'
 }
 

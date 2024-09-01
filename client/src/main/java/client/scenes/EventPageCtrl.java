@@ -484,11 +484,11 @@ public class EventPageCtrl {
                 .format(exp.getDate().toInstant()
                         .atZone(TimeZone.getDefault().toZoneId()));
 
-        double amount = exp.getAmount();
+        double amount = exp.getAmount().doubleValue();
         String currency = exp.getCurrency().toUpperCase();
         try {
             if(!userConfig.getCurrency().equals("NONE")) {
-                amount = converter.convert("USD", userConfig.getCurrency(),
+                amount = converter.convert("EUR", userConfig.getCurrency(),
                         amount, exp.getDate().toInstant());
                 currency = userConfig.getCurrency().toUpperCase();
             }
@@ -499,7 +499,8 @@ public class EventPageCtrl {
             return "...";
         }
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        formater.setMaximumFractionDigits(2);
+        formater.setMaximumFractionDigits(Currency.getInstance(userConfig.getCurrency())
+                .getDefaultFractionDigits());
         formater.setCurrency(Currency.getInstance(currency));
         String formattedAmount = formater.format(amount);
 

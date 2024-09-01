@@ -108,7 +108,7 @@ class AddCustomTransactionCtrlTest {
             ctrl.display(event, stage);
             robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
-            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("USD"));
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("EUR"));
             robot.lookup("#amountField").queryAs(TextField.class).setText("1");
             robot.lookup("#save").queryButton().fire();
         });
@@ -117,7 +117,7 @@ class AddCustomTransactionCtrlTest {
         assertFalse(event.getTransactions().isEmpty());
         Transaction saved = event.getTransactions().getFirst();
         Transaction expected = new Transaction(event.getParticipants().getFirst(),
-                event.getParticipants().get(1), 1, "USD", saved.getDate());
+                event.getParticipants().get(1), 1, "EUR", saved.getDate());
         expected.setEventID(event.getId());
         assertNotEquals(0, saved.getId());
         saved.setId(0);
@@ -132,15 +132,15 @@ class AddCustomTransactionCtrlTest {
             ctrl.display(event, stage);
             robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
-            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("EUR"));
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("USD"));
             robot.lookup("#amountField").queryAs(TextField.class).setText("1");
             robot.lookup("#save").queryButton().fire();
         });
         waitForFxEvents();
         assertTrue(server.getCalls().contains("addTransaction"));
         Transaction saved = event.getTransactions().getFirst();
-        double expected = converter.convert("EUR", "USD",  1, saved.getDate().toInstant());
-        assertEquals(expected, saved.getAmount());
+        double expected = converter.convert("USD", "EUR",  1, saved.getDate().toInstant());
+        assertEquals(expected, saved.getAmount().doubleValue(), 0.0001);
     }
 
     @Test
@@ -242,7 +242,7 @@ class AddCustomTransactionCtrlTest {
             ctrl.display(event, stage);
             robot.lookup("#chooseGiver").queryAs(ChoiceBox.class).getSelectionModel().select(0);
             robot.lookup("#chooseReceiver").queryAs(ChoiceBox.class).getSelectionModel().select(1);
-            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("USD"));
+            robot.lookup("#chooseCurrency").queryAs(ComboBox.class).setValue(new CommonFunctions.HideableItem<>("EUR"));
             robot.lookup("#amountField").queryAs(TextField.class).setText("AB");
             robot.lookup("#amountField").queryAs(TextField.class).setText("1");
             ctrl.saveClicked();
@@ -250,7 +250,7 @@ class AddCustomTransactionCtrlTest {
         waitForFxEvents();
         assertTrue(server.getCalls().contains("addTransaction"));
         assertFalse(event.getTransactions().isEmpty());
-        assertEquals(1, event.getTransactions().getFirst().getAmount());
+        assertEquals("1.00", event.getTransactions().getFirst().getAmount().toString());
     }
 
     @Test

@@ -66,6 +66,8 @@ public class CurrencyConverter {
                     alert.showAndWait();
                     throw new CurrencyConversionException("Server error: " + rates.get("status"));
                 }
+                double eur = rates.get("EUR");
+                rates.replaceAll((cur,rate) -> rate/eur); // convert USD based rates to EUR based
                 fileManager.add(rates, date); // cache the rates
             }
             return amount * (rates.get(to.toUpperCase()) / rates.get(from.toUpperCase()));
@@ -80,8 +82,6 @@ public class CurrencyConverter {
             throw new CurrencyConversionException("IO error");
         }
     }
-
-
 
     /**
      * @return get a set of

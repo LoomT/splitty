@@ -60,8 +60,8 @@ public class ShrunkOpenDebtsListItem extends HBox {
         }
         double convertedAmount;
         try {
-            convertedAmount = converter.convert("USD", transaction.getCurrency(),
-                    transaction.getAmount(), transaction.getDate().toInstant());
+            convertedAmount = converter.convert("EUR", transaction.getCurrency(),
+                    transaction.getAmount().doubleValue(), transaction.getDate().toInstant());
         } catch (CurrencyConverter.CurrencyConversionException e) {
             return;
         } catch (ConnectException e) {
@@ -70,8 +70,12 @@ public class ShrunkOpenDebtsListItem extends HBox {
         }
         String template = languageConf.get("OpenDebtsListItem.template");
         NumberFormat formater = NumberFormat.getCurrencyInstance(Locale.getDefault());
-        formater.setMaximumFractionDigits(2);
+
+        System.out.println(Currency.getInstance(transaction.getCurrency())
+                .getDefaultFractionDigits());
         formater.setCurrency(Currency.getInstance(transaction.getCurrency()));
+        formater.setMaximumFractionDigits(Currency.getInstance(transaction.getCurrency())
+                .getDefaultFractionDigits());
         String formattedAmount = formater.format(convertedAmount);
         String text = String.format(template, transaction.getGiver().getName(),
                 transaction.getReceiver().getName(), formattedAmount);

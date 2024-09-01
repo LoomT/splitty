@@ -167,7 +167,7 @@ public class UserConfig {
      * @return currently set preferred currency
      */
     public String getCurrency() {
-        return configProperties.getProperty("currency", "USD");
+        return configProperties.getProperty("currency", "EUR");
     }
 
     /**

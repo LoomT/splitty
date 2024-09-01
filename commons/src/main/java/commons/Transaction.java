@@ -3,6 +3,8 @@ package commons;
 import jakarta.persistence.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.Objects;
 
@@ -19,7 +21,7 @@ public class Transaction implements Cloneable, Comparable<Transaction> {
     private Participant giver;
     @ManyToOne
     private Participant receiver;
-    private double amount;
+    private BigDecimal amount;
     private String currency;
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
@@ -41,7 +43,7 @@ public class Transaction implements Cloneable, Comparable<Transaction> {
         this();
         this.giver = giver;
         this.receiver = receiver;
-        this.amount = amount;
+        this.amount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
     }
 
@@ -56,7 +58,7 @@ public class Transaction implements Cloneable, Comparable<Transaction> {
                        double amount, String currency, Date date) {
         this.giver = giver;
         this.receiver = receiver;
-        this.amount = amount;
+        this.amount = new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
         this.currency = currency;
         this.date = date;
     }
@@ -127,7 +129,7 @@ public class Transaction implements Cloneable, Comparable<Transaction> {
     /**
      * @return amount in default currency
      */
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
@@ -147,7 +149,7 @@ public class Transaction implements Cloneable, Comparable<Transaction> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Transaction that = (Transaction) o;
-        return id == that.id && Double.compare(amount, that.amount) == 0
+        return id == that.id && Objects.equals(amount, that.amount)
                 && Objects.equals(eventID, that.eventID)
                 && Objects.equals(giver, that.giver)
                 && Objects.equals(receiver, that.receiver)

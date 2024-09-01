@@ -145,7 +145,7 @@ public class AddCustomTransactionCtrl {
         double amount = number.doubleValue();
         double convertedAmount;
         try {
-            convertedAmount = converter.convert(chooseCurrency.getValue().toString(), "USD",
+            convertedAmount = converter.convert(chooseCurrency.getValue().toString(), "EUR",
                     amount, Instant.now());
         } catch (CurrencyConverter.CurrencyConversionException e) {
             return;
