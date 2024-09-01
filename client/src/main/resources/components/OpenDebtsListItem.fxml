@@ -23,6 +23,6 @@
       <Cursor fx:constant="HAND" />
    </cursor>
    <stylesheets>
-      <URL value="@/client/scenes/global.css" />
+      <URL value="@/scenes/global.css" />
    </stylesheets>
 </fx:root>

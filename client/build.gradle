@@ -1,33 +1,43 @@
 plugins {
     id 'application'
-    id("org.openjfx.javafxplugin") version "0.0.11"
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 application {
     mainClass = 'client.Main'
 }
 
+distributions {
+	main {
+		contents {
+			from('src/main/resources/') {
+				into 'bin'
+			}
+		}
+	}
+}
+
 javafx {
     version = "21.0.2"
     modules = [ 'javafx.controls', 'javafx.fxml' ]
+	sdk = "C:\\Program Files\\Java\\javafx-sdk-21.0.2"
 }
 
 java {
 	sourceCompatibility = '21'
 }
 
-
 dependencies {
 	implementation project(":commons")
-	
+
 	implementation group: 'org.glassfish.jersey.core', name: 'jersey-client', version: '3.1.5'
 	implementation group: 'org.glassfish.jersey.inject', name: 'jersey-hk2', version: '3.1.5'
 	implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson', version: '3.1.5'
 	implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.1'
 	implementation 'com.google.inject:guice:7.0.0'
 
-	implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.3'
-	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.2.3'
+	implementation 'org.springframework.boot:spring-boot-starter-mail:3.3.3'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.3.3'
 
 	implementation 'org.openjfx:javafx-controls:17.0.2'
 	implementation 'org.openjfx:javafx-fxml:17.0.2'
@@ -38,4 +48,14 @@ dependencies {
 	testImplementation "org.testfx:testfx-junit5:4.0.18"
 	testImplementation 'org.testfx:openjfx-monocle:21.0.2'
 	testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
+}
+
+// insert jvm arguments into the script since the attribute does not work
+startScripts{
+	doLast{
+		String bashContent = windowsScript.text
+		windowsScript.text = bashContent.replaceFirst('set DEFAULT_JVM_OPTS=', "set DEFAULT_JVM_OPTS=--module-path=\"./javafx-sdk-21.0.2/lib\" --add-modules=javafx.controls,javafx.fxml")
+		String unixContent = unixScript.text
+		unixScript.text = unixContent.replaceFirst('DEFAULT_JVM_OPTS=\"\"', "DEFAULT_JVM_OPTS=\"--module-path=\"./javafx-sdk-21.0.2/lib\" --add-modules=javafx.controls,javafx.fxml\"")
+	}
 }

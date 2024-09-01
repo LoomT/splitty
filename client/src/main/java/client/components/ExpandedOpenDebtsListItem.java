@@ -71,7 +71,7 @@ public class ExpandedOpenDebtsListItem extends HBox {
         this.mainCtrl = mainCtrl;
         this.event = event;
         FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource("/client/components/ExpandedOpenDebtsListItem.fxml")
+                getClass().getResource("/components/ExpandedOpenDebtsListItem.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

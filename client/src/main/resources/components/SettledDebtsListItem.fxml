@@ -19,6 +19,6 @@
       <Insets bottom="7.0" left="10.0" right="20.0" top="7.0" />
    </padding>
    <stylesheets>
-      <URL value="@/client/scenes/global.css" />
+      <URL value="@/scenes/global.css" />
    </stylesheets>
 </fx:root>

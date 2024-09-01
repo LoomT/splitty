@@ -44,7 +44,7 @@ public class ShrunkOpenDebtsListItem extends HBox {
         this.callBackExpand = callBackExpand;
         this.callBackSettle = callBackSettle;
         FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource("/client/components/OpenDebtsListItem.fxml")
+                getClass().getResource("/components/OpenDebtsListItem.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

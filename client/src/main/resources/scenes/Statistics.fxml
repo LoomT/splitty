@@ -53,6 +53,6 @@
         <Button fx:id="back" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" styleClass="sbutton" text="%Statistics.back" />
     </children>
     <stylesheets>
-        <URL value="@/client/scenes/global.css" />
+        <URL value="@/scenes/global.css" />
     </stylesheets>
 </AnchorPane>

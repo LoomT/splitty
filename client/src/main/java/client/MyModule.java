@@ -52,7 +52,7 @@ public class MyModule implements Module {
         binder.bind(ServerUtils.class).to(ServerUtilsImpl.class).in(Scopes.SINGLETON);
         binder.bind(LanguageConf.class).in(Scopes.SINGLETON);
         binder.bind(IOInterface.class).toInstance(new FileIO(UserConfig.class.getClassLoader()
-                .getResource("client/config.properties")));
+                .getResourceAsStream("config.properties")));
         binder.bind(Websocket.class).to(WebsocketImpl.class).in(Scopes.SINGLETON);
         binder.bind(FileManager.class).to(FileManagerImpl.class).in(Scopes.SINGLETON);
         binder.bind(CurrencyConverter.class).in(Scopes.SINGLETON);
