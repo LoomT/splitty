@@ -20,6 +20,6 @@
     <Button fx:id="backButton" layoutX="15.0" layoutY="80.0" mnemonicParsing="false" onAction="#backButtonClicked" styleClass="sbutton" text="%AdminLogin.backBtn" />
    <Label fx:id="warningLabel" layoutX="198.0" layoutY="244.0" styleClass="errorText" text="%AdminLogin.incorrectPassword" textFill="RED" />
     <stylesheets>
-        <URL value="@/client/scenes/global.css" />
+        <URL value="@/scenes/global.css" />
     </stylesheets>
 </AnchorPane>

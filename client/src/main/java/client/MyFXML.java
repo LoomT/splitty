@@ -23,7 +23,9 @@ import javafx.util.BuilderFactory;
 import javafx.util.Callback;
 import javafx.util.Pair;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -76,7 +78,16 @@ public class MyFXML {
      */
     private URL getLocation(String... parts) {
         var path = Path.of("", parts).toString();
-        return MyFXML.class.getClassLoader().getResource(path);
+        URL url = MyFXML.class.getClassLoader().getResource(path);
+        if(url != null)
+            return url;
+        URL url2;
+        try {
+            url2 = new File(path).toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Can't find the FXML file: " + path, e);
+        }
+        return url2;
     }
 
     /**

@@ -43,7 +43,7 @@ public class SettledDebtsListItem extends HBox {
         this.callBackCancel = callBackCancel;
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass()
-                        .getResource("/client/components/SettledDebtsListItem.fxml")
+                        .getResource("/components/SettledDebtsListItem.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

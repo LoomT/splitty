@@ -33,7 +33,7 @@ public class EventListItemAdmin extends HBox {
                               Runnable onDownload, Runnable onClick) {
         FXMLLoader fxmlLoader = new FXMLLoader(
             getClass()
-                .getResource("/client/components/EventListItemAdmin.fxml")
+                .getResource("/components/EventListItemAdmin.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

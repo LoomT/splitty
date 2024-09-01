@@ -72,47 +72,47 @@ public class Main extends Application {
         boolean isHighContrast = userConfig.getHighContrast();
         var start = FXML.load(StartScreenCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "StartScreen.fxml"
+                "scenes", "StartScreen.fxml"
         );
         var adminLogin = FXML.load(AdminLoginCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "AdminLogin.fxml");
+                "scenes", "AdminLogin.fxml");
         var eventPage = FXML.load(EventPageCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "EventPage.fxml");
+                "scenes", "EventPage.fxml");
         var editParticipants = FXML.load(EditParticipantsCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "EditParticipants.fxml");
+                "scenes", "EditParticipants.fxml");
         var adminOverview = FXML.load(AdminOverviewCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "AdminOverview.fxml");
+                "scenes", "AdminOverview.fxml");
         var addExpense = FXML.load(AddExpenseCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "AddExpense.fxml");
+                "scenes", "AddExpense.fxml");
         var titleChanger = FXML.load(EditTitleCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "EditTitle.fxml");
+                "scenes", "EditTitle.fxml");
         var addTag = FXML.load(AddTagCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "AddTag.fxml");
+                "scenes", "AddTag.fxml");
         var options = FXML.load(OptionsCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "Options.fxml");
+                "scenes", "Options.fxml");
         var statistics = FXML.load(StatisticsCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "Statistics.fxml");
+                "scenes", "Statistics.fxml");
         var addCustomTransaction = FXML.load(AddCustomTransactionCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "AddCustomTransaction.fxml");
+                "scenes", "AddCustomTransaction.fxml");
         var openDebtsPage = FXML.load(OpenDebtsPageCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "OpenDebtsPage.fxml");
+                "scenes", "OpenDebtsPage.fxml");
         var inviteMailPage = FXML.load(InviteMailCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "InviteMail.fxml");
+                "scenes", "InviteMail.fxml");
         var tagPage = FXML.load(TagPageCtrl.class,
                 languageConf.getLanguageResources(), isHighContrast,
-                "client", "scenes", "TagPage.fxml");
+                "scenes", "TagPage.fxml");
         var mainCtrl = INJECTOR.getInstance(MainCtrlInterface.class);
         primaryStage.setResizable(false);
         primaryStage.getIcons().add(new Image("flags/logo.png"));

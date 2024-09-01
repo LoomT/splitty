@@ -42,7 +42,7 @@ public class ExpenseItem extends HBox {
     ) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass()
-                        .getResource("/client/components/ExpenseItem.fxml")
+                        .getResource("/components/ExpenseItem.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

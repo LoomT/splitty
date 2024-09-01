@@ -39,7 +39,7 @@ public class EventListItem extends HBox {
     public EventListItem(String eventName, String id, Runnable onRemove, Consumer<String> onClick) {
         FXMLLoader fxmlLoader = new FXMLLoader(
                 getClass()
-                        .getResource("/client/components/EventListItem.fxml")
+                        .getResource("/components/EventListItem.fxml")
         );
         fxmlLoader.setRoot(this);
         fxmlLoader.setController(this);

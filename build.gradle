@@ -15,8 +15,8 @@ subprojects {
 	
 	
 	group = 'oopp'
-	version = '0.0.1-SNAPSHOT'
-	sourceCompatibility = '11'
+	version = '1.0.0'
+	sourceCompatibility = '21'
 	checkstyle {
 		toolVersion "9.2.1"
 

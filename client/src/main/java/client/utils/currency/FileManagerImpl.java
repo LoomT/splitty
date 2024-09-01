@@ -5,14 +5,10 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.scene.control.Alert;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import java.io.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class FileManagerImpl implements FileManager{
     private final File rateDir;
@@ -23,12 +19,26 @@ public class FileManagerImpl implements FileManager{
      */
     public FileManagerImpl() {
         try {
-            URL path = FileManager.class.getClassLoader()
-                    .getResource("client/rates/currencies.txt");
-            if(path == null) {
-                throw new FileNotFoundException("Resource not found: client/rates/currencies.txt");
+            currencies = new File("rates", "currencies.txt");
+            currencies.getParentFile().mkdir();
+            if(currencies.createNewFile()) {
+                StringBuilder result = new StringBuilder();
+                InputStream currs = FileManager.class.getClassLoader()
+                        .getResourceAsStream("rates/currencies.txt");
+                if(currs == null) {
+                    throw new FileNotFoundException("Resource not found: " +
+                            "rates/currencies.txt");
+                }
+                try (Scanner scanner = new Scanner(currs)) {
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        result.append(line).append("\n");
+                    }
+                }
+                BufferedWriter writer = new BufferedWriter(new FileWriter(currencies));
+                writer.write(result.toString());
+                writer.close();
             }
-            currencies = new File(URLDecoder.decode(path.getFile(), StandardCharsets.UTF_8));
             rateDir = new File(currencies.getParentFile().toString());
             if(!currencies.exists() || !rateDir.exists()) {
                 throw new FileNotFoundException("Resource not found: client/rates");
