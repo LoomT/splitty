@@ -137,8 +137,16 @@ public class StartScreenCtrl {
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
             } catch (Exception e) {
-                mainCtrl.handleServerNotFound();
-                break;
+                if(e instanceof IllegalArgumentException) {
+                    System.out.println(e.getMessage());
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            "Critical error!");
+                    alert.setHeaderText("Unexpected error");
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                    alert.showAndWait();
+                    break;
+                }
             }
         }
     }
