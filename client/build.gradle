@@ -13,6 +13,9 @@ distributions {
 			from('src/main/resources/') {
 				into 'bin'
 			}
+			from('src/include/') {
+				into 'bin'
+			}
 		}
 	}
 }
