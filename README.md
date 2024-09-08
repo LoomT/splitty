@@ -6,7 +6,6 @@ A 9 week university course project made using Spring Boot and JavaFX by a team o
 
 ## Releases
 The app can be found in the Releases tab for all platforms with JavaFX included.
-For zipped version of the app, after unzipping the `/bin/client` file should be given executable rights. For example on MacOS `chmod +x "/Applications/Splitty.app/Contents/MacOS/bin/client"` should be typed in the terminal.
 
 ## From an IDE
 While the project can be run out-of-the-box with Gradle, running it from within your IDE (Eclipse/IntelliJ) requires setting up OpenJFX.
