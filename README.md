@@ -4,6 +4,11 @@ A 9 week university course project made using Spring Boot and JavaFX by a team o
 
 # Instructions
 
+## Releases
+The app can be found in the Releases tab for all platforms with JavaFX included.
+For zipped version of the app, after unzipping the `/bin/client` file should be given executable rights. For example on MacOS `chmod +x "/Applications/Splitty.app/Contents/MacOS/bin/client"` should be typed in the terminal.
+
+## From an IDE
 While the project can be run out-of-the-box with Gradle, running it from within your IDE (Eclipse/IntelliJ) requires setting up OpenJFX.
 
 First download (and unzip) an OpenJFX SDK from https://openjfx.io that matches your Java JDK, then add the following *VM* commands to your run configurations:
@@ -13,7 +18,7 @@ First download (and unzip) an OpenJFX SDK from https://openjfx.io that matches y
 Tip: Make sure you adapt the path to the lib(!) directory (not just the directory that you unzipped).
 Tip: Double check that the path is correct. You will receive abstract error messages otherwise.
 
-# To run the project without an IDE or downloading the JavaFX:
+## To run the project without an IDE or downloading the JavaFX:
 - Open a terminal in the root directory of the project
 - For the first time, type: `./gradlew build`
 - To start the server, type: `./gradlew bootRun`
