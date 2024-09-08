@@ -17,6 +17,7 @@ distributions {
 				into 'bin/scenes'
 			}
 		}
+
 	}
 	windows {
 		distributionBaseName = 'splitty'
@@ -46,7 +47,12 @@ tasks.register('mac_x64Zip', Zip) {
 	archiveClassifier = 'mac-x64'
 	from("build/install/client") {
 		into 'Splitty.app/Contents/MacOS'
-		exclude '**/*.bat'
+		exclude '**/client.bat'
+		exclude '**/client'
+	}
+	from("build/install/client/bin/client") {
+		into 'Splitty.app/Contents/MacOS/bin'
+		filePermissions {unix("rwxrwxrwx")}
 	}
 	from("src/include/mac") {
 		into "Splitty.app/Contents"
@@ -64,7 +70,12 @@ tasks.register('mac_aarch64Zip', Zip) {
 	archiveClassifier = 'mac-aarch64'
 	from("build/install/client") {
 		into 'Splitty.app/Contents/MacOS'
-		exclude '**/*.bat'
+		exclude '**/client.bat'
+		exclude '**/client'
+	}
+	from("build/install/client/bin/client") {
+		into 'Splitty.app/Contents/MacOS/bin'
+		filePermissions {unix("rwxrwxrwx")}
 	}
 	from("src/include/mac") {
 		into "Splitty.app/Contents"
@@ -82,7 +93,12 @@ tasks.register('linuxZip', Zip) {
 	archiveClassifier = 'linux'
 	from("build/install/client") {
 		into 'splitty'
-		exclude '**/*.bat'
+		exclude '**/client.bat'
+		exclude '**/client'
+	}
+	from("build/install/client/bin/client") {
+		into 'splitty/bin'
+		filePermissions {unix("rwxrwxrwx")}
 	}
 	from('src/include/linux') {
 		into 'splitty/bin'
