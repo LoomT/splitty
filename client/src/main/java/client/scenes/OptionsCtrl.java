@@ -127,7 +127,10 @@ public class OptionsCtrl {
     public void display(Stage stage) {
         this.stage = stage;
         stage.getScene().getWindow()
-                .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> cancelClicked());
+                .addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, e -> {
+                    e.consume();
+                    cancelClicked();
+                });
         lastContrast = userConfig.getHighContrast();
         updateEmailFields();
     }

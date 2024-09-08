@@ -97,6 +97,10 @@ public class StartScreenCtrl {
      * Reloads the event codes from the user config and updates the event list
      */
     public void reloadEventCodes() {
+        if(!server.ping(userConfig.getUrl())) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
 
@@ -137,8 +141,16 @@ public class StartScreenCtrl {
                 list.add(eventListItem);
                 eventList.getChildren().add(eventListItem);
             } catch (Exception e) {
-                mainCtrl.handleServerNotFound();
-                break;
+                if(e instanceof IllegalArgumentException) {
+                    System.out.println(e.getMessage());
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR,
+                            "Critical error!");
+                    alert.setHeaderText("Unexpected error");
+                    java.awt.Toolkit.getDefaultToolkit().beep();
+                    alert.showAndWait();
+                    break;
+                }
             }
         }
     }

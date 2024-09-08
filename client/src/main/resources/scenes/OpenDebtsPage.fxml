@@ -48,6 +48,6 @@
       </VBox>
    </children>
    <stylesheets>
-      <URL value="@/client/scenes/global.css" />
+      <URL value="@/scenes/global.css" />
    </stylesheets>
 </AnchorPane>
