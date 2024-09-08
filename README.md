@@ -2,6 +2,8 @@
 
 A 9 week university course project made using Spring Boot and JavaFX by a team of 6 students. The basic idea of this client/server app is to split bills in an organized fashion. An event can be created with participants and expenses to reflect a real event where the minimal debts will be calculated automatically.
 
+### This app requires Java 21 or higher!
+
 # Instructions
 
 ## Releases
