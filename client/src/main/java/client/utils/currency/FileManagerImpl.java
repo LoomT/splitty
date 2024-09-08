@@ -1,47 +1,57 @@
 package client.utils.currency;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.scene.control.Alert;
+import net.harawata.appdirs.AppDirs;
+import net.harawata.appdirs.AppDirsFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class FileManagerImpl implements FileManager{
     private final File rateDir;
-    private final File currencies;
+    private final List<String> currencies;
 
     /**
      * Constructs a file manager for exchange rates
      */
     public FileManagerImpl() {
+        ObjectReader reader = new ObjectMapper().reader().forType(List.class);
+        InputStream currencyStream = FileManager.class.getClassLoader()
+                .getResourceAsStream("rates/currencies.txt");
+        if(currencyStream == null) {
+            throw new RuntimeException("Resource not found: " +
+                    "rates/currencies.txt");
+        }
         try {
-            currencies = new File("rates", "currencies.txt");
-            currencies.getParentFile().mkdir();
-            if(currencies.createNewFile()) {
-                StringBuilder result = new StringBuilder();
-                InputStream currs = FileManager.class.getClassLoader()
-                        .getResourceAsStream("rates/currencies.txt");
-                if(currs == null) {
-                    throw new FileNotFoundException("Resource not found: " +
-                            "rates/currencies.txt");
-                }
-                try (Scanner scanner = new Scanner(currs)) {
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        result.append(line).append("\n");
-                    }
-                }
-                BufferedWriter writer = new BufferedWriter(new FileWriter(currencies));
-                writer.write(result.toString());
-                writer.close();
-            }
-            rateDir = new File(currencies.getParentFile().toString());
-            if(!currencies.exists() || !rateDir.exists()) {
-                throw new FileNotFoundException("Resource not found: client/rates");
+            currencies = reader.readValue(currencyStream);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR,
+                    "Failed to read currencies.txt.\n" +
+                            "If the error persists, try reinstalling the app");
+            alert.setHeaderText("Unexpected error");
+            java.awt.Toolkit.getDefaultToolkit().beep();
+            alert.showAndWait();
+            throw new RuntimeException("Failed to read currencies.txt");
+        }
+
+        try {
+            AppDirs appDirs = AppDirsFactory.getInstance();
+            String appData = appDirs.getUserDataDir("Splitty", null, null)
+                    + File.separator + "rates";
+            rateDir = new File(appData);
+            rateDir.mkdirs();
+            if(!rateDir.exists()) {
+                System.out.println("Cannot write to user data directory");
+                throw new RuntimeException("Cannot write to user data directory");
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
@@ -87,17 +97,6 @@ public class FileManagerImpl implements FileManager{
      */
     @Override
     public List<String> getAvailableCurrencies() {
-        ObjectReader reader = new ObjectMapper().reader().forType(List.class);
-        try {
-            return reader.readValue(currencies);
-        } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR,
-                    "Failed to read currencies.txt.\n" +
-                            "If the error persists, try reinstalling the app");
-            alert.setHeaderText("Unexpected error");
-            java.awt.Toolkit.getDefaultToolkit().beep();
-            alert.showAndWait();
-            throw new RuntimeException("Failed to read currencies.txt");
-        }
+        return currencies;
     }
 }

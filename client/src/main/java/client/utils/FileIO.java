@@ -1,6 +1,8 @@
 package client.utils;
 
 import javafx.scene.control.Alert;
+import net.harawata.appdirs.AppDirs;
+import net.harawata.appdirs.AppDirsFactory;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -23,7 +25,16 @@ public class FileIO implements IOInterface{
         }
 //        file = new File(URLDecoder.decode(url, StandardCharsets.UTF_8));
         try {
-            file = new File("config.properties");
+            AppDirs appDirs = AppDirsFactory.getInstance();
+            String appData = appDirs.getUserDataDir("Splitty", null, null);
+            File dir = new File(appData);
+            System.out.println(dir.getPath());
+            dir.mkdirs();
+            if(!dir.exists()) {
+                System.out.println("Cannot write to user data directory");
+                throw new RuntimeException("Cannot write to user data directory");
+            }
+            file = new File(appData, "config.properties");
             if(file.createNewFile()) {
                 StringBuilder result = new StringBuilder();
                 try (Scanner scanner = new Scanner(url)) {
@@ -39,7 +50,7 @@ public class FileIO implements IOInterface{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if(file == null || !file.exists()) {
+        if(!file.exists()) {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     "Config file not found.\nIf the error persists, try reinstalling the app");
             alert.setHeaderText("Unexpected error");
