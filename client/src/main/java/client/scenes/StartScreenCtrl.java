@@ -97,6 +97,10 @@ public class StartScreenCtrl {
      * Reloads the event codes from the user config and updates the event list
      */
     public void reloadEventCodes() {
+        if(!server.ping(userConfig.getUrl())) {
+            mainCtrl.handleServerNotFound();
+            return;
+        }
         List<String> recentEventCodes = userConfig.getRecentEventCodes();
         List<EventListItem> list = new ArrayList<>();
 
