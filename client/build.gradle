@@ -10,14 +10,84 @@ application {
 distributions {
 	main {
 		contents {
-			from('src/main/resources/') {
-				into 'bin'
+			from('src/main/resources/components/') {
+				into 'bin/components'
 			}
-			from('src/include/') {
-				into 'bin'
+			from('src/main/resources/scenes/') {
+				into 'bin/scenes'
 			}
 		}
 	}
+	windows {
+		distributionBaseName = 'splitty'
+		distributionClassifier = 'win'
+		contents {
+			from('build/install/client/bin') {
+				into('bin')
+				exclude('client')
+			}
+			from('build/install/client/lib') {
+				into('lib')
+			}
+			from('src/include/win') {
+				into 'bin'
+			}
+			from('src/main/resources/flags/logo.ico') {
+				into ''
+			}
+		}
+	}
+}
+
+tasks.register('mac_x64Zip', Zip) {
+	dependsOn installDist
+	setGroup("distribution")
+	archiveBaseName = 'splitty'
+	archiveClassifier = 'mac-x64'
+	from("build/install/client") {
+		into 'Splitty.app/Contents/MacOS'
+		exclude '**/*.bat'
+	}
+	from("src/include/mac") {
+		into "Splitty.app/Contents"
+	}
+	from('src/include/mac_x64') {
+		into 'Splitty.app/Contents/MacOS/bin'
+	}
+	destinationDirectory = layout.buildDirectory.dir("distributions")
+}
+
+tasks.register('mac_aarch64Zip', Zip) {
+	dependsOn installDist
+	setGroup("distribution")
+	archiveBaseName = 'splitty'
+	archiveClassifier = 'mac-aarch64'
+	from("build/install/client") {
+		into 'Splitty.app/Contents/MacOS'
+		exclude '**/*.bat'
+	}
+	from("src/include/mac") {
+		into "Splitty.app/Contents"
+	}
+	from('src/include/mac_aarch64') {
+		into 'Splitty.app/Contents/MacOS/bin'
+	}
+	destinationDirectory = layout.buildDirectory.dir("distributions")
+}
+
+tasks.register('linuxZip', Zip) {
+	dependsOn installDist
+	setGroup("distribution")
+	archiveBaseName = 'splitty'
+	archiveClassifier = 'linux'
+	from("build/install/client") {
+		into 'splitty'
+		exclude '**/*.bat'
+	}
+	from('src/include/linux') {
+		into 'splitty/bin'
+	}
+	destinationDirectory = layout.buildDirectory.dir("distributions")
 }
 
 javafx {
@@ -42,10 +112,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.3.3'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.3.3'
 
-	implementation 'org.openjfx:javafx-controls:17.0.2'
-	implementation 'org.openjfx:javafx-fxml:17.0.2'
-
 	implementation 'org.jetbrains:annotations:24.1.0'
+	implementation 'net.harawata:appdirs:1.2.2'
 
 	testImplementation "org.testfx:testfx-core:4.0.18"
 	testImplementation "org.testfx:testfx-junit5:4.0.18"
@@ -59,6 +127,6 @@ startScripts{
 		String bashContent = windowsScript.text
 		windowsScript.text = bashContent.replaceFirst('set DEFAULT_JVM_OPTS=', "set DEFAULT_JVM_OPTS=--module-path=\"./javafx-sdk-21.0.2/lib\" --add-modules=javafx.controls,javafx.fxml")
 		String unixContent = unixScript.text
-		unixScript.text = unixContent.replaceFirst('DEFAULT_JVM_OPTS=\"\"', "DEFAULT_JVM_OPTS=\"--module-path=\"./javafx-sdk-21.0.2/lib\" --add-modules=javafx.controls,javafx.fxml\"")
+		unixScript.text = unixContent.replaceFirst('DEFAULT_JVM_OPTS=\"\"', "DEFAULT_JVM_OPTS=\"--module-path=\"\\\$APP_HOME/bin/javafx-sdk-21.0.4/lib\" --add-modules=javafx.controls,javafx.fxml\"")
 	}
 }
