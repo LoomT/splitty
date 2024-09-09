@@ -175,7 +175,7 @@ public class TagPageCtrl {
         TextInputDialog dialog = new TextInputDialog(tag.getName());
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.setGraphic(null);
-        dialogPane.getStylesheets().add(getClass().getResource("global.css").toExternalForm());
+        dialogPane.getStylesheets().add("scenes/global.css");
         dialogPane.getStyleClass().add("backgroundAnchorpane");
         dialog.getEditor().getStyleClass().add("ntextfield");
         dialog.setTitle("Edit Tag Name");
