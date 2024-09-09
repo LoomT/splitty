@@ -59,7 +59,6 @@ public class TagPageCtrl {
      * @param server       server to be ysed
      */
     @Inject
-
     public TagPageCtrl(MainCtrlInterface mainCtrl, LanguageConf languageConf,
                          Websocket websocket, ServerUtils server) {
         this.mainCtrl = mainCtrl;
@@ -72,7 +71,6 @@ public class TagPageCtrl {
      * initialize method
      */
     public void initialize() {
-
         back.setOnAction(e -> mainCtrl.showStatisticsPage(event));
         websocket.on(REMOVE_TAG, t -> populateTagList(event));
         websocket.on(UPDATE_TAG, t -> populateTagList(event));
@@ -196,7 +194,6 @@ public class TagPageCtrl {
                 server.updateTag(tag.getId(), event.getId(), tag);
             } catch (ConnectException ex) {
                 mainCtrl.handleServerNotFound();
-                return;
             }
         });
     }
